@@ -1,0 +1,527 @@
+EESchema Schematic File Version 2  date Tue 09 Aug 2011 11:00:35 PM CEST
+LIBS:power
+LIBS:device
+LIBS:transistors
+LIBS:conn
+LIBS:linear
+LIBS:regul
+LIBS:74xx
+LIBS:cmos4000
+LIBS:adc-dac
+LIBS:memory
+LIBS:xilinx
+LIBS:special
+LIBS:microcontrollers
+LIBS:dsp
+LIBS:microchip
+LIBS:analog_switches
+LIBS:motorola
+LIBS:texas
+LIBS:intel
+LIBS:audio
+LIBS:interface
+LIBS:digital-audio
+LIBS:philips
+LIBS:display
+LIBS:cypress
+LIBS:siliconi
+LIBS:opto
+LIBS:atmel
+LIBS:contrib
+LIBS:valves
+LIBS:nuc120ld
+LIBS:nuc120ldq48
+LIBS:nucproto-cache
+EELAYER 25  0
+EELAYER END
+$Descr A4 11700 8267
+encoding utf-8
+Sheet 1 1
+Title ""
+Date "9 aug 2011"
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+Text Label 2650 1050 2    40   ~ 0
+D-
+Text Label 2650 1150 2    40   ~ 0
+D+
+Wire Wire Line
+	4350 4500 4350 4600
+Wire Wire Line
+	4350 3950 4350 4100
+Wire Wire Line
+	4850 3300 4850 3450
+Connection ~ 4850 2800
+Wire Wire Line
+	4650 2800 5350 2800
+Wire Notes Line
+	1950 5350 1950 3800
+Wire Notes Line
+	1950 5350 3000 5350
+Wire Notes Line
+	3000 5350 3000 3800
+Wire Notes Line
+	3000 3800 1950 3800
+Wire Wire Line
+	2400 3400 2750 3400
+Wire Wire Line
+	2750 3400 2750 4450
+Wire Wire Line
+	2450 5050 2450 4950
+Wire Wire Line
+	2150 4850 2150 4950
+Wire Wire Line
+	1550 4450 1550 3800
+Wire Wire Line
+	950  3400 1150 3400
+Connection ~ 950  4000
+Wire Wire Line
+	1000 4000 950  4000
+Connection ~ 8000 1100
+Wire Wire Line
+	8100 1100 8000 1100
+Wire Wire Line
+	2350 2300 2950 2300
+Wire Wire Line
+	5400 1050 5000 1050
+Wire Wire Line
+	1550 2400 950  2400
+Wire Wire Line
+	1550 2300 950  2300
+Wire Wire Line
+	7150 1750 7150 1550
+Wire Wire Line
+	6650 950  7300 950 
+Wire Wire Line
+	2300 1050 2800 1050
+Wire Wire Line
+	1150 1050 1800 1050
+Wire Wire Line
+	1250 5050 1250 4950
+Wire Wire Line
+	950  4850 950  4950
+Wire Wire Line
+	1500 1500 1500 1250
+Wire Wire Line
+	1500 1250 1150 1250
+Wire Wire Line
+	1150 950  1650 950 
+Wire Wire Line
+	950  4950 1550 4950
+Wire Wire Line
+	1550 4950 1550 4850
+Connection ~ 1250 4950
+Wire Wire Line
+	1150 1150 1800 1150
+Wire Wire Line
+	2800 1150 2300 1150
+Wire Wire Line
+	6650 1150 6950 1150
+Wire Wire Line
+	7300 1350 7300 1550
+Wire Wire Line
+	7300 1550 6950 1550
+Connection ~ 7150 1550
+Wire Wire Line
+	1550 2200 950  2200
+Wire Wire Line
+	5400 950  5000 950 
+Wire Wire Line
+	5400 1150 5200 1150
+Wire Wire Line
+	5200 1150 5200 1050
+Connection ~ 5200 1050
+Wire Wire Line
+	8100 1000 8000 1000
+Wire Wire Line
+	8000 1000 8000 1350
+Wire Wire Line
+	9350 1000 9450 1000
+Wire Wire Line
+	9450 1000 9450 1350
+Wire Wire Line
+	1500 4000 1550 4000
+Connection ~ 1550 4000
+Wire Wire Line
+	950  4450 950  3900
+Wire Wire Line
+	1150 3500 1150 3800
+Wire Wire Line
+	1150 3800 1550 3800
+Wire Wire Line
+	2150 4950 2750 4950
+Wire Wire Line
+	2750 4950 2750 4850
+Connection ~ 2450 4950
+Wire Wire Line
+	2400 3500 2400 4050
+Wire Wire Line
+	2400 4050 2150 4050
+Wire Wire Line
+	2150 4050 2150 4450
+Wire Wire Line
+	4050 2800 3850 2800
+Wire Wire Line
+	3850 2800 3850 3050
+Wire Wire Line
+	4850 2100 4850 2200
+Wire Wire Line
+	7000 2800 6600 2800
+Wire Wire Line
+	4850 2900 4850 2700
+Wire Wire Line
+	8250 3150 8800 3150
+Connection ~ 950  4350
+Connection ~ 1550 4350
+Connection ~ 2750 4350
+Connection ~ 2150 4350
+Wire Wire Line
+	4350 5100 4350 5300
+Wire Wire Line
+	4350 5300 4750 5300
+$Comp
+L VDD #PWR01
+U 1 1 4E419C63
+P 4350 3950
+F 0 "#PWR01" H 4350 4050 30  0001 C CNN
+F 1 "VDD" H 4350 4060 30  0000 C CNN
+	1    4350 3950
+	1    0    0    -1  
+$EndComp
+Text Label 6950 1150 2    40   ~ 0
+LDO
+Text Label 8800 3150 2    40   ~ 0
+LED
+Text Label 4750 5300 2    40   ~ 0
+LED
+$Comp
+L R R6
+U 1 1 4E4186C6
+P 4350 4850
+F 0 "R6" V 4430 4850 50  0000 C CNN
+F 1 "500" V 4350 4850 50  0000 C CNN
+	1    4350 4850
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D1
+U 1 1 4E418482
+P 4350 4300
+F 0 "D1" H 4350 4400 50  0000 C CNN
+F 1 "LED" H 4350 4200 50  0000 C CNN
+	1    4350 4300
+	0    1    1    0   
+$EndComp
+$Comp
+L DGND #PWR7
+U 1 1 4E4181CD
+P 4850 3450
+F 0 "#PWR7" H 4850 3450 40  0001 C CNN
+F 1 "DGND" H 4850 3380 40  0000 C CNN
+	1    4850 3450
+	1    0    0    -1  
+$EndComp
+$Comp
+L C C3
+U 1 1 4E4181C7
+P 4850 3100
+F 0 "C3" H 4900 3200 50  0000 L CNN
+F 1 "0.1u" H 4900 3000 50  0000 L CNN
+	1    4850 3100
+	1    0    0    -1  
+$EndComp
+Text Label 5350 2800 2    40   ~ 0
+#RESET
+Text Label 6600 2800 0    40   ~ 0
+#RESET
+$Comp
+L VDD #PWR02
+U 1 1 4E41818E
+P 4850 2100
+F 0 "#PWR02" H 4850 2200 30  0001 C CNN
+F 1 "VDD" H 4850 2210 30  0000 C CNN
+	1    4850 2100
+	1    0    0    -1  
+$EndComp
+$Comp
+L DGND #PWR6
+U 1 1 4E41814B
+P 3850 3050
+F 0 "#PWR6" H 3850 3050 40  0001 C CNN
+F 1 "DGND" H 3850 2980 40  0000 C CNN
+	1    3850 3050
+	1    0    0    -1  
+$EndComp
+$Comp
+L SW_PUSH SW1
+U 1 1 4E417EF0
+P 4350 2800
+F 0 "SW1" H 4500 2910 50  0000 C CNN
+F 1 "SW_PUSH" H 4350 2720 50  0000 C CNN
+	1    4350 2800
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R3
+U 1 1 4E417E10
+P 4850 2450
+F 0 "R3" V 4930 2450 50  0000 C CNN
+F 1 "10k" V 4850 2450 50  0000 C CNN
+	1    4850 2450
+	1    0    0    -1  
+$EndComp
+Text Notes 2300 2650 2    40   ~ 0
+Operating voltage select
+Text Notes 2800 5250 2    40   ~ 0
+Optional 32kHz crystal
+$Comp
+L DGND #PWR9
+U 1 1 4E417D67
+P 2450 5050
+F 0 "#PWR9" H 2450 5050 40  0001 C CNN
+F 1 "DGND" H 2450 4980 40  0000 C CNN
+	1    2450 5050
+	1    0    0    -1  
+$EndComp
+$Comp
+L C C7
+U 1 1 4E417D5F
+P 2750 4650
+F 0 "C7" H 2800 4750 50  0000 L CNN
+F 1 "C" H 2800 4550 50  0000 L CNN
+	1    2750 4650
+	1    0    0    -1  
+$EndComp
+$Comp
+L C C6
+U 1 1 4E417D5B
+P 2150 4650
+F 0 "C6" H 2200 4750 50  0000 L CNN
+F 1 "C" H 2200 4550 50  0000 L CNN
+	1    2150 4650
+	1    0    0    -1  
+$EndComp
+$Comp
+L CRYSTAL X2
+U 1 1 4E417D0E
+P 2450 4350
+F 0 "X2" H 2450 4500 60  0000 C CNN
+F 1 "32.768kHz" H 2450 4200 60  0000 C CNN
+	1    2450 4350
+	1    0    0    1   
+$EndComp
+$Comp
+L GNDA #PWR03
+U 1 1 4E417C87
+P 9450 1350
+F 0 "#PWR03" H 9450 1350 40  0001 C CNN
+F 1 "GNDA" H 9450 1280 40  0000 C CNN
+	1    9450 1350
+	1    0    0    -1  
+$EndComp
+$Comp
+L DGND #PWR1
+U 1 1 4E417C7C
+P 8000 1350
+F 0 "#PWR1" H 8000 1350 40  0001 C CNN
+F 1 "DGND" H 8000 1280 40  0000 C CNN
+	1    8000 1350
+	1    0    0    -1  
+$EndComp
+Text Label 7050 950  2    40   ~ 0
+VDD33
+Text Label 2950 2300 2    40   ~ 0
+VDD33
+$Comp
+L CONN_3X2 P1
+U 1 1 4E417C4B
+P 1950 2350
+F 0 "P1" H 1950 2600 50  0000 C CNN
+F 1 "CONN_3X2" V 1950 2400 40  0000 C CNN
+	1    1950 2350
+	1    0    0    -1  
+$EndComp
+Text Label 5000 1050 0    40   ~ 0
+VDD
+Text Label 5000 950  0    40   ~ 0
+VBUS
+Text Label 950  2400 0    40   ~ 0
+VEXT
+Text Label 950  2200 0    40   ~ 0
+VBUS
+Text Label 950  2300 0    40   ~ 0
+VDD
+$Comp
+L NUC120LDQ48 U1
+U 5 1 4E4179AF
+P 2900 950
+F 0 "U1" H 2900 1050 60  0000 L CNN
+F 1 "NUC120LDQ48" H 3950 1050 60  0000 R CNN
+	5    2900 950 
+	1    0    0    -1  
+$EndComp
+$Comp
+L NUC120LDQ48 U1
+U 4 1 4E4179AE
+P 1250 3300
+F 0 "U1" H 1250 3400 60  0000 L CNN
+F 1 "NUC120LDQ48" H 2300 3400 60  0000 R CNN
+	4    1250 3300
+	1    0    0    -1  
+$EndComp
+$Comp
+L NUC120LDQ48 U1
+U 3 1 4E4179AA
+P 8200 900
+F 0 "U1" H 8200 1000 60  0000 L CNN
+F 1 "NUC120LDQ48" H 9250 1000 60  0000 R CNN
+	3    8200 900 
+	1    0    0    -1  
+$EndComp
+$Comp
+L NUC120LDQ48 U1
+U 2 1 4E4179A6
+P 5500 850
+F 0 "U1" H 5500 950 60  0000 L CNN
+F 1 "NUC120LDQ48" H 6550 950 60  0000 R CNN
+	2    5500 850 
+	1    0    0    -1  
+$EndComp
+$Comp
+L NUC120LDQ48 U1
+U 1 1 4E41798B
+P 7100 2700
+F 0 "U1" H 7100 2800 60  0000 L CNN
+F 1 "NUC120LDQ48" H 8150 2800 60  0000 R CNN
+	1    7100 2700
+	1    0    0    -1  
+$EndComp
+$Comp
+L DGND #PWR4
+U 1 1 4E3E9CD7
+P 7150 1750
+F 0 "#PWR4" H 7150 1750 40  0001 C CNN
+F 1 "DGND" H 7150 1680 40  0000 C CNN
+	1    7150 1750
+	1    0    0    -1  
+$EndComp
+$Comp
+L C C2
+U 1 1 4E3E9CC3
+P 6950 1350
+F 0 "C2" H 7000 1450 50  0000 L CNN
+F 1 "0.1u" H 7000 1250 50  0000 L CNN
+	1    6950 1350
+	1    0    0    -1  
+$EndComp
+$Comp
+L C C1
+U 1 1 4E3E9C78
+P 7300 1150
+F 0 "C1" H 7350 1250 50  0000 L CNN
+F 1 "0.1u" H 7350 1050 50  0000 L CNN
+	1    7300 1150
+	1    0    0    -1  
+$EndComp
+$Comp
+L DGND #PWR8
+U 1 1 4E3E9113
+P 1250 5050
+F 0 "#PWR8" H 1250 5050 40  0001 C CNN
+F 1 "DGND" H 1250 4980 40  0000 C CNN
+	1    1250 5050
+	1    0    0    -1  
+$EndComp
+$Comp
+L C C5
+U 1 1 4E3E9104
+P 1550 4650
+F 0 "C5" H 1600 4750 50  0000 L CNN
+F 1 "8p" H 1600 4550 50  0000 L CNN
+	1    1550 4650
+	1    0    0    -1  
+$EndComp
+$Comp
+L C C4
+U 1 1 4E3E9101
+P 950 4650
+F 0 "C4" H 1000 4750 50  0000 L CNN
+F 1 "8p" H 1000 4550 50  0000 L CNN
+	1    950  4650
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R4
+U 1 1 4E3E909C
+P 950 3650
+F 0 "R4" V 1030 3650 50  0000 C CNN
+F 1 "33" V 950 3650 50  0000 C CNN
+	1    950  3650
+	1    0    0    1   
+$EndComp
+$Comp
+L R R5
+U 1 1 4E3D9B51
+P 1250 4000
+F 0 "R5" V 1330 4000 50  0000 C CNN
+F 1 "1M" V 1250 4000 50  0000 C CNN
+	1    1250 4000
+	0    1    -1   0   
+$EndComp
+$Comp
+L CRYSTAL X1
+U 1 1 4E3D9B11
+P 1250 4350
+F 0 "X1" H 1250 4500 60  0000 C CNN
+F 1 "12MHz" H 1250 4200 60  0000 C CNN
+	1    1250 4350
+	1    0    0    1   
+$EndComp
+$Comp
+L DGND #PWR3
+U 1 1 4E3D9375
+P 1500 1500
+F 0 "#PWR3" H 1500 1500 40  0001 C CNN
+F 1 "DGND" H 1500 1430 40  0000 C CNN
+	1    1500 1500
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R1
+U 1 1 4E3D925D
+P 2050 1050
+F 0 "R1" V 2130 1050 50  0000 C CNN
+F 1 "100" V 2050 1050 50  0000 C CNN
+	1    2050 1050
+	0    1    -1   0   
+$EndComp
+$Comp
+L R R2
+U 1 1 4E3D9144
+P 2050 1150
+F 0 "R2" V 2130 1150 50  0000 C CNN
+F 1 "100" V 2050 1150 50  0000 C CNN
+	1    2050 1150
+	0    1    1    0   
+$EndComp
+Text Label 1650 950  2    40   ~ 0
+VBUS
+$Comp
+L USB_2 J1
+U 1 1 4E3D8AFF
+P 950 1100
+F 0 "J1" H 875 1350 60  0000 C CNN
+F 1 "USB_2" H 1000 800 60  0001 C CNN
+F 4 "VCC" H 1275 1250 50  0001 C CNN "VCC"
+F 5 "D+" H 1250 1150 50  0001 C CNN "Data+"
+F 6 "D-" H 1250 1050 50  0001 C CNN "Data-"
+F 7 "GND" H 1275 950 50  0001 C CNN "Ground"
+	1    950  1100
+	1    0    0    -1  
+$EndComp
+$EndSCHEMATC

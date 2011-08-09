@@ -1,0 +1,143 @@
+Cmp-Mod V01 Created by CvPCB (2011-07-16 BZR 3051)-testing date = Tue 09 Aug 2011 10:06:12 PM CEST
+
+BeginCmp
+TimeStamp = /4E3E9C78;
+Reference = C1;
+ValeurCmp = 0.1u;
+IdModule  = SM0805;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E3E9CC3;
+Reference = C2;
+ValeurCmp = 0.1u;
+IdModule  = SM0805;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E4181C7;
+Reference = C3;
+ValeurCmp = 0.1u;
+IdModule  = SM0805;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E3E9101;
+Reference = C4;
+ValeurCmp = 8p;
+IdModule  = SM0805;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E3E9104;
+Reference = C5;
+ValeurCmp = 8p;
+IdModule  = SM0805;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E417D5B;
+Reference = C6;
+ValeurCmp = C;
+IdModule  = SM0805;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E417D5F;
+Reference = C7;
+ValeurCmp = C;
+IdModule  = SM0805;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E418482;
+Reference = D1;
+ValeurCmp = LED;
+IdModule  = LED-0805;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E3D8AFF;
+Reference = J1;
+ValeurCmp = USB_2;
+IdModule  = USB_A;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E417C4B;
+Reference = P1;
+ValeurCmp = CONN_3X2;
+IdModule  = pin_array_3x2;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E3D925D;
+Reference = R1;
+ValeurCmp = 100;
+IdModule  = SM0805;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E3D9144;
+Reference = R2;
+ValeurCmp = 100;
+IdModule  = SM0805;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E417E10;
+Reference = R3;
+ValeurCmp = 10k;
+IdModule  = SM0805;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E3E909C;
+Reference = R4;
+ValeurCmp = 33;
+IdModule  = SM0805;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E3D9B51;
+Reference = R5;
+ValeurCmp = 1M;
+IdModule  = SM0805;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E4186C6;
+Reference = R6;
+ValeurCmp = 500;
+IdModule  = SM0805;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E417EF0;
+Reference = SW1;
+ValeurCmp = SW_PUSH;
+IdModule  = SW_PUSH_SMALL;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E4179AF;
+Reference = U1;
+ValeurCmp = NUC120LDQ48;
+IdModule  = LQFP48;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E3D9B11;
+Reference = X1;
+ValeurCmp = 12MHz;
+IdModule  = ABM8;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E417D0E;
+Reference = X2;
+ValeurCmp = 32.768kHz;
+IdModule  = crystal_32kHz;
+EndCmp
+
+EndListe
