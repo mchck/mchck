@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by CvPCB (2011-07-16 BZR 3051)-testing date = Tue 09 Aug 2011 10:06:12 PM CEST
+Cmp-Mod V01 Genere par PcbNew le Fri 12 Aug 2011 01:14:06 AM CEST
 
 BeginCmp
 TimeStamp = /4E3E9C78;
@@ -60,14 +60,42 @@ BeginCmp
 TimeStamp = /4E3D8AFF;
 Reference = J1;
 ValeurCmp = USB_2;
-IdModule  = USB_A;
+IdModule  = SparkFun-USB-A-PCB;
 EndCmp
 
 BeginCmp
-TimeStamp = /4E417C4B;
+TimeStamp = /4E41B34F;
+Reference = J2;
+ValeurCmp = USB_2;
+IdModule  = SparkFun-USB-MINIB;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E41B357;
+Reference = J3;
+ValeurCmp = USB_2;
+IdModule  = SIL-4;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E445BCD;
 Reference = P1;
-ValeurCmp = CONN_3X2;
-IdModule  = pin_array_3x2;
+ValeurCmp = CONN_4;
+IdModule  = 3PAD-CHOICE;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E444C2D;
+Reference = P2;
+ValeurCmp = CONN_5;
+IdModule  = PIN_ARRAY_5X1;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E445E8A;
+Reference = P3;
+ValeurCmp = CONN_2;
+IdModule  = PIN_ARRAY_2X1;
 EndCmp
 
 BeginCmp
@@ -116,7 +144,7 @@ BeginCmp
 TimeStamp = /4E417EF0;
 Reference = SW1;
 ValeurCmp = SW_PUSH;
-IdModule  = SW_PUSH_SMALL;
+IdModule  = EVQP2;
 EndCmp
 
 BeginCmp

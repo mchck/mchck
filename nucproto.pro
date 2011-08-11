@@ -1,4 +1,4 @@
-update=Wed 10 Aug 2011 12:19:38 AM CEST
+update=Fri 12 Aug 2011 12:47:58 AM CEST
 version=1
 last_client=pcbnew
 [cvpcb]
@@ -80,15 +80,15 @@ LibName32=nuc120ldq48
 [pcbnew]
 version=1
 PadDrlX=0
-PadDimH=551
-PadDimV=472
+PadDimH=591
+PadDimV=591
 BoardThickness=630
 TxtPcbV=800
 TxtPcbH=600
 TxtModV=600
 TxtModH=600
 TxtModW=120
-VEgarde=100
+VEgarde=59
 DrawLar=150
 EdgeLar=150
 TxtLar=120
@@ -110,3 +110,5 @@ LibName11=LQFP48
 LibName12=ABM8
 LibName13=crystal_32kHz
 LibName14=/home/corecode/.kicad.d/mod/SparkFun
+LibName15=EVQP2
+LibName16=3PAD-CHOICE

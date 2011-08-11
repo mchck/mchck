@@ -1,172 +1,162 @@
-# EESchema Netlist Version 1.1 created  Tue 09 Aug 2011 11:00:38 PM CEST
+# EESchema Netlist Version 1.1 created  Fri 12 Aug 2011 01:13:34 AM CEST
 (
- ( /4E4186C6 $noname  R6 500 {Lib=R}
-  (    1 N-000049 )
-  (    2 /LED )
+ ( /4E3E9C78 SM0805 C1 0.1u
+  ( 1 /VDD33 )
+  ( 2 DGND )
  )
- ( /4E418482 $noname  D1 LED {Lib=LED}
-  (    1 VDD )
-  (    2 N-000049 )
+ ( /4E3E9CC3 SM0805 C2 0.1u
+  ( 1 /LDO )
+  ( 2 DGND )
  )
- ( /4E4181C7 $noname  C3 0.1u {Lib=C}
-  (    1 /#RESET )
-  (    2 DGND )
+ ( /4E4181C7 SM0805 C3 0.1u
+  ( 1 /#RESET )
+  ( 2 DGND )
  )
- ( /4E417EF0 $noname  SW1 SW_PUSH {Lib=SW_PUSH}
-  (    1 DGND )
-  (    2 /#RESET )
+ ( /4E3E9101 SM0805 C4 8p
+  ( 1 N-000051 )
+  ( 2 DGND )
  )
- ( /4E417E10 $noname  R3 10k {Lib=R}
-  (    1 VDD )
-  (    2 /#RESET )
+ ( /4E3E9104 SM0805 C5 8p
+  ( 1 N-000020 )
+  ( 2 DGND )
  )
- ( /4E417D5F $noname  C7 C {Lib=C}
-  (    1 N-000017 )
-  (    2 DGND )
+ ( /4E417D5B SM0805 C6 C
+  ( 1 N-000001 )
+  ( 2 DGND )
  )
- ( /4E417D5B $noname  C6 C {Lib=C}
-  (    1 N-000016 )
-  (    2 DGND )
+ ( /4E417D5F SM0805 C7 C
+  ( 1 N-000003 )
+  ( 2 DGND )
  )
- ( /4E417D0E $noname  X2 32.768kHz {Lib=CRYSTAL}
-  (    1 N-000016 )
-  (    2 N-000017 )
+ ( /4E418482 LED-0805 D1 LED
+  ( 1 VDD )
+  ( 2 N-000010 )
  )
- ( /4E417C4B $noname  P1 CONN_3X2 {Lib=CONN_3X2}
-  (    1 /VBUS )
-  (    2 ? )
-  (    3 VDD )
-  (    4 /VDD33 )
-  (    5 ? )
-  (    6 ? )
+ ( /4E3D8AFF SparkFun-USB-A-PCB J1 USB_2
+  ( 1 /VBUS )
+  ( 2 /USB_D- )
+  ( 3 /USB_D+ )
+  ( 4 DGND )
  )
- ( /4E4179AF $noname  U1 NUC120LDQ48 {Lib=NUC120LDQ48}
-  (    1 ? )
-  (    2 N-000017 )
-  (    3 N-000016 )
-  (    4 ? )
-  (    5 ? )
-  (    6 ? )
-  (    7 ? )
-  (    8 ? )
-  (    9 ? )
-  (   10 /LDO )
-  (   11 VDD )
-  (   12 DGND )
-  (   13 /VBUS )
-  (   14 /VDD33 )
-  (   15 /D- )
-  (   16 /D+ )
-  (   17 ? )
-  (   18 ? )
-  (   19 ? )
-  (   20 ? )
-  (   21 ? )
-  (   22 ? )
-  (   23 ? )
-  (   24 ? )
-  (   25 ? )
-  (   26 ? )
-  (   27 ? )
-  (   28 ? )
-  (   29 ? )
-  (   30 ? )
-  (   31 GNDA )
-  (   32 ? )
-  (   33 ? )
-  (   34 ? )
-  (   35 ? )
-  (   36 ? )
-  (   37 ? )
-  (   38 ? )
-  (   39 /LED )
-  (   40 VDD )
-  (   41 ? )
-  (   42 ? )
-  (   43 ? )
-  (   44 N-000025 )
-  (   45 N-000024 )
-  (   46 /#RESET )
-  (   47 DGND )
-  (   48 ? )
+ ( /4E41B34F SparkFun-USB-MINIB J2 USB_2
+  ( 1 /VBUS )
+  ( 2 /USB_D- )
+  ( 3 /USB_D+ )
+  ( 4 DGND )
  )
- ( /4E3E9CC3 $noname  C2 0.1u {Lib=C}
-  (    1 /LDO )
-  (    2 DGND )
+ ( /4E41B357 SIL-4 J3 USB_2
+  ( 1 /VBUS )
+  ( 2 /USB_D- )
+  ( 3 /USB_D+ )
+  ( 4 DGND )
  )
- ( /4E3E9C78 $noname  C1 0.1u {Lib=C}
-  (    1 /VDD33 )
-  (    2 DGND )
+ ( /4E445BCD 3PAD-CHOICE P1 CONN_4
+  ( 1 VDD )
+  ( 2 /VBUS )
+  ( 3 /VDD33 )
+  ( 4 /VEXT )
  )
- ( /4E3E9104 $noname  C5 8p {Lib=C}
-  (    1 N-000024 )
-  (    2 DGND )
+ ( /4E444C2D PIN_ARRAY_5x1 P2 CONN_5
+  ( 1 VDD )
+  ( 2 /ICE_CK )
+  ( 3 /ICE_DAT )
+  ( 4 /#RESET )
+  ( 5 DGND )
  )
- ( /4E3E9101 $noname  C4 8p {Lib=C}
-  (    1 N-000026 )
-  (    2 DGND )
+ ( /4E445E8A PIN_ARRAY_2X1 P3 CONN_2
+  ( 1 /VEXT )
+  ( 2 DGND )
  )
- ( /4E3E909C $noname  R4 33 {Lib=R}
-  (    1 N-000026 )
-  (    2 N-000025 )
+ ( /4E3D925D SM0805 R1 100
+  ( 1 /D- )
+  ( 2 /USB_D- )
  )
- ( /4E3D9B51 $noname  R5 1M {Lib=R}
-  (    1 N-000024 )
-  (    2 N-000026 )
+ ( /4E3D9144 SM0805 R2 100
+  ( 1 /D+ )
+  ( 2 /USB_D+ )
  )
- ( /4E3D9B11 $noname  X1 12MHz {Lib=CRYSTAL}
-  (    1 N-000026 )
-  (    2 N-000024 )
+ ( /4E417E10 SM0805 R3 10k
+  ( 1 VDD )
+  ( 2 /#RESET )
  )
- ( /4E3D925D $noname  R1 100 {Lib=R}
-  (    1 /D- )
-  (    2 N-000028 )
+ ( /4E3E909C SM0805 R4 33
+  ( 1 N-000051 )
+  ( 2 N-000021 )
  )
- ( /4E3D9144 $noname  R2 100 {Lib=R}
-  (    1 /D+ )
-  (    2 N-000029 )
+ ( /4E3D9B51 SM0805 R5 1M
+  ( 1 N-000020 )
+  ( 2 N-000051 )
  )
- ( /4E3D8AFF $noname  J1 USB_2 {Lib=USB_2}
-  (    1 /VBUS )
-  (    2 N-000028 )
-  (    3 N-000029 )
-  (    4 DGND )
+ ( /4E4186C6 SM0805 R6 500
+  ( 1 N-000010 )
+  ( 2 /LED )
+ )
+ ( /4E417EF0 EVQP2 SW1 SW_PUSH
+  ( 1 DGND )
+  ( 2 /#RESET )
+ )
+ ( /4E4179AF LQFP48 U1 NUC120LDQ48
+  ( 1 ? )
+  ( 2 N-000003 )
+  ( 3 N-000001 )
+  ( 4 ? )
+  ( 5 ? )
+  ( 6 ? )
+  ( 7 ? )
+  ( 8 ? )
+  ( 9 ? )
+  ( 10 /LDO )
+  ( 11 VDD )
+  ( 12 DGND )
+  ( 13 /VBUS )
+  ( 14 /VDD33 )
+  ( 15 /D- )
+  ( 16 /D+ )
+  ( 17 ? )
+  ( 18 ? )
+  ( 19 ? )
+  ( 20 ? )
+  ( 21 ? )
+  ( 22 ? )
+  ( 23 ? )
+  ( 24 ? )
+  ( 25 ? )
+  ( 26 ? )
+  ( 27 ? )
+  ( 28 ? )
+  ( 29 /ICE_DAT )
+  ( 30 /ICE_CK )
+  ( 31 GNDA )
+  ( 32 ? )
+  ( 33 ? )
+  ( 34 ? )
+  ( 35 ? )
+  ( 36 ? )
+  ( 37 ? )
+  ( 38 ? )
+  ( 39 /LED )
+  ( 40 VDD )
+  ( 41 ? )
+  ( 42 ? )
+  ( 43 ? )
+  ( 44 N-000021 )
+  ( 45 N-000020 )
+  ( 46 /#RESET )
+  ( 47 DGND )
+  ( 48 ? )
+ )
+ ( /4E3D9B11 ABM8 X1 12MHz
+  ( 1 N-000051 )
+  ( 2 N-000020 )
+ )
+ ( /4E417D0E crystal_32kHz X2 32.768kHz
+  ( 1 N-000001 )
+  ( 2 N-000003 )
  )
 )
 *
 { Allowed footprints by component:
-$component R6
- R?
- SM0603
- SM0805
- R?-*
-$endlist
-$component D1
- LED-3MM
- LED-5MM
- LED-10MM
- LED-0603
- LED-0805
- LED-1206
- LEDV
-$endlist
-$component C3
- SM*
- C?
- C1-1
-$endlist
-$component R3
- R?
- SM0603
- SM0805
- R?-*
-$endlist
-$component C7
- SM*
- C?
- C1-1
-$endlist
-$component C6
+$component C1
  SM*
  C?
  C1-1
@@ -176,12 +166,7 @@ $component C2
  C?
  C1-1
 $endlist
-$component C1
- SM*
- C?
- C1-1
-$endlist
-$component C5
+$component C3
  SM*
  C?
  C1-1
@@ -191,17 +176,29 @@ $component C4
  C?
  C1-1
 $endlist
-$component R4
- R?
- SM0603
- SM0805
- R?-*
+$component C5
+ SM*
+ C?
+ C1-1
 $endlist
-$component R5
- R?
- SM0603
- SM0805
- R?-*
+$component C6
+ SM*
+ C?
+ C1-1
+$endlist
+$component C7
+ SM*
+ C?
+ C1-1
+$endlist
+$component D1
+ LED-3MM
+ LED-5MM
+ LED-10MM
+ LED-0603
+ LED-0805
+ LED-1206
+ LEDV
 $endlist
 $component R1
  R?
@@ -215,81 +212,29 @@ $component R2
  SM0805
  R?-*
 $endlist
+$component R3
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R4
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R5
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R6
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
 $endfootprintlist
 }
-{ Pin List by Nets
-Net 3 "VDD" "VDD"
- P1 3
- D1 1
- R3 1
- U1 11
- U1 40
-Net 16 "" ""
- C6 1
- U1 3
- X2 1
-Net 17 "" ""
- C7 1
- U1 2
- X2 2
-Net 21 "/VBUS" "VBUS"
- U1 13
- J1 1
- P1 1
-Net 24 "" ""
- U1 45
- X1 2
- R5 1
- C5 1
-Net 25 "" ""
- U1 44
- R4 2
-Net 26 "" ""
- C4 1
- R4 1
- R5 2
- X1 1
-Net 27 "/VDD33" "VDD33"
- P1 4
- U1 14
- C1 1
-Net 28 "" ""
- J1 2
- R1 2
-Net 29 "" ""
- J1 3
- R2 2
-Net 47 "/LDO" "LDO"
- C2 1
- U1 10
-Net 48 "/D+" "D+"
- U1 16
- R2 1
-Net 49 "" ""
- R6 1
- D1 2
-Net 50 "DGND" "DGND"
- C3 2
- U1 12
- SW1 1
- C7 2
- J1 4
- C4 2
- C5 2
- C1 2
- C6 2
- U1 47
- C2 2
-Net 51 "/LED" "LED"
- R6 2
- U1 39
-Net 52 "/#RESET" "#RESET"
- C3 1
- U1 46
- SW1 2
- R3 2
-Net 53 "/D-" "D-"
- U1 15
- R1 1
-}
-#End
