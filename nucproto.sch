@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Fri 12 Aug 2011 01:16:42 AM CEST
+EESchema Schematic File Version 2  date Fri 12 Aug 2011 01:36:00 AM CEST
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -46,25 +46,10 @@ Comment2 ""
 Comment3 ""
 Comment4 ""
 $EndDescr
-Text Label 3000 2450 0    40   ~ 0
-VEXT
-$Comp
-L DGND #PWR8
-U 1 1 4E445E97
-P 3250 2750
-F 0 "#PWR8" H 3250 2750 40  0001 C CNN
-F 1 "DGND" H 3250 2680 40  0000 C CNN
-	1    3250 2750
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
-	3250 2750 3250 2650
+	3450 2400 2900 2400
 Wire Wire Line
-	3250 2650 3450 2650
-Wire Wire Line
-	6250 3600 5700 3600
-Wire Wire Line
-	6250 3400 5700 3400
+	3450 2200 2900 2200
 Wire Wire Line
 	6950 2400 7500 2400
 Wire Wire Line
@@ -181,8 +166,6 @@ Wire Wire Line
 Wire Wire Line
 	1600 2100 1000 2100
 Wire Wire Line
-	1600 2400 1000 2400
-Wire Wire Line
 	5000 1050 5400 1050
 Wire Wire Line
 	1600 2300 1000 2300
@@ -264,59 +247,48 @@ Wire Wire Line
 Wire Wire Line
 	6950 2300 7500 2300
 Wire Wire Line
-	6250 3300 5700 3300
+	3450 2100 2900 2100
 Wire Wire Line
-	6250 3500 5700 3500
+	3450 2300 2900 2300
 Wire Wire Line
-	6250 3700 6000 3700
+	3450 2500 3200 2500
 Wire Wire Line
-	6000 3700 6000 3800
-Wire Wire Line
-	3450 2450 3000 2450
+	3200 2500 3200 2600
 $Comp
-L CONN_2 P3
-U 1 1 4E445E8A
-P 3800 2550
-F 0 "P3" V 3750 2550 40  0000 C CNN
-F 1 "CONN_2" V 3850 2550 40  0000 C CNN
-	1    3800 2550
-	1    0    0    -1  
-$EndComp
-$Comp
-L CONN_4 P1
+L CONN_3 P1
 U 1 1 4E445BCD
-P 1950 2250
-F 0 "P1" V 1900 2250 50  0000 C CNN
-F 1 "CONN_4" V 2000 2250 50  0000 C CNN
-	1    1950 2250
+P 1950 2200
+F 0 "P1" V 1900 2200 50  0000 C CNN
+F 1 "CONN_3" V 2000 2200 40  0000 C CNN
+	1    1950 2200
 	1    0    0    -1  
 $EndComp
-Text Notes 6000 3150 0    40   ~ 0
+Text Notes 3200 1950 0    40   ~ 0
 Debug/ICP header
 $Comp
 L DGND #PWR11
 U 1 1 4E444C7E
-P 6000 3800
-F 0 "#PWR11" H 6000 3800 40  0001 C CNN
-F 1 "DGND" H 6000 3730 40  0000 C CNN
-	1    6000 3800
+P 3200 2600
+F 0 "#PWR11" H 3200 2600 40  0001 C CNN
+F 1 "DGND" H 3200 2530 40  0000 C CNN
+	1    3200 2600
 	1    0    0    -1  
 $EndComp
-Text Label 5700 3600 0    40   ~ 0
+Text Label 2900 2400 0    40   ~ 0
 #RESET
-Text Label 5700 3500 0    40   ~ 0
+Text Label 2900 2300 0    40   ~ 0
 ICE_DAT
-Text Label 5700 3400 0    40   ~ 0
+Text Label 2900 2200 0    40   ~ 0
 ICE_CK
-Text Label 5700 3300 0    40   ~ 0
+Text Label 2900 2100 0    40   ~ 0
 VDD
 $Comp
 L CONN_5 P2
 U 1 1 4E444C2D
-P 6650 3500
-F 0 "P2" V 6600 3500 50  0000 C CNN
-F 1 "CONN_5" V 6700 3500 50  0000 C CNN
-	1    6650 3500
+P 3850 2300
+F 0 "P2" V 3800 2300 50  0000 C CNN
+F 1 "CONN_5" V 3900 2300 50  0000 C CNN
+	1    3850 2300
 	1    0    0    -1  
 $EndComp
 Text Label 7500 2400 2    40   ~ 0
@@ -554,8 +526,6 @@ Text Label 5000 1050 0    40   ~ 0
 VDD
 Text Label 5000 950  0    40   ~ 0
 VBUS
-Text Label 1000 2400 0    40   ~ 0
-VEXT
 Text Label 1000 2200 0    40   ~ 0
 VBUS
 Text Label 1000 2100 0    40   ~ 0
