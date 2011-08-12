@@ -1,4 +1,4 @@
-# EESchema Netlist Version 1.1 created  Fri 12 Aug 2011 02:33:26 AM CEST
+# EESchema Netlist Version 1.1 created  Fri 12 Aug 2011 04:24:58 AM CEST
 (
  ( /4E44688C $noname  P5 CONN_5X2 {Lib=CONN_5X2}
   (    1 /ADC7 )
@@ -22,7 +22,7 @@
   (    7 /CPO0 )
   (    8 /#INT1 )
   (    9 /TM0 )
-  (   10 ? )
+  (   10 /PWM1 )
   (   11 /I2C1SDA )
   (   12 /I2C1SCL )
  )
@@ -32,7 +32,7 @@
   (    3 /ADC0 )
   (    4 /RXD1 )
   (    5 /TXD1 )
-  (    6 ? )
+  (    6 /PWM0 )
   (    7 /SPISS00 )
   (    8 /MOSI00 )
   (    9 /MISO00 )
@@ -85,21 +85,21 @@
   (    2 /#RESET )
  )
  ( /4E417D5F $noname  C7 C {Lib=C}
-  (    1 N-000031 )
+  (    1 N-000032 )
   (    2 DGND )
  )
  ( /4E417D5B $noname  C6 C {Lib=C}
-  (    1 N-000032 )
+  (    1 N-000033 )
   (    2 DGND )
  )
  ( /4E417D0E $noname  X2 32.768kHz {Lib=CRYSTAL}
-  (    1 N-000032 )
-  (    2 N-000031 )
+  (    1 N-000033 )
+  (    2 N-000032 )
  )
  ( /4E4179AF $noname  U1 NUC120LDQ48 {Lib=NUC120LDQ48}
   (    1 /CPO0 )
-  (    2 N-000031 )
-  (    3 N-000032 )
+  (    2 N-000032 )
+  (    3 N-000033 )
   (    4 /I2C1SCL )
   (    5 /I2C1SDA )
   (    6 /I2C0SCL )
@@ -123,11 +123,11 @@
   (   24 /SPISS00 )
   (   25 /PWM3 )
   (   26 /PWM2 )
-  (   27 ? )
-  (   28 ? )
+  (   27 /PWM1 )
+  (   28 /PWM0 )
   (   29 /ICE_DAT )
   (   30 /ICE_CK )
-  (   31 GNDA )
+  (   31 DGND )
   (   32 /ADC0 )
   (   33 /ADC1 )
   (   34 /ADC2 )
@@ -141,7 +141,7 @@
   (   42 /CPP0 )
   (   43 /#INT1 )
   (   44 N-000038 )
-  (   45 N-000052 )
+  (   45 N-000030 )
   (   46 /#RESET )
   (   47 DGND )
   (   48 /TM0 )
@@ -155,24 +155,24 @@
   (    2 DGND )
  )
  ( /4E3E9104 $noname  C5 8p {Lib=C}
-  (    1 N-000052 )
+  (    1 N-000030 )
   (    2 DGND )
  )
  ( /4E3E9101 $noname  C4 8p {Lib=C}
-  (    1 N-000028 )
+  (    1 N-000029 )
   (    2 DGND )
  )
  ( /4E3E909C $noname  R4 33 {Lib=R}
-  (    1 N-000028 )
+  (    1 N-000029 )
   (    2 N-000038 )
  )
  ( /4E3D9B51 $noname  R5 1M {Lib=R}
-  (    1 N-000052 )
-  (    2 N-000028 )
+  (    1 N-000030 )
+  (    2 N-000029 )
  )
  ( /4E3D9B11 $noname  X1 12MHz {Lib=CRYSTAL}
-  (    1 N-000028 )
-  (    2 N-000052 )
+  (    1 N-000029 )
+  (    2 N-000030 )
  )
  ( /4E3D925D $noname  R1 100 {Lib=R}
   (    1 /D- )
@@ -274,61 +274,48 @@ $endlist
 $endfootprintlist
 }
 { Pin List by Nets
-Net 1 "DGND" "DGND"
- C7 2
- J2 4
- P3 1
- C5 2
- C2 2
- SW1 1
- C1 2
- P5 2
- P2 5
- U1 12
- C6 2
- J3 4
- J1 4
- C4 2
- C3 2
- U1 47
-Net 2 "/VBUS" "VBUS"
- P1 2
+Net 1 "/VBUS" "VBUS"
+ J2 1
  U1 13
+ P1 2
  J1 1
  J3 1
- J2 1
-Net 3 "/USB_D-" "USB_D-"
- J1 2
+Net 2 "/USB_D-" "USB_D-"
+ J2 2
  R1 2
  J3 2
- J2 2
+ J1 2
+Net 3 "/USB_D+" "USB_D+"
+ J1 3
+ J2 3
+ J3 3
+ R2 2
 Net 4 "VDD" "VDD"
- R3 1
- U1 40
- P2 1
- U1 11
- D1 1
  P3 2
+ U1 11
+ U1 40
+ R3 1
+ P2 1
  P1 1
+ D1 1
 Net 5 "/#RESET" "#RESET"
- C3 1
- P2 4
- U1 46
  R3 2
+ P2 4
  SW1 2
+ U1 46
+ C3 1
 Net 6 "" ""
- D1 2
  R6 1
-Net 7 "/ADC7" "ADC7"
- P5 1
- U1 39
- R6 2
-Net 8 "/ADC1" "ADC1"
- P4 1
- U1 33
-Net 9 "/ADC0" "ADC0"
- P3 3
- U1 32
+ D1 2
+Net 7 "/CTS0" "CTS0"
+ U1 20
+ P5 7
+Net 8 "/PWM3" "PWM3"
+ U1 25
+ P5 6
+Net 9 "/RXD0" "RXD0"
+ U1 17
+ P5 3
 Net 10 "/I2C0SCL" "I2C0SCL"
  U1 6
  P3 12
@@ -339,78 +326,105 @@ Net 12 "/SPICLK0" "SPICLK0"
  U1 23
  P3 10
 Net 13 "/MISO00" "MISO00"
- U1 22
  P3 9
+ U1 22
 Net 14 "/MOSI00" "MOSI00"
- U1 21
  P3 8
+ U1 21
 Net 15 "/SPISS00" "SPISS00"
  U1 24
  P3 7
+Net 16 "/PWM0" "PWM0"
+ P3 6
+ U1 28
 Net 17 "/TXD1" "TXD1"
- U1 9
  P3 5
+ U1 9
 Net 18 "/RXD1" "RXD1"
  P3 4
  U1 8
-Net 20 "/#INT1" "#INT1"
- P4 8
- U1 43
-Net 21 "/CPN0" "CPN0"
+Net 19 "/ADC0" "ADC0"
+ U1 32
+ P3 3
+Net 20 "/TM0" "TM0"
+ P4 9
+ U1 48
+Net 21 "/CPO0" "CPO0"
+ P4 7
+ U1 1
+Net 22 "/CPN0" "CPN0"
  P4 6
  U1 41
-Net 22 "/ADC3" "ADC3"
+Net 23 "/CPP0" "CPP0"
+ P4 5
+ U1 42
+Net 24 "/ADC4" "ADC4"
+ P4 4
+ U1 36
+Net 25 "/ADC3" "ADC3"
  P4 3
  U1 35
-Net 23 "/RTS0" "RTS0"
- U1 19
- P5 4
-Net 24 "/ADC5" "ADC5"
- U1 37
- P5 9
-Net 26 "/RXD0" "RXD0"
- P5 3
- U1 17
-Net 27 "/PWM3" "PWM3"
- P5 6
- U1 25
-Net 28 "" ""
- C4 1
- R4 1
- R5 2
- X1 1
-Net 29 "/USB_D+" "USB_D+"
- J3 3
- J2 3
- J1 3
- R2 2
-Net 30 "/VDD33" "VDD33"
- C1 1
- P1 3
- U1 14
-Net 31 "" ""
- X2 2
- U1 2
- C7 1
-Net 32 "" ""
- C6 1
- U1 3
- X2 1
-Net 33 "/ICE_CK" "ICE_CK"
- U1 30
- P2 3
-Net 34 "/I2C1SCL" "I2C1SCL"
- P4 12
- U1 4
-Net 35 "/ADC2" "ADC2"
+Net 26 "/ADC2" "ADC2"
  P4 2
  U1 34
-Net 36 "/LDO" "LDO"
- C2 1
+Net 27 "/ADC1" "ADC1"
+ U1 33
+ P4 1
+Net 28 "/ADC6" "ADC6"
+ U1 38
+ P5 10
+Net 29 "" ""
+ R5 2
+ R4 1
+ X1 1
+ C4 1
+Net 30 "" ""
+ U1 45
+ C5 1
+ R5 1
+ X1 2
+Net 31 "/VDD33" "VDD33"
+ P1 3
+ U1 14
+ C1 1
+Net 32 "" ""
+ C7 1
+ U1 2
+ X2 2
+Net 33 "" ""
+ U1 3
+ C6 1
+ X2 1
+Net 34 "/LDO" "LDO"
  U1 10
+ C2 1
+Net 35 "/I2C1SDA" "I2C1SDA"
+ P4 11
+ U1 5
+Net 36 "/#INT1" "#INT1"
+ P4 8
+ U1 43
+Net 37 "DGND" "DGND"
+ U1 12
+ U1 31
+ C2 2
+ C6 2
+ J1 4
+ J2 4
+ P3 1
+ C3 2
+ P5 2
+ SW1 1
+ U1 47
+ P2 5
+ J3 4
+ C7 2
+ C1 2
+ C5 2
+ C4 2
 Net 38 "" ""
- R4 2
  U1 44
+ R4 2
 Net 39 "/ICE_DAT" "ICE_DAT"
  P2 2
  U1 29
@@ -420,37 +434,30 @@ Net 40 "/D+" "D+"
 Net 41 "/D-" "D-"
  R1 1
  U1 15
-Net 42 "/CTS0" "CTS0"
- U1 20
- P5 7
-Net 43 "/TXD0" "TXD0"
- P5 8
+Net 42 "/ICE_CK" "ICE_CK"
+ P2 3
+ U1 30
+Net 43 "/RTS0" "RTS0"
+ U1 19
+ P5 4
+Net 44 "/TXD0" "TXD0"
  U1 18
-Net 44 "/ADC6" "ADC6"
- P5 10
- U1 38
-Net 45 "/PWM2" "PWM2"
+ P5 8
+Net 45 "/ADC7" "ADC7"
+ R6 2
+ U1 39
+ P5 1
+Net 46 "/PWM2" "PWM2"
  U1 26
  P5 5
-Net 46 "/TM0" "TM0"
- U1 48
- P4 9
-Net 48 "/ADC4" "ADC4"
- P4 4
- U1 36
-Net 49 "/I2C1SDA" "I2C1SDA"
- P4 11
- U1 5
-Net 50 "/CPP0" "CPP0"
- U1 42
- P4 5
-Net 51 "/CPO0" "CPO0"
- P4 7
- U1 1
-Net 52 "" ""
- C5 1
- U1 45
- R5 1
- X1 2
+Net 47 "/ADC5" "ADC5"
+ P5 9
+ U1 37
+Net 48 "/I2C1SCL" "I2C1SCL"
+ U1 4
+ P4 12
+Net 49 "/PWM1" "PWM1"
+ P4 10
+ U1 27
 }
 #End
