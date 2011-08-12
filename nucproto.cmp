@@ -1,4 +1,4 @@
-Cmp-Mod V01 Genere par PcbNew le Fri 12 Aug 2011 01:14:06 AM CEST
+Cmp-Mod V01 Created by CvPCB (2011-07-16 BZR 3051)-testing date = Fri 12 Aug 2011 02:29:24 AM CEST
 
 BeginCmp
 TimeStamp = /4E3E9C78;
@@ -80,7 +80,7 @@ EndCmp
 BeginCmp
 TimeStamp = /4E445BCD;
 Reference = P1;
-ValeurCmp = CONN_4;
+ValeurCmp = CONN_3;
 IdModule  = 3PAD-CHOICE;
 EndCmp
 
@@ -92,10 +92,24 @@ IdModule  = PIN_ARRAY_5X1;
 EndCmp
 
 BeginCmp
-TimeStamp = /4E445E8A;
+TimeStamp = /4E446858;
 Reference = P3;
-ValeurCmp = CONN_2;
-IdModule  = PIN_ARRAY_2X1;
+ValeurCmp = CONN_12;
+IdModule  = SIL-12;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E446864;
+Reference = P4;
+ValeurCmp = CONN_12;
+IdModule  = SIL-12;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E44688C;
+Reference = P5;
+ValeurCmp = CONN_5X2;
+IdModule  = PIN_ARRAY_5x2;
 EndCmp
 
 BeginCmp
