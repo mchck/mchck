@@ -1,59 +1,101 @@
-Cmp-Mod V01 Created by CvPCB (2011-07-16 BZR 3051)-testing date = Fri 12 Aug 2011 02:29:24 AM CEST
+Cmp-Mod V01 Created by CvPCB (2011-07-16 BZR 3051)-testing date = Sat 20 Aug 2011 11:51:16 AM CEST
 
 BeginCmp
 TimeStamp = /4E3E9C78;
 Reference = C1;
 ValeurCmp = 0.1u;
-IdModule  = SM0805;
+IdModule  = SM0603;
 EndCmp
 
 BeginCmp
 TimeStamp = /4E3E9CC3;
 Reference = C2;
 ValeurCmp = 0.1u;
-IdModule  = SM0805;
+IdModule  = SM0603;
 EndCmp
 
 BeginCmp
 TimeStamp = /4E4181C7;
 Reference = C3;
 ValeurCmp = 0.1u;
-IdModule  = SM0805;
+IdModule  = SM0603;
 EndCmp
 
 BeginCmp
 TimeStamp = /4E3E9101;
 Reference = C4;
 ValeurCmp = 8p;
-IdModule  = SM0805;
+IdModule  = SM0603;
 EndCmp
 
 BeginCmp
 TimeStamp = /4E3E9104;
 Reference = C5;
 ValeurCmp = 8p;
-IdModule  = SM0805;
+IdModule  = SM0603;
 EndCmp
 
 BeginCmp
 TimeStamp = /4E417D5B;
 Reference = C6;
-ValeurCmp = C;
-IdModule  = SM0805;
+ValeurCmp = 18p;
+IdModule  = SM0603;
 EndCmp
 
 BeginCmp
 TimeStamp = /4E417D5F;
 Reference = C7;
-ValeurCmp = C;
-IdModule  = SM0805;
+ValeurCmp = 18p;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E4D1569;
+Reference = C8;
+ValeurCmp = 1u;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E4D092C;
+Reference = C9;
+ValeurCmp = 0.1u;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E4D0915;
+Reference = C10;
+ValeurCmp = 0.1u;
+IdModule  = SM0603;
 EndCmp
 
 BeginCmp
 TimeStamp = /4E418482;
 Reference = D1;
 ValeurCmp = LED;
-IdModule  = LED-0805;
+IdModule  = LED-0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E4C633E;
+Reference = D2;
+ValeurCmp = LED;
+IdModule  = LED-0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E4C6343;
+Reference = D3;
+ValeurCmp = LED;
+IdModule  = LED-0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E4C6353;
+Reference = D4;
+ValeurCmp = LED;
+IdModule  = LED-0603;
 EndCmp
 
 BeginCmp
@@ -74,7 +116,21 @@ BeginCmp
 TimeStamp = /4E41B357;
 Reference = J3;
 ValeurCmp = USB_2;
-IdModule  = SIL-4;
+IdModule  = SparkFun-1X04_LOCK;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E4C62A1;
+Reference = JP1;
+ValeurCmp = PRESENCE_ENABLE;
+IdModule  = SparkFun-SJ_2S-NO;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E4D0FD5;
+Reference = K1;
+ValeurCmp = CONN_3;
+IdModule  = 3PAD-CHOICE;
 EndCmp
 
 BeginCmp
@@ -88,70 +144,91 @@ BeginCmp
 TimeStamp = /4E444C2D;
 Reference = P2;
 ValeurCmp = CONN_5;
-IdModule  = PIN_ARRAY_5X1;
+IdModule  = SparkFun-1X05_LOCK;
 EndCmp
 
 BeginCmp
 TimeStamp = /4E446858;
 Reference = P3;
-ValeurCmp = CONN_12;
-IdModule  = SIL-12;
+ValeurCmp = UPPER_PINS;
+IdModule  = SparkFun-1X15_LOCK;
 EndCmp
 
 BeginCmp
 TimeStamp = /4E446864;
 Reference = P4;
-ValeurCmp = CONN_12;
-IdModule  = SIL-12;
+ValeurCmp = LOWER_PINS;
+IdModule  = SparkFun-1X15_LOCK;
 EndCmp
 
 BeginCmp
 TimeStamp = /4E44688C;
 Reference = P5;
-ValeurCmp = CONN_5X2;
-IdModule  = PIN_ARRAY_5x2;
+ValeurCmp = RIGHT_PINS;
+IdModule  = SparkFun-2X5-NS;
 EndCmp
 
 BeginCmp
 TimeStamp = /4E3D925D;
 Reference = R1;
 ValeurCmp = 100;
-IdModule  = SM0805;
+IdModule  = SM0603;
 EndCmp
 
 BeginCmp
 TimeStamp = /4E3D9144;
 Reference = R2;
 ValeurCmp = 100;
-IdModule  = SM0805;
+IdModule  = SM0603;
 EndCmp
 
 BeginCmp
 TimeStamp = /4E417E10;
 Reference = R3;
 ValeurCmp = 10k;
-IdModule  = SM0805;
+IdModule  = SM0603;
 EndCmp
 
 BeginCmp
 TimeStamp = /4E3E909C;
 Reference = R4;
 ValeurCmp = 33;
-IdModule  = SM0805;
+IdModule  = SM0603;
 EndCmp
 
 BeginCmp
 TimeStamp = /4E3D9B51;
 Reference = R5;
 ValeurCmp = 1M;
-IdModule  = SM0805;
+IdModule  = SM0603;
 EndCmp
 
 BeginCmp
 TimeStamp = /4E4186C6;
 Reference = R6;
 ValeurCmp = 500;
-IdModule  = SM0805;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E4C633D;
+Reference = R7;
+ValeurCmp = 500;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E4C6344;
+Reference = R8;
+ValeurCmp = 500;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E4C6352;
+Reference = R9;
+ValeurCmp = 500;
+IdModule  = SM0603;
 EndCmp
 
 BeginCmp
@@ -162,10 +239,45 @@ IdModule  = EVQP2;
 EndCmp
 
 BeginCmp
+TimeStamp = /4E4C645F;
+Reference = SW2;
+ValeurCmp = SW_PUSH;
+IdModule  = EVQP2;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E4C661C;
+Reference = SW3;
+ValeurCmp = SW_PUSH;
+IdModule  = EVQP2;
+EndCmp
+
+BeginCmp
 TimeStamp = /4E4179AF;
 Reference = U1;
 ValeurCmp = NUC120LDQ48;
 IdModule  = LQFP48;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E4C606F;
+Reference = U2;
+ValeurCmp = MICROSD;
+IdModule  = DM3D-SF;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E4D08A5;
+Reference = U3;
+ValeurCmp = MCP1700T-330;
+IdModule  = SparkFun-SOT23;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E4CF82A;
+Reference = U4;
+ValeurCmp = 74LCX125;
+IdModule  = SparkFun-TSSOP16;
 EndCmp
 
 BeginCmp
@@ -179,7 +291,7 @@ BeginCmp
 TimeStamp = /4E417D0E;
 Reference = X2;
 ValeurCmp = 32.768kHz;
-IdModule  = crystal_32kHz;
+IdModule  = SparkFun-CRYSTAL-32KHZ-SMD;
 EndCmp
 
 EndListe

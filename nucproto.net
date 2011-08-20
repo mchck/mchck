@@ -1,201 +1,337 @@
-# EESchema Netlist Version 1.1 created  Fri 12 Aug 2011 04:24:58 AM CEST
+# EESchema Netlist Version 1.1 created  Sat 20 Aug 2011 11:51:16 AM CEST
 (
- ( /4E44688C $noname  P5 CONN_5X2 {Lib=CONN_5X2}
-  (    1 /ADC7 )
-  (    2 DGND )
-  (    3 /RXD0 )
-  (    4 /RTS0 )
-  (    5 /PWM2 )
-  (    6 /PWM3 )
-  (    7 /CTS0 )
-  (    8 /TXD0 )
-  (    9 /ADC5 )
-  (   10 /ADC6 )
+ ( /4E3E9C78 SM0603 C1 0.1u
+  ( 1 /NUC_VDD33 )
+  ( 2 DGND )
  )
- ( /4E446864 $noname  P4 CONN_12 {Lib=CONN_12}
-  (    1 /ADC1 )
-  (    2 /ADC2 )
-  (    3 /ADC3 )
-  (    4 /ADC4 )
-  (    5 /CPP0 )
-  (    6 /CPN0 )
-  (    7 /CPO0 )
-  (    8 /#INT1 )
-  (    9 /TM0 )
-  (   10 /PWM1 )
-  (   11 /I2C1SDA )
-  (   12 /I2C1SCL )
+ ( /4E3E9CC3 SM0603 C2 0.1u
+  ( 1 N-000043 )
+  ( 2 DGND )
  )
- ( /4E446858 $noname  P3 CONN_12 {Lib=CONN_12}
-  (    1 DGND )
-  (    2 VDD )
-  (    3 /ADC0 )
-  (    4 /RXD1 )
-  (    5 /TXD1 )
-  (    6 /PWM0 )
-  (    7 /SPISS00 )
-  (    8 /MOSI00 )
-  (    9 /MISO00 )
-  (   10 /SPICLK0 )
-  (   11 /I2C0SDA )
-  (   12 /I2C0SCL )
+ ( /4E4181C7 SM0603 C3 0.1u
+  ( 1 /#RESET )
+  ( 2 DGND )
  )
- ( /4E445BCD $noname  P1 CONN_3 {Lib=CONN_3}
-  (    1 VDD )
-  (    2 /VBUS )
-  (    3 /VDD33 )
+ ( /4E3E9101 SM0603 C4 8p
+  ( 1 N-000038 )
+  ( 2 DGND )
  )
- ( /4E444C2D $noname  P2 CONN_5 {Lib=CONN_5}
-  (    1 VDD )
-  (    2 /ICE_DAT )
-  (    3 /ICE_CK )
-  (    4 /#RESET )
-  (    5 DGND )
+ ( /4E3E9104 SM0603 C5 8p
+  ( 1 N-000036 )
+  ( 2 DGND )
  )
- ( /4E41B357 $noname  J3 USB_2 {Lib=USB_2}
-  (    1 /VBUS )
-  (    2 /USB_D- )
-  (    3 /USB_D+ )
-  (    4 DGND )
+ ( /4E417D5B SM0603 C6 18p
+  ( 1 N-000035 )
+  ( 2 DGND )
  )
- ( /4E41B34F $noname  J2 USB_2 {Lib=USB_2}
-  (    1 /VBUS )
-  (    2 /USB_D- )
-  (    3 /USB_D+ )
-  (    4 DGND )
+ ( /4E417D5F SM0603 C7 18p
+  ( 1 N-000051 )
+  ( 2 DGND )
  )
- ( /4E4186C6 $noname  R6 500 {Lib=R}
-  (    1 N-000006 )
-  (    2 /ADC7 )
+ ( /4E4D1569 SM0603 C8 1u
+  ( 1 VDD )
+  ( 2 DGND )
  )
- ( /4E418482 $noname  D1 LED {Lib=LED}
-  (    1 VDD )
-  (    2 N-000006 )
+ ( /4E4D092C SM0603 C9 0.1u
+  ( 1 /VBUS )
+  ( 2 DGND )
  )
- ( /4E4181C7 $noname  C3 0.1u {Lib=C}
-  (    1 /#RESET )
-  (    2 DGND )
+ ( /4E4D0915 SM0603 C10 0.1u
+  ( 1 /REG_VDD33 )
+  ( 2 DGND )
  )
- ( /4E417EF0 $noname  SW1 SW_PUSH {Lib=SW_PUSH}
-  (    1 DGND )
-  (    2 /#RESET )
+ ( /4E418482 LED-0603 D1 LED
+  ( 1 VDD )
+  ( 2 N-000054 )
  )
- ( /4E417E10 $noname  R3 10k {Lib=R}
-  (    1 VDD )
-  (    2 /#RESET )
+ ( /4E4C633E LED-0603 D2 LED
+  ( 1 VDD )
+  ( 2 N-000021 )
  )
- ( /4E417D5F $noname  C7 C {Lib=C}
-  (    1 N-000032 )
-  (    2 DGND )
+ ( /4E4C6343 LED-0603 D3 LED
+  ( 1 VDD )
+  ( 2 N-000020 )
  )
- ( /4E417D5B $noname  C6 C {Lib=C}
-  (    1 N-000033 )
-  (    2 DGND )
+ ( /4E4C6353 LED-0603 D4 LED
+  ( 1 VDD )
+  ( 2 N-000027 )
  )
- ( /4E417D0E $noname  X2 32.768kHz {Lib=CRYSTAL}
-  (    1 N-000033 )
-  (    2 N-000032 )
+ ( /4E3D8AFF SparkFun-USB-A-PCB J1 USB_2
+  ( 1 /VBUS )
+  ( 2 /USB_D- )
+  ( 3 /USB_D+ )
+  ( 4 DGND )
  )
- ( /4E4179AF $noname  U1 NUC120LDQ48 {Lib=NUC120LDQ48}
-  (    1 /CPO0 )
-  (    2 N-000032 )
-  (    3 N-000033 )
-  (    4 /I2C1SCL )
-  (    5 /I2C1SDA )
-  (    6 /I2C0SCL )
-  (    7 /I2C0SDA )
-  (    8 /RXD1 )
-  (    9 /TXD1 )
-  (   10 /LDO )
-  (   11 VDD )
-  (   12 DGND )
-  (   13 /VBUS )
-  (   14 /VDD33 )
-  (   15 /D- )
-  (   16 /D+ )
-  (   17 /RXD0 )
-  (   18 /TXD0 )
-  (   19 /RTS0 )
-  (   20 /CTS0 )
-  (   21 /MOSI00 )
-  (   22 /MISO00 )
-  (   23 /SPICLK0 )
-  (   24 /SPISS00 )
-  (   25 /PWM3 )
-  (   26 /PWM2 )
-  (   27 /PWM1 )
-  (   28 /PWM0 )
-  (   29 /ICE_DAT )
-  (   30 /ICE_CK )
-  (   31 DGND )
-  (   32 /ADC0 )
-  (   33 /ADC1 )
-  (   34 /ADC2 )
-  (   35 /ADC3 )
-  (   36 /ADC4 )
-  (   37 /ADC5 )
-  (   38 /ADC6 )
-  (   39 /ADC7 )
-  (   40 VDD )
-  (   41 /CPN0 )
-  (   42 /CPP0 )
-  (   43 /#INT1 )
-  (   44 N-000038 )
-  (   45 N-000030 )
-  (   46 /#RESET )
-  (   47 DGND )
-  (   48 /TM0 )
+ ( /4E41B34F SparkFun-USB-MINIB J2 USB_2
+  ( 1 /VBUS )
+  ( 2 /USB_D- )
+  ( 3 /USB_D+ )
+  ( 4 DGND )
  )
- ( /4E3E9CC3 $noname  C2 0.1u {Lib=C}
-  (    1 /LDO )
-  (    2 DGND )
+ ( /4E41B357 SparkFun-1X04_LOCK J3 USB_2
+  ( 1 /VBUS )
+  ( 2 /USB_D- )
+  ( 3 /USB_D+ )
+  ( 4 DGND )
  )
- ( /4E3E9C78 $noname  C1 0.1u {Lib=C}
-  (    1 /VDD33 )
-  (    2 DGND )
+ ( /4E4C62A1 SparkFun-SJ_2S-NO JP1 PRESENCE_ENABLE
+  ( 1 N-000032 )
+  ( 2 /#INT1 )
  )
- ( /4E3E9104 $noname  C5 8p {Lib=C}
-  (    1 N-000030 )
-  (    2 DGND )
+ ( /4E4D0FD5 3PAD-CHOICE K1 CONN_3
+  ( 1 +3.3V )
+  ( 2 /NUC_VDD33 )
+  ( 3 /REG_VDD33 )
  )
- ( /4E3E9101 $noname  C4 8p {Lib=C}
-  (    1 N-000029 )
-  (    2 DGND )
+ ( /4E445BCD 3PAD-CHOICE P1 CONN_3
+  ( 1 VDD )
+  ( 2 /VBUS )
+  ( 3 +3.3V )
  )
- ( /4E3E909C $noname  R4 33 {Lib=R}
-  (    1 N-000029 )
-  (    2 N-000038 )
+ ( /4E444C2D SparkFun-1X05_LOCK P2 CONN_5
+  ( 1 VDD )
+  ( 2 /ICE_DAT )
+  ( 3 /ICE_CK )
+  ( 4 /#RESET )
+  ( 5 DGND )
  )
- ( /4E3D9B51 $noname  R5 1M {Lib=R}
-  (    1 N-000030 )
-  (    2 N-000029 )
+ ( /4E446858 SparkFun-1X15_LOCK P3 UPPER_PINS
+  ( 1 DGND )
+  ( 2 /ADC0 )
+  ( 3 /RXD1 )
+  ( 4 /TXD1 )
+  ( 5 /PWM0 )
+  ( 6 /MOSI00 )
+  ( 7 /MISO00 )
+  ( 8 /SPICLK0 )
+  ( 9 /SPISS00 )
+  ( 10 /I2C0SDA )
+  ( 11 /I2C0SCL )
+  ( 12 /#INT1 )
+  ( 13 /ADC5 )
+  ( 14 /ADC6 )
+  ( 15 VDD )
  )
- ( /4E3D9B11 $noname  X1 12MHz {Lib=CRYSTAL}
-  (    1 N-000029 )
-  (    2 N-000030 )
+ ( /4E446864 SparkFun-1X15_LOCK P4 LOWER_PINS
+  ( 1 VDD )
+  ( 2 +3.3V )
+  ( 3 /ADC1 )
+  ( 4 /ADC2 )
+  ( 5 /ADC3 )
+  ( 6 /CPP0 )
+  ( 7 /CPN0 )
+  ( 8 /CPO0 )
+  ( 9 /BTN2 )
+  ( 10 /PWM1 )
+  ( 11 /LED1 )
+  ( 12 /LED2 )
+  ( 13 /I2C1SDA )
+  ( 14 /I2C1SCL )
+  ( 15 DGND )
  )
- ( /4E3D925D $noname  R1 100 {Lib=R}
-  (    1 /D- )
-  (    2 /USB_D- )
+ ( /4E44688C SparkFun-2X5-NS P5 RIGHT_PINS
+  ( 1 /RXD0 )
+  ( 2 DGND )
+  ( 3 /LED3 )
+  ( 4 /ADC7 )
+  ( 5 /#RESET )
+  ( 6 /ADC4 )
+  ( 7 VDD )
+  ( 8 /CTS0 )
+  ( 9 DGND )
+  ( 10 /TXD0 )
  )
- ( /4E3D9144 $noname  R2 100 {Lib=R}
-  (    1 /D+ )
-  (    2 /USB_D+ )
+ ( /4E3D925D SM0603 R1 100
+  ( 1 /D- )
+  ( 2 /USB_D- )
  )
- ( /4E3D8AFF $noname  J1 USB_2 {Lib=USB_2}
-  (    1 /VBUS )
-  (    2 /USB_D- )
-  (    3 /USB_D+ )
-  (    4 DGND )
+ ( /4E3D9144 SM0603 R2 100
+  ( 1 /D+ )
+  ( 2 /USB_D+ )
+ )
+ ( /4E417E10 SM0603 R3 10k
+  ( 1 VDD )
+  ( 2 /#RESET )
+ )
+ ( /4E3E909C SM0603 R4 33
+  ( 1 N-000038 )
+  ( 2 N-000037 )
+ )
+ ( /4E3D9B51 SM0603 R5 1M
+  ( 1 N-000036 )
+  ( 2 N-000038 )
+ )
+ ( /4E4186C6 SM0603 R6 500
+  ( 1 N-000054 )
+  ( 2 /LED1 )
+ )
+ ( /4E4C633D SM0603 R7 500
+  ( 1 N-000021 )
+  ( 2 /LED2 )
+ )
+ ( /4E4C6344 SM0603 R8 500
+  ( 1 N-000020 )
+  ( 2 /LED3 )
+ )
+ ( /4E4C6352 SM0603 R9 500
+  ( 1 N-000027 )
+  ( 2 /CTS0 )
+ )
+ ( /4E417EF0 EVQP2 SW1 SW_PUSH
+  ( 1 DGND )
+  ( 2 /#RESET )
+ )
+ ( /4E4C645F EVQP2 SW2 SW_PUSH
+  ( 1 DGND )
+  ( 2 /#INT1 )
+ )
+ ( /4E4C661C EVQP2 SW3 SW_PUSH
+  ( 1 DGND )
+  ( 2 /BTN2 )
+ )
+ ( /4E4179AF LQFP48 U1 NUC120LDQ48
+  ( 1 /CPO0 )
+  ( 2 N-000051 )
+  ( 3 N-000035 )
+  ( 4 /I2C1SCL )
+  ( 5 /I2C1SDA )
+  ( 6 /I2C0SCL )
+  ( 7 /I2C0SDA )
+  ( 8 /RXD1 )
+  ( 9 /TXD1 )
+  ( 10 N-000043 )
+  ( 11 VDD )
+  ( 12 DGND )
+  ( 13 /VBUS )
+  ( 14 /NUC_VDD33 )
+  ( 15 /D- )
+  ( 16 /D+ )
+  ( 17 /RXD0 )
+  ( 18 /TXD0 )
+  ( 19 /LED3 )
+  ( 20 /CTS0 )
+  ( 21 /MOSI00 )
+  ( 22 /MISO00 )
+  ( 23 /SPICLK0 )
+  ( 24 /SPISS00 )
+  ( 25 /LED2 )
+  ( 26 /LED1 )
+  ( 27 /PWM1 )
+  ( 28 /PWM0 )
+  ( 29 /ICE_DAT )
+  ( 30 /ICE_CK )
+  ( 31 DGND )
+  ( 32 /ADC0 )
+  ( 33 /ADC1 )
+  ( 34 /ADC2 )
+  ( 35 /ADC3 )
+  ( 36 /ADC4 )
+  ( 37 /ADC5 )
+  ( 38 /ADC6 )
+  ( 39 /ADC7 )
+  ( 40 VDD )
+  ( 41 /CPN0 )
+  ( 42 /CPP0 )
+  ( 43 /#INT1 )
+  ( 44 N-000037 )
+  ( 45 N-000036 )
+  ( 46 /#RESET )
+  ( 47 DGND )
+  ( 48 /BTN2 )
+ )
+ ( /4E4C606F DM3D-SF U2 MICROSD
+  ( 1 ? )
+  ( 2 N-000025 )
+  ( 3 N-000024 )
+  ( 4 +3.3V )
+  ( 5 N-000060 )
+  ( 6 DGND )
+  ( 7 /MISO00 )
+  ( 8 ? )
+  ( 9 N-000032 )
+  ( 10 DGND )
+ )
+ ( /4E4D08A5 SparkFun-SOT23 U3 MCP1700T-330
+  ( GND DGND )
+  ( VI /VBUS )
+  ( VO /REG_VDD33 )
+ )
+ ( /4E4CF82A SparkFun-TSSOP16 U4 74LCX125
+  ( 1 DGND )
+  ( 2 /ADC7 )
+  ( 3 N-000025 )
+  ( 4 DGND )
+  ( 5 /MOSI00 )
+  ( 6 N-000024 )
+  ( 7 DGND )
+  ( 8 N-000060 )
+  ( 9 /SPICLK0 )
+  ( 10 DGND )
+  ( 11 +3.3V )
+  ( 12 +3.3V )
+  ( 13 +3.3V )
+  ( 14 +3.3V )
+ )
+ ( /4E3D9B11 ABM8 X1 12MHz
+  ( 1 N-000038 )
+  ( 2 N-000036 )
+ )
+ ( /4E417D0E SparkFun-CRYSTAL-32KHZ-SMD X2 32.768kHz
+  ( 1 N-000035 )
+  ( 2 N-000051 )
  )
 )
 *
 { Allowed footprints by component:
-$component R6
- R?
- SM0603
- SM0805
- R?-*
+$component C1
+ SM*
+ C?
+ C1-1
+$endlist
+$component C2
+ SM*
+ C?
+ C1-1
+$endlist
+$component C3
+ SM*
+ C?
+ C1-1
+$endlist
+$component C4
+ SM*
+ C?
+ C1-1
+$endlist
+$component C5
+ SM*
+ C?
+ C1-1
+$endlist
+$component C6
+ SM*
+ C?
+ C1-1
+$endlist
+$component C7
+ SM*
+ C?
+ C1-1
+$endlist
+$component C8
+ SM*
+ C?
+ C1-1
+$endlist
+$component C9
+ SM*
+ C?
+ C1-1
+$endlist
+$component C10
+ SM*
+ C?
+ C1-1
 $endlist
 $component D1
  LED-3MM
@@ -206,58 +342,32 @@ $component D1
  LED-1206
  LEDV
 $endlist
-$component C3
- SM*
- C?
- C1-1
+$component D2
+ LED-3MM
+ LED-5MM
+ LED-10MM
+ LED-0603
+ LED-0805
+ LED-1206
+ LEDV
 $endlist
-$component R3
- R?
- SM0603
- SM0805
- R?-*
+$component D3
+ LED-3MM
+ LED-5MM
+ LED-10MM
+ LED-0603
+ LED-0805
+ LED-1206
+ LEDV
 $endlist
-$component C7
- SM*
- C?
- C1-1
-$endlist
-$component C6
- SM*
- C?
- C1-1
-$endlist
-$component C2
- SM*
- C?
- C1-1
-$endlist
-$component C1
- SM*
- C?
- C1-1
-$endlist
-$component C5
- SM*
- C?
- C1-1
-$endlist
-$component C4
- SM*
- C?
- C1-1
-$endlist
-$component R4
- R?
- SM0603
- SM0805
- R?-*
-$endlist
-$component R5
- R?
- SM0603
- SM0805
- R?-*
+$component D4
+ LED-3MM
+ LED-5MM
+ LED-10MM
+ LED-0603
+ LED-0805
+ LED-1206
+ LEDV
 $endlist
 $component R1
  R?
@@ -271,193 +381,47 @@ $component R2
  SM0805
  R?-*
 $endlist
+$component R3
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R4
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R5
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R6
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R7
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R8
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R9
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
 $endfootprintlist
 }
-{ Pin List by Nets
-Net 1 "/VBUS" "VBUS"
- J2 1
- U1 13
- P1 2
- J1 1
- J3 1
-Net 2 "/USB_D-" "USB_D-"
- J2 2
- R1 2
- J3 2
- J1 2
-Net 3 "/USB_D+" "USB_D+"
- J1 3
- J2 3
- J3 3
- R2 2
-Net 4 "VDD" "VDD"
- P3 2
- U1 11
- U1 40
- R3 1
- P2 1
- P1 1
- D1 1
-Net 5 "/#RESET" "#RESET"
- R3 2
- P2 4
- SW1 2
- U1 46
- C3 1
-Net 6 "" ""
- R6 1
- D1 2
-Net 7 "/CTS0" "CTS0"
- U1 20
- P5 7
-Net 8 "/PWM3" "PWM3"
- U1 25
- P5 6
-Net 9 "/RXD0" "RXD0"
- U1 17
- P5 3
-Net 10 "/I2C0SCL" "I2C0SCL"
- U1 6
- P3 12
-Net 11 "/I2C0SDA" "I2C0SDA"
- P3 11
- U1 7
-Net 12 "/SPICLK0" "SPICLK0"
- U1 23
- P3 10
-Net 13 "/MISO00" "MISO00"
- P3 9
- U1 22
-Net 14 "/MOSI00" "MOSI00"
- P3 8
- U1 21
-Net 15 "/SPISS00" "SPISS00"
- U1 24
- P3 7
-Net 16 "/PWM0" "PWM0"
- P3 6
- U1 28
-Net 17 "/TXD1" "TXD1"
- P3 5
- U1 9
-Net 18 "/RXD1" "RXD1"
- P3 4
- U1 8
-Net 19 "/ADC0" "ADC0"
- U1 32
- P3 3
-Net 20 "/TM0" "TM0"
- P4 9
- U1 48
-Net 21 "/CPO0" "CPO0"
- P4 7
- U1 1
-Net 22 "/CPN0" "CPN0"
- P4 6
- U1 41
-Net 23 "/CPP0" "CPP0"
- P4 5
- U1 42
-Net 24 "/ADC4" "ADC4"
- P4 4
- U1 36
-Net 25 "/ADC3" "ADC3"
- P4 3
- U1 35
-Net 26 "/ADC2" "ADC2"
- P4 2
- U1 34
-Net 27 "/ADC1" "ADC1"
- U1 33
- P4 1
-Net 28 "/ADC6" "ADC6"
- U1 38
- P5 10
-Net 29 "" ""
- R5 2
- R4 1
- X1 1
- C4 1
-Net 30 "" ""
- U1 45
- C5 1
- R5 1
- X1 2
-Net 31 "/VDD33" "VDD33"
- P1 3
- U1 14
- C1 1
-Net 32 "" ""
- C7 1
- U1 2
- X2 2
-Net 33 "" ""
- U1 3
- C6 1
- X2 1
-Net 34 "/LDO" "LDO"
- U1 10
- C2 1
-Net 35 "/I2C1SDA" "I2C1SDA"
- P4 11
- U1 5
-Net 36 "/#INT1" "#INT1"
- P4 8
- U1 43
-Net 37 "DGND" "DGND"
- U1 12
- U1 31
- C2 2
- C6 2
- J1 4
- J2 4
- P3 1
- C3 2
- P5 2
- SW1 1
- U1 47
- P2 5
- J3 4
- C7 2
- C1 2
- C5 2
- C4 2
-Net 38 "" ""
- U1 44
- R4 2
-Net 39 "/ICE_DAT" "ICE_DAT"
- P2 2
- U1 29
-Net 40 "/D+" "D+"
- U1 16
- R2 1
-Net 41 "/D-" "D-"
- R1 1
- U1 15
-Net 42 "/ICE_CK" "ICE_CK"
- P2 3
- U1 30
-Net 43 "/RTS0" "RTS0"
- U1 19
- P5 4
-Net 44 "/TXD0" "TXD0"
- U1 18
- P5 8
-Net 45 "/ADC7" "ADC7"
- R6 2
- U1 39
- P5 1
-Net 46 "/PWM2" "PWM2"
- U1 26
- P5 5
-Net 47 "/ADC5" "ADC5"
- P5 9
- U1 37
-Net 48 "/I2C1SCL" "I2C1SCL"
- U1 4
- P4 12
-Net 49 "/PWM1" "PWM1"
- P4 10
- U1 27
-}
-#End
