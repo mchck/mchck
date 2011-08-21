@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by CvPCB (2011-07-16 BZR 3051)-testing date = Sat 20 Aug 2011 11:51:16 AM CEST
+Cmp-Mod V01 Created by CvPCB (2011-07-16 BZR 3051)-testing date = Sun 21 Aug 2011 02:38:42 PM CEST
 
 BeginCmp
 TimeStamp = /4E3E9C78;
@@ -151,21 +151,14 @@ BeginCmp
 TimeStamp = /4E446858;
 Reference = P3;
 ValeurCmp = UPPER_PINS;
-IdModule  = SparkFun-1X15_LOCK;
+IdModule  = SparkFun-1X18_LOCK;
 EndCmp
 
 BeginCmp
 TimeStamp = /4E446864;
 Reference = P4;
 ValeurCmp = LOWER_PINS;
-IdModule  = SparkFun-1X15_LOCK;
-EndCmp
-
-BeginCmp
-TimeStamp = /4E44688C;
-Reference = P5;
-ValeurCmp = RIGHT_PINS;
-IdModule  = SparkFun-2X5-NS;
+IdModule  = SparkFun-1X18_LOCK;
 EndCmp
 
 BeginCmp
