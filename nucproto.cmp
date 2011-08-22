@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by CvPCB (2011-07-16 BZR 3051)-testing date = Sun 21 Aug 2011 02:38:42 PM CEST
+Cmp-Mod V01 Genere par PcbNew le Mon 22 Aug 2011 03:03:49 AM CEST
 
 BeginCmp
 TimeStamp = /4E3E9C78;
@@ -135,7 +135,7 @@ EndCmp
 
 BeginCmp
 TimeStamp = /4E445BCD;
-Reference = P1;
+Reference = K2;
 ValeurCmp = CONN_3;
 IdModule  = 3PAD-CHOICE;
 EndCmp
@@ -225,6 +225,13 @@ IdModule  = SM0603;
 EndCmp
 
 BeginCmp
+TimeStamp = /4E51AA47;
+Reference = R10;
+ValeurCmp = 50k;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
 TimeStamp = /4E417EF0;
 Reference = SW1;
 ValeurCmp = SW_PUSH;
@@ -270,7 +277,7 @@ BeginCmp
 TimeStamp = /4E4CF82A;
 Reference = U4;
 ValeurCmp = 74LCX125;
-IdModule  = SparkFun-TSSOP16;
+IdModule  = SparkFun-TSSOP14;
 EndCmp
 
 BeginCmp

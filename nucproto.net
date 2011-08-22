@@ -1,11 +1,11 @@
-# EESchema Netlist Version 1.1 created  Sun 21 Aug 2011 02:38:42 PM CEST
+# EESchema Netlist Version 1.1 created  Mon 22 Aug 2011 03:03:04 AM CEST
 (
  ( /4E3E9C78 SM0603 C1 0.1u
   ( 1 /NUC_VDD33 )
   ( 2 DGND )
  )
  ( /4E3E9CC3 SM0603 C2 0.1u
-  ( 1 N-000043 )
+  ( 1 N-000045 )
   ( 2 DGND )
  )
  ( /4E4181C7 SM0603 C3 0.1u
@@ -17,7 +17,7 @@
   ( 2 DGND )
  )
  ( /4E3E9104 SM0603 C5 8p
-  ( 1 N-000039 )
+  ( 1 N-000037 )
   ( 2 DGND )
  )
  ( /4E417D5B SM0603 C6 18p
@@ -25,7 +25,7 @@
   ( 2 DGND )
  )
  ( /4E417D5F SM0603 C7 18p
-  ( 1 N-000051 )
+  ( 1 N-000052 )
   ( 2 DGND )
  )
  ( /4E4D1569 SM0603 C8 1u
@@ -42,19 +42,19 @@
  )
  ( /4E418482 LED-0603 D1 LED
   ( 1 VDD )
-  ( 2 N-000052 )
+  ( 2 N-000054 )
  )
  ( /4E4C633E LED-0603 D2 LED
   ( 1 VDD )
-  ( 2 N-000020 )
+  ( 2 N-000022 )
  )
  ( /4E4C6343 LED-0603 D3 LED
   ( 1 VDD )
-  ( 2 N-000026 )
+  ( 2 N-000021 )
  )
  ( /4E4C6353 LED-0603 D4 LED
   ( 1 VDD )
-  ( 2 N-000025 )
+  ( 2 N-000028 )
  )
  ( /4E3D8AFF SparkFun-USB-A-PCB J1 USB_2
   ( 1 /VBUS )
@@ -75,7 +75,7 @@
   ( 4 DGND )
  )
  ( /4E4C62A1 SparkFun-SJ_2S-NO JP1 PRESENCE_ENABLE
-  ( 1 N-000033 )
+  ( 1 N-000034 )
   ( 2 /#INT1 )
  )
  ( /4E4D0FD5 3PAD-CHOICE K1 CONN_3
@@ -83,7 +83,7 @@
   ( 2 /NUC_VDD33 )
   ( 3 /REG_VDD33 )
  )
- ( /4E445BCD 3PAD-CHOICE P1 CONN_3
+ ( /4E445BCD 3PAD-CHOICE K2 CONN_3
   ( 1 VDD )
   ( 2 /VBUS )
   ( 3 +3.3V )
@@ -149,27 +149,31 @@
  )
  ( /4E3E909C SM0603 R4 33
   ( 1 N-000040 )
-  ( 2 N-000038 )
+  ( 2 N-000039 )
  )
  ( /4E3D9B51 SM0603 R5 1M
-  ( 1 N-000039 )
+  ( 1 N-000037 )
   ( 2 N-000040 )
  )
  ( /4E4186C6 SM0603 R6 500
-  ( 1 N-000052 )
+  ( 1 N-000054 )
   ( 2 /LED1 )
  )
  ( /4E4C633D SM0603 R7 500
-  ( 1 N-000020 )
+  ( 1 N-000022 )
   ( 2 /LED2 )
  )
  ( /4E4C6344 SM0603 R8 500
-  ( 1 N-000026 )
+  ( 1 N-000021 )
   ( 2 /LED3 )
  )
  ( /4E4C6352 SM0603 R9 500
-  ( 1 N-000025 )
+  ( 1 N-000028 )
   ( 2 /CTS0 )
+ )
+ ( /4E51AA47 SM0603 R10 50k
+  ( 1 /MISO00 )
+  ( 2 +3.3V )
  )
  ( /4E417EF0 EVQP2 SW1 SW_PUSH
   ( 1 DGND )
@@ -185,7 +189,7 @@
  )
  ( /4E4179AF LQFP48 U1 NUC120LDQ48
   ( 1 /CPO0 )
-  ( 2 N-000051 )
+  ( 2 N-000052 )
   ( 3 N-000036 )
   ( 4 /I2C1SCL )
   ( 5 /I2C1SDA )
@@ -193,7 +197,7 @@
   ( 7 /I2C0SDA )
   ( 8 /RXD1 )
   ( 9 /TXD1 )
-  ( 10 N-000043 )
+  ( 10 N-000045 )
   ( 11 VDD )
   ( 12 DGND )
   ( 13 /VBUS )
@@ -227,22 +231,22 @@
   ( 41 /CPN0 )
   ( 42 /CPP0 )
   ( 43 /#INT1 )
-  ( 44 N-000038 )
-  ( 45 N-000039 )
+  ( 44 N-000039 )
+  ( 45 N-000037 )
   ( 46 /#RESET )
   ( 47 DGND )
   ( 48 /BTN2 )
  )
  ( /4E4C606F DM3D-SF U2 MICROSD
   ( 1 ? )
-  ( 2 N-000060 )
-  ( 3 N-000022 )
+  ( 2 N-000025 )
+  ( 3 N-000024 )
   ( 4 +3.3V )
-  ( 5 N-000057 )
+  ( 5 N-000060 )
   ( 6 DGND )
   ( 7 /MISO00 )
   ( 8 ? )
-  ( 9 N-000033 )
+  ( 9 N-000034 )
   ( 10 DGND )
  )
  ( /4E4D08A5 SparkFun-SOT23 U3 MCP1700T-330
@@ -250,15 +254,15 @@
   ( VI /VBUS )
   ( VO /REG_VDD33 )
  )
- ( /4E4CF82A SparkFun-TSSOP16 U4 74LCX125
+ ( /4E4CF82A SparkFun-TSSOP14 U4 74LCX125
   ( 1 DGND )
   ( 2 /ADC7 )
-  ( 3 N-000060 )
+  ( 3 N-000025 )
   ( 4 DGND )
   ( 5 /MOSI00 )
-  ( 6 N-000022 )
+  ( 6 N-000024 )
   ( 7 DGND )
-  ( 8 N-000057 )
+  ( 8 N-000060 )
   ( 9 /SPICLK0 )
   ( 10 DGND )
   ( 11 +3.3V )
@@ -268,11 +272,11 @@
  )
  ( /4E3D9B11 ABM8 X1 12MHz
   ( 1 N-000040 )
-  ( 2 N-000039 )
+  ( 2 N-000037 )
  )
  ( /4E417D0E SparkFun-CRYSTAL-32KHZ-SMD X2 32.768kHz
   ( 1 N-000036 )
-  ( 2 N-000051 )
+  ( 2 N-000052 )
  )
 )
 *
@@ -412,6 +416,12 @@ $component R8
  R?-*
 $endlist
 $component R9
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R10
  R?
  SM0603
  SM0805

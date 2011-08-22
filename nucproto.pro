@@ -1,4 +1,4 @@
-update=Sun 21 Aug 2011 02:37:19 PM CEST
+update=Mon 22 Aug 2011 01:05:26 AM CEST
 version=1
 last_client=pcbnew
 [cvpcb]
@@ -96,7 +96,7 @@ VEgarde=59
 DrawLar=150
 EdgeLar=150
 TxtLar=120
-MSegLar=150
+MSegLar=80
 LastNetListRead=nucproto.net
 [pcbnew/libraries]
 LibDir=
@@ -119,3 +119,4 @@ LibName16=3PAD-CHOICE
 LibName17=MICROSD-AMPHENOL
 LibName18=DM3D-SF
 LibName19=SparkFun-1X18_LOCK
+LibName20=SparkFun-TSSOP14
