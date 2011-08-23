@@ -1,4 +1,4 @@
-update=Mon 22 Aug 2011 04:48:21 AM CEST
+update=Tue 23 Aug 2011 11:59:02 PM CEST
 version=1
 last_client=pcbnew
 [cvpcb]
@@ -81,10 +81,12 @@ LibName33=microsd
 LibName34=conn_16
 LibName35=conn_15
 LibName36=conn_18
+LibName37=/home/corecode/.kicad.d/lib/SparkFun
+LibName38=tac_switchsmd_evqp2
 [pcbnew]
 version=1
 PadDrlX=0
-PadDimH=571
+PadDimH=394
 PadDimV=394
 BoardThickness=630
 TxtPcbV=800
@@ -96,7 +98,7 @@ VEgarde=59
 DrawLar=150
 EdgeLar=150
 TxtLar=120
-MSegLar=80
+MSegLar=20
 LastNetListRead=nucproto.net
 [pcbnew/libraries]
 LibDir=
@@ -121,3 +123,5 @@ LibName18=DM3D-SF
 LibName19=SparkFun-1X18_LOCK
 LibName20=SparkFun-TSSOP14
 LibName21=MCP1700-SOT23
+LibName22=SOD-882
+LibName23=SOD-523F
