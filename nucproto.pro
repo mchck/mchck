@@ -1,4 +1,4 @@
-update=Mon 22 Aug 2011 01:05:26 AM CEST
+update=Mon 22 Aug 2011 04:48:21 AM CEST
 version=1
 last_client=pcbnew
 [cvpcb]
@@ -83,9 +83,9 @@ LibName35=conn_15
 LibName36=conn_18
 [pcbnew]
 version=1
-PadDrlX=400
-PadDimH=740
-PadDimV=740
+PadDrlX=0
+PadDimH=571
+PadDimV=394
 BoardThickness=630
 TxtPcbV=800
 TxtPcbH=600
@@ -120,3 +120,4 @@ LibName17=MICROSD-AMPHENOL
 LibName18=DM3D-SF
 LibName19=SparkFun-1X18_LOCK
 LibName20=SparkFun-TSSOP14
+LibName21=MCP1700-SOT23
