@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by CvPCB (2011-07-16 BZR 3051)-testing date = Mon 22 Aug 2011 11:04:47 AM CEST
+Cmp-Mod V01 Created by CvPCB (2011-07-16 BZR 3051)-testing date = Tue 23 Aug 2011 11:48:18 AM CEST
 
 BeginCmp
 TimeStamp = /4E3E9C78;
@@ -78,13 +78,6 @@ IdModule  = LED-0603;
 EndCmp
 
 BeginCmp
-TimeStamp = /4E4C633E;
-Reference = D2;
-ValeurCmp = LED;
-IdModule  = LED-0603;
-EndCmp
-
-BeginCmp
 TimeStamp = /4E3D8AFF;
 Reference = J1;
 ValeurCmp = USB_2;
@@ -113,6 +106,13 @@ IdModule  = 3PAD-CHOICE;
 EndCmp
 
 BeginCmp
+TimeStamp = /4E5376FA;
+Reference = P1;
+ValeurCmp = RIGHT_PINS;
+IdModule  = SparkFun-1X05_LOCK;
+EndCmp
+
+BeginCmp
 TimeStamp = /4E444C2D;
 Reference = P2;
 ValeurCmp = CONN_5;
@@ -123,14 +123,21 @@ BeginCmp
 TimeStamp = /4E446858;
 Reference = P3;
 ValeurCmp = UPPER_PINS;
-IdModule  = SparkFun-1X18_LOCK;
+IdModule  = SparkFun-1X13;
 EndCmp
 
 BeginCmp
 TimeStamp = /4E446864;
 Reference = P4;
 ValeurCmp = LOWER_PINS;
-IdModule  = SparkFun-1X18_LOCK;
+IdModule  = SparkFun-1X13;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E537706;
+Reference = P5;
+ValeurCmp = LEFT_PINS;
+IdModule  = SparkFun-1X05_LOCK;
 EndCmp
 
 BeginCmp
@@ -155,13 +162,6 @@ IdModule  = SM0603;
 EndCmp
 
 BeginCmp
-TimeStamp = /4E521A72;
-Reference = R4;
-ValeurCmp = 1k;
-IdModule  = SM0603;
-EndCmp
-
-BeginCmp
 TimeStamp = /4E4186C6;
 Reference = R6;
 ValeurCmp = 500;
@@ -169,29 +169,8 @@ IdModule  = SM0603;
 EndCmp
 
 BeginCmp
-TimeStamp = /4E4C633D;
-Reference = R7;
-ValeurCmp = 500;
-IdModule  = SM0603;
-EndCmp
-
-BeginCmp
-TimeStamp = /4E51AA47;
-Reference = R10;
-ValeurCmp = 50k;
-IdModule  = SM0603;
-EndCmp
-
-BeginCmp
 TimeStamp = /4E417EF0;
 Reference = SW1;
-ValeurCmp = SW_PUSH;
-IdModule  = EVQP2;
-EndCmp
-
-BeginCmp
-TimeStamp = /4E4C645F;
-Reference = SW2;
 ValeurCmp = SW_PUSH;
 IdModule  = EVQP2;
 EndCmp
@@ -204,24 +183,10 @@ IdModule  = LQFP48;
 EndCmp
 
 BeginCmp
-TimeStamp = /4E4C606F;
-Reference = U2;
-ValeurCmp = MICROSD;
-IdModule  = DM3D-SF;
-EndCmp
-
-BeginCmp
 TimeStamp = /4E4D08A5;
 Reference = U3;
 ValeurCmp = MCP1700T-330;
 IdModule  = MCP1700-SOT23;
-EndCmp
-
-BeginCmp
-TimeStamp = /4E4CF82A;
-Reference = U4;
-ValeurCmp = 74LCX125;
-IdModule  = SparkFun-TSSOP14;
 EndCmp
 
 BeginCmp
