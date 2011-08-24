@@ -1,4 +1,4 @@
-update=Tue 23 Aug 2011 11:59:02 PM CEST
+update=Wed 24 Aug 2011 09:50:43 AM CEST
 version=1
 last_client=pcbnew
 [cvpcb]
@@ -85,9 +85,9 @@ LibName37=/home/corecode/.kicad.d/lib/SparkFun
 LibName38=tac_switchsmd_evqp2
 [pcbnew]
 version=1
-PadDrlX=0
-PadDimH=394
-PadDimV=394
+PadDrlX=400
+PadDimH=740
+PadDimV=740
 BoardThickness=630
 TxtPcbV=800
 TxtPcbH=600
@@ -125,3 +125,5 @@ LibName20=SparkFun-TSSOP14
 LibName21=MCP1700-SOT23
 LibName22=SOD-882
 LibName23=SOD-523F
+LibName24=SparkFun-1X13_LOCK
+LibName25=SparkFun-1X13_LOCK_INVERSE
