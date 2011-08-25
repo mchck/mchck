@@ -1,4 +1,4 @@
-# EESchema Netlist Version 1.1 created  Wed 24 Aug 2011 11:35:31 AM CEST
+# EESchema Netlist Version 1.1 created  Thu 25 Aug 2011 02:27:09 AM CEST
 (
  ( /4E540DB8 SOD-523F  D2 CDBU0530 {Lib=DIODE-SCHOTTKY_}
   (    A /VBUS )
@@ -73,7 +73,7 @@
   (   13 /ADC6 )
  )
  ( /4E444C2D SparkFun-1X05  P2 CONN_5 {Lib=CONN_5}
-  (    1 /VRAW )
+  (    1 VDD )
   (    2 /ICE_DAT )
   (    3 /ICE_CK )
   (    4 /#RESET )
@@ -406,10 +406,10 @@ Net 40 "DGND" "DGND"
  C7 2
  J1 4
  C2 2
- U1 47
- J2 4
  R6 2
+ J2 4
  C3 2
+ U1 47
  U1 12
  U1 31
  C1 2
@@ -418,18 +418,19 @@ Net 40 "DGND" "DGND"
  P4 1
  P3 1
 Net 41 "" ""
- C7 1
- X2 2
  U1 2
+ X2 2
+ C7 1
 Net 42 "" ""
  U1 3
- X2 1
  C6 1
+ X2 1
 Net 43 "VDD" "VDD"
- U1 11
+ P2 1
+ P4 2
  U1 40
  U3 VO
- P4 2
+ U1 11
  R3 1
  C8 1
 Net 44 "/RXD0" "RXD0"
@@ -442,16 +443,15 @@ Net 46 "/CTS0" "CTS0"
  P1 5
  U1 20
 Net 47 "/LDO" "LDO"
- U1 10
  C2 1
+ U1 10
 Net 48 "/VRAW" "VRAW"
- P3 2
- P2 1
  D2 C
- U3 VI
+ P3 2
  C9 1
+ U3 VI
 Net 49 "/NUC_VDD33" "NUC_VDD33"
- U1 14
  C1 1
+ U1 14
 }
 #End

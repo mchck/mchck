@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Wed 24 Aug 2011 11:35:18 AM CEST
+EESchema Schematic File Version 2  date Thu 25 Aug 2011 02:27:04 AM CEST
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -44,7 +44,7 @@ $Descr A4 11700 8267
 encoding utf-8
 Sheet 1 1
 Title "NUC120 proto board"
-Date "24 aug 2011"
+Date "25 aug 2011"
 Rev "1"
 Comp ""
 Comment1 ""
@@ -91,9 +91,7 @@ Wire Notes Line
 Wire Notes Line
 	6450 3300 4250 3300
 Wire Wire Line
-	5500 4100 5500 4200
-Wire Wire Line
-	5500 4200 5500 4300
+	5500 4100 5500 4300
 Wire Wire Line
 	10600 4000 10250 4000
 Wire Wire Line
@@ -105,7 +103,7 @@ Wire Wire Line
 Wire Wire Line
 	1300 5750 850  5750
 Wire Wire Line
-	5950 950  5950 1050
+	5950 1050 5950 950 
 Wire Wire Line
 	8650 3850 9000 3850
 Wire Wire Line
@@ -206,15 +204,13 @@ Wire Notes Line
 Wire Notes Line
 	2950 3400 1900 3400
 Wire Wire Line
-	2350 3000 2700 3000
+	2700 3000 2350 3000
 Wire Wire Line
-	2700 3000 2700 3950
-Wire Wire Line
-	2700 3950 2700 4050
+	2700 4050 2700 3000
 Wire Wire Line
 	2400 4650 2400 4550
 Wire Wire Line
-	2100 4450 2100 4550
+	2100 4550 2100 4450
 Wire Wire Line
 	900  3000 1100 3000
 Connection ~ 9350 1100
@@ -241,56 +237,44 @@ Wire Wire Line
 Wire Wire Line
 	8000 1150 8300 1150
 Wire Wire Line
-	8650 1350 8650 1550
+	8650 1550 8650 1350
 Wire Wire Line
-	8650 1550 8500 1550
-Wire Wire Line
-	8500 1550 8300 1550
+	8300 1550 8650 1550
 Connection ~ 8500 1550
 Wire Wire Line
 	6750 950  6350 950 
 Wire Wire Line
 	6750 1150 6550 1150
 Wire Wire Line
-	6550 1150 6550 1050
+	6550 1050 6550 1150
 Connection ~ 6550 1050
 Wire Wire Line
-	9450 1000 9350 1000
+	9350 1000 9450 1000
 Wire Wire Line
-	9350 1000 9350 1100
-Wire Wire Line
-	9350 1100 9350 1350
+	9350 1350 9350 1000
 Wire Wire Line
 	10700 1000 10800 1000
 Wire Wire Line
 	10800 1000 10800 1350
 Wire Wire Line
-	2100 4550 2400 4550
-Wire Wire Line
-	2400 4550 2700 4550
+	2100 4550 2700 4550
 Wire Wire Line
 	2700 4550 2700 4450
 Connection ~ 2400 4550
 Wire Wire Line
 	2350 3100 2350 3650
 Wire Wire Line
-	2350 3650 2100 3650
+	2100 3650 2350 3650
 Wire Wire Line
-	2100 3650 2100 3950
+	2100 4050 2100 3650
 Wire Wire Line
-	2100 3950 2100 4050
-Wire Wire Line
-	8300 5900 8250 5900
-Wire Wire Line
-	8250 5900 8100 5900
+	8300 5900 8100 5900
 Wire Wire Line
 	8100 5900 8100 6150
 Wire Wire Line
 	9100 5200 9100 5300
 Wire Wire Line
-	9100 5800 9100 5900
-Wire Wire Line
-	9100 5900 9100 6000
+	9100 5800 9100 6000
 Connection ~ 2700 3950
 Connection ~ 2100 3950
 Wire Wire Line
@@ -360,11 +344,7 @@ Wire Wire Line
 Wire Wire Line
 	10200 1550 10200 1650
 Wire Wire Line
-	5950 1050 6350 1050
-Wire Wire Line
-	6350 1050 6550 1050
-Wire Wire Line
-	6550 1050 6750 1050
+	6750 1050 5950 1050
 Wire Wire Line
 	10600 3400 10250 3400
 Wire Wire Line
@@ -385,11 +365,7 @@ Wire Wire Line
 Wire Wire Line
 	1000 4150 1000 4350
 Wire Wire Line
-	9600 5900 9100 5900
-Wire Wire Line
-	9100 5900 8750 5900
-Wire Wire Line
-	8750 5900 8700 5900
+	9600 5900 8700 5900
 Wire Wire Line
 	8300 6000 8250 6000
 Wire Wire Line
@@ -398,11 +374,7 @@ Connection ~ 8250 5900
 Wire Wire Line
 	6150 3800 5900 3800
 Wire Wire Line
-	5100 3800 4950 3800
-Wire Wire Line
-	4950 3800 4650 3800
-Wire Wire Line
-	4650 3800 4350 3800
+	5100 3800 4350 3800
 Connection ~ 4650 3800
 Wire Wire Line
 	2450 5750 2800 5750
@@ -418,7 +390,7 @@ F 1 "DGND" H 1000 5580 40  0000 C CNN
 	0    1    1    0   
 $EndComp
 Text Label 5450 2200 2    40   ~ 0
-VRAW
+VDD
 Text Label 2646 5750 0    40   ~ 0
 VRAW
 Text Label 8250 1150 2    40   ~ 0
