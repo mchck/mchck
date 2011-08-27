@@ -1,4 +1,4 @@
-# EESchema Netlist Version 1.1 created  Sat 27 Aug 2011 03:33:15 AM CEST
+# EESchema Netlist Version 1.1 created  Sun 28 Aug 2011 01:19:24 AM CEST
 (
  ( /4E3E9C78 SM0603 C1 0.1u
   ( 1 /NUC_VDD33 )
@@ -13,15 +13,19 @@
   ( 2 DGND )
  )
  ( /4E580A32 SM0603 C4 4.7u
-  ( 1 /VCHARGE )
+  ( 1 VDD )
+  ( 2 DGND )
+ )
+ ( /4E592213/4E597873 SM0603 C5 22u
+  ( 1 VDD )
   ( 2 DGND )
  )
  ( /4E417D5B SM0603 C6 18p
-  ( 1 N-000043 )
+  ( 1 N-000035 )
   ( 2 DGND )
  )
  ( /4E417D5F SM0603 C7 18p
-  ( 1 N-000035 )
+  ( 1 N-000036 )
   ( 2 DGND )
  )
  ( /4E4D1569 SM0603 C8 1u
@@ -32,16 +36,16 @@
   ( 1 /VRAW )
   ( 2 DGND )
  )
+ ( /4E592213/4E592548 SM0603 C10 4.7u
+  ( 1 /Li-Po/Li-Ion_charger/BAT )
+  ( 2 DGND )
+ )
  ( /4E418482 LED-0603 D1 LED
   ( 1 /ADC5 )
-  ( 2 N-000045 )
+  ( 2 N-000031 )
  )
  ( /4E540DB8 SOD-523F D2 CDBU0530
   ( A /VBUS )
-  ( C /VCHARGE )
- )
- ( /4E57EA91 SOD-523F D3 CDBU0530
-  ( A /VCHARGE )
   ( C VDD )
  )
  ( /4E3D8AFF SparkFun-USB-A-PCB J1 USB_2
@@ -112,17 +116,19 @@
   ( 4 /ADC4 )
   ( 5 /ADC3 )
  )
- ( /4E57EAF7 SparkFun-1X02_LOCK P6 BAT
-  ( 1 /VBAT )
+ ( /4E593421 SparkFun-1X02_LOCK P6 BATTERY
+  ( 1 /Li-Po/Li-Ion_charger/BAT )
   ( 2 DGND )
  )
- ( /4E58245C SparkFun-1X01 P7 TST
-  ( 1 N-000049 )
- )
- ( /4E582552 SparkFun-SOT23-3 Q1 MOSFET-PCHANNEL
-  ( 1 /VCHARGE )
+ ( /4E592213/4E592A2E SparkFun-SOT23 Q2 IRLML2246TRPBF
+  ( 1 N-000052 )
   ( 2 VDD )
-  ( 3 /VBAT )
+  ( 3 /Li-Po/Li-Ion_charger/BAT )
+ )
+ ( /4E592213/4E592A2B SparkFun-SOT23 Q3 IRLML2246TRPBF
+  ( 1 N-000053 )
+  ( 2 VDD )
+  ( 3 N-000052 )
  )
  ( /4E3D925D SM0603 R1 100
   ( 1 /D- )
@@ -136,16 +142,20 @@
   ( 1 VDD )
   ( 2 /#RESET )
  )
- ( /4E57FBCE SM0603 R4 20k
-  ( 1 DGND )
-  ( 2 N-000047 )
- )
- ( /4E58474E SM0603 R5 10k
-  ( 1 /VCHARGE )
-  ( 2 DGND )
+ ( /4E592213/4E593272 SM0603 R5 100k
+  ( 1 VDD )
+  ( 2 N-000053 )
  )
  ( /4E4186C6 SM0603 R6 500
-  ( 1 N-000045 )
+  ( 1 N-000031 )
+  ( 2 DGND )
+ )
+ ( /4E592213/4E59308D SM0603 R7 100k
+  ( 1 N-000052 )
+  ( 2 DGND )
+ )
+ ( /4E592213/4E5924E9 SM0603 R8 36k
+  ( 1 N-000051 )
   ( 2 DGND )
  )
  ( /4E5409DB EVQP2 S1 RESET
@@ -156,8 +166,8 @@
  )
  ( /4E4179AF LQFP48 U1 NUC120LDQ48
   ( 1 /CPO0 )
-  ( 2 N-000035 )
-  ( 3 N-000043 )
+  ( 2 N-000036 )
+  ( 3 N-000035 )
   ( 4 /I2C1SCL )
   ( 5 /I2C1SDA )
   ( 6 /I2C0SCL )
@@ -198,32 +208,35 @@
   ( 41 /CPN0 )
   ( 42 /CPP0 )
   ( 43 /#INT1 )
-  ( 44 N-000051 )
-  ( 45 N-000034 )
+  ( 44 N-000050 )
+  ( 45 N-000028 )
   ( 46 /#RESET )
   ( 47 DGND )
   ( 48 /TM0 )
  )
- ( /4E5823AC SparkFun-SOT23-5 U2 MCP73831-SOT
-  ( 1 N-000049 )
-  ( 2 DGND )
-  ( 3 /VBAT )
-  ( 4 /VCHARGE )
-  ( 5 N-000047 )
- )
- ( /4E4D08A5 MCP1700-SOT23 U3 MCP1702T-330
+ ( /4E4D08A5 MCP1700-SOT23 U3 MCP1702T-50
   ( GND DGND )
   ( VI /VRAW )
-  ( VO /VCHARGE )
+  ( VO VDD )
+ )
+ ( /4E592213/4E5922E0 SparkFun-SO08 U4 CN3063
+  ( 1 DGND )
+  ( 2 N-000051 )
+  ( 3 DGND )
+  ( 4 VDD )
+  ( 5 /Li-Po/Li-Ion_charger/BAT )
+  ( 6 N-000053 )
+  ( 7 N-000053 )
+  ( 8 /Li-Po/Li-Ion_charger/BAT )
  )
  ( /4E417D0E SparkFun-CRYSTAL-32KHZ-SMD X2 32.768kHz
-  ( 1 N-000043 )
-  ( 2 N-000035 )
+  ( 1 N-000035 )
+  ( 2 N-000036 )
  )
  ( /4E53FD8B SparkFun-RESONATOR-SMD Y1 8MHz
-  ( 1 N-000051 )
+  ( 1 N-000050 )
   ( 2 DGND )
-  ( 3 N-000034 )
+  ( 3 N-000028 )
  )
 )
 *
@@ -248,6 +261,11 @@ $component C4
  C?
  C1-1
 $endlist
+$component C5
+ SM*
+ C?
+ C1-1
+$endlist
 $component C6
  SM*
  C?
@@ -264,6 +282,11 @@ $component C8
  C1-1
 $endlist
 $component C9
+ SM*
+ C?
+ C1-1
+$endlist
+$component C10
  SM*
  C?
  C1-1
@@ -295,12 +318,6 @@ $component R3
  SM0805
  R?-*
 $endlist
-$component R4
- R?
- SM0603
- SM0805
- R?-*
-$endlist
 $component R5
  R?
  SM0603
@@ -308,6 +325,18 @@ $component R5
  R?-*
 $endlist
 $component R6
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R7
+ R?
+ SM0603
+ SM0805
+ R?-*
+$endlist
+$component R8
  R?
  SM0603
  SM0805

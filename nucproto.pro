@@ -1,4 +1,4 @@
-update=Sat 27 Aug 2011 12:50:45 AM CEST
+update=Sat 27 Aug 2011 06:44:49 PM CEST
 version=1
 last_client=eeschema
 [cvpcb]
@@ -128,3 +128,4 @@ LibName36=conn_18
 LibName37=mcp73831
 LibName38=/home/corecode/.kicad.d/lib/SparkFun
 LibName39=tac_switchsmd_evqp2
+LibName40=cn3063
