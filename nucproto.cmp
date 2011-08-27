@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by CvPCB (2011-07-16 BZR 3051)-testing date = Wed 24 Aug 2011 11:31:26 AM CEST
+Cmp-Mod V01 Created by CvPCB (2011-07-16 BZR 3051)-testing date = Sat 27 Aug 2011 03:33:15 AM CEST
 
 BeginCmp
 TimeStamp = /4E3E9C78;
@@ -18,6 +18,13 @@ BeginCmp
 TimeStamp = /4E4181C7;
 Reference = C3;
 ValeurCmp = 0.1u;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E580A32;
+Reference = C4;
+ValeurCmp = 4.7u;
 IdModule  = SM0603;
 EndCmp
 
@@ -64,6 +71,13 @@ IdModule  = SOD-523F;
 EndCmp
 
 BeginCmp
+TimeStamp = /4E57EA91;
+Reference = D3;
+ValeurCmp = CDBU0530;
+IdModule  = SOD-523F;
+EndCmp
+
+BeginCmp
 TimeStamp = /4E3D8AFF;
 Reference = J1;
 ValeurCmp = USB_2;
@@ -88,7 +102,7 @@ BeginCmp
 TimeStamp = /4E5376FA;
 Reference = P1;
 ValeurCmp = LEFT_PINS;
-IdModule  = SparkFun-1X05;
+IdModule  = SparkFun-1X04;
 EndCmp
 
 BeginCmp
@@ -120,6 +134,27 @@ IdModule  = SparkFun-1X05_LOCK;
 EndCmp
 
 BeginCmp
+TimeStamp = /4E57EAF7;
+Reference = P6;
+ValeurCmp = BAT;
+IdModule  = SparkFun-1X02_LOCK;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E58245C;
+Reference = P7;
+ValeurCmp = TST;
+IdModule  = SparkFun-1X01;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E582552;
+Reference = Q1;
+ValeurCmp = MOSFET-PCHANNEL;
+IdModule  = SparkFun-SOT23-3;
+EndCmp
+
+BeginCmp
 TimeStamp = /4E3D925D;
 Reference = R1;
 ValeurCmp = 100;
@@ -136,6 +171,20 @@ EndCmp
 BeginCmp
 TimeStamp = /4E417E10;
 Reference = R3;
+ValeurCmp = 10k;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E57FBCE;
+Reference = R4;
+ValeurCmp = 20k;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E58474E;
+Reference = R5;
 ValeurCmp = 10k;
 IdModule  = SM0603;
 EndCmp
@@ -159,6 +208,13 @@ TimeStamp = /4E4179AF;
 Reference = U1;
 ValeurCmp = NUC120LDQ48;
 IdModule  = LQFP48;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E5823AC;
+Reference = U2;
+ValeurCmp = MCP73831-SOT;
+IdModule  = SparkFun-SOT23-5;
 EndCmp
 
 BeginCmp
