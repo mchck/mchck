@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Sun 28 Aug 2011 12:22:45 AM CEST
+EESchema Schematic File Version 2  date Sun 28 Aug 2011 03:10:55 PM CEST
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -46,7 +46,7 @@ $Descr A4 11700 8267
 encoding utf-8
 Sheet 2 2
 Title ""
-Date "27 aug 2011"
+Date "28 aug 2011"
 Rev ""
 Comp ""
 Comment1 ""
@@ -54,6 +54,8 @@ Comment2 ""
 Comment3 ""
 Comment4 ""
 $EndDescr
+Wire Wire Line
+	4750 4900 4750 4700
 Connection ~ 6450 3500
 Wire Wire Line
 	6800 3500 6450 3500
@@ -115,6 +117,28 @@ Connection ~ 4300 2450
 Wire Wire Line
 	6450 3050 6450 2450
 Connection ~ 6450 2450
+Wire Wire Line
+	4750 3950 4750 4300
+Connection ~ 4750 3950
+$Comp
+L DGND #PWR27
+U 1 1 4E59787B
+P 4750 4900
+F 0 "#PWR27" H 4750 4900 40  0001 C CNN
+F 1 "DGND" H 4750 4830 40  0000 C CNN
+	1    4750 4900
+	1    0    0    -1  
+$EndComp
+$Comp
+L C C5
+U 1 1 4E597873
+P 4750 4500
+F 0 "C5" H 4800 4600 50  0000 L CNN
+F 1 "22u" H 4800 4400 50  0000 L CNN
+F 2 "SM0603" H 4750 4500 60  0001 C CNN
+	1    4750 4500
+	1    0    0    -1  
+$EndComp
 $Comp
 L R R5
 U 1 1 4E593272
@@ -214,10 +238,10 @@ F 2 "SM0603" H 7550 4800 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L DGND #PWR27
+L DGND #PWR26
 U 1 1 4E592536
 P 6300 4800
-F 0 "#PWR27" H 6300 4800 40  0001 C CNN
+F 0 "#PWR26" H 6300 4800 40  0001 C CNN
 F 1 "DGND" H 6300 4730 40  0000 C CNN
 	1    6300 4800
 	0    -1   -1   0   

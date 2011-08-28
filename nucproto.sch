@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Sun 28 Aug 2011 12:22:45 AM CEST
+EESchema Schematic File Version 2  date Sun 28 Aug 2011 03:10:55 PM CEST
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -46,7 +46,7 @@ $Descr A4 11700 8267
 encoding utf-8
 Sheet 1 2
 Title "NUC120 proto board"
-Date "27 aug 2011"
+Date "28 aug 2011"
 Rev "1"
 Comp ""
 Comment1 ""
@@ -54,20 +54,41 @@ Comment2 ""
 Comment3 ""
 Comment4 ""
 $EndDescr
-Text Notes 4650 6800 0    40   ~ 0
-Optional Li-Po/Li-Ion charger\n(solar input possible)
-Wire Notes Line
-	3800 6700 3800 5600
-Wire Notes Line
-	3800 6700 6250 6700
-Wire Notes Line
-	6250 6700 6250 5600
-Wire Notes Line
-	6250 5600 3800 5600
+NoConn ~ 8300 5800
+NoConn ~ 8700 5800
 Wire Wire Line
-	4350 6050 4650 6050
+	8100 6150 8100 5900
+Wire Wire Line
+	8100 5900 8300 5900
+Wire Wire Line
+	5000 4850 5000 5050
+Wire Notes Line
+	5750 4500 5300 4500
 Wire Wire Line
 	5400 4550 6400 4550
+Wire Notes Line
+	4650 3900 4200 3900
+Wire Notes Line
+	4650 3900 4650 4500
+Wire Notes Line
+	4200 3900 4200 4500
+Wire Wire Line
+	4450 4350 4450 4550
+Connection ~ 4450 4050
+Wire Wire Line
+	5550 4150 5550 4050
+Wire Wire Line
+	5550 4050 3850 4050
+Wire Notes Line
+	3800 6900 3800 5800
+Wire Notes Line
+	3800 6900 6250 6900
+Wire Notes Line
+	6250 6900 6250 5800
+Wire Notes Line
+	6250 5800 3800 5800
+Wire Wire Line
+	4350 6250 4650 6250
 Wire Notes Line
 	8100 6800 8100 6600
 Wire Notes Line
@@ -83,21 +104,17 @@ Wire Notes Line
 Wire Notes Line
 	7900 6800 7900 4900
 Wire Notes Line
-	5850 3850 3950 3850
+	5850 3850 3700 3850
 Wire Notes Line
 	5850 3850 5850 5300
 Wire Notes Line
-	5850 5300 3950 5300
+	5850 5300 3700 5300
 Wire Notes Line
-	3950 5300 3950 3850
+	3700 5300 3700 3850
 Wire Wire Line
 	10250 2700 9900 2700
 Wire Wire Line
-	5500 4950 4450 4950
-Wire Wire Line
 	6400 4550 6400 4350
-Wire Wire Line
-	5100 4050 4750 4050
 Wire Wire Line
 	5150 1000 4700 1000
 Wire Wire Line
@@ -107,14 +124,9 @@ Wire Wire Line
 Wire Wire Line
 	2450 5750 2800 5750
 Wire Wire Line
-	4050 4550 4600 4550
-Connection ~ 8250 5900
+	4600 4550 3850 4550
 Wire Wire Line
-	8250 5900 8250 6000
-Wire Wire Line
-	8250 6000 8300 6000
-Wire Wire Line
-	8700 5900 9600 5900
+	9600 5900 8700 5900
 Wire Wire Line
 	1000 4150 1000 4350
 Wire Wire Line
@@ -201,13 +213,9 @@ Wire Wire Line
 Connection ~ 2100 3950
 Connection ~ 2700 3950
 Wire Wire Line
-	9100 6000 9100 5800
+	9100 5800 9100 6000
 Wire Wire Line
 	9100 5200 9100 5300
-Wire Wire Line
-	8100 6150 8100 5900
-Wire Wire Line
-	8100 5900 8300 5900
 Wire Wire Line
 	2100 4050 2100 3650
 Wire Wire Line
@@ -382,8 +390,6 @@ Wire Wire Line
 Wire Wire Line
 	10250 3600 9900 3600
 Wire Wire Line
-	5000 5050 5000 4850
-Wire Wire Line
 	6350 1450 6350 1600
 Wire Wire Line
 	8300 2350 8650 2350
@@ -394,24 +400,14 @@ Wire Wire Line
 Wire Wire Line
 	10600 6450 10600 6600
 Wire Wire Line
-	8700 6000 8750 6000
-Wire Wire Line
-	8750 6000 8750 5900
-Connection ~ 8750 5900
-Wire Wire Line
 	4700 1350 4700 1450
 Wire Wire Line
 	4700 1450 5150 1450
-Wire Wire Line
-	5300 4050 5700 4050
-Connection ~ 5700 4550
-Connection ~ 5500 4550
+Connection ~ 5550 4550
 Wire Wire Line
 	10550 2900 9900 2900
 Wire Wire Line
 	4700 1800 4700 1900
-Wire Wire Line
-	5700 4050 5700 4550
 Wire Notes Line
 	1800 1700 1800 550 
 Wire Notes Line
@@ -433,40 +429,70 @@ Wire Notes Line
 Wire Notes Line
 	10150 6850 10150 4900
 Wire Wire Line
-	6050 4550 6050 6050
+	6050 4550 6050 6250
 Wire Wire Line
-	6050 6050 5750 6050
+	6050 6250 5750 6250
 Connection ~ 6050 4550
 Wire Wire Line
-	4350 6250 4450 6250
+	4350 6450 4450 6450
 Wire Wire Line
-	4450 6250 4450 6400
+	4450 6450 4450 6600
+Wire Wire Line
+	4450 4150 4450 4050
+Wire Wire Line
+	5550 4550 5550 4350
+Wire Notes Line
+	5750 4500 5750 3900
+Wire Notes Line
+	5300 4500 5300 3900
+Wire Notes Line
+	4200 4500 4650 4500
+Wire Notes Line
+	5300 3900 5750 3900
+Wire Wire Line
+	5550 4950 4450 4950
+Text Notes 5350 4000 0    40   ~ 0
+Use for 5V
+Text Notes 4250 4000 0    40   ~ 0
+Use for <5V
 $Comp
-L DGND #PWR22
+L DIODE-SCHOTTKY_ D3
+U 1 1 4E5A3C9E
+P 4450 4250
+F 0 "D3" H 4550 4269 50  0000 L BNN
+F 1 "CDBU0530" H 4300 4100 50  0000 L BNN
+F 2 "SOD-523F" H 4450 4400 50  0001 C CNN
+	1    4450 4250
+	0    1    1    0   
+$EndComp
+Text Notes 4650 7000 0    40   ~ 0
+Optional Li-Po/Li-Ion charger\n(solar input possible)
+$Comp
+L DGND #PWR23
 U 1 1 4E593436
-P 4450 6400
-F 0 "#PWR22" H 4450 6400 40  0001 C CNN
-F 1 "DGND" H 4450 6330 40  0000 C CNN
-	1    4450 6400
+P 4450 6600
+F 0 "#PWR23" H 4450 6600 40  0001 C CNN
+F 1 "DGND" H 4450 6530 40  0000 C CNN
+	1    4450 6600
 	1    0    0    -1  
 $EndComp
 $Comp
 L CONN_2 P6
 U 1 1 4E593421
-P 4000 6150
-F 0 "P6" V 3950 6150 40  0000 C CNN
-F 1 "BATTERY" V 4050 6150 40  0000 C CNN
-F 2 "SparkFun-1X02_LOCK" H 4000 6150 60  0001 C CNN
-	1    4000 6150
+P 4000 6350
+F 0 "P6" V 3950 6350 40  0000 C CNN
+F 1 "BATTERY" V 4050 6350 40  0000 C CNN
+F 2 "SparkFun-1X02_LOCK" H 4000 6350 60  0001 C CNN
+	1    4000 6350
 	-1   0    0    -1  
 $EndComp
 $Sheet
-S 4650 5900 1100 300 
+S 4650 6100 1100 300 
 U 4E592213
 F0 "Li-Po/Li-Ion charger" 60
 F1 "charger.sch" 60
-F2 "BAT" O L 4650 6050 60 
-F3 "VSUPPLY" B R 5750 6050 60 
+F2 "BAT" O L 4650 6250 60 
+F3 "VSUPPLY" B R 5750 6250 60 
 $EndSheet
 Text Notes 10350 5000 0    40   ~ 0
 suggested minimal\ndebug LED
@@ -476,8 +502,8 @@ Text Notes 8150 5050 0    40   ~ 0
 Suggested reset button
 Text Notes 4100 3650 0    60   ~ 12
 If option not installed, replace\nD2 with 0R resistor
-Text Notes 4400 5450 0    40   ~ 0
-Optional 5V LDO, max. 13.2V input
+Text Notes 4300 5400 0    40   ~ 0
+Optional LDO, max. 13.2V input\nUse > 4.2V with Li-Po charger
 $Comp
 L DGND #PWR11
 U 1 1 4E580B32
@@ -499,11 +525,11 @@ $EndComp
 $Comp
 L C C4
 U 1 1 4E580A32
-P 5500 4750
-F 0 "C4" H 5550 4850 50  0000 L CNN
-F 1 "4.7u" H 5550 4650 50  0000 L CNN
-F 2 "SM0603" H 5500 4750 60  0001 C CNN
-	1    5500 4750
+P 5550 4750
+F 0 "C4" H 5600 4850 50  0000 L CNN
+F 1 "4.7u" H 5600 4650 50  0000 L CNN
+F 2 "SM0603" H 5550 4750 60  0001 C CNN
+	1    5550 4750
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -553,17 +579,17 @@ Text Label 2646 5750 0    40   ~ 0
 VRAW
 Text Label 8250 1150 2    40   ~ 0
 LDO
-Text Label 4050 4550 0    40   ~ 0
+Text Label 3850 4550 0    40   ~ 0
 VRAW
 $Comp
 L DIODE-SCHOTTKY_ D2
 U 1 1 4E540DB8
-P 5200 4050
-F 0 "D2" H 5300 4069 50  0000 L BNN
-F 1 "CDBU0530" H 5050 3900 50  0000 L BNN
-F 2 "SOD-523F" H 5200 4200 50  0001 C CNN
-	1    5200 4050
-	1    0    0    -1  
+P 5550 4250
+F 0 "D2" H 5650 4269 50  0000 L BNN
+F 1 "CDBU0530" H 5400 4100 50  0000 L BNN
+F 2 "SOD-523F" H 5550 4400 50  0001 C CNN
+	1    5550 4250
+	0    1    1    0   
 $EndComp
 $Comp
 L VDD #PWR04
@@ -577,11 +603,11 @@ $EndComp
 $Comp
 L TAC_SWITCHSMD_EVQP2 S1
 U 1 1 4E5409DB
-P 8500 5900
-F 0 "S1" H 8400 6150 50  0000 L BNN
-F 1 "RESET" H 8450 5700 50  0000 L BNN
-F 2 "EVQP2" H 8500 6050 50  0001 C CNN
-	1    8500 5900
+P 8500 5800
+F 0 "S1" H 8400 6050 50  0000 L BNN
+F 1 "RESET" H 8450 5600 50  0000 L BNN
+F 2 "EVQP2" H 8500 5950 50  0001 C CNN
+	1    8500 5800
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -664,7 +690,7 @@ F 2 "SM0603" H 6350 1250 60  0001 C CNN
 	1    6350 1250
 	1    0    0    -1  
 $EndComp
-Text Label 4750 4050 0    40   ~ 0
+Text Label 3850 4050 0    40   ~ 0
 VBUS
 $Comp
 L DGND #PWR16
@@ -680,7 +706,7 @@ L 78L05 U3
 U 1 1 4E4D08A5
 P 5000 4600
 F 0 "U3" H 5150 4404 60  0000 C CNN
-F 1 "MCP1702T-50" H 5000 4800 60  0000 C CNN
+F 1 "MCP1702T" H 5000 4800 60  0000 C CNN
 F 2 "MCP1700-SOT23" H 5000 4600 60  0001 C CNN
 	1    5000 4600
 	1    0    0    -1  
@@ -995,10 +1021,10 @@ F 2 "LED-0603" H 10600 5650 60  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L DGND #PWR23
+L DGND #PWR22
 U 1 1 4E4181CD
 P 9100 6550
-F 0 "#PWR23" H 9100 6550 40  0001 C CNN
+F 0 "#PWR22" H 9100 6550 40  0001 C CNN
 F 1 "DGND" H 9100 6480 40  0000 C CNN
 	1    9100 6550
 	1    0    0    -1  
