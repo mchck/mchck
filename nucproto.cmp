@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by CvPCB (2011-07-16 BZR 3051)-testing date = Sun 28 Aug 2011 01:19:24 AM CEST
+Cmp-Mod V01 Created by CVPcb (2011-08-26 BZR 3082)-testing date = Sun 28 Aug 2011 08:27:14 PM CEST
 
 BeginCmp
 TimeStamp = /4E3E9C78;
@@ -80,6 +80,13 @@ EndCmp
 BeginCmp
 TimeStamp = /4E540DB8;
 Reference = D2;
+ValeurCmp = CDBU0530;
+IdModule  = SOD-523F;
+EndCmp
+
+BeginCmp
+TimeStamp = /4E5A3C9E;
+Reference = D3;
 ValeurCmp = CDBU0530;
 IdModule  = SOD-523F;
 EndCmp
@@ -218,6 +225,13 @@ IdModule  = EVQP2;
 EndCmp
 
 BeginCmp
+TimeStamp = /4E5A861E;
+Reference = SJ1;
+ValeurCmp = SOLDERJUMPER_2WAYS;
+IdModule  = SparkFun-SJ_3;
+EndCmp
+
+BeginCmp
 TimeStamp = /4E4179AF;
 Reference = U1;
 ValeurCmp = NUC120LDQ48;
@@ -227,7 +241,7 @@ EndCmp
 BeginCmp
 TimeStamp = /4E4D08A5;
 Reference = U3;
-ValeurCmp = MCP1702T-50;
+ValeurCmp = MCP1702T;
 IdModule  = MCP1700-SOT23;
 EndCmp
 

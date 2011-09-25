@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Sun 28 Aug 2011 03:10:55 PM CEST
+EESchema Schematic File Version 2  date Sun 28 Aug 2011 09:42:49 PM CEST
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -54,23 +54,25 @@ Comment2 ""
 Comment3 ""
 Comment4 ""
 $EndDescr
+Connection ~ 5750 2350
+Wire Wire Line
+	6450 3050 6450 2350
+Wire Wire Line
+	6450 2350 5100 2350
 Wire Wire Line
 	4750 4900 4750 4700
 Connection ~ 6450 3500
 Wire Wire Line
 	6800 3500 6450 3500
 Wire Wire Line
-	6450 3450 6450 3550
+	6450 3550 6450 3450
 Connection ~ 7550 4500
-Connection ~ 5750 2450
-Wire Wire Line
-	5750 2450 5750 2600
 Wire Wire Line
 	5750 4200 5750 3950
 Wire Wire Line
 	5750 3950 4300 3950
 Wire Wire Line
-	4300 3950 4300 2450
+	4300 3950 4300 1950
 Connection ~ 5150 4800
 Wire Wire Line
 	5400 4950 5150 4950
@@ -98,7 +100,7 @@ Wire Wire Line
 Wire Wire Line
 	5750 5100 5750 5200
 Wire Wire Line
-	6100 4500 8200 4500
+	8200 4500 6100 4500
 Wire Wire Line
 	6150 3250 5150 3250
 Wire Wire Line
@@ -107,19 +109,22 @@ Wire Wire Line
 	5400 4800 5150 4800
 Connection ~ 5750 3250
 Wire Wire Line
-	7100 3700 7100 4500
+	7100 4500 7100 3700
 Connection ~ 7100 4500
 Wire Wire Line
-	3800 2450 7100 2450
+	3800 1950 7100 1950
 Wire Wire Line
-	7100 2450 7100 3300
-Connection ~ 4300 2450
+	7100 1950 7100 3300
+Connection ~ 4300 1950
 Wire Wire Line
-	6450 3050 6450 2450
-Connection ~ 6450 2450
-Wire Wire Line
-	4750 3950 4750 4300
+	4750 4300 4750 3950
 Connection ~ 4750 3950
+Wire Wire Line
+	5750 2350 5750 2600
+Text HLabel 3800 1950 0    80   BiDi ~ 16
+VSUPPLY
+Text HLabel 5100 2350 0    80   Input ~ 16
+VDD
 $Comp
 L DGND #PWR27
 U 1 1 4E59787B
@@ -258,6 +263,4 @@ F 2 "SM0603" H 6650 5500 60  0001 C CNN
 	1    6650 5500
 	1    0    0    -1  
 $EndComp
-Text HLabel 3800 2450 0    80   BiDi ~ 16
-VSUPPLY
 $EndSCHEMATC

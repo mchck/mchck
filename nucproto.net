@@ -1,5 +1,10 @@
-# EESchema Netlist Version 1.1 created  Sun 28 Aug 2011 03:10:59 PM CEST
+# EESchema Netlist Version 1.1 created  Sun 28 Aug 2011 09:42:55 PM CEST
 (
+ ( /4E5A861E SparkFun-SJ_3  SJ1 SOLDERJUMPER_2WAYS {Lib=SOLDERJUMPER_2WAYS}
+  (    1 /VRAW )
+  (    2 /Li-Po/Li-Ion_charger/VSUPPLY )
+  (    3 VDD )
+ )
  ( /4E5A3C9E SOD-523F  D3 CDBU0530 {Lib=DIODE-SCHOTTKY_}
   (    A /VBUS )
   (    C /VRAW )
@@ -103,12 +108,12 @@
   (    4 DGND )
  )
  ( /4E4186C6 SM0603  R6 500 {Lib=R}
-  (    1 N-000031 )
+  (    1 N-000035 )
   (    2 DGND )
  )
  ( /4E418482 LED-0603  D1 LED {Lib=LED}
   (    1 /ADC5 )
-  (    2 N-000031 )
+  (    2 N-000035 )
  )
  ( /4E4181C7 SM0603  C3 0.1u {Lib=C}
   (    1 /#RESET )
@@ -119,21 +124,21 @@
   (    2 /#RESET )
  )
  ( /4E417D5F SM0603  C7 18p {Lib=C}
-  (    1 N-000036 )
+  (    1 N-000037 )
   (    2 DGND )
  )
  ( /4E417D5B SM0603  C6 18p {Lib=C}
-  (    1 N-000035 )
+  (    1 N-000042 )
   (    2 DGND )
  )
  ( /4E417D0E SparkFun-CRYSTAL-32KHZ-SMD  X2 32.768kHz {Lib=CRYSTAL}
-  (    1 N-000035 )
-  (    2 N-000036 )
+  (    1 N-000042 )
+  (    2 N-000037 )
  )
  ( /4E4179AF LQFP48  U1 NUC120LDQ48 {Lib=NUC120LDQ48}
   (    1 /CPO0 )
-  (    2 N-000036 )
-  (    3 N-000035 )
+  (    2 N-000037 )
+  (    3 N-000042 )
   (    4 /I2C1SCL )
   (    5 /I2C1SDA )
   (    6 /I2C0SCL )
@@ -203,43 +208,43 @@
   (    4 DGND )
  )
  ( /4E592213/4E597873 SM0603  C5 22u {Lib=C}
-  (    1 VDD )
+  (    1 /Li-Po/Li-Ion_charger/VSUPPLY )
   (    2 DGND )
  )
  ( /4E592213/4E593272 SM0603  R5 100k {Lib=R}
   (    1 VDD )
-  (    2 N-000055 )
+  (    2 N-000056 )
  )
  ( /4E592213/4E5922E0 SparkFun-SO08  U4 CN3063 {Lib=CN3063}
   (    1 DGND )
-  (    2 N-000053 )
+  (    2 N-000054 )
   (    3 DGND )
-  (    4 VDD )
+  (    4 /Li-Po/Li-Ion_charger/VSUPPLY )
   (    5 /Li-Po/Li-Ion_charger/BAT )
-  (    6 N-000055 )
-  (    7 N-000055 )
+  (    6 N-000056 )
+  (    7 N-000056 )
   (    8 /Li-Po/Li-Ion_charger/BAT )
  )
  ( /4E592213/4E59308D SM0603  R7 100k {Lib=R}
-  (    1 N-000054 )
+  (    1 N-000055 )
   (    2 DGND )
  )
  ( /4E592213/4E592A2E SparkFun-SOT23  Q2 IRLML2246TRPBF {Lib=MOSFET-PCHANNEL}
-  (    1 N-000054 )
-  (    2 VDD )
+  (    1 N-000055 )
+  (    2 /Li-Po/Li-Ion_charger/VSUPPLY )
   (    3 /Li-Po/Li-Ion_charger/BAT )
  )
  ( /4E592213/4E592A2B SparkFun-SOT23  Q3 IRLML2246TRPBF {Lib=MOSFET-PCHANNEL}
-  (    1 N-000055 )
+  (    1 N-000056 )
   (    2 VDD )
-  (    3 N-000054 )
+  (    3 N-000055 )
  )
  ( /4E592213/4E592548 SM0603  C10 4.7u {Lib=C}
   (    1 /Li-Po/Li-Ion_charger/BAT )
   (    2 DGND )
  )
  ( /4E592213/4E5924E9 SM0603  R8 36k {Lib=R}
-  (    1 N-000053 )
+  (    1 N-000054 )
   (    2 DGND )
  )
 )
@@ -349,204 +354,202 @@ $endlist
 $endfootprintlist
 }
 { Pin List by Nets
-Net 1 "DGND" "DGND"
- U1 31
- J1 4
- C1 2
- C2 2
- U1 12
- C3 2
- R6 2
- U3 GND
- Y1 2
- U1 47
- C6 2
- C7 2
- S1 3
- J2 4
- J3 4
- C8 2
- P6 2
- C4 2
- C9 2
- R8 2
- C10 2
- C5 2
- U4 1
- U4 3
- P3 1
- P4 1
- P2 5
- R7 2
-Net 2 "/MOSI00" "MOSI00"
- U1 21
+Net 1 "/MOSI00" "MOSI00"
  P4 3
-Net 3 "/MISO00" "MISO00"
- P4 4
+ U1 21
+Net 2 "/MISO00" "MISO00"
  U1 22
-Net 4 "/SPICLK0" "SPICLK0"
- U1 23
+ P4 4
+Net 3 "/SPICLK0" "SPICLK0"
  P4 5
-Net 5 "/SPISS00" "SPISS00"
- P4 6
+ U1 23
+Net 4 "/SPISS00" "SPISS00"
  U1 24
-Net 6 "/PWM0" "PWM0"
+ P4 6
+Net 5 "/PWM0" "PWM0"
  U1 28
  P4 10
-Net 7 "/ADC1" "ADC1"
+Net 6 "/ADC1" "ADC1"
  U1 33
  P4 12
-Net 8 "/ADC2" "ADC2"
- U1 34
- P4 13
-Net 9 "/#RESET" "#RESET"
- R3 2
- P2 4
- S1 4
- U1 46
- C3 1
-Net 10 "/CPP0" "CPP0"
- P5 1
+Net 7 "/CPP0" "CPP0"
  U1 42
-Net 11 "/I2C0SCL" "I2C0SCL"
- P3 6
- U1 6
-Net 12 "/I2C0SDA" "I2C0SDA"
- P3 5
- U1 7
-Net 13 "/RXD1" "RXD1"
- P3 4
- U1 8
-Net 14 "/TXD1" "TXD1"
- P3 3
- U1 9
-Net 15 "/CTS0" "CTS0"
- P1 4
- U1 20
-Net 16 "/ADC7" "ADC7"
- P3 12
- U1 39
-Net 17 "/PWM2" "PWM2"
- P4 8
- U1 26
-Net 18 "/ADC6" "ADC6"
- P3 13
- U1 38
-Net 19 "/PWM3" "PWM3"
- P4 7
- U1 25
-Net 20 "/CPO0" "CPO0"
- U1 1
- P3 9
-Net 21 "/#INT1" "#INT1"
- P3 11
+ P5 1
+Net 8 "/#RESET" "#RESET"
+ R3 2
+ S1 4
+ C3 1
+ P2 4
+ U1 46
+Net 9 "/#INT1" "#INT1"
  U1 43
-Net 22 "/TM0" "TM0"
+ P3 11
+Net 10 "/TM0" "TM0"
  P3 10
  U1 48
-Net 23 "/PWM1" "PWM1"
- U1 27
- P4 9
-Net 24 "/ADC0" "ADC0"
- P4 11
- U1 32
-Net 25 "/I2C1SDA" "I2C1SDA"
- P3 7
+Net 11 "/CPO0" "CPO0"
+ P3 9
+ U1 1
+Net 12 "/I2C0SCL" "I2C0SCL"
+ U1 6
+ P3 6
+Net 13 "/I2C0SDA" "I2C0SDA"
+ U1 7
+ P3 5
+Net 14 "/RXD1" "RXD1"
+ P3 4
+ U1 8
+Net 15 "/TXD1" "TXD1"
+ P3 3
+ U1 9
+Net 16 "DGND" "DGND"
+ C2 2
+ Y1 2
+ R6 2
+ C3 2
+ J2 4
+ J3 4
+ P6 2
+ C6 2
+ S1 3
+ C7 2
+ U3 GND
+ C10 2
+ C8 2
+ R8 2
+ P4 1
+ P2 5
+ C1 2
+ P3 1
+ R7 2
+ J1 4
+ U4 3
+ C9 2
+ U1 31
+ U1 12
+ U1 47
+ C4 2
+ U4 1
+ C5 2
+Net 17 "/ADC2" "ADC2"
+ U1 34
+ P4 13
+Net 18 "/CTS0" "CTS0"
+ U1 20
+ P1 4
+Net 19 "/PWM2" "PWM2"
+ U1 26
+ P4 8
+Net 20 "/ADC6" "ADC6"
+ P3 13
+ U1 38
+Net 21 "/PWM3" "PWM3"
+ U1 25
+ P4 7
+Net 22 "VDD" "VDD"
+ SJ1 3
+ C4 1
+ U1 40
+ D2 C
+ P2 1
+ U1 11
+ C8 1
+ Q3 2
+ U3 VO
+ R5 1
+ P4 2
+ R3 1
+Net 23 "/ADC4" "ADC4"
+ U1 36
+ P5 4
+Net 24 "/I2C1SDA" "I2C1SDA"
  U1 5
-Net 26 "/I2C1SCL" "I2C1SCL"
+ P3 7
+Net 25 "/I2C1SCL" "I2C1SCL"
  P3 8
  U1 4
-Net 27 "/VBUS" "VBUS"
- D2 A
- D3 A
- U1 13
- J3 1
- J2 1
- J1 1
+Net 26 "/PWM1" "PWM1"
+ U1 27
+ P4 9
+Net 27 "/ADC0" "ADC0"
+ P4 11
+ U1 32
 Net 28 "" ""
  U1 45
  Y1 3
-Net 29 "/RXD0" "RXD0"
- P1 1
- U1 17
-Net 30 "/ADC4" "ADC4"
- P5 4
- U1 36
-Net 31 "" ""
- D1 2
- R6 1
-Net 32 "/ADC5" "ADC5"
- P5 3
- D1 1
- U1 37
-Net 33 "/USB_D+" "USB_D+"
+Net 29 "/USB_D+" "USB_D+"
+ J2 3
  J3 3
  R2 2
  J1 3
- J2 3
-Net 34 "/USB_D-" "USB_D-"
+Net 30 "/USB_D-" "USB_D-"
  J1 2
+ J2 2
  R1 2
  J3 2
- J2 2
+Net 31 "/ADC7" "ADC7"
+ P3 12
+ U1 39
+Net 32 "/RTS0" "RTS0"
+ U1 19
+ P1 3
+Net 33 "/TXD0" "TXD0"
+ P1 2
+ U1 18
+Net 34 "/RXD0" "RXD0"
+ P1 1
+ U1 17
 Net 35 "" ""
- X2 1
- U1 3
- C6 1
-Net 36 "" ""
+ R6 1
+ D1 2
+Net 36 "/ADC5" "ADC5"
+ P5 3
+ U1 37
+ D1 1
+Net 37 "" ""
+ C7 1
  X2 2
  U1 2
- C7 1
-Net 37 "/ICE_DAT" "ICE_DAT"
- P2 2
+Net 38 "/ICE_DAT" "ICE_DAT"
  U1 29
-Net 38 "/D+" "D+"
- U1 16
+ P2 2
+Net 39 "/D+" "D+"
  R2 1
-Net 39 "/D-" "D-"
- R1 1
+ U1 16
+Net 40 "/D-" "D-"
  U1 15
-Net 40 "/ICE_CK" "ICE_CK"
+ R1 1
+Net 41 "/ICE_CK" "ICE_CK"
  P2 3
  U1 30
-Net 42 "/VRAW" "VRAW"
- D3 C
- U3 VI
- P3 2
- C9 1
-Net 43 "/Li-Po/Li-Ion charger/BAT" "BAT"
- U4 5
- U4 8
- C10 1
- P6 1
- Q2 3
-Net 45 "/LDO" "LDO"
+Net 42 "" ""
+ X2 1
+ C6 1
+ U1 3
+Net 43 "/Li-Po/Li-Ion charger/VSUPPLY" "VSUPPLY"
+ SJ1 2
+ Q2 2
+ C5 1
+ U4 4
+Net 44 "/LDO" "LDO"
  C2 1
  U1 10
-Net 46 "/TXD0" "TXD0"
- U1 18
- P1 2
-Net 47 "VDD" "VDD"
- P2 1
- Q2 2
- C4 1
- Q3 2
- C8 1
- C5 1
- R5 1
- P4 2
- D2 C
- R3 1
- U3 VO
- U1 11
- U1 40
- U4 4
-Net 48 "/NUC_VDD33" "NUC_VDD33"
- C1 1
+Net 45 "/Li-Po/Li-Ion charger/BAT" "BAT"
+ Q2 3
+ C10 1
+ U4 8
+ U4 5
+ P6 1
+Net 46 "/VBUS" "VBUS"
+ J2 1
+ U1 13
+ D2 A
+ D3 A
+ J1 1
+ J3 1
+Net 49 "/NUC_VDD33" "NUC_VDD33"
  U1 14
-Net 49 "/RTS0" "RTS0"
- P1 3
- U1 19
+ C1 1
 Net 50 "/ADC3" "ADC3"
  U1 35
  P5 5
@@ -556,17 +559,23 @@ Net 51 "/CPN0" "CPN0"
 Net 52 "" ""
  U1 44
  Y1 1
-Net 53 "" ""
- U4 2
- R8 1
+Net 53 "/VRAW" "VRAW"
+ C9 1
+ U3 VI
+ SJ1 1
+ D3 C
+ P3 2
 Net 54 "" ""
+ R8 1
+ U4 2
+Net 55 "" ""
+ Q3 3
  Q2 1
  R7 1
- Q3 3
-Net 55 "" ""
- R5 2
+Net 56 "" ""
  U4 6
- U4 7
  Q3 1
+ U4 7
+ R5 2
 }
 #End
