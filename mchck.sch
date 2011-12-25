@@ -39,13 +39,12 @@ LIBS:mcp73831
 LIBS:SparkFun
 LIBS:tac_switchsmd_evqp2
 LIBS:cn3063
-LIBS:nucproto-cache
 EELAYER 25  0
 EELAYER END
 $Descr A4 11700 8267
 encoding utf-8
 Sheet 1 2
-Title "NUC120 proto board"
+Title "MC HCK micro controller board"
 Date "28 aug 2011"
 Rev "1"
 Comp ""
@@ -523,7 +522,7 @@ $EndComp
 $Sheet
 S 4600 6300 1100 550 
 U 4E592213
-F0 "Li-Po/Li-Ion charger" 60
+F0 "charger" 60
 F1 "charger.sch" 60
 F2 "BAT" O L 4600 6700 60 
 F3 "VSUPPLY" B L 4600 6450 60 

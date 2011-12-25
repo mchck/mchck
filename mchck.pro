@@ -15,7 +15,7 @@ EquName1=devcms
 version=1
 [eeschema]
 version=1
-LibDir=/home/corecode/devel/electronics/libs;../nucproto
+LibDir=.
 NetFmt=1
 HPGLSpd=20
 HPGLDm=15
@@ -82,7 +82,7 @@ LibName34=conn_16
 LibName35=conn_15
 LibName36=conn_18
 LibName37=mcp73831
-LibName38=/home/corecode/.kicad.d/lib/SparkFun
+LibName38=SparkFun
 LibName39=tac_switchsmd_evqp2
 LibName40=cn3063
 [pcbnew]
@@ -101,7 +101,7 @@ DrawLar=150
 EdgeLar=150
 TxtLar=120
 MSegLar=20
-LastNetListRead=nucproto.net
+LastNetListRead=mchck.net
 [pcbnew/libraries]
 LibDir=
 LibName1=sockets
@@ -117,7 +117,7 @@ LibName10=dip_sockets
 LibName11=LQFP48
 LibName12=ABM8
 LibName13=crystal_32kHz
-LibName14=/home/corecode/.kicad.d/mod/SparkFun
+LibName14=SparkFun
 LibName15=EVQP2
 LibName16=3PAD-CHOICE
 LibName17=MICROSD-AMPHENOL

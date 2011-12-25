@@ -39,13 +39,12 @@ LIBS:mcp73831
 LIBS:SparkFun
 LIBS:tac_switchsmd_evqp2
 LIBS:cn3063
-LIBS:nucproto-cache
 EELAYER 25  0
 EELAYER END
 $Descr A4 11700 8267
 encoding utf-8
 Sheet 2 2
-Title ""
+Title "MC HCK LiPo (solar) charger"
 Date "28 aug 2011"
 Rev ""
 Comp ""

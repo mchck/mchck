@@ -1,8 +1,8 @@
-# EESchema Netlist Version 1.1 created  Sun 28 Aug 2011 09:42:55 PM CEST
+# EESchema Netlist Version 1.1 created  Sun 25 Dec 2011 03:15:06 AM CET
 (
  ( /4E5A861E SparkFun-SJ_3  SJ1 SOLDERJUMPER_2WAYS {Lib=SOLDERJUMPER_2WAYS}
   (    1 /VRAW )
-  (    2 /Li-Po/Li-Ion_charger/VSUPPLY )
+  (    2 /charger/VSUPPLY )
   (    3 VDD )
  )
  ( /4E5A3C9E SOD-523F  D3 CDBU0530 {Lib=DIODE-SCHOTTKY_}
@@ -10,7 +10,7 @@
   (    C /VRAW )
  )
  ( /4E593421 SparkFun-1X02_LOCK  P6 BATTERY {Lib=CONN_2}
-  (    1 /Li-Po/Li-Ion_charger/BAT )
+  (    1 /charger/BAT )
   (    2 DGND )
  )
  ( /4E580A32 SM0603  C4 4.7u {Lib=C}
@@ -208,7 +208,7 @@
   (    4 DGND )
  )
  ( /4E592213/4E597873 SM0603  C5 22u {Lib=C}
-  (    1 /Li-Po/Li-Ion_charger/VSUPPLY )
+  (    1 /charger/VSUPPLY )
   (    2 DGND )
  )
  ( /4E592213/4E593272 SM0603  R5 100k {Lib=R}
@@ -219,11 +219,11 @@
   (    1 DGND )
   (    2 N-000054 )
   (    3 DGND )
-  (    4 /Li-Po/Li-Ion_charger/VSUPPLY )
-  (    5 /Li-Po/Li-Ion_charger/BAT )
+  (    4 /charger/VSUPPLY )
+  (    5 /charger/BAT )
   (    6 N-000056 )
   (    7 N-000056 )
-  (    8 /Li-Po/Li-Ion_charger/BAT )
+  (    8 /charger/BAT )
  )
  ( /4E592213/4E59308D SM0603  R7 100k {Lib=R}
   (    1 N-000055 )
@@ -231,8 +231,8 @@
  )
  ( /4E592213/4E592A2E SparkFun-SOT23  Q2 IRLML2246TRPBF {Lib=MOSFET-PCHANNEL}
   (    1 N-000055 )
-  (    2 /Li-Po/Li-Ion_charger/VSUPPLY )
-  (    3 /Li-Po/Li-Ion_charger/BAT )
+  (    2 /charger/VSUPPLY )
+  (    3 /charger/BAT )
  )
  ( /4E592213/4E592A2B SparkFun-SOT23  Q3 IRLML2246TRPBF {Lib=MOSFET-PCHANNEL}
   (    1 N-000056 )
@@ -240,7 +240,7 @@
   (    3 N-000055 )
  )
  ( /4E592213/4E592548 SM0603  C10 4.7u {Lib=C}
-  (    1 /Li-Po/Li-Ion_charger/BAT )
+  (    1 /charger/BAT )
   (    2 DGND )
  )
  ( /4E592213/4E5924E9 SM0603  R8 36k {Lib=R}
@@ -270,6 +270,7 @@ $component R6
  SM0603
  SM0805
  R?-*
+ SM1206
 $endlist
 $component D1
  LED-3MM
@@ -290,6 +291,7 @@ $component R3
  SM0603
  SM0805
  R?-*
+ SM1206
 $endlist
 $component C7
  SM*
@@ -316,12 +318,14 @@ $component R1
  SM0603
  SM0805
  R?-*
+ SM1206
 $endlist
 $component R2
  R?
  SM0603
  SM0805
  R?-*
+ SM1206
 $endlist
 $component C5
  SM*
@@ -333,12 +337,14 @@ $component R5
  SM0603
  SM0805
  R?-*
+ SM1206
 $endlist
 $component R7
  R?
  SM0603
  SM0805
  R?-*
+ SM1206
 $endlist
 $component C10
  SM*
@@ -350,6 +356,7 @@ $component R8
  SM0603
  SM0805
  R?-*
+ SM1206
 $endlist
 $endfootprintlist
 }
@@ -526,7 +533,7 @@ Net 42 "" ""
  X2 1
  C6 1
  U1 3
-Net 43 "/Li-Po/Li-Ion charger/VSUPPLY" "VSUPPLY"
+Net 43 "/charger/VSUPPLY" "VSUPPLY"
  SJ1 2
  Q2 2
  C5 1
@@ -534,7 +541,7 @@ Net 43 "/Li-Po/Li-Ion charger/VSUPPLY" "VSUPPLY"
 Net 44 "/LDO" "LDO"
  C2 1
  U1 10
-Net 45 "/Li-Po/Li-Ion charger/BAT" "BAT"
+Net 45 "/charger/BAT" "BAT"
  Q2 3
  C10 1
  U4 8
