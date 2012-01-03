@@ -1,8 +1,9 @@
 SOURCES=	$(wildcard *.ps)
 PDFS=		${SOURCES:.ps=-crop.pdf}
 PNGS=		${SOURCES:.ps=.png}
+PNG_PREVIEWS=	${PNGS:.png=-small.png}
 
-all: clean pdf png
+all: clean png png_preview
 
 clean:
 	-rm -f *.pdf *.png
@@ -12,6 +13,7 @@ realclean:
 
 pdf: ${PDFS}
 png: ${PNGS}
+png_preview: ${PNG_PREVIEWS}
 
 
 %.pdf: %.ps
@@ -20,5 +22,8 @@ png: ${PNGS}
 %-crop.pdf: %.pdf
 	pdfcrop $^
 
-%.png: %.pdf
-	convert -density 600 -alpha off $^ $@
+%.png: %-crop.pdf
+	convert -antialias -density 600 -alpha off $^ $@
+
+%-small.png: %.png
+	convert -resize 10% $^ $@
