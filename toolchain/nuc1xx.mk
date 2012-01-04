@@ -17,7 +17,7 @@ CFLAGS+=	-D__XTAL='(${XTALFREQ}L)'
 
 LDFLAGS+=	-Wl,--gc-sections -L${_libdir}/ld -T ${TARGETLD} -T link.ld -nostartfiles
 
-STARTFILE_SRC=	core_cm0.c system_NUC1xx.c startup_coide.c
+STARTFILE_SRC=	core_cm0.c system_NUC1xx.c startup_NUC1xx.c
 STARTFILE_OBJ=	$(addsuffix .o, $(basename ${STARTFILE_SRC}))
 STARTFILE_LIB=	libcrtnuc1xx.a
 STARTFILE_LIBSHORT=	-lcrtnuc1xx

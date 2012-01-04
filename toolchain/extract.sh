@@ -63,7 +63,7 @@ do
 done
 
 
-for crt in "$base/startup_coide.c" "$core/core_cm0.c" "$dev/system_$platform.c"
+for crt in "$base/startup_$platform.c" "$core/core_cm0.c" "$dev/system_$platform.c"
 do
     echo "CRT $crt"
     install_source "$crt" "$c"
