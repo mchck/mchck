@@ -1,0 +1,3 @@
+[submodule "summon-arm-toolchain"]
+	path = summon-arm-toolchain
+	url = git://github.com/corecode/summon-arm-toolchain.git
