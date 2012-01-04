@@ -15,9 +15,7 @@ CFLAGS+=	-I${_libdir}/include -I${_libdir}/include/Driver
 CFLAGS+=	-D${TARGET}
 CFLAGS+=	-D__XTAL='(${XTALFREQ}L)'
 
-LDFLAGS+=	-Wl,--gc-sections -L${_libdir}/ld -T ${TARGETLD} -T link.ld -nostdlib
-#-nostdlib -nostartfiles -nodefaultlibs
-LDLIBS+=	-lgcc
+LDFLAGS+=	-Wl,--gc-sections -L${_libdir}/ld -T ${TARGETLD} -T link.ld -nostartfiles
 
 STARTFILE_SRC=	core_cm0.c system_NUC1xx.c startup_coide.c
 STARTFILE_OBJ=	$(addsuffix .o, $(basename ${STARTFILE_SRC}))
@@ -39,7 +37,7 @@ CLEANFILES+=	${PROG}.hex ${PROG}.elf ${PROG}.bin
 all: ${PROG}.hex ${PROG}.bin
 
 ${PROG}.elf: ${OBJS} ${STARTFILES}
-	${CC} -o $@ ${LDFLAGS} ${STARTFILES} ${OBJS} ${LDLIBS}
+	${CC} -o $@ ${CFLAGS} ${LDFLAGS} ${STARTFILES} ${OBJS} ${LDLIBS}
 
 %.hex: %.elf
 	${OBJCOPY} -O ihex $< $@
