@@ -16,7 +16,6 @@ $savepcb.*
 *.csv
 *.dsn
 *.ses
-*.cmp
 *.stf
 *.lst
 *.bck
