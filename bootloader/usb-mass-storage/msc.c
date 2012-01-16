@@ -138,7 +138,7 @@ out_error:
 }
 
 /**
- * msc_bulk_in is called whever the *previous* out packet has been
+ * msc_bulk_in is called when the *previous* out packet has been
  * ACK'ed by the host, and more space is free in the EP.
  *
  * The most common case of this would be while we're in "in",
