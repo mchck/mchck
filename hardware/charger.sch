@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Sun 28 Aug 2011 09:42:49 PM CEST
+EESchema Schematic File Version 2  date Fri 27 Jan 2012 06:24:55 PM CET
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -39,13 +39,16 @@ LIBS:mcp73831
 LIBS:SparkFun
 LIBS:tac_switchsmd_evqp2
 LIBS:cn3063
+LIBS:STM32L15x_QFN48
+LIBS:mic5205
+LIBS:mchck-cache
 EELAYER 25  0
 EELAYER END
 $Descr A4 11700 8267
 encoding utf-8
-Sheet 2 2
+Sheet 2 3
 Title "MC HCK LiPo (solar) charger"
-Date "28 aug 2011"
+Date "27 jan 2012"
 Rev ""
 Comp ""
 Comment1 ""
