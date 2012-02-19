@@ -1,4 +1,4 @@
-# EESchema Netlist Version 1.1 created  Fri 17 Feb 2012 12:31:39 AM CET
+# EESchema Netlist Version 1.1 created  Mon 20 Feb 2012 12:39:45 AM CET
 (
  ( /4F3D2CED SparkFun-1X05_LOCK  P4 LEFT_PINS {Lib=CONN_5}
   (    1 /power/VEXT )
@@ -46,11 +46,11 @@
  ( /4F22E1F9 SparkFun-SO08  U2 SPI_FLASH-X25XXSMD {Lib=SPI_FLASH-X25XXSMD}
   (    1 /FLASH_CS )
   (    2 /FLASH_MISO )
-  (    3 ? )
+  (    3 VDD )
   (    4 DGND )
   (    5 /FLASH_MOSI )
   (    6 /FLASH_SCK )
-  (    7 ? )
+  (    7 VDD )
   (    8 VDD )
  )
  ( /4F16AC22 LQFP48  U1 STM32L15X_QFN48 {Lib=STM32L15X_QFN48}
@@ -210,28 +210,28 @@
   (    2 DGND )
  )
  ( /4F22DD51/4F22E7C7 SM0603  R6 20k {Lib=R}
-  (    1 N-000056 )
+  (    1 N-000054 )
   (    2 DGND )
  )
  ( /4F22DD51/4F22E691 SparkFun-PAD.03X.03  P5 CHRG_STAT {Lib=CONN_1}
-  (    1 N-000053 )
+  (    1 N-000051 )
  )
  ( /4F22DD51/4F22DEC3 SOT23-5  U3 MCP73831-SOT {Lib=MCP73831-SOT}
-  (    1 N-000053 )
+  (    1 N-000051 )
   (    2 DGND )
   (    3 /power/VLIPO )
   (    4 /power/VBUS )
-  (    5 N-000056 )
+  (    5 N-000054 )
  )
  ( /4F22DD51/4F22DDAE SOT23-5  U4 MIC5205 {Lib=MIC5205}
   (    1 /power/VIN )
   (    2 DGND )
   (    3 /power/VIN )
-  (    4 N-000055 )
+  (    4 N-000053 )
   (    5 VDD )
  )
  ( /4F22DD51/4F22DDAB SM0603_Capa  C8 470p {Lib=C}
-  (    1 N-000055 )
+  (    1 N-000053 )
   (    2 DGND )
  )
  ( /4F22DD51/4F22DDA9 SM0603_Capa  C7 2.2u {Lib=C}
@@ -343,73 +343,82 @@ $endfootprintlist
 }
 { Pin List by Nets
 Net 1 "/power/VLIPO" "VLIPO"
- P2 1
- Q1 3
- C6 1
  U3 3
+ P2 1
+ C6 1
+ Q1 3
 Net 2 "VDD" "VDD"
- C1 1
- C3 1
- P6 1
- U1 1
- U4 5
- SJ2 1
  R4 1
- P1 1
- U1 48
- L1 2
- C2 1
+ U4 5
  C9 1
- U2 8
- U1 24
+ P6 1
+ SJ2 1
+ C3 1
+ C1 1
+ P1 1
  U1 36
-Net 5 "/power/VBUS" "VBUS"
- J3 1
- R5 1
- J2 1
- D2 A
- Q1 1
- J1 1
- U3 4
-Net 6 "/VDDA" "VDDA"
+ U1 48
+ C2 1
+ U2 8
+ U2 7
+ U1 24
+ U1 1
+ U2 3
+ L1 2
+Net 3 "/VDDA" "VDDA"
  U1 9
- C4 1
  L1 1
-Net 7 "/PB7" "PB7"
+ C4 1
+Net 4 "/PB7" "PB7"
  U1 43
  P1 9
-Net 8 "/PB6" "PB6"
+Net 5 "/PB6" "PB6"
  P1 8
  U1 42
-Net 9 "/FLASH_MOSI" "FLASH_MOSI"
- U2 5
- U1 41
- P4 5
-Net 10 "/PA9" "PA9"
- P1 4
- U1 30
-Net 11 "/power/VEXT" "VEXT"
- SJ1 1
- P4 1
-Net 12 "/SWDIO" "SWDIO"
- U1 34
- P6 3
-Net 13 "/~RESET" "~RESET"
- S1 4
- U1 7
- R4 2
- C5 1
- P6 5
-Net 14 "/FLASH_MISO" "FLASH_MISO"
- P4 4
- U2 2
- U1 40
-Net 16 "/PB11" "PB11"
+Net 6 "/PB11" "PB11"
  U1 22
  P3 5
+Net 7 "/PA9" "PA9"
+ P1 4
+ U1 30
+Net 8 "/PC15" "PC15"
+ P1 14
+ U1 4
+Net 9 "/LED1" "LED1"
+ P1 12
+ U1 2
+ D1 1
+Net 10 "/power/VEXT" "VEXT"
+ SJ1 1
+ P4 1
+Net 11 "/power/VBUS" "VBUS"
+ U3 4
+ J1 1
+ R5 1
+ J3 1
+ J2 1
+ Q1 1
+ D2 A
+Net 12 "/~RESET" "~RESET"
+ C5 1
+ U1 7
+ P6 5
+ R4 2
+ S1 4
+Net 13 "/FLASH_MISO" "FLASH_MISO"
+ U2 2
+ U1 40
+ P4 4
+Net 14 "/FLASH_MOSI" "FLASH_MOSI"
+ U1 41
+ U2 5
+ P4 5
+Net 16 "/SWDIO" "SWDIO"
+ U1 34
+ P6 3
 Net 17 "/PA0" "PA0"
- P3 14
  U1 10
+ P3 14
 Net 18 "/PA2" "PA2"
  P3 12
  U1 12
@@ -417,146 +426,139 @@ Net 19 "/PA4" "PA4"
  U1 14
  P3 10
 Net 20 "/PA6" "PA6"
- P3 8
  U1 16
-Net 21 "/PB10" "PB10"
- P3 6
- U1 21
-Net 22 "/PB14" "PB14"
- P3 2
+ P3 8
+Net 21 "/PB14" "PB14"
  U1 27
+ P3 2
+Net 22 "/PA10" "PA10"
+ U1 31
+ P1 5
 Net 23 "" ""
- R3 1
  D1 2
-Net 24 "/LED1" "LED1"
- U1 2
- P1 12
- D1 1
-Net 25 "/FLASH_CS" "FLASH_CS"
- U2 1
- U1 38
- P4 2
-Net 26 "DGND" "DGND"
- SJ2 3
- U1 23
- U1 20
- C7 2
- C8 2
- U3 2
- U4 2
- C9 2
- C4 2
- U2 4
- J2 5
- P6 2
- J3 4
- R6 2
- C6 2
- R5 2
- U1 8
- C5 2
- S1 3
- C1 2
- C3 2
- J1 4
- C2 2
- R3 2
- U1 47
- U1 35
- P1 2
- Y1 2
-Net 27 "/BOOT0" "BOOT0"
- U1 44
- SJ2 2
-Net 28 "/FLASH_SCK" "FLASH_SCK"
- P4 3
- U1 39
- U2 6
-Net 29 "/PB15" "PB15"
+ R3 1
+Net 24 "/PB15" "PB15"
  U1 28
  P3 1
+Net 25 "DGND" "DGND"
+ U4 2
+ U3 2
+ C8 2
+ C9 2
+ C7 2
+ SJ2 3
+ R5 2
+ C6 2
+ R6 2
+ C3 2
+ R3 2
+ J1 4
+ Y1 2
+ C5 2
+ P1 2
+ S1 3
+ U1 35
+ U1 47
+ C2 2
+ C1 2
+ P6 2
+ U1 8
+ U1 20
+ U1 23
+ C4 2
+ U2 4
+ J3 4
+ J2 5
+Net 26 "/FLASH_SCK" "FLASH_SCK"
+ U2 6
+ P4 3
+ U1 39
+Net 27 "/PA8" "PA8"
+ P1 3
+ U1 29
+Net 28 "/PB1" "PB1"
+ U1 19
+ P1 6
+Net 29 "/FLASH_CS" "FLASH_CS"
+ U1 38
+ U2 1
+ P4 2
 Net 30 "/PB0" "PB0"
- U1 18
  P1 7
+ U1 18
 Net 31 "/SWDCK" "SWDCK"
  P6 4
  U1 37
-Net 32 "/PB13" "PB13"
- P3 3
- U1 26
-Net 33 "/PB8" "PB8"
- U1 45
- P1 10
-Net 34 "/OSC_OUT" "OSC_OUT"
- U1 6
- Y1 3
-Net 35 "/OSC_IN" "OSC_IN"
- Y1 1
- U1 5
-Net 38 "/USBDM" "USBDM"
- U1 32
- R1 2
-Net 39 "/USB_D-" "USB_D-"
- J2 2
- J1 2
- R1 1
- J3 2
-Net 40 "/USBDP" "USBDP"
- R2 2
- U1 33
-Net 41 "/USB_D+" "USB_D+"
- J3 3
- R2 1
- J2 3
- J1 3
-Net 42 "/PB1" "PB1"
- U1 19
- P1 6
-Net 43 "/PA7" "PA7"
- U1 17
- P3 7
-Net 44 "/PA5" "PA5"
- U1 15
- P3 9
-Net 45 "/PA3" "PA3"
- U1 13
- P3 11
-Net 46 "/PA1" "PA1"
- U1 11
- P3 13
-Net 47 "/PC15" "PC15"
- P1 14
- U1 4
-Net 48 "/PB9" "PB9"
+Net 32 "/PB9" "PB9"
  U1 46
  P1 11
+Net 33 "/PB13" "PB13"
+ U1 26
+ P3 3
+Net 34 "/PB8" "PB8"
+ U1 45
+ P1 10
+Net 35 "/BOOT0" "BOOT0"
+ U1 44
+ SJ2 2
+Net 36 "/OSC_OUT" "OSC_OUT"
+ Y1 3
+ U1 6
+Net 37 "/OSC_IN" "OSC_IN"
+ U1 5
+ Y1 1
+Net 40 "/USBDM" "USBDM"
+ U1 32
+ R1 2
+Net 41 "/USB_D-" "USB_D-"
+ J2 2
+ R1 1
+ J1 2
+ J3 2
+Net 42 "/USBDP" "USBDP"
+ R2 2
+ U1 33
+Net 43 "/USB_D+" "USB_D+"
+ J3 3
+ J2 3
+ J1 3
+ R2 1
+Net 44 "/PB10" "PB10"
+ U1 21
+ P3 6
+Net 45 "/PA7" "PA7"
+ U1 17
+ P3 7
+Net 46 "/PA5" "PA5"
+ U1 15
+ P3 9
+Net 47 "/PA3" "PA3"
+ P3 11
+ U1 13
+Net 48 "/PA1" "PA1"
+ P3 13
+ U1 11
 Net 49 "/PC14" "PC14"
- P1 13
  U1 3
-Net 50 "/PA10" "PA10"
- P1 5
- U1 31
-Net 51 "/PA8" "PA8"
- U1 29
- P1 3
-Net 52 "/PB12" "PB12"
- P3 4
+ P1 13
+Net 50 "/PB12" "PB12"
  U1 25
-Net 53 "" ""
- U3 1
+ P3 4
+Net 51 "" ""
  P5 1
-Net 54 "/power/VIN" "VIN"
- D2 C
+ U3 1
+Net 52 "/power/VIN" "VIN"
  Q1 2
+ SJ1 2
+ D2 C
  C7 1
  U4 3
- SJ1 2
  U4 1
-Net 55 "" ""
- U4 4
+Net 53 "" ""
  C8 1
-Net 56 "" ""
- U3 5
+ U4 4
+Net 54 "" ""
  R6 1
+ U3 5
 }
 #End

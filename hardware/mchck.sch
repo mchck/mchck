@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Fri 17 Feb 2012 01:12:38 AM CET
+EESchema Schematic File Version 2  date Mon 20 Feb 2012 12:34:06 AM CET
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -48,7 +48,7 @@ $Descr A4 11700 8267
 encoding utf-8
 Sheet 1 2
 Title "MC HCK micro controller board"
-Date "17 feb 2012"
+Date "19 feb 2012"
 Rev "1"
 Comp "(c) 2011,2012 Simon Schubert"
 Comment1 "CERN OHL v.1.1 or later"
@@ -56,20 +56,8 @@ Comment2 ""
 Comment3 ""
 Comment4 ""
 $EndDescr
-$Comp
-L CONN_5 P4
-U 1 1 4F3D2CED
-P 5350 7300
-F 0 "P4" V 5300 7300 50  0000 C CNN
-F 1 "LEFT_PINS" V 5400 7300 50  0000 C CNN
-F 2 "SparkFun-1X05_LOCK" V 5350 7300 60  0000 C CNN
-	1    5350 7300
-	1    0    0    -1  
-$EndComp
-Text Label 7550 3000 0    40   ~ 0
-PC13
-Text Label 8550 3000 2    40   ~ 0
-LED1
+Wire Wire Line
+	8900 1250 9200 1250
 Wire Wire Line
 	8550 3000 7550 3000
 Wire Wire Line
@@ -184,8 +172,6 @@ Wire Wire Line
 	9200 1150 8800 1150
 Wire Wire Line
 	10400 1350 10800 1350
-Wire Wire Line
-	10650 900  10650 1050
 Wire Wire Line
 	10650 1050 10400 1050
 Wire Wire Line
@@ -418,12 +404,38 @@ Wire Wire Line
 	7550 1600 8550 1600
 Wire Wire Line
 	8550 1400 7550 1400
+Wire Wire Line
+	10400 1150 10650 1150
+Wire Wire Line
+	10650 1150 10650 900 
+Connection ~ 10650 1050
+$Comp
+L VDD #PWR?
+U 1 1 4F4186E8
+P 8900 1250
+F 0 "#PWR?" H 8900 1350 30  0001 C CNN
+F 1 "VDD" H 8900 1360 30  0000 C CNN
+	1    8900 1250
+	0    -1   -1   0   
+$EndComp
+$Comp
+L CONN_5 P4
+U 1 1 4F3D2CED
+P 5350 7300
+F 0 "P4" V 5300 7300 50  0000 C CNN
+F 1 "LEFT_PINS" V 5400 7300 50  0000 C CNN
+F 2 "SparkFun-1X05_LOCK" V 5350 7300 60  0000 C CNN
+	1    5350 7300
+	1    0    0    -1  
+$EndComp
+Text Label 7550 3000 0    40   ~ 0
+PC13
+Text Label 8550 3000 2    40   ~ 0
+LED1
 Text Label 8550 1400 2    40   ~ 0
 FLASH_CS
 Text Label 7550 1400 0    40   ~ 0
 PA15
-NoConn ~ 9200 1250
-NoConn ~ 10400 1150
 Text Label 7550 1500 0    40   ~ 0
 PB3
 Text Label 7550 1600 0    40   ~ 0
