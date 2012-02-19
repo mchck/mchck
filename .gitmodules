@@ -1,6 +1,0 @@
-[submodule "summon-arm-toolchain"]
-	path = summon-arm-toolchain
-	url = git://github.com/corecode/summon-arm-toolchain.git
-[submodule "pirate-swd-nuc1xx"]
-	path = pirate-swd-nuc1xx
-	url = git://github.com/pascalhahn/pirate-swd.git
