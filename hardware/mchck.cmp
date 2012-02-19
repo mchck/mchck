@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by CvPcb (2012-jan-04)-stable date = Tue 31 Jan 2012 02:28:24 AM CET
+Cmp-Mod V01 Created by CvPcb (2012-jan-04)-stable date = Thu 16 Feb 2012 06:06:55 PM CET
 
 BeginCmp
 TimeStamp = /4F22C5A2;
@@ -60,7 +60,7 @@ BeginCmp
 TimeStamp = /4F22DD51/4F22DDA8;
 Reference = C9;
 ValeurCmp = 2.2u;
-IdModule  = SM0805;
+IdModule  = SM0603_Capa;
 EndCmp
 
 BeginCmp
@@ -85,23 +85,23 @@ IdModule  = SparkFun-USB-A-PCB;
 EndCmp
 
 BeginCmp
-TimeStamp = /4E41B34F;
+TimeStamp = /4F274705;
 Reference = J2;
-ValeurCmp = USB_2;
+ValeurCmp = MINI_USB;
 IdModule  = SparkFun-USB-MINIB;
 EndCmp
 
 BeginCmp
-TimeStamp = /4E41B357;
+TimeStamp = /4F27475E;
 Reference = J3;
-ValeurCmp = USB_2;
+ValeurCmp = INT_USB;
 IdModule  = SparkFun-1X04;
 EndCmp
 
 BeginCmp
 TimeStamp = /4F25AB46;
 Reference = L1;
-ValeurCmp = INDUCTOR0603;
+ValeurCmp = 10uH;
 IdModule  = SM0603_NC;
 EndCmp
 
@@ -109,27 +109,27 @@ BeginCmp
 TimeStamp = /4E446864;
 Reference = P1;
 ValeurCmp = LOWER_PINS;
-IdModule  = SparkFun-1X13_LOCK_INVERSE;
+IdModule  = SparkFun-1X14_LOCK;
 EndCmp
 
 BeginCmp
-TimeStamp = /4E5376FA;
+TimeStamp = /4F3D29B5;
 Reference = P2;
-ValeurCmp = LEFT_PINS;
-IdModule  = SparkFun-1X05_LOCK;
+ValeurCmp = CONN_1;
+IdModule  = SparkFun-1X01;
 EndCmp
 
 BeginCmp
 TimeStamp = /4E446858;
 Reference = P3;
 ValeurCmp = UPPER_PINS;
-IdModule  = SparkFun-1X13_LOCK_INVERSE;
+IdModule  = SparkFun-1X14_LOCK;
 EndCmp
 
 BeginCmp
-TimeStamp = /4E537706;
+TimeStamp = /4F3D2CED;
 Reference = P4;
-ValeurCmp = RIGHT_PINS;
+ValeurCmp = LEFT_PINS;
 IdModule  = SparkFun-1X05_LOCK;
 EndCmp
 
@@ -138,6 +138,13 @@ TimeStamp = /4F22DD51/4F22E691;
 Reference = P5;
 ValeurCmp = CHRG_STAT;
 IdModule  = SparkFun-PAD.03X.03;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F2EFBC8;
+Reference = P6;
+ValeurCmp = DEBUG;
+IdModule  = SparkFun-1X05_LOCK;
 EndCmp
 
 BeginCmp
@@ -201,6 +208,13 @@ TimeStamp = /4F22DD51/4F22F0B1;
 Reference = SJ1;
 ValeurCmp = EN_VRAW;
 IdModule  = SparkFun-SJ_2S-TRACE;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F35555B;
+Reference = SJ2;
+ValeurCmp = SOLDERJUMPER_2WAYT;
+IdModule  = SparkFun-SJ_2;
 EndCmp
 
 BeginCmp

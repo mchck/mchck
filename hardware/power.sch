@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Sun 05 Feb 2012 10:52:59 PM CET
+EESchema Schematic File Version 2  date Fri 17 Feb 2012 01:12:38 AM CET
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -47,21 +47,23 @@ EELAYER END
 $Descr A4 11700 8267
 encoding utf-8
 Sheet 2 2
-Title ""
-Date "5 feb 2012"
-Rev ""
-Comp ""
-Comment1 ""
+Title "MC HCK power distribution"
+Date "17 feb 2012"
+Rev "2"
+Comp "(c) 2011,2012 Simon Schubert"
+Comment1 "CERN OHL v.1.1 or later"
 Comment2 ""
 Comment3 ""
 Comment4 ""
 $EndDescr
+Text Label 4600 2000 2    40   ~ 0
+VIN
 Connection ~ 3850 2000
 $Comp
-L PWR_FLAG #FLG030
+L PWR_FLAG #FLG036
 U 1 1 4F25B2E7
 P 3850 2000
-F 0 "#FLG030" H 3850 2095 30  0001 C CNN
+F 0 "#FLG036" H 3850 2095 30  0001 C CNN
 F 1 "PWR_FLAG" H 3850 2180 30  0000 C CNN
 	1    3850 2000
 	1    0    0    -1  
@@ -182,10 +184,10 @@ Pull-down for the PMOS gate
 Text Notes 2050 2750 0    40   Italic 8
 No charger with VRAW operation!
 $Comp
-L DGND #PWR031
+L DGND #PWR037
 U 1 1 4F22EC44
 P 1450 4000
-F 0 "#PWR031" H 1450 4000 40  0001 C CNN
+F 0 "#PWR037" H 1450 4000 40  0001 C CNN
 F 1 "DGND" H 1450 3930 40  0000 C CNN
 	1    1450 4000
 	1    0    0    -1  
@@ -231,19 +233,19 @@ F 2 "SM0805" H 3850 3450 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L DGND #PWR032
+L DGND #PWR038
 U 1 1 4F22E98E
 P 3850 3500
-F 0 "#PWR032" H 3850 3500 40  0001 C CNN
+F 0 "#PWR038" H 3850 3500 40  0001 C CNN
 F 1 "DGND" H 3850 3430 40  0000 C CNN
 	1    3850 3500
 	1    0    0    -1  
 $EndComp
 $Comp
-L DGND #PWR033
+L DGND #PWR039
 U 1 1 4F22E7CC
 P 3450 3800
-F 0 "#PWR033" H 3450 3800 40  0001 C CNN
+F 0 "#PWR039" H 3450 3800 40  0001 C CNN
 F 1 "DGND" H 3450 3730 40  0000 C CNN
 	1    3450 3800
 	1    0    0    -1  
@@ -271,10 +273,10 @@ F 2 "SparkFun-PAD.03X.03" H 1800 3455 30  0000 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L DGND #PWR034
+L DGND #PWR040
 U 1 1 4F22DF4A
 P 3150 3550
-F 0 "#PWR034" H 3150 3550 40  0001 C CNN
+F 0 "#PWR040" H 3150 3550 40  0001 C CNN
 F 1 "DGND" H 3150 3480 40  0000 C CNN
 	1    3150 3550
 	1    0    0    -1  
@@ -308,10 +310,10 @@ F 2 "SOT23-5" H 6450 1900 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L DGND #PWR035
+L DGND #PWR041
 U 1 1 4F22DDAC
 P 5550 2700
-F 0 "#PWR035" H 5550 2700 40  0001 C CNN
+F 0 "#PWR041" H 5550 2700 40  0001 C CNN
 F 1 "DGND" H 5550 2630 40  0000 C CNN
 	1    5550 2700
 	1    0    0    -1  
@@ -327,10 +329,10 @@ F 2 "SM0603_Capa" H 7450 2500 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L DGND #PWR036
+L DGND #PWR042
 U 1 1 4F22DDAA
 P 7400 2800
-F 0 "#PWR036" H 7400 2800 40  0001 C CNN
+F 0 "#PWR042" H 7400 2800 40  0001 C CNN
 F 1 "DGND" H 7400 2730 40  0000 C CNN
 	1    7400 2800
 	1    0    0    -1  
@@ -358,10 +360,10 @@ F 2 "SM0805" H 8150 2350 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L DGND #PWR037
+L DGND #PWR043
 U 1 1 4F22DDA7
 P 8100 2650
-F 0 "#PWR037" H 8100 2650 40  0001 C CNN
+F 0 "#PWR043" H 8100 2650 40  0001 C CNN
 F 1 "DGND" H 8100 2580 40  0000 C CNN
 	1    8100 2650
 	1    0    0    -1  
