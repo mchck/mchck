@@ -38,7 +38,7 @@ ${GERBERS}: ${BOARD}
 
 
 FAB_BRANCH=	fab
-FAB_INDEX=	.git/fab-index
+FAB_INDEX=	$(shell git rev-parse --git-dir || echo ".git")/fab-index
 e=	GIT_INDEX_FILE=${FAB_INDEX}
 
 ci-fab: ${GERBERS} ${PDFS} ${PNGS} ${PNG_PREVIEWS} ${LICENSE_FILES}
