@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by CvPcb (2012-jan-04)-stable date = Thu 16 Feb 2012 06:06:55 PM CET
+Cmp-Mod V01 Created by CvPcb (2012-jan-04)-stable date = Wed 22 Feb 2012 11:46:21 AM CET
 
 BeginCmp
 TimeStamp = /4F22C5A2;
@@ -207,7 +207,7 @@ BeginCmp
 TimeStamp = /4F22DD51/4F22F0B1;
 Reference = SJ1;
 ValeurCmp = EN_VRAW;
-IdModule  = SparkFun-SJ_2S-TRACE;
+IdModule  = SparkFun-SJ_2S-NO;
 EndCmp
 
 BeginCmp
