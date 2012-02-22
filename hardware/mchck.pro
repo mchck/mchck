@@ -1,4 +1,4 @@
-update=Sun 19 Feb 2012 10:55:05 PM CET
+update=Wed 22 Feb 2012 10:53:16 PM CET
 version=1
 last_client=pcbnew
 [cvpcb]
@@ -89,17 +89,17 @@ LibName41=STM32L15x_QFN48
 LibName42=mic5205
 [pcbnew]
 version=1
-PadDrlX=400
-PadDimH=740
-PadDimV=740
+PadDrlX=320
+PadDimH=600
+PadDimV=600
 BoardThickness=630
-TxtPcbV=276
-TxtPcbH=276
-TxtModV=276
-TxtModH=276
-TxtModW=39
-VEgarde=31
-DrawLar=150
+TxtPcbV=354
+TxtPcbH=354
+TxtModV=354
+TxtModH=354
+TxtModW=59
+VEgarde=100
+DrawLar=59
 EdgeLar=150
 TxtLar=120
 MSegLar=59
