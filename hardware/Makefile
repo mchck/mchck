@@ -1,10 +1,13 @@
-SOURCES=	$(wildcard *.ps)
+P=	mchck
+
+SOURCES=	$(wildcard $P*.ps)
 PDFS=		${SOURCES:.ps=-crop.pdf}
-PNGS=		${SOURCES:.ps=.png}
+PNGS=            ${COMPOSITE_PNGS} ${SOURCES:.ps=.png}
 PNG_PREVIEWS=	${PNGS:.png=-small.png}
-BOARD=		$(wildcard *.brd)
-GERBERS=	$(wildcard *.g[bt][lso] *.gbr *.drl)
+BOARD=		$P.brd
+GERBERS=	$(wildcard $P-*.g[bt][lso] $P-*.gbr $P*.drl)
 LICENSE_FILES=	LICENSE LICENSE.HOWTO README.md
+COMPOSITE_PNGS=	$P-Composite_Front.png $P-Composite_Back.png
 
 all: clean png png_preview
 
@@ -26,10 +29,17 @@ png_preview: ${PNG_PREVIEWS}
 	pdfcrop $^
 
 %.png: %-crop.pdf
-	convert -antialias -density 600 -alpha off $^ $@
+	convert -antialias -density 1200 -alpha off -resize '25%' $^ $@
 
 %-small.png: %.png
-	convert -resize 10% $^ $@
+	convert -resize '300x300' $^ $@
+
+# Wouldn't it be great if we didn't need this rule?
+$P-Composite_%-small.png: $P-Composite_%.png
+	convert -resize '300x300' $^ $@
+
+$P-Composite_%.png: $P-%.png $P-Mask_%.png $P-SilkS_%.png $P-PCB_Edges.png
+	sh composite-board.sh $^ $$(case "$@" in *Back*) printf -- "-flop";;esac) $@
 
 
 ${GERBERS}: ${BOARD}
