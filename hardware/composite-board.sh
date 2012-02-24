@@ -86,14 +86,14 @@ cp "$SRC_EDGES"		"$TMPDIR/edges.png";
 	convert \
 		"copper.png" \
 		+matte \
-		-fill 'rgb(200, 255, 200)' \
+		-fill 'rgb(170, 200, 110)' \
 		-draw 'color 0,0 reset' \
-		"MIFF:overlay.miff";
+		"MIFF:pcb.miff";
 
 	# stack and merge layers in order: copper, mask, silkscreen, board edges
-	composite "copper.miff"	"overlay.miff" -compose src-atop "overlay.miff";
-	composite "mask.miff"	"overlay.miff" -compose multiply "overlay.miff";
-	composite "silks.miff"	"overlay.miff" -compose src-atop "overlay.miff";
+	composite "mask.miff"	"copper.miff"  -compose multiply "overlay.miff";
+        composite "pcb.miff"    "overlay.miff" -compose dst-atop "overlay.miff";
+        composite "silks.miff"  "overlay.miff" -compose src-atop "overlay.miff";
 	composite "edges.miff"	"overlay.miff" -compose src-atop "overlay.miff";
 	composite "shape.miff"  "overlay.miff" -compose copy-opacity "overlay.miff";
 
