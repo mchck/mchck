@@ -28,18 +28,20 @@ png_preview: ${PNG_PREVIEWS}
 %-crop.pdf: %.pdf
 	pdfcrop $^
 
+# ImageMagick crashes when specifying the Palette type and writing to png... do it two-step instead
 %.png: %-crop.pdf
-	convert -antialias -density 1200 -alpha off -resize '25%' $^ $@
+	convert -density 1200 -alpha off -resize '25%' -resize '2000x2000>' -type optimize -quality 95 $^ $@
+	-[ $$(du -k $@ | cut -f 1) -gt 80 ] && convert $@ -colors 255 -define png:format=png8 -quality 95 $@
 
 %-small.png: %.png
-	convert -resize '300x300' $^ $@
+	convert -type TrueColorMatte -resize '300x300' -quality 95 -colors 255 -type optimize $^ $@
 
 # Wouldn't it be great if we didn't need this rule?
 $P-Composite_%-small.png: $P-Composite_%.png
-	convert -resize '300x300' $^ $@
+	convert -type TrueColorMatte -resize '300x300' -quality 95 -colors 255 -type optimize $^ $@
 
 $P-Composite_%.png: $P-%.png $P-Mask_%.png $P-SilkS_%.png $P-PCB_Edges.png
-	sh composite-board.sh $^ $$(case "$@" in *Back*) printf -- "-flop";;esac) $@
+	sh composite-board.sh $^ $$(case "$@" in *Back*) printf -- "-flop";;esac) -colors 255 -type PaletteMatte -quality 95 $@
 
 
 ${GERBERS}: ${BOARD}
