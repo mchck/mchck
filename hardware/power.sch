@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Sat 25 Feb 2012 02:36:31 AM CET
+EESchema Schematic File Version 2  date Sat 25 Feb 2012 02:43:46 AM CET
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -48,7 +48,7 @@ $Descr A4 11700 8267
 encoding utf-8
 Sheet 2 2
 Title "MC HCK power distribution"
-Date "24 feb 2012"
+Date "25 feb 2012"
 Rev "2"
 Comp "(c) 2011,2012 Simon Schubert"
 Comment1 "CERN OHL v.1.1 or later"
@@ -223,10 +223,10 @@ F 2 "SOT323" H 4200 2750 50  0000 C CNN
 	1    0    0    1   
 $EndComp
 $Comp
-L CAP0805 C6
+L CAP0805 C9
 U 1 1 4F22E9AF
 P 3850 3300
-F 0 "C6" H 3910 3415 50  0000 L BNN
+F 0 "C9" H 3910 3415 50  0000 L BNN
 F 1 "4.7u" H 3910 3215 50  0000 L BNN
 F 2 "SM0805" H 3850 3450 50  0000 C CNN
 	1    3850 3300
@@ -263,10 +263,10 @@ $EndComp
 Text Notes 3600 3700 0    40   ~ 0
 Ichg = 1000V/Rprog\nRprog = 1000V/Ichg\n\nfor 50mA, Rprog = 20k
 $Comp
-L CONN_1 P5
+L CONN_1 P6
 U 1 1 4F22E691
 P 1800 3300
-F 0 "P5" H 1880 3300 40  0000 L CNN
+F 0 "P6" H 1880 3300 40  0000 L CNN
 F 1 "CHRG_STAT" H 1800 3355 30  0000 C CNN
 F 2 "SparkFun-PAD.03X.03" H 1800 3455 30  0000 C CNN
 	1    1800 3300
@@ -338,10 +338,10 @@ F 1 "DGND" H 7400 2730 40  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L C C7
+L C C6
 U 1 1 4F22DDA9
 P 5300 2350
-F 0 "C7" H 5350 2450 50  0000 L CNN
+F 0 "C6" H 5350 2450 50  0000 L CNN
 F 1 "2.2u" H 5350 2250 50  0000 L CNN
 F 2 "SM0603_Capa" H 5350 2350 50  0000 C CNN
 	1    5300 2350
@@ -350,10 +350,10 @@ $EndComp
 Text Notes 7250 3000 0    40   Italic 0
 Optional for\nlow noise
 $Comp
-L C C9
+L C C7
 U 1 1 4F22DDA8
 P 8100 2350
-F 0 "C9" H 8150 2450 50  0000 L CNN
+F 0 "C7" H 8150 2450 50  0000 L CNN
 F 1 "2.2u" H 8150 2250 50  0000 L CNN
 F 2 "SM0603_Capa" H 8150 2350 50  0000 C CNN
 	1    8100 2350

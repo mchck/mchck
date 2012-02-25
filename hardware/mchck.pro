@@ -1,4 +1,4 @@
-update=Sat 25 Feb 2012 02:34:53 AM CET
+update=Sat 25 Feb 2012 02:54:23 AM CET
 version=1
 last_client=pcbnew
 [cvpcb]
@@ -89,6 +89,7 @@ LibName41=STM32L15x_QFN48
 LibName42=mic5205
 [pcbnew]
 version=1
+LastNetListRead=mchck.net
 PadDrlX=320
 PadDimH=600
 PadDimV=600
@@ -103,7 +104,6 @@ DrawLar=59
 EdgeLar=150
 TxtLar=120
 MSegLar=59
-LastNetListRead=mchck.net
 [pcbnew/libraries]
 LibDir=
 LibName1=mchck
