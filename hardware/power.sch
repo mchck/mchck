@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Fri 24 Feb 2012 10:22:05 AM CET
+EESchema Schematic File Version 2  date Sat 25 Feb 2012 02:36:31 AM CET
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -56,20 +56,9 @@ Comment2 ""
 Comment3 ""
 Comment4 ""
 $EndDescr
-Text Label 4600 2000 2    40   ~ 0
-VIN
-Connection ~ 3850 2000
-$Comp
-L PWR_FLAG #FLG038
-U 1 1 4F25B2E7
-P 3850 2000
-F 0 "#FLG038" H 3850 2095 30  0001 C CNN
-F 1 "PWR_FLAG" H 3850 2180 30  0000 C CNN
-	1    3850 2000
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
-	2700 2000 2700 1550
+	2700 1450 2700 2000
+Connection ~ 3850 2000
 Wire Notes Line
 	3250 1600 1650 1600
 Wire Notes Line
@@ -164,16 +153,27 @@ Wire Notes Line
 Wire Notes Line
 	1250 4150 1250 2300
 Wire Wire Line
-	2700 1000 2700 1150
+	2700 1000 2700 1250
 $Comp
-L SOLDERJUMPERNO SJ1
-U 1 1 4F22F0B1
+L DIODE-SCHOTTKY_ D3
+U 1 1 4F48209B
 P 2700 1350
-F 0 "SJ1" H 2600 1450 50  0000 L BNN
-F 1 "EN_VRAW" H 2550 1200 50  0000 L BNN
-F 2 "SparkFun-SJ_2S-NO" H 2700 1500 50  0000 C CNN
+F 0 "D3" H 2800 1369 50  0000 L BNN
+F 1 "CDBU0530" H 2550 1200 50  0000 L BNN
+F 2 "SOD-523F" H 2700 1500 50  0000 C CNN
 	1    2700 1350
 	0    1    1    0   
+$EndComp
+Text Label 4600 2000 2    40   ~ 0
+VIN
+$Comp
+L PWR_FLAG #FLG038
+U 1 1 4F25B2E7
+P 3850 2000
+F 0 "#FLG038" H 3850 2095 30  0001 C CNN
+F 1 "PWR_FLAG" H 3850 2180 30  0000 C CNN
+	1    3850 2000
+	1    0    0    -1  
 $EndComp
 Text Notes 2200 2150 0    40   ~ 0
 Cut track and install if VRAW\nand VBUS operation desired
@@ -208,7 +208,7 @@ U 1 1 4F22EB14
 P 1900 2000
 F 0 "D2" H 2000 2019 50  0000 L BNN
 F 1 "CDBU0530" H 1750 1850 50  0000 L BNN
-F 2 "SM0603_DIODE_NC" H 1900 2150 50  0000 C CNN
+F 2 "SOD-523F-NC" H 1900 2150 50  0000 C CNN
 	1    1900 2000
 	1    0    0    -1  
 $EndComp

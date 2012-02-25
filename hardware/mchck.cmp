@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by CvPcb (2012-jan-04)-stable date = Fri 24 Feb 2012 10:09:16 AM CET
+Cmp-Mod V01 Created by CvPcb (2012-jan-04)-stable date = Sat 25 Feb 2012 02:24:18 AM CET
 
 BeginCmp
 TimeStamp = /4F22C5A2;
@@ -81,7 +81,14 @@ BeginCmp
 TimeStamp = /4F22DD51/4F22EB14;
 Reference = D2;
 ValeurCmp = CDBU0530;
-IdModule  = SM0603_DIODE_NC;
+IdModule  = SOD-523F-NC;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F22DD51/4F48209B;
+Reference = D3;
+ValeurCmp = CDBU0530;
+IdModule  = SOD-523F;
 EndCmp
 
 BeginCmp
@@ -208,13 +215,6 @@ TimeStamp = /4E5409DB;
 Reference = S1;
 ValeurCmp = RESET;
 IdModule  = EVQP2;
-EndCmp
-
-BeginCmp
-TimeStamp = /4F22DD51/4F22F0B1;
-Reference = SJ1;
-ValeurCmp = EN_VRAW;
-IdModule  = SparkFun-SJ_2S-NO;
 EndCmp
 
 BeginCmp
