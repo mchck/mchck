@@ -34,14 +34,14 @@ png_preview: ${PNG_PREVIEWS}
 	-[ $$(du -k $@ | cut -f 1) -gt 80 ] && convert $@ -colors 255 -define png:format=png8 -quality 95 $@
 
 %-small.png: %.png
-	convert -type TrueColorMatte -resize '300x300' -quality 95 -colors 255 -type optimize $^ $@
+	convert -type TrueColorMatte -resize '300x300' -quality 95 -type optimize $^ $@
 
 # Wouldn't it be great if we didn't need this rule?
 $P-Composite_%-small.png: $P-Composite_%.png
-	convert -type TrueColorMatte -resize '300x300' -quality 95 -colors 255 -type optimize $^ $@
+	convert -type TrueColorMatte -resize '300x300' -quality 95 -type optimize $^ $@
 
 $P-Composite_%.png: $P-%.png $P-Mask_%.png $P-SilkS_%.png $P-PCB_Edges.png
-	sh composite-board.sh $^ $$(case "$@" in *Back*) printf -- "-flop";;esac) -colors 255 -type PaletteMatte -quality 95 $@
+	sh composite-board.sh $^ $$(case "$@" in *Back*) printf -- "-flop";;esac) -type optimize -quality 95 $@
 
 
 ${GERBERS}: ${BOARD}

@@ -47,7 +47,7 @@ cp "$SRC_EDGES"		"$TMPDIR/edges.png";
 	# solder stop layer
 	convert \
 		"mask.png" \
-		-background green \
+		-background 'rgb(0,100,0)' \
 		-alpha Shape \
 		"MIFF:mask.miff";
 
@@ -91,7 +91,7 @@ cp "$SRC_EDGES"		"$TMPDIR/edges.png";
 		"MIFF:pcb.miff";
 
 	# stack and merge layers in order: copper, mask, silkscreen, board edges
-	composite "mask.miff"	"copper.miff"  -compose multiply "overlay.miff";
+	composite "mask.miff"	"copper.miff"  -compose divide "overlay.miff";
         composite "pcb.miff"    "overlay.miff" -compose dst-atop "overlay.miff";
         composite "silks.miff"  "overlay.miff" -compose src-atop "overlay.miff";
 	composite "edges.miff"	"overlay.miff" -compose src-atop "overlay.miff";
