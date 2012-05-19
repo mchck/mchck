@@ -60,7 +60,7 @@ void WEAK  SPI3_IRQHandler(void);
 void WEAK  I2C0_IRQHandler(void); 
 void WEAK  I2C1_IRQHandler(void); 
 void WEAK  CAN0_IRQHandler(void); 
-void WEAK  USBD_IRQHandler(void);  
+void WEAK  USBD_IRQHandler(void);
 void WEAK  PS2_IRQHandler(void);  
 void WEAK  ACMP_IRQHandler(void); 
 void WEAK  PDMA_IRQHandler(void);

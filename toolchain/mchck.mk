@@ -8,19 +8,35 @@ AS=	arm-none-eabi-as
 OBJCOPY=	arm-none-eabi-objcopy
 
 XTALFREQ?=	8000000
-TARGET?=	NUC120LD2BN
+TARGET?=	STM32L151C8
 
-CFLAGS+=	-mcpu=cortex-m0 -msoft-float -mthumb -ffunction-sections -std=gnu99
-CFLAGS+=	-I${_libdir}/include -I${_libdir}/include/Driver
-CFLAGS+=	-D${TARGET}
+COPTFLAGS?=	-Os
+CWARNFLAGS?=	-Wall
+
+CFLAGS+=	-mcpu=cortex-m3 -msoft-float -mthumb -ffunction-sections -std=gnu99
+CFLAGS+=	-I${_libdir}/include -I.
 CFLAGS+=	-D__XTAL='(${XTALFREQ}L)'
+CFLAGS+=	-include ${_libdir}/include/mchck_internal.h
+CFLAGS+=	-g
+ifndef DEBUG
+CFLAGS+=	${COPTFLAGS}
+endif
+CFLAGS+=	${CWARNFLAGS}
 
-LDFLAGS+=	-Wl,--gc-sections -L${_libdir}/ld -T ${TARGETLD} -T link.ld -nostartfiles
+LDFLAGS+=	-Wl,--gc-sections -L${_libdir} -L${_libdir}/ld
+LDFLAGS+=	-T ${TARGETLD}
+ifdef LOADER
+LDFLAGS+=	-T loader.ld
+else
+LDFLAGS+=	-T app.ld
+endif
+LDFLAGS+=	-T link.ld
+LDFLAGS+=       -nostartfiles
 
-STARTFILE_SRC=	core_cm0.c system_NUC1xx.c startup_NUC1xx.c
+STARTFILE_SRC=	startup_stm32l15xxx.c system_stm32l1xx.c
 STARTFILE_OBJ=	$(addsuffix .o, $(basename ${STARTFILE_SRC}))
-STARTFILE_LIB=	libcrtnuc1xx.a
-STARTFILE_LIBSHORT=	-lcrtnuc1xx
+#STARTFILE_LIB=	libcrtnuc1xx.a
+#STARTFILE_LIBSHORT=	-lcrtnuc1xx
 STARTFILES=	${STARTFILE_OBJ}
 
 TARGETLD?=	${TARGET}.ld
