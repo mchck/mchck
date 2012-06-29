@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by CvPcb (2012-jan-04)-stable date = Sat 25 Feb 2012 02:24:18 AM CET
+Cmp-Mod V01 Genere par PcbNew le Fri 29 Jun 2012 12:48:58 PM EDT
 
 BeginCmp
 TimeStamp = /4F22C5A2;
@@ -221,7 +221,7 @@ BeginCmp
 TimeStamp = /4F35555B;
 Reference = SJ2;
 ValeurCmp = SOLDERJUMPER_2WAYT;
-IdModule  = SparkFun-SJ_2;
+IdModule  = SparkFun-SJ_2VerySmall-NO;
 EndCmp
 
 BeginCmp

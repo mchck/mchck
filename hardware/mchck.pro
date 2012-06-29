@@ -1,6 +1,6 @@
-update=Sat 25 Feb 2012 02:54:23 AM CET
+update=Wed 27 Jun 2012 05:31:46 PM EDT
 version=1
-last_client=pcbnew
+last_client=eeschema
 [cvpcb]
 version=1
 NetITyp=0
