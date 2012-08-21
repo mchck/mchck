@@ -1,14 +1,14 @@
-Cmp-Mod V01 Genere par PcbNew le Fri 29 Jun 2012 12:48:58 PM EDT
+Cmp-Mod V01 Created by CvPcb (2012-03-22 BZR 3475)-stable date = Tue 21 Aug 2012 01:06:30 PM CEST
 
 BeginCmp
-TimeStamp = /4F22C5A2;
+TimeStamp = /4F22C636;
 Reference = C1;
 ValeurCmp = 100n;
 IdModule  = SM0603_Capa;
 EndCmp
 
 BeginCmp
-TimeStamp = /4F22C636;
+TimeStamp = /4F22C5A2;
 Reference = C2;
 ValeurCmp = 100n;
 IdModule  = SM0603_Capa;
@@ -36,31 +36,31 @@ IdModule  = SM0603_Capa;
 EndCmp
 
 BeginCmp
-TimeStamp = /4F22DD51/4F22E9AF;
+TimeStamp = /4F22DD51/4F22DDA8;
 Reference = C6;
-ValeurCmp = 4.7u;
-IdModule  = SM0805;
+ValeurCmp = 1u;
+IdModule  = SM0603_Capa;
 EndCmp
 
 BeginCmp
 TimeStamp = /4F22DD51/4F22DDA9;
 Reference = C7;
-ValeurCmp = 2.2u;
-IdModule  = SM0603_Capa;
+ValeurCmp = 10u;
+IdModule  = SM0805;
 EndCmp
 
 BeginCmp
-TimeStamp = /4F22DD51/4F22DDAB;
+TimeStamp = /4F22DD51/503156DF;
 Reference = C8;
-ValeurCmp = 470p;
-IdModule  = SM0603_Capa;
+ValeurCmp = 10u;
+IdModule  = SM0805;
 EndCmp
 
 BeginCmp
-TimeStamp = /4F22DD51/4F22DDA8;
+TimeStamp = /4F22DD51/4F22E9AF;
 Reference = C9;
-ValeurCmp = 2.2u;
-IdModule  = SM0603_Capa;
+ValeurCmp = 4.7u;
+IdModule  = SM0805;
 EndCmp
 
 BeginCmp
@@ -85,7 +85,7 @@ IdModule  = SOD-523F-NC;
 EndCmp
 
 BeginCmp
-TimeStamp = /4F22DD51/4F48209B;
+TimeStamp = /4F22DD51/5030034E;
 Reference = D3;
 ValeurCmp = CDBU0530;
 IdModule  = SOD-523F;
@@ -101,15 +101,15 @@ EndCmp
 BeginCmp
 TimeStamp = /4F274705;
 Reference = J2;
-ValeurCmp = MINI_USB;
-IdModule  = SparkFun-USB-MINIB;
+ValeurCmp = MICRO_USB;
+IdModule  = SparkFun-USB-MICROB;
 EndCmp
 
 BeginCmp
 TimeStamp = /4F27475E;
 Reference = J3;
 ValeurCmp = INT_USB;
-IdModule  = SparkFun-1X04;
+IdModule  = SparkFun-1X05_LOCK;
 EndCmp
 
 BeginCmp
@@ -120,52 +120,52 @@ IdModule  = SM0603_NC;
 EndCmp
 
 BeginCmp
-TimeStamp = /4E446864;
-Reference = P1;
-ValeurCmp = LOWER_PINS;
-IdModule  = SparkFun-1X14_LOCK;
-EndCmp
-
-BeginCmp
-TimeStamp = /4F3D29B5;
-Reference = P2;
-ValeurCmp = CONN_1;
-IdModule  = SparkFun-1X01;
-EndCmp
-
-BeginCmp
 TimeStamp = /4E446858;
-Reference = P3;
+Reference = P1;
 ValeurCmp = UPPER_PINS;
 IdModule  = SparkFun-1X14_LOCK;
 EndCmp
 
 BeginCmp
+TimeStamp = /4E446864;
+Reference = P2;
+ValeurCmp = LOWER_PINS;
+IdModule  = SparkFun-1X14_LOCK;
+EndCmp
+
+BeginCmp
 TimeStamp = /4F3D2CED;
-Reference = P4;
+Reference = P3;
 ValeurCmp = LEFT_PINS;
 IdModule  = SparkFun-1X05_LOCK;
 EndCmp
 
 BeginCmp
-TimeStamp = /4F22DD51/4F22E691;
-Reference = P5;
-ValeurCmp = CHRG_STAT;
-IdModule  = SparkFun-PAD.03X.03;
-EndCmp
-
-BeginCmp
 TimeStamp = /4F2EFBC8;
-Reference = P6;
+Reference = P4;
 ValeurCmp = DEBUG;
 IdModule  = SparkFun-1X05_LOCK;
 EndCmp
 
 BeginCmp
-TimeStamp = /4F22DD51/4F22EA1F;
-Reference = Q1;
-ValeurCmp = MOSFET-PCHANNEL;
-IdModule  = SOT323;
+TimeStamp = /50315323;
+Reference = P5;
+ValeurCmp = CONN_1;
+IdModule  = SparkFun-PAD.03X.03;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F22DD51/4F22E691;
+Reference = P6;
+ValeurCmp = CHRG_STAT;
+IdModule  = SparkFun-PAD.03X.03;
+EndCmp
+
+BeginCmp
+TimeStamp = /50315332;
+Reference = P7;
+ValeurCmp = CONN_1;
+IdModule  = SparkFun-PAD.03X.03;
 EndCmp
 
 BeginCmp
@@ -184,22 +184,8 @@ EndCmp
 
 BeginCmp
 TimeStamp = /4E4186C6;
-Reference = R3;
-ValeurCmp = 1k;
-IdModule  = SM0603;
-EndCmp
-
-BeginCmp
-TimeStamp = /4E417E10;
 Reference = R4;
 ValeurCmp = 1k;
-IdModule  = SM0603;
-EndCmp
-
-BeginCmp
-TimeStamp = /4F22DD51/4F22EC3E;
-Reference = R5;
-ValeurCmp = 100k;
 IdModule  = SM0603;
 EndCmp
 
@@ -211,23 +197,37 @@ IdModule  = SM0603;
 EndCmp
 
 BeginCmp
-TimeStamp = /4E5409DB;
+TimeStamp = /50317101;
 Reference = S1;
-ValeurCmp = RESET;
-IdModule  = EVQP2;
+ValeurCmp = SWITCH-MOMENTARY-2-SMD-1101NE;
+IdModule  = SparkFun-TACTILE-SWITCH-1101NE;
 EndCmp
 
 BeginCmp
-TimeStamp = /4F35555B;
+TimeStamp = /4FEDD8B1;
 Reference = SJ2;
-ValeurCmp = SOLDERJUMPER_2WAYT;
+ValeurCmp = SOLDERJUMPERNC;
 IdModule  = SparkFun-SJ_2VerySmall-NO;
 EndCmp
 
 BeginCmp
-TimeStamp = /4F16AC22;
+TimeStamp = /4FEDCF32;
+Reference = SJ3;
+ValeurCmp = SOLDERJUMPERNC;
+IdModule  = SparkFun-SJ_2VerySmall-NO;
+EndCmp
+
+BeginCmp
+TimeStamp = /4FEDCFCF;
+Reference = SJ4;
+ValeurCmp = SOLDERJUMPERNC;
+IdModule  = SparkFun-SJ_2VerySmall-NO;
+EndCmp
+
+BeginCmp
+TimeStamp = /502D6F34;
 Reference = U1;
-ValeurCmp = STM32L15X_QFN48;
+ValeurCmp = NUC120_QFN48;
 IdModule  = LQFP48;
 EndCmp
 
@@ -246,10 +246,10 @@ IdModule  = SOT23-5;
 EndCmp
 
 BeginCmp
-TimeStamp = /4F22DD51/4F22DDAE;
+TimeStamp = /4F22DD51/50323A90;
 Reference = U4;
-ValeurCmp = MIC5205;
-IdModule  = SOT23-5;
+ValeurCmp = MCP1702;
+IdModule  = SOT89-DEFAULTCON;
 EndCmp
 
 BeginCmp
