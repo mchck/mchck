@@ -4,3 +4,6 @@
 [submodule "pirate-swd-nuc1xx"]
 	path = pirate-swd-nuc1xx
 	url = git://github.com/pascalhahn/pirate-swd.git
+[submodule "wiki"]
+	path = wiki
+	url = https://github.com/corecode/mchck.wiki.git
