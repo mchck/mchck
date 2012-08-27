@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by CvPcb (2012-03-22 BZR 3475)-stable date = Tue 21 Aug 2012 01:06:30 PM CEST
+Cmp-Mod V01 Created by CvPcb (2012-03-22 BZR 3475)-stable date = Tue 28 Aug 2012 01:21:16 AM CEST
 
 BeginCmp
 TimeStamp = /4F22C636;
@@ -120,6 +120,13 @@ IdModule  = SM0603_NC;
 EndCmp
 
 BeginCmp
+TimeStamp = /4F22DD51/503C00A7;
+Reference = L2;
+ValeurCmp = INDUCTOR_SELECT;
+IdModule  = SM0805-3WAY-NC;
+EndCmp
+
+BeginCmp
 TimeStamp = /4E446858;
 Reference = P1;
 ValeurCmp = UPPER_PINS;
@@ -136,7 +143,7 @@ EndCmp
 BeginCmp
 TimeStamp = /4F3D2CED;
 Reference = P3;
-ValeurCmp = LEFT_PINS;
+ValeurCmp = RIGHT_PINS;
 IdModule  = SparkFun-1X05_LOCK;
 EndCmp
 
@@ -150,21 +157,21 @@ EndCmp
 BeginCmp
 TimeStamp = /50315323;
 Reference = P5;
-ValeurCmp = CONN_1;
-IdModule  = SparkFun-PAD.03X.03;
-EndCmp
-
-BeginCmp
-TimeStamp = /4F22DD51/4F22E691;
-Reference = P6;
-ValeurCmp = CHRG_STAT;
+ValeurCmp = RTC_XTAL;
 IdModule  = SparkFun-PAD.03X.03;
 EndCmp
 
 BeginCmp
 TimeStamp = /50315332;
+Reference = P6;
+ValeurCmp = RTC_XTAL;
+IdModule  = SparkFun-PAD.03X.03;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F22DD51/4F22E691;
 Reference = P7;
-ValeurCmp = CONN_1;
+ValeurCmp = CHRG_STAT;
 IdModule  = SparkFun-PAD.03X.03;
 EndCmp
 
@@ -204,23 +211,30 @@ IdModule  = SparkFun-TACTILE-SWITCH-1101NE;
 EndCmp
 
 BeginCmp
+TimeStamp = /4F22DD51/503BFB94;
+Reference = SJ1;
+ValeurCmp = SOLDERJUMPERNO;
+IdModule  = SparkFun-SJ_2VerySmall-NO;
+EndCmp
+
+BeginCmp
 TimeStamp = /4FEDD8B1;
 Reference = SJ2;
-ValeurCmp = SOLDERJUMPERNC;
+ValeurCmp = SOLDERJUMPERNO;
 IdModule  = SparkFun-SJ_2VerySmall-NO;
 EndCmp
 
 BeginCmp
 TimeStamp = /4FEDCF32;
 Reference = SJ3;
-ValeurCmp = SOLDERJUMPERNC;
+ValeurCmp = SOLDERJUMPERNO;
 IdModule  = SparkFun-SJ_2VerySmall-NO;
 EndCmp
 
 BeginCmp
 TimeStamp = /4FEDCFCF;
 Reference = SJ4;
-ValeurCmp = SOLDERJUMPERNC;
+ValeurCmp = SOLDERJUMPERNO;
 IdModule  = SparkFun-SJ_2VerySmall-NO;
 EndCmp
 
@@ -246,10 +260,10 @@ IdModule  = SOT23-5;
 EndCmp
 
 BeginCmp
-TimeStamp = /4F22DD51/50323A90;
+TimeStamp = /4F22DD51/503BF088;
 Reference = U4;
-ValeurCmp = MCP1702;
-IdModule  = SOT89-DEFAULTCON;
+ValeurCmp = MULTIREG;
+IdModule  = SOT23-5;
 EndCmp
 
 BeginCmp

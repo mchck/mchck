@@ -1,5 +1,4 @@
-EESchema Schematic File Version 2  date Tue 21 Aug 2012 03:06:45 PM CEST
-LIBS:v_reg_lm1117sot223
+EESchema Schematic File Version 2  date Tue 28 Aug 2012 01:50:20 AM CEST
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -41,6 +40,8 @@ LIBS:cn3063
 LIBS:mic5205
 LIBS:NUC120_QFN48
 LIBS:mcp1702
+LIBS:multireg
+LIBS:inductor_select
 LIBS:mchck-cache
 EELAYER 25  0
 EELAYER END
@@ -48,7 +49,7 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 2
 Title "MC HCK micro controller board"
-Date "21 aug 2012"
+Date "27 aug 2012"
 Rev "3"
 Comp "(c) 2011,2012 Simon Schubert"
 Comment1 "CERN OHL v.1.1 or later"
@@ -57,23 +58,23 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L SOLDERJUMPERNC SJ?
+L SOLDERJUMPERNO SJ?
 U 1 1 4FEDD8B1
 P 3000 950
 AR Path="/4FEDCF32" Ref="SJ?"  Part="1" 
 AR Path="/4FEDD8B1" Ref="SJ2"  Part="1" 
 F 0 "SJ2" H 3050 1000 50  0000 L TNN
-F 1 "SOLDERJUMPERNC" H 3000 950 50  0001 L BNN
+F 1 "SOLDERJUMPERNO" H 3000 950 50  0001 L BNN
 F 2 "SparkFun-SJ_2VerySmall-NO" H 3000 1100 50  0001 C CNN
 	1    3000 950 
 	1    0    0    1   
 $EndComp
 $Comp
-L SOLDERJUMPERNC SJ4
+L SOLDERJUMPERNO SJ4
 U 1 1 4FEDCFCF
 P 3000 1150
 F 0 "SJ4" H 3050 1100 50  0000 L BNN
-F 1 "SOLDERJUMPERNC" H 3000 1150 50  0001 L BNN
+F 1 "SOLDERJUMPERNO" H 3000 1150 50  0001 L BNN
 F 2 "SparkFun-SJ_2VerySmall-NO" H 3000 1300 50  0001 C CNN
 	1    3000 1150
 	1    0    0    -1  
@@ -81,11 +82,11 @@ $EndComp
 Text Label 3550 950  2    40   ~ 0
 VBUS
 $Comp
-L SOLDERJUMPERNC SJ3
+L SOLDERJUMPERNO SJ3
 U 1 1 4FEDCF32
 P 3000 1050
 F 0 "SJ3" H 3050 1000 50  0000 L BNN
-F 1 "SOLDERJUMPERNC" H 3000 1050 50  0001 L BNN
+F 1 "SOLDERJUMPERNO" H 3000 1050 50  0001 L BNN
 F 2 "SparkFun-SJ_2VerySmall-NO" H 3000 1200 50  0001 C CNN
 	1    3000 1050
 	1    0    0    -1  

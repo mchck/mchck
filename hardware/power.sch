@@ -1,5 +1,4 @@
-EESchema Schematic File Version 2  date Tue 21 Aug 2012 03:06:45 PM CEST
-LIBS:v_reg_lm1117sot223
+EESchema Schematic File Version 2  date Tue 28 Aug 2012 01:50:20 AM CEST
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -41,6 +40,8 @@ LIBS:cn3063
 LIBS:mic5205
 LIBS:NUC120_QFN48
 LIBS:mcp1702
+LIBS:multireg
+LIBS:inductor_select
 LIBS:mchck-cache
 EELAYER 25  0
 EELAYER END
@@ -48,7 +49,7 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 2 2
 Title "MC HCK power distribution"
-Date "21 aug 2012"
+Date "27 aug 2012"
 Rev "3"
 Comp "(c) 2011,2012 Simon Schubert"
 Comment1 "CERN OHL v.1.1 or later"
@@ -206,41 +207,45 @@ F 2 "SOD-523F" H 4200 3500 50  0001 C CNN
 $EndComp
 $Comp
 L DGND #PWR035
-U 1 1 50317BA8
-P 6750 2400
-F 0 "#PWR035" H 6750 2400 40  0001 C CNN
-F 1 "DGND" H 6750 2330 40  0000 C CNN
-	1    6750 2400
-	1    0    0    -1  
-$EndComp
-$Comp
-L DGND #PWR036
 U 1 1 503156D9
-P 7450 2700
-F 0 "#PWR036" H 7450 2700 40  0001 C CNN
-F 1 "DGND" H 7450 2630 40  0000 C CNN
-	1    7450 2700
+P 7600 2700
+F 0 "#PWR035" H 7600 2700 40  0001 C CNN
+F 1 "DGND" H 7600 2630 40  0000 C CNN
+	1    7600 2700
 	1    0    0    -1  
 $EndComp
 $Comp
 L CAP0805 C8
 U 1 1 503156DF
-P 7450 2350
-F 0 "C8" H 7500 2450 50  0000 L CNN
-F 1 "10u" H 7500 2250 50  0000 L CNN
-F 2 "SM0805" H 7500 2350 50  0001 C CNN
-	1    7450 2350
+P 7600 2350
+F 0 "C8" H 7650 2450 50  0000 L CNN
+F 1 "10u" H 7650 2250 50  0000 L CNN
+F 2 "SM0805" H 7650 2350 50  0001 C CNN
+	1    7600 2350
+	1    0    0    -1  
+$EndComp
+Text Notes 5800 1250 0    40   Italic 0
+Optional LDO or DC/DC reg if 3.3V operation\nor high input voltage is required
+Text Notes 2300 1450 0    40   Italic 0
+XXX VRAW input missing
+$Comp
+L MULTIREG U4
+U 1 1 503BF088
+P 6750 2150
+F 0 "U4" H 6600 2450 60  0000 C CNN
+F 1 "MULTIREG" H 6750 1800 60  0000 C CNN
+	1    6750 2150
 	1    0    0    -1  
 $EndComp
 $Comp
-L MCP1702 U4
-U 1 1 50323A90
-P 6750 2050
-F 0 "U4" H 6900 1854 60  0000 C CNN
-F 1 "MCP1702" H 6750 2250 60  0000 C CNN
-F 2 "SOT89" H 6750 2350 60  0000 C CNN
-	1    6750 2050
-	1    0    0    -1  
+L SOLDERJUMPERNO SJ1
+U 1 1 503BFB94
+P 7400 2200
+F 0 "SJ1" H 7300 2300 50  0000 L BNN
+F 1 "SOLDERJUMPERNO" H 7400 2200 50  0001 L BNN
+F 2 "SparkFun-SJ_2S-NO" H 7400 2350 50  0001 C CNN
+	1    7400 2200
+	0    -1   -1   0   
 $EndComp
 Connection ~ 3850 2000
 Wire Notes Line
@@ -302,28 +307,71 @@ Wire Notes Line
 Wire Wire Line
 	1450 2000 1450 3750
 Wire Wire Line
-	6750 2400 6750 2300
+	7600 2000 7600 2150
 Wire Wire Line
-	7450 2000 7450 2150
-Wire Wire Line
-	7450 2450 7450 2700
-Connection ~ 7450 2000
+	7600 2450 7600 2700
+Connection ~ 7600 2000
 Wire Wire Line
 	2000 2000 6350 2000
 Wire Wire Line
-	7150 2000 8650 2000
+	7350 2000 8650 2000
 Wire Notes Line
-	7750 1100 7750 2950
+	7850 1100 7850 2950
 Wire Notes Line
-	7750 2950 5750 2950
+	7850 2950 5750 2950
 Wire Notes Line
 	5750 2950 5750 1100
 Wire Notes Line
-	5750 1100 7750 1100
-Text Notes 5800 1250 0    40   Italic 0
-Optional LDO if 3.3V operation\nor high input voltage is required
-Text Notes 5800 1500 0    40   ~ 0
-MCP1703: up to 16V, 250mA, 2uA qu. current\nAP1115B: up to 16V, 600mA, 5mA qu. current
-Text Notes 2300 1450 0    40   Italic 0
-XXX VRAW input missing
+	5750 1100 7850 1100
+Wire Wire Line
+	6350 2150 6250 2150
+Wire Wire Line
+	6250 2150 6250 2600
+Wire Wire Line
+	6250 2600 6050 2600
+Connection ~ 6050 2600
+Wire Wire Line
+	6350 2300 6300 2300
+Wire Wire Line
+	6300 2300 6300 2000
+Connection ~ 6300 2000
+Wire Wire Line
+	7150 2300 7150 2400
+Wire Wire Line
+	7150 2400 7400 2400
+Connection ~ 7400 2000
+Wire Wire Line
+	7050 1700 7350 1700
+Wire Wire Line
+	7350 1700 7350 2000
+Wire Wire Line
+	6450 1700 6100 1700
+Wire Wire Line
+	6100 1700 6100 2000
+Connection ~ 6100 2000
+Wire Wire Line
+	7150 2000 7150 1850
+Wire Wire Line
+	7150 1850 6750 1850
+Wire Wire Line
+	6750 1850 6750 1700
+$Comp
+L INDUCTOR_SELECT L2
+U 1 1 503C00A7
+P 6750 1700
+F 0 "L2" H 6750 1800 50  0000 C CNN
+F 1 "INDUCTOR_SELECT" H 6800 1650 50  0001 C CNN
+	1    6750 1700
+	1    0    0    -1  
+$EndComp
+$Comp
+L PWR_FLAG #FLG036
+U 1 1 503C02A4
+P 7700 2000
+F 0 "#FLG036" H 7700 2095 30  0001 C CNN
+F 1 "PWR_FLAG" H 7700 2180 30  0000 C CNN
+	1    7700 2000
+	1    0    0    -1  
+$EndComp
+Connection ~ 7700 2000
 $EndSCHEMATC

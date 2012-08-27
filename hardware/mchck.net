@@ -1,14 +1,14 @@
-# EESchema Netlist Version 1.1 created  Tue 21 Aug 2012 03:06:51 PM CEST
+# EESchema Netlist Version 1.1 created  Tue 28 Aug 2012 01:23:42 AM CEST
 (
- ( /4FEDD8B1 SparkFun-SJ_2VerySmall-NO  SJ2 SOLDERJUMPERNC {Lib=SOLDERJUMPERNC}
+ ( /4FEDD8B1 SparkFun-SJ_2VerySmall-NO  SJ2 SOLDERJUMPERNO {Lib=SOLDERJUMPERNO}
   (    1 N-000002 )
   (    2 /power/VBUS )
  )
- ( /4FEDCFCF SparkFun-SJ_2VerySmall-NO  SJ4 SOLDERJUMPERNC {Lib=SOLDERJUMPERNC}
+ ( /4FEDCFCF SparkFun-SJ_2VerySmall-NO  SJ4 SOLDERJUMPERNO {Lib=SOLDERJUMPERNO}
   (    1 N-000003 )
   (    2 /USB_D+ )
  )
- ( /4FEDCF32 SparkFun-SJ_2VerySmall-NO  SJ3 SOLDERJUMPERNC {Lib=SOLDERJUMPERNC}
+ ( /4FEDCF32 SparkFun-SJ_2VerySmall-NO  SJ3 SOLDERJUMPERNO {Lib=SOLDERJUMPERNO}
   (    1 N-000032 )
   (    2 /USB_D- )
  )
@@ -235,9 +235,20 @@
   (    1 VDD )
   (    2 DGND )
  )
- ( /4F22DD51/50323A90 SOT89  U4 MCP1702 {Lib=MCP1702}
-  (    1 DGND )
-  (    2 /power/VIN )
+ ( /4F22DD51/503BF088 $noname  U4 MULTIREG {Lib=MULTIREG}
+  (    1 /power/VIN )
+  (    2 DGND )
+  (    3 /power/VIN )
+  (    4 N-000058 )
+  (    5 N-000057 )
+ )
+ ( /4F22DD51/503BFB94 SparkFun-SJ_2S-NO  SJ1 SOLDERJUMPERNO {Lib=SOLDERJUMPERNO}
+  (    1 N-000058 )
+  (    2 VDD )
+ )
+ ( /4F22DD51/503C00A7 $noname  L2 INDUCTOR_SELECT {Lib=INDUCTOR_SELECT}
+  (    1 /power/VIN )
+  (    2 N-000057 )
   (    3 VDD )
  )
 )
@@ -316,25 +327,23 @@ $component C6
  C1-1
 $endlist
 $component U4
- SOT89
- SOT-23A
- TO92-INVERT
+ SOT-23-5
 $endlist
 $endfootprintlist
 }
 { Pin List by Nets
 Net 1 "/PA7" "PA7"
- U1 39
  P3 4
+ U1 39
 Net 2 "" ""
- SJ2 1
  J2 1
+ SJ2 1
 Net 3 "" ""
  J2 3
  SJ4 1
 Net 4 "" ""
- P6 1
  U1 2
+ P6 1
 Net 5 "/PB15" "PB15"
  P3 1
  U1 43
@@ -342,14 +351,14 @@ Net 6 "/PA14" "PA14"
  P2 6
  U1 26
 Net 7 "/PA12" "PA12"
- P2 8
  U1 28
+ P2 8
 Net 8 "/PA1" "PA1"
  U1 33
  P2 10
 Net 9 "/PB12" "PB12"
- P1 11
  U1 1
+ P1 11
 Net 10 "" ""
  P5 1
  U1 3
@@ -360,34 +369,34 @@ Net 12 "/PA8" "PA8"
  P1 7
  U1 7
 Net 13 "/PB2" "PB2"
- P1 2
  U1 19
+ P1 2
 Net 14 "/PB0" "PB0"
- P1 4
  U1 17
+ P1 4
 Net 15 "/PA2" "PA2"
- U1 34
  P2 11
+ U1 34
 Net 16 "/power/VBUS" "VBUS"
- J1 1
- SJ2 2
  J3 1
+ SJ2 2
+ J1 1
  U3 4
- D2 A
  U1 13
+ D2 A
 Net 17 "/USBDM" "USBDM"
- U1 15
  R1 2
+ U1 15
 Net 18 "/PB5" "PB5"
- U1 9
  P1 5
+ U1 9
 Net 19 "/SWDCK" "SWDCK"
  U1 30
  P4 4
 Net 20 "/~RESET" "~RESET"
+ S1 P$2
  U1 46
  C5 1
- S1 P$2
  P4 5
 Net 21 "/PA13" "PA13"
  U1 27
@@ -397,39 +406,39 @@ Net 22 "/FLASH_SCK" "FLASH_SCK"
  U2 6
  U1 23
 Net 23 "DGND" "DGND"
- R6 2
- U2 4
  J2 5
  J3 4
- C5 2
- Y1 2
  P4 2
- C9 2
- C4 2
- U1 12
- J1 4
- U1 31
- C6 2
- C3 2
- R4 2
- C8 2
- P1 13
- U4 1
  C10 2
+ R6 2
  U3 2
+ C9 2
+ C8 2
+ U4 2
+ C6 2
  C7 2
+ R4 2
+ P1 13
+ U1 31
+ J1 4
+ C5 2
+ U1 12
+ U2 4
+ C4 2
+ Y1 2
+ C3 2
+ C2 2
  S1 P$1
  U1 47
  C1 2
- C2 2
 Net 24 "/FLASH_MISO" "FLASH_MISO"
- P2 2
  U1 22
+ P2 2
  U2 2
 Net 25 "/FLASH_MOSI" "FLASH_MOSI"
+ U1 21
  P2 1
  U2 5
- U1 21
 Net 26 "/PC0" "PC0"
  P2 4
  U1 24
@@ -446,20 +455,20 @@ Net 30 "/PA4" "PA4"
  P2 13
  U1 36
 Net 31 "/PA3" "PA3"
- U1 35
  P2 12
+ U1 35
 Net 32 "" ""
  SJ3 1
  J2 2
 Net 33 "/PC6" "PC6"
- U1 42
  P3 2
+ U1 42
 Net 34 "/PB1" "PB1"
  P1 3
  U1 18
 Net 35 "/PB4" "PB4"
- P1 6
  U1 8
+ P1 6
 Net 36 "/PA0" "PA0"
  P2 9
  U1 32
@@ -467,43 +476,44 @@ Net 37 "/SWDIO" "SWDIO"
  P4 3
  U1 29
 Net 38 "VDD" "VDD"
- C6 1
- U2 3
  C1 1
+ C6 1
  U2 7
+ U2 3
+ L2 3
  U2 8
- C8 1
- U4 3
  P4 1
+ C8 1
+ SJ1 2
+ U1 11
+ C10 1
  L1 2
  P1 14
- C10 1
- U1 11
 Net 39 "/LDO" "LDO"
  U1 10
  C3 1
 Net 40 "/OSC_OUT" "OSC_OUT"
- U1 44
  Y1 1
+ U1 44
 Net 41 "/USB_D-" "USB_D-"
- J3 2
- R1 1
  SJ3 2
  J1 2
+ R1 1
+ J3 2
 Net 42 "/USB_D+" "USB_D+"
- J1 3
  R2 1
  SJ4 2
  J3 3
+ J1 3
 Net 43 "" ""
- R4 1
  D1 2
+ R4 1
 Net 44 "/USBDP" "USBDP"
  R2 2
  U1 16
 Net 45 "/PA9" "PA9"
- U1 6
  P1 8
+ U1 6
 Net 46 "/PA11" "PA11"
  P1 10
  U1 4
@@ -512,26 +522,26 @@ Net 47 "/PB3" "PB3"
  U1 20
 Net 48 "/FLASH_CS" "FLASH_CS"
  U2 1
- P2 5
  U1 25
+ P2 5
 Net 49 "/PA6" "PA6"
  U1 38
- P3 5
  D1 1
+ P3 5
 Net 51 "/VDDA" "VDDA"
  C4 1
  U1 40
  L1 1
 Net 52 "/OSC_IN" "OSC_IN"
- U1 45
  Y1 3
+ U1 45
 Net 53 "/VDD33" "VDD33"
- C2 1
  U1 14
+ C2 1
 Net 54 "/power/VLIPO" "VLIPO"
- D3 A
  J3 5
  C9 1
+ D3 A
  U3 3
 Net 55 "" ""
  U3 5
@@ -539,10 +549,18 @@ Net 55 "" ""
 Net 56 "" ""
  P7 1
  U3 1
-Net 57 "/power/VIN" "VIN"
- C7 1
- U4 2
+Net 57 "" ""
+ L2 2
+ U4 5
+Net 58 "" ""
+ SJ1 1
+ U4 4
+Net 59 "/power/VIN" "VIN"
+ U4 1
  D3 C
+ U4 3
+ C7 1
  D2 C
+ L2 1
 }
 #End
