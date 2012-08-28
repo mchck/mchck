@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Tue 28 Aug 2012 12:22:53 PM CEST
+EESchema Schematic File Version 2  date Tue 28 Aug 2012 01:16:06 PM CEST
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -154,7 +154,7 @@ F 2 "SOT23-5" H 2500 4300 60  0001 C CNN
 	1    2500 3900
 	1    0    0    -1  
 $EndComp
-Text HLabel 8650 2000 2    40   Output ~ 0
+Text HLabel 9150 2000 2    40   Output ~ 0
 VDD
 Text HLabel 1100 2000 0    40   Input ~ 0
 VBUS
@@ -180,20 +180,20 @@ $EndComp
 $Comp
 L C C6
 U 1 1 4F22DDA8
-P 8100 2350
-F 0 "C6" H 8150 2450 50  0000 L CNN
-F 1 "1u" H 8150 2250 50  0000 L CNN
-F 2 "SM0603_Capa" H 8150 2350 50  0001 C CNN
-	1    8100 2350
+P 8600 2350
+F 0 "C6" H 8650 2450 50  0000 L CNN
+F 1 "1u" H 8650 2250 50  0000 L CNN
+F 2 "SM0603_Capa" H 8650 2350 50  0001 C CNN
+	1    8600 2350
 	1    0    0    -1  
 $EndComp
 $Comp
 L DGND #PWR036
 U 1 1 4F22DDA7
-P 8100 2650
-F 0 "#PWR036" H 8100 2650 40  0001 C CNN
-F 1 "DGND" H 8100 2580 40  0000 C CNN
-	1    8100 2650
+P 8600 2650
+F 0 "#PWR036" H 8600 2650 40  0001 C CNN
+F 1 "DGND" H 8600 2580 40  0000 C CNN
+	1    8600 2650
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -225,7 +225,7 @@ F 2 "SM0805" H 7650 2350 50  0001 C CNN
 	1    7600 2350
 	1    0    0    -1  
 $EndComp
-Text Notes 5800 1250 0    40   Italic 0
+Text Notes 5800 900  0    40   Italic 0
 Optional LDO or DC/DC reg if 3.3V operation\nor high input voltage is required
 Text Notes 2300 1450 0    40   Italic 0
 XXX VRAW input missing
@@ -271,13 +271,19 @@ Wire Wire Line
 Wire Wire Line
 	1450 3750 2200 3750
 Wire Wire Line
-	2800 3750 4550 3750
+	2800 3750 3850 3750
+Wire Wire Line
+	3850 3750 4200 3750
+Wire Wire Line
+	4200 3750 4550 3750
 Wire Wire Line
 	6050 2000 6050 2150
 Wire Wire Line
-	8100 2650 8100 2550
+	8600 2650 8600 2550
 Wire Wire Line
-	6050 2450 6050 2700
+	6050 2450 6050 2600
+Wire Wire Line
+	6050 2600 6050 2700
 Connection ~ 6050 2000
 Wire Wire Line
 	2800 4050 3150 4050
@@ -291,13 +297,15 @@ Wire Wire Line
 	3850 3850 3850 3750
 Connection ~ 3850 3750
 Wire Wire Line
-	1100 2000 1800 2000
+	1100 2000 1450 2000
+Wire Wire Line
+	1450 2000 1800 2000
 Wire Wire Line
 	4200 2000 4200 3250
 Connection ~ 4200 2000
 Wire Wire Line
-	8100 2000 8100 2150
-Connection ~ 8100 2000
+	8600 2000 8600 2150
+Connection ~ 8600 2000
 Wire Notes Line
 	5000 3050 1250 3050
 Wire Notes Line
@@ -314,17 +322,35 @@ Wire Wire Line
 	7600 2450 7600 2700
 Connection ~ 7600 2000
 Wire Wire Line
-	2000 2000 6350 2000
+	2000 2000 3850 2000
 Wire Wire Line
-	7350 2000 8650 2000
+	3850 2000 4200 2000
+Wire Wire Line
+	4200 2000 6050 2000
+Wire Wire Line
+	6050 2000 6100 2000
+Wire Wire Line
+	6100 2000 6300 2000
+Wire Wire Line
+	6300 2000 6350 2000
+Wire Wire Line
+	7350 2000 7400 2000
+Wire Wire Line
+	7400 2000 7600 2000
+Wire Wire Line
+	7600 2000 7700 2000
+Wire Wire Line
+	7700 2000 8600 2000
+Wire Wire Line
+	8600 2000 9150 2000
 Wire Notes Line
-	7850 1100 7850 2950
+	8100 750  8100 2950
 Wire Notes Line
-	7850 2950 5750 2950
+	8100 2950 5550 2950
 Wire Notes Line
-	5750 2950 5750 1100
+	5550 2950 5550 750 
 Wire Notes Line
-	5750 1100 7850 1100
+	5550 750  8100 750 
 Wire Wire Line
 	6350 2150 6250 2150
 Wire Wire Line
@@ -377,4 +403,10 @@ F 1 "PWR_FLAG" H 7700 2180 30  0000 C CNN
 	1    0    0    -1  
 $EndComp
 Connection ~ 7700 2000
+Text Notes 5700 1150 0    40   ~ 0
+LDO, e.g. MIC5205 (16V, 150mA, 1uA Iq):  cut L2/in\n\nany DC/DC regulator:  cut L2/in and L2/out and bridge SJ1\nstep-down, e.g. LM3671 (5.5V, 600mA, 16uA Iq):  place L across L2/out \nstep-up, e.g. TPS61097 (5.5V, 350mA, 5uA Iq):    place L across L2/in
+Text Notes 6550 1650 0    40   ~ 0
+in
+Text Notes 6850 1650 0    40   ~ 0
+out
 $EndSCHEMATC
