@@ -1,4 +1,4 @@
-# EESchema Netlist Version 1.1 created  Tue 28 Aug 2012 01:23:42 AM CEST
+# EESchema Netlist Version 1.1 created  Tue 28 Aug 2012 02:13:34 AM CEST
 (
  ( /4FEDD8B1 SparkFun-SJ_2VerySmall-NO  SJ2 SOLDERJUMPERNO {Lib=SOLDERJUMPERNO}
   (    1 N-000002 )
@@ -196,6 +196,8 @@
  ( /4F22C5A2 SM0603_Capa  C2 100n {Lib=C}
   (    1 /VDD33 )
   (    2 DGND )
+ )
+ ( /503C1464 $noname  G1 OHW_LOGO {Lib=LOGO}
  )
  ( /4F22DD51/4F22EB14 SOD-523F-NC  D2 CDBU0530 {Lib=DIODE-SCHOTTKY_}
   (    A /power/VBUS )

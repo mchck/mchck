@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by CvPcb (2012-03-22 BZR 3475)-stable date = Tue 28 Aug 2012 01:21:16 AM CEST
+Cmp-Mod V01 Created by CvPcb (2012-03-22 BZR 3475)-stable date = Tue 28 Aug 2012 02:15:45 AM CEST
 
 BeginCmp
 TimeStamp = /4F22C636;
@@ -89,6 +89,13 @@ TimeStamp = /4F22DD51/5030034E;
 Reference = D3;
 ValeurCmp = CDBU0530;
 IdModule  = SOD-523F;
+EndCmp
+
+BeginCmp
+TimeStamp = /503C1464;
+Reference = G1;
+ValeurCmp = OHW_LOGO;
+IdModule  = OHW-LOGO-6mm;
 EndCmp
 
 BeginCmp

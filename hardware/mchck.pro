@@ -1,4 +1,4 @@
-update=Tue 28 Aug 2012 01:21:04 AM CEST
+update=Tue 28 Aug 2012 02:13:21 AM CEST
 version=1
 last_client=pcbnew
 [general]
@@ -63,12 +63,13 @@ LibName40=NUC120_QFN48
 LibName41=mcp1702
 LibName42=multireg
 LibName43=inductor_select
+LibName44=logo
 [pcbnew]
 version=1
 LastNetListRead=mchck.net
 PadDrlX=0
-PadDimH=450
-PadDimV=550
+PadDimH=0
+PadDimV=0
 BoardThickness=630
 TxtPcbV=354
 TxtPcbH=354
@@ -115,3 +116,4 @@ LibName30=SparkFun-USB-MICROB
 LibName31=SparkFun
 LibName32=SOT89
 LibName33=SM0805-3WAY-NC
+LibName34=ohwlogo-6mm

@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Tue 28 Aug 2012 01:50:20 AM CEST
+EESchema Schematic File Version 2  date Tue 28 Aug 2012 02:23:00 AM CEST
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -42,6 +42,7 @@ LIBS:NUC120_QFN48
 LIBS:mcp1702
 LIBS:multireg
 LIBS:inductor_select
+LIBS:logo
 LIBS:mchck-cache
 EELAYER 25  0
 EELAYER END
@@ -49,7 +50,7 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 2
 Title "MC HCK micro controller board"
-Date "27 aug 2012"
+Date "28 aug 2012"
 Rev "3"
 Comp "(c) 2011,2012 Simon Schubert"
 Comment1 "CERN OHL v.1.1 or later"
@@ -1130,4 +1131,13 @@ Connection ~ 10750 1600
 Wire Wire Line
 	4600 1200 4600 1550
 Connection ~ 4600 1500
+$Comp
+L LOGO G1
+U 1 1 503C1464
+P 1200 2300
+F 0 "G1" H 1200 2300 60  0000 C CNN
+F 1 "OHW LOGO" H 1200 2050 60  0000 C CNN
+	1    1200 2300
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC
