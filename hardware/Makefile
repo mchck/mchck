@@ -71,3 +71,11 @@ ci-fab: ${GERBERS} ${PDFS} ${PNGS} ${PNG_PREVIEWS} ${LICENSE_FILES}
 			$$(git show-ref -q ${FAB_BRANCH} && echo "-p ${FAB_BRANCH}") -p HEAD)
 
 .PHONY: ci-fab
+
+zip: ${P}.zip
+
+.PHONY: zip
+
+${P}.zip: ${GERBERS}
+	-rm $@
+	zip $@ $^
