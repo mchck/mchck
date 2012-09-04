@@ -1,4 +1,4 @@
-PCBNEW-BOARD Version 1 date Wed 29 Aug 2012 11:30:44 PM CEST
+PCBNEW-BOARD Version 1 date Mon 03 Sep 2012 07:38:50 PM CEST
 
 # Created by Pcbnew(2012-03-22 BZR 3475)-stable
 
@@ -21,7 +21,7 @@ $EndGENERAL
 $SHEETDESCR
 Sheet A4 11693 8268
 Title "MC HCK micro controller board"
-Date "29 aug 2012"
+Date "3 sep 2012"
 Rev "3"
 Comp "(c) 2011,2012 Simon Schubert"
 Comment1 "CERN OHL v.1.1 or later"
