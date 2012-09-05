@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by CvPcb (2012-03-22 BZR 3475)-stable date = Wed Sep  5 16:30:02 2012
+Cmp-Mod V01 Created by CvPcb (2012-03-22 BZR 3475)-stable date = Wed Sep  5 18:55:00 2012
 
 BeginCmp
 TimeStamp = /50474F32/50477093;
@@ -78,6 +78,13 @@ IdModule  = SM0603_Capa;
 EndCmp
 
 BeginCmp
+TimeStamp = /50474F32/504B05C7;
+Reference = C12;
+ValeurCmp = 100n;
+IdModule  = SM0603_Capa;
+EndCmp
+
+BeginCmp
 TimeStamp = /50474F32/4E418482;
 Reference = D1;
 ValeurCmp = LED;
@@ -96,20 +103,6 @@ TimeStamp = /4F22DD51/5030034E;
 Reference = D3;
 ValeurCmp = CDBU0530;
 IdModule  = SOD-523F;
-EndCmp
-
-BeginCmp
-TimeStamp = /50474F32/50466A2D;
-Reference = FB1;
-ValeurCmp = FILTER;
-IdModule  = SM0603_NC;
-EndCmp
-
-BeginCmp
-TimeStamp = /50474F32/50466A78;
-Reference = FB2;
-ValeurCmp = FILTER;
-IdModule  = SM0603_NC;
 EndCmp
 
 BeginCmp
@@ -269,6 +262,13 @@ EndCmp
 BeginCmp
 TimeStamp = /4F22DD51/50478372;
 Reference = SJ5;
+ValeurCmp = SOLDERJUMPERNC;
+IdModule  = SM0603_NC;
+EndCmp
+
+BeginCmp
+TimeStamp = /50474F32/50478946;
+Reference = SJ6;
 ValeurCmp = SOLDERJUMPERNC;
 IdModule  = SM0603_NC;
 EndCmp

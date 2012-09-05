@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Wed Sep  5 16:35:40 2012
+EESchema Schematic File Version 2  date Thu Sep  6 00:41:00 2012
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -49,7 +49,7 @@ EELAYER 25  0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 4 4
+Sheet 2 4
 Title "MC HCK micro controller board"
 Date "5 sep 2012"
 Rev "4"
