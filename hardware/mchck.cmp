@@ -1,44 +1,44 @@
-Cmp-Mod V01 Created by CvPcb (2012-03-22 BZR 3475)-stable date = Tue 28 Aug 2012 12:22:36 PM CEST
+Cmp-Mod V01 Created by CvPcb (2012-03-22 BZR 3475)-stable date = Wed Sep  5 16:30:02 2012
 
 BeginCmp
-TimeStamp = /4F22C636;
+TimeStamp = /50474F32/50477093;
 Reference = C1;
 ValeurCmp = 100n;
 IdModule  = SM0603_Capa;
 EndCmp
 
 BeginCmp
-TimeStamp = /4F22C5A2;
+TimeStamp = /50474F32/4F22C5A2;
 Reference = C2;
 ValeurCmp = 100n;
 IdModule  = SM0603_Capa;
 EndCmp
 
 BeginCmp
-TimeStamp = /4F22C606;
+TimeStamp = /50474F32/4F22C606;
 Reference = C3;
 ValeurCmp = 100n;
 IdModule  = SM0603_Capa;
 EndCmp
 
 BeginCmp
-TimeStamp = /4F22F29F;
+TimeStamp = /50474F32/4F22F29F;
 Reference = C4;
 ValeurCmp = 100n;
 IdModule  = SM0603_Capa;
 EndCmp
 
 BeginCmp
-TimeStamp = /4E4181C7;
+TimeStamp = /50474F32/4E4181C7;
 Reference = C5;
 ValeurCmp = 100n;
 IdModule  = SM0603_Capa;
 EndCmp
 
 BeginCmp
-TimeStamp = /4F22DD51/4F22DDA8;
+TimeStamp = /50474F32/5048FC9E;
 Reference = C6;
-ValeurCmp = 1u;
+ValeurCmp = 2.2u;
 IdModule  = SM0603_Capa;
 EndCmp
 
@@ -64,28 +64,21 @@ IdModule  = SM0805;
 EndCmp
 
 BeginCmp
-TimeStamp = /4F475346;
+TimeStamp = /50474F32/4F475346;
 Reference = C10;
 ValeurCmp = 100n;
 IdModule  = SM0603_Capa;
 EndCmp
 
 BeginCmp
-TimeStamp = /503C9BEA;
+TimeStamp = /4F22DD51/50477AE0;
 Reference = C11;
-ValeurCmp = C;
+ValeurCmp = 2.2u;
 IdModule  = SM0603_Capa;
 EndCmp
 
 BeginCmp
-TimeStamp = /503C9BB8;
-Reference = C12;
-ValeurCmp = C;
-IdModule  = SM0603_Capa;
-EndCmp
-
-BeginCmp
-TimeStamp = /4E418482;
+TimeStamp = /50474F32/4E418482;
 Reference = D1;
 ValeurCmp = LED;
 IdModule  = LED-0603;
@@ -106,6 +99,34 @@ IdModule  = SOD-523F;
 EndCmp
 
 BeginCmp
+TimeStamp = /50474F32/50466A2D;
+Reference = FB1;
+ValeurCmp = FILTER;
+IdModule  = SM0603_NC;
+EndCmp
+
+BeginCmp
+TimeStamp = /50474F32/50466A78;
+Reference = FB2;
+ValeurCmp = FILTER;
+IdModule  = SM0603_NC;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F22DD51/504667D4;
+Reference = FB3;
+ValeurCmp = FILTER;
+IdModule  = SM0603_NC;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F22DD51/5046681B;
+Reference = FB4;
+ValeurCmp = FILTER;
+IdModule  = SM0603_NC;
+EndCmp
+
+BeginCmp
 TimeStamp = /503C1464;
 Reference = G1;
 ValeurCmp = OHW_LOGO;
@@ -113,38 +134,31 @@ IdModule  = OHW-LOGO-6mm;
 EndCmp
 
 BeginCmp
-TimeStamp = /4E3D8AFF;
+TimeStamp = /504995A0/4E3D8AFF;
 Reference = J1;
 ValeurCmp = USB_2;
 IdModule  = SparkFun-USB-A-PCB;
 EndCmp
 
 BeginCmp
-TimeStamp = /4F274705;
+TimeStamp = /504995A0/4F274705;
 Reference = J2;
 ValeurCmp = MICRO_USB;
 IdModule  = SparkFun-USB-MICROB;
 EndCmp
 
 BeginCmp
-TimeStamp = /4F27475E;
+TimeStamp = /504995A0/4F27475E;
 Reference = J3;
 ValeurCmp = INT_USB;
 IdModule  = SparkFun-1X05_LOCK;
 EndCmp
 
 BeginCmp
-TimeStamp = /4F25AB46;
-Reference = L1;
-ValeurCmp = 10uH;
-IdModule  = SM0603_NC;
-EndCmp
-
-BeginCmp
 TimeStamp = /4F22DD51/503C00A7;
 Reference = L2;
 ValeurCmp = INDUCTOR_SELECT;
-IdModule  = SM0805-3WAY-NC;
+IdModule  = SM0805-3WAY;
 EndCmp
 
 BeginCmp
@@ -164,28 +178,21 @@ EndCmp
 BeginCmp
 TimeStamp = /4F3D2CED;
 Reference = P3;
-ValeurCmp = RIGHT_PINS;
+ValeurCmp = DEBUG;
 IdModule  = SparkFun-1X05_LOCK;
 EndCmp
 
 BeginCmp
 TimeStamp = /4F2EFBC8;
 Reference = P4;
-ValeurCmp = DEBUG;
+ValeurCmp = RIGHT_PINS;
 IdModule  = SparkFun-1X05_LOCK;
 EndCmp
 
 BeginCmp
-TimeStamp = /50315323;
+TimeStamp = /504995A0/5047107A;
 Reference = P5;
-ValeurCmp = RTC_XTAL;
-IdModule  = SparkFun-PAD.03X.03;
-EndCmp
-
-BeginCmp
-TimeStamp = /50315332;
-Reference = P6;
-ValeurCmp = RTC_XTAL;
+ValeurCmp = CONN_1;
 IdModule  = SparkFun-PAD.03X.03;
 EndCmp
 
@@ -197,21 +204,21 @@ IdModule  = SparkFun-PAD.03X.03;
 EndCmp
 
 BeginCmp
-TimeStamp = /4F22C560;
+TimeStamp = /504995A0/4F22C560;
 Reference = R1;
-ValeurCmp = 10R;
+ValeurCmp = 33;
 IdModule  = SM0603;
 EndCmp
 
 BeginCmp
-TimeStamp = /4F22C569;
+TimeStamp = /504995A0/4F22C569;
 Reference = R2;
-ValeurCmp = 10R;
+ValeurCmp = 33;
 IdModule  = SM0603;
 EndCmp
 
 BeginCmp
-TimeStamp = /4E4186C6;
+TimeStamp = /50474F32/4E4186C6;
 Reference = R4;
 ValeurCmp = 1k;
 IdModule  = SM0603;
@@ -225,10 +232,10 @@ IdModule  = SM0603;
 EndCmp
 
 BeginCmp
-TimeStamp = /50317101;
+TimeStamp = /50474F32/50466EFD;
 Reference = S1;
-ValeurCmp = SWITCH-MOMENTARY-2-SMD-1101NE;
-IdModule  = SparkFun-TACTILE-SWITCH-1101NE;
+ValeurCmp = TAC_SWITCHSMD_EVQP2;
+IdModule  = EVQP2;
 EndCmp
 
 BeginCmp
@@ -239,35 +246,42 @@ IdModule  = SparkFun-SJ_2VerySmall-NO;
 EndCmp
 
 BeginCmp
-TimeStamp = /4FEDD8B1;
+TimeStamp = /504995A0/4FEDD8B1;
 Reference = SJ2;
 ValeurCmp = SOLDERJUMPERNO;
 IdModule  = SparkFun-SJ_2VerySmall-NO;
 EndCmp
 
 BeginCmp
-TimeStamp = /4FEDCF32;
+TimeStamp = /504995A0/4FEDCF32;
 Reference = SJ3;
 ValeurCmp = SOLDERJUMPERNO;
 IdModule  = SparkFun-SJ_2VerySmall-NO;
 EndCmp
 
 BeginCmp
-TimeStamp = /4FEDCFCF;
+TimeStamp = /504995A0/4FEDCFCF;
 Reference = SJ4;
 ValeurCmp = SOLDERJUMPERNO;
 IdModule  = SparkFun-SJ_2VerySmall-NO;
 EndCmp
 
 BeginCmp
-TimeStamp = /502D6F34;
+TimeStamp = /4F22DD51/50478372;
+Reference = SJ5;
+ValeurCmp = SOLDERJUMPERNC;
+IdModule  = SM0603_NC;
+EndCmp
+
+BeginCmp
+TimeStamp = /50474F32/5044CEB6;
 Reference = U1;
-ValeurCmp = NUC120_QFN48;
+ValeurCmp = MK20LF;
 IdModule  = LQFP48;
 EndCmp
 
 BeginCmp
-TimeStamp = /4F22E1F9;
+TimeStamp = /50474F32/4F22E1F9;
 Reference = U2;
 ValeurCmp = SPI_FLASH-X25XXSMD;
 IdModule  = SparkFun-SO08;
@@ -288,10 +302,17 @@ IdModule  = SOT23-5;
 EndCmp
 
 BeginCmp
-TimeStamp = /4E53FD8B;
+TimeStamp = /50474F32/5045BE79;
 Reference = Y1;
-ValeurCmp = 8MHz;
-IdModule  = SparkFun-RESONATOR-SMD;
+ValeurCmp = CRYSTAL32-SMD;
+IdModule  = SparkFun-CRYSTAL-32KHZ-SMD;
+EndCmp
+
+BeginCmp
+TimeStamp = /50474F32/50475FDA;
+Reference = Y2;
+ValeurCmp = CRYSTALSMD;
+IdModule  = SparkFun-HC49UP;
 EndCmp
 
 EndListe
