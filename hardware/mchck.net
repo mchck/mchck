@@ -1,20 +1,20 @@
-# EESchema Netlist Version 1.1 created  Thu Sep  6 14:10:47 2012
+# EESchema Netlist Version 1.1 created  Thu Sep  6 17:26:39 2012
 (
- ( /4F3D2CED SparkFun-1X05_LOCK  P3 DEBUG {Lib=CONN_5}
+ ( /4F3D2CED SparkFun-1X05_LOCK  P2 DEBUG {Lib=CONN_5}
   (    1 +BATT )
   (    2 VSS )
   (    3 /MCU/TRACE_SWO )
   (    4 /MCU/SWD_CLK )
   (    5 /MCU/SWD_DIO )
  )
- ( /4F2EFBC8 SparkFun-1X05_LOCK  P4 RIGHT_PINS {Lib=CONN_5}
+ ( /4F2EFBC8 SparkFun-1X05_LOCK  P1 RIGHT_PINS {Lib=CONN_5}
   (    1 /power/VRAW )
   (    2 /MCU/~RESET )
   (    3 /MCU/PR3 )
   (    4 /MCU/PR4 )
   (    5 /MCU/PR5 )
  )
- ( /4E446864 SparkFun-1X14_LOCK  P2 LOWER_PINS {Lib=CONN_14}
+ ( /4E446864 SparkFun-1X14_LOCK  P4 LOWER_PINS {Lib=CONN_14}
   (    1 /MCU/PL1 )
   (    2 /MCU/PL2 )
   (    3 /MCU/PL3 )
@@ -30,7 +30,7 @@
   (   13 VSS )
   (   14 +3.3V )
  )
- ( /4E446858 SparkFun-1X14_LOCK  P1 UPPER_PINS {Lib=CONN_14}
+ ( /4E446858 SparkFun-1X14_LOCK  P3 UPPER_PINS {Lib=CONN_14}
   (    1 /MCU/PU1 )
   (    2 /MCU/PU2 )
   (    3 /MCU/PU3 )
@@ -48,37 +48,37 @@
  )
  ( /503C1464 OHW-LOGO-6mm  G1 OHW_LOGO {Lib=LOGO}
  )
- ( /504995A0/4FEDD8B1 SparkFun-SJ_2VerySmall-NO  SJ2 SOLDERJUMPERNO {Lib=SOLDERJUMPERNO}
+ ( /504995A0/4FEDD8B1 SparkFun-SJ_2VerySmall-NO  SJ3 SOLDERJUMPERNO {Lib=SOLDERJUMPERNO}
   (    1 N-000054 )
   (    2 /MCU/+5V )
  )
- ( /504995A0/4FEDCFCF SparkFun-SJ_2VerySmall-NO  SJ4 SOLDERJUMPERNO {Lib=SOLDERJUMPERNO}
+ ( /504995A0/4FEDCFCF SparkFun-SJ_2VerySmall-NO  SJ1 SOLDERJUMPERNO {Lib=SOLDERJUMPERNO}
   (    1 N-000055 )
   (    2 /USB/USB_D+ )
  )
- ( /504995A0/4FEDCF32 SparkFun-SJ_2VerySmall-NO  SJ3 SOLDERJUMPERNO {Lib=SOLDERJUMPERNO}
+ ( /504995A0/4FEDCF32 SparkFun-SJ_2VerySmall-NO  SJ2 SOLDERJUMPERNO {Lib=SOLDERJUMPERNO}
   (    1 N-000053 )
   (    2 /USB/USB_D- )
  )
- ( /504995A0/4F27475E SparkFun-1X05_LOCK  J3 INT_USB {Lib=CONN_5}
+ ( /504995A0/4F27475E SparkFun-1X05_LOCK  J2 INT_USB {Lib=CONN_5}
   (    1 /MCU/+5V )
   (    2 /USB/USB_D- )
   (    3 /USB/USB_D+ )
   (    4 GNDPWR )
   (    5 /USB/VLIPO )
  )
- ( /504995A0/4F274705 SparkFun-USB-MICROB  J2 MICRO_USB {Lib=CONN_5}
+ ( /504995A0/4F274705 SparkFun-USB-MICROB  J3 MICRO_USB {Lib=CONN_5}
   (    1 N-000054 )
   (    2 N-000053 )
   (    3 N-000055 )
   (    4 N-000056 )
   (    5 GNDPWR )
  )
- ( /504995A0/4F22C569 SM0603  R2 33 {Lib=R}
+ ( /504995A0/4F22C569 SM0603  R1 33 {Lib=R}
   (    1 /USB/USB_D+ )
   (    2 /MCU/USB_DP )
  )
- ( /504995A0/4F22C560 SM0603  R1 33 {Lib=R}
+ ( /504995A0/4F22C560 SM0603  R2 33 {Lib=R}
   (    1 /USB/USB_D- )
   (    2 /MCU/USB_DM )
  )
@@ -88,40 +88,40 @@
   (    3 /USB/USB_D+ )
   (    4 GNDPWR )
  )
- ( /504995A0/5047107A SparkFun-PAD.03X.03  P5 ID {Lib=CONN_1}
+ ( /504995A0/5047107A SparkFun-PAD.03X.03  P6 ID {Lib=CONN_1}
   (    1 N-000056 )
  )
- ( /4F22DD51/4F22EB14 SOD-523F-NC  D2 CDBU0530 {Lib=DIODE-SCHOTTKY_}
+ ( /4F22DD51/4F22EB14 SOD-523F-NC  D3 CDBU0530 {Lib=DIODE-SCHOTTKY_}
   (    A /MCU/+5V )
   (    C /power/VRAW )
  )
- ( /4F22DD51/4F22E9AF SM0805  C9 4.7u {Lib=CAP0805}
+ ( /4F22DD51/4F22E9AF SM0805  C7 4.7u {Lib=CAP0805}
   (    1 /USB/VLIPO )
   (    2 GNDPWR )
  )
- ( /4F22DD51/4F22E7C7 SM0603  R6 20k {Lib=R}
+ ( /4F22DD51/4F22E7C7 SM0603  R4 20k {Lib=R}
   (    1 N-000043 )
   (    2 GNDPWR )
  )
- ( /4F22DD51/4F22E691 SparkFun-PAD.03X.03  P7 CHRG {Lib=CONN_1}
+ ( /4F22DD51/4F22E691 SparkFun-PAD.03X.03  P5 CHRG {Lib=CONN_1}
   (    1 N-000044 )
  )
- ( /4F22DD51/4F22DEC3 SOT23-5  U3 MCP73831-SOT {Lib=MCP73831-SOT}
+ ( /4F22DD51/4F22DEC3 SOT23-5  U2 MCP73831-SOT {Lib=MCP73831-SOT}
   (    1 N-000044 )
   (    2 GNDPWR )
   (    3 /USB/VLIPO )
   (    4 /MCU/+5V )
   (    5 N-000043 )
  )
- ( /4F22DD51/4F22DDA9 SM0805  C7 10u {Lib=CAP0805}
+ ( /4F22DD51/4F22DDA9 SM0805  C12 10u {Lib=CAP0805}
   (    1 /power/VRAW )
   (    2 GNDPWR )
  )
- ( /4F22DD51/5030034E SOD-523F  D3 CDBU0530 {Lib=DIODE-SCHOTTKY_}
+ ( /4F22DD51/5030034E SOD-523F  D2 CDBU0530 {Lib=DIODE-SCHOTTKY_}
   (    A /USB/VLIPO )
   (    C /MCU/+5V )
  )
- ( /4F22DD51/503156DF SM0805  C8 10u {Lib=CAP0805}
+ ( /4F22DD51/503156DF SM0805  C11 10u {Lib=CAP0805}
   (    1 /MCU/VREGOUT )
   (    2 GNDPWR )
  )
@@ -132,28 +132,28 @@
   (    4 N-000046 )
   (    5 N-000047 )
  )
- ( /4F22DD51/503BFB94 SparkFun-SJ_2VerySmall-NO  SJ1 SOLDERJUMPERNO {Lib=SOLDERJUMPERNO}
+ ( /4F22DD51/503BFB94 SparkFun-SJ_2VerySmall-NO  SJ5 SOLDERJUMPERNO {Lib=SOLDERJUMPERNO}
   (    1 N-000046 )
   (    2 /MCU/VREGOUT )
  )
- ( /4F22DD51/503C00A7 SM0805-3WAY  L2 INDUCTOR_SELECT {Lib=INDUCTOR_SELECT}
+ ( /4F22DD51/503C00A7 SM0805-3WAY  L1 INDUCTOR_SELECT {Lib=INDUCTOR_SELECT}
   (    1 /power/VRAW )
   (    2 N-000047 )
   (    3 /MCU/VREGOUT )
  )
- ( /4F22DD51/504667D4 SM0603_NC  FB3 FILTER {Lib=FILTER}
+ ( /4F22DD51/504667D4 SM0603_NC  FB2 FILTER {Lib=FILTER}
   (    1 /MCU/VREGOUT )
   (    2 +3.3V )
  )
- ( /4F22DD51/5046681B SM0603_NC  FB4 FILTER {Lib=FILTER}
+ ( /4F22DD51/5046681B SM0603_NC  FB1 FILTER {Lib=FILTER}
   (    1 GNDPWR )
   (    2 VSS )
  )
- ( /4F22DD51/50477AE0 SM0603_Capa  C11 2.2u {Lib=C}
+ ( /4F22DD51/50477AE0 SM0603_Capa  C2 2.2u {Lib=C}
   (    1 /MCU/+5V )
   (    2 VSS )
  )
- ( /4F22DD51/50478372 SM0603_NC  SJ5 SOLDERJUMPERNC {Lib=SOLDERJUMPERNC}
+ ( /4F22DD51/50478372 SM0603_NC  SJ6 SOLDERJUMPERNC {Lib=SOLDERJUMPERNC}
   (    1 +3.3V )
   (    2 +BATT )
  )
@@ -165,7 +165,7 @@
   (    1 +3.3V )
   (    2 VSS )
  )
- ( /50474F32/4F22E1F9 SparkFun-SO08  U2 SPI_FLASH-X25XXSMD {Lib=SPI_FLASH-X25XXSMD}
+ ( /50474F32/4F22E1F9 SparkFun-SO08  U3 SPI_FLASH-X25XXSMD {Lib=SPI_FLASH-X25XXSMD}
   (    1 /MCU/PU4/FLASH_CS )
   (    2 /MCU/PU5/FLASH_MISO )
   (    3 +3.3V )
@@ -175,11 +175,11 @@
   (    7 +3.3V )
   (    8 +3.3V )
  )
- ( /50474F32/4F22C606 SM0603_Capa  C3 100n {Lib=C}
+ ( /50474F32/4F22C606 SM0603_Capa  C5 100n {Lib=C}
   (    1 +3.3V )
   (    2 VSS )
  )
- ( /50474F32/4E4186C6 SM0603  R4 1k {Lib=R}
+ ( /50474F32/4E4186C6 SM0603  R3 1k {Lib=R}
   (    1 N-000051 )
   (    2 VSS )
  )
@@ -187,11 +187,11 @@
   (    1 /MCU/PR4 )
   (    2 N-000051 )
  )
- ( /50474F32/4E4181C7 SM0603_Capa  C5 100n {Lib=C}
+ ( /50474F32/4E4181C7 SM0603_Capa  C6 100n {Lib=C}
   (    1 /MCU/~RESET )
   (    2 VSS )
  )
- ( /50474F32/4F22C5A2 SM0603_Capa  C2 100n {Lib=C}
+ ( /50474F32/4F22C5A2 SM0603_Capa  C3 100n {Lib=C}
   (    1 +3.3V )
   (    2 VSS )
  )
@@ -255,32 +255,25 @@
   (    3 ? )
   (    4 VSS )
  )
- ( /50474F32/50477093 SM0603_Capa  C1 100n {Lib=C}
+ ( /50474F32/50477093 SM0603_Capa  C8 100n {Lib=C}
   (    1 /MCU/PL3 )
   (    2 VSS )
  )
- ( /50474F32/5048FC9E SM0603_Capa  C6 2.2u {Lib=C}
+ ( /50474F32/5048FC9E SM0603_Capa  C1 2.2u {Lib=C}
   (    1 /MCU/VREGOUT )
   (    2 VSS )
  )
- ( /50474F32/504B05C7 SM0603_Capa  C12 100n {Lib=C}
+ ( /50474F32/504B05C7 SM0603_Capa  C9 100n {Lib=C}
   (    1 N-000048 )
   (    2 VSS )
  )
- ( /50474F32/50478946 SM0603_NC  SJ6 SOLDERJUMPERNC {Lib=SOLDERJUMPERNC}
+ ( /50474F32/50478946 SM0603_NC  SJ4 SOLDERJUMPERNC {Lib=SOLDERJUMPERNC}
   (    1 +3.3V )
   (    2 N-000048 )
  )
 )
 *
 { Allowed footprints by component:
-$component R2
- R?
- SM0603
- SM0805
- R?-*
- SM1206
-$endlist
 $component R1
  R?
  SM0603
@@ -288,7 +281,14 @@ $component R1
  R?-*
  SM1206
 $endlist
-$component R6
+$component R2
+ R?
+ SM0603
+ SM0805
+ R?-*
+ SM1206
+$endlist
+$component R4
  R?
  SM0603
  SM0805
@@ -298,7 +298,7 @@ $endlist
 $component U4
  SOT-23-5
 $endlist
-$component C11
+$component C2
  SM*
  C?
  C1-1
@@ -313,12 +313,12 @@ $component C4
  C?
  C1-1
 $endlist
-$component C3
+$component C5
  SM*
  C?
  C1-1
 $endlist
-$component R4
+$component R3
  R?
  SM0603
  SM0805
@@ -334,12 +334,17 @@ $component D1
  LED-1206
  LEDV
 $endlist
-$component C5
+$component C6
  SM*
  C?
  C1-1
 $endlist
-$component C2
+$component C3
+ SM*
+ C?
+ C1-1
+$endlist
+$component C8
  SM*
  C?
  C1-1
@@ -349,12 +354,7 @@ $component C1
  C?
  C1-1
 $endlist
-$component C6
- SM*
- C?
- C1-1
-$endlist
-$component C12
+$component C9
  SM*
  C?
  C1-1
@@ -364,242 +364,242 @@ $endfootprintlist
 { Pin List by Nets
 Net 1 "/MCU/+5V" "+5V"
  U1 6
- C11 1
- U3 4
- D2 A
+ C2 1
+ U2 4
+ D3 A
  J1 1
- SJ2 2
- J3 1
- D3 C
+ SJ3 2
+ J2 1
+ D2 C
 Net 2 "/MCU/VREGOUT" "VREGOUT"
  U1 5
- FB3 1
- L2 3
- C6 1
- C8 1
- SJ1 2
+ FB2 1
+ L1 3
+ C1 1
+ C11 1
+ SJ5 2
 Net 3 "/USB/VLIPO" "VLIPO"
- U3 3
- C9 1
- D3 A
- J3 5
+ U2 3
+ C7 1
+ D2 A
+ J2 5
 Net 4 "/MCU/USB_DM" "USB_DM"
- R1 2
+ R2 2
  U1 4
 Net 5 "/MCU/PR5" "PR5"
- P4 5
+ P1 5
  U1 32
 Net 6 "/MCU/PU10" "PU10"
  U1 39
- P1 10
+ P3 10
 Net 7 "/MCU/PL2" "PL2"
  U1 8
- P2 2
+ P4 2
 Net 8 "/MCU/PU14" "PU14"
- P1 14
+ P3 14
  U1 35
 Net 9 "/MCU/PU13" "PU13"
- P1 13
+ P3 13
  U1 36
 Net 10 "+3.3V" "+3.3V"
- P2 14
+ P4 14
  U1 22
- FB3 2
- SJ5 1
+ FB2 2
+ SJ6 1
  U1 9
- C2 1
- U2 8
- U2 7
- U2 3
+ C3 1
+ U3 8
+ U3 7
+ U3 3
  C4 1
  C10 1
- C3 1
- SJ6 1
+ C5 1
+ SJ4 1
  U1 1
 Net 11 "/MCU/~RESET" "~RESET"
  U1 26
- P4 2
- C5 1
+ P1 2
+ C6 1
  S1 1
 Net 12 "/MCU/PR3" "PR3"
  U1 34
- P4 3
+ P1 3
 Net 13 "/MCU/PR4" "PR4"
  D1 1
- P4 4
+ P1 4
  U1 33
 Net 14 "/MCU/PL1" "PL1"
  U1 7
- P2 1
+ P4 1
 Net 15 "/MCU/SWD_DIO" "SWD_DIO"
  U1 20
- P3 5
+ P2 5
 Net 16 "/MCU/SWD_CLK" "SWD_CLK"
  U1 17
- P3 4
+ P2 4
 Net 17 "/MCU/TRACE_SWO" "TRACE_SWO"
- P3 3
+ P2 3
  U1 19
 Net 18 "VSS" "VSS"
  U1 11
  U1 12
- C12 2
- P3 2
- C6 2
- C4 2
+ C9 2
+ P2 2
  C1 2
- P2 13
+ C4 2
+ C8 2
+ P4 13
  U1 23
  S1 4
  S1 2
  C10 2
  U1 2
- C2 2
- C5 2
- R4 2
  C3 2
- FB4 2
- C11 2
- U2 4
+ C6 2
+ R3 2
+ C5 2
+ FB1 2
+ C2 2
+ U3 4
 Net 19 "/MCU/USB_DP" "USB_DP"
  U1 3
- R2 2
+ R1 2
 Net 20 "/MCU/PU6/FLASH_MOSI" "PU6/FLASH_MOSI"
  U1 43
- P1 6
- U2 5
+ P3 6
+ U3 5
 Net 21 "/MCU/PL11" "PL11"
  U1 30
- P2 11
+ P4 11
 Net 22 "/MCU/PL12" "PL12"
- P2 12
+ P4 12
  U1 31
 Net 23 "/MCU/PU1" "PU1"
- P1 1
+ P3 1
  U1 48
 Net 24 "/MCU/PU2" "PU2"
  U1 47
- P1 2
+ P3 2
 Net 25 "/MCU/PU3" "PU3"
  U1 46
- P1 3
+ P3 3
 Net 26 "/MCU/PU4/FLASH_CS" "PU4/FLASH_CS"
- U2 1
- P1 4
+ U3 1
+ P3 4
  U1 45
 Net 27 "/MCU/PU5/FLASH_MISO" "PU5/FLASH_MISO"
  U1 44
- U2 2
- P1 5
+ U3 2
+ P3 5
 Net 28 "/MCU/PL10" "PL10"
  U1 29
- P2 10
+ P4 10
 Net 29 "/MCU/PU7/FLASH_SCK" "PU7/FLASH_SCK"
  U1 42
- P1 7
- U2 6
+ P3 7
+ U3 6
 Net 30 "/MCU/PU8" "PU8"
  U1 41
- P1 8
+ P3 8
 Net 31 "/MCU/PU9" "PU9"
- P1 9
+ P3 9
  U1 40
 Net 32 "/MCU/PU11" "PU11"
  U1 38
- P1 11
+ P3 11
 Net 33 "/MCU/PU12" "PU12"
  U1 37
- P1 12
+ P3 12
 Net 34 "/MCU/PL3" "PL3"
- P2 3
+ P4 3
  U1 13
- C1 1
+ C8 1
 Net 35 "/MCU/PL4" "PL4"
- P2 4
+ P4 4
  U1 18
 Net 36 "/MCU/PL5" "PL5"
  U1 21
- P2 5
+ P4 5
 Net 37 "/MCU/PL6" "PL6"
- P2 6
+ P4 6
  U1 24
 Net 38 "/MCU/PL7" "PL7"
- P2 7
+ P4 7
  U1 25
 Net 39 "/MCU/PL8" "PL8"
- P2 8
+ P4 8
  U1 27
 Net 40 "/MCU/PL9" "PL9"
  U1 28
- P2 9
+ P4 9
 Net 41 "/power/VRAW" "VRAW"
- L2 1
+ L1 1
  U4 3
  U4 1
- D2 C
- P4 1
- C7 1
+ D3 C
+ P1 1
+ C12 1
 Net 42 "+BATT" "+BATT"
- SJ5 2
+ SJ6 2
  U1 16
- P3 1
+ P2 1
 Net 43 "" ""
- R6 1
- U3 5
+ R4 1
+ U2 5
 Net 44 "" ""
- U3 1
- P7 1
+ U2 1
+ P5 1
 Net 45 "GNDPWR" "GNDPWR"
- J3 4
- FB4 1
- J2 5
- C9 2
- U3 2
+ J2 4
+ FB1 1
+ J3 5
  C7 2
- R6 2
+ U2 2
+ C12 2
+ R4 2
  U4 2
- C8 2
+ C11 2
  J1 4
 Net 46 "" ""
  U4 4
- SJ1 1
+ SJ5 1
 Net 47 "" ""
- L2 2
+ L1 2
  U4 5
 Net 48 "" ""
- SJ6 2
- C12 1
+ SJ4 2
+ C9 1
  U1 10
 Net 50 "" ""
  U1 15
  Y1 X2
 Net 51 "" ""
- R4 1
+ R3 1
  D1 2
 Net 52 "" ""
  U1 14
  Y1 X1
 Net 53 "" ""
- SJ3 1
- J2 2
-Net 54 "" ""
  SJ2 1
- J2 1
+ J3 2
+Net 54 "" ""
+ SJ3 1
+ J3 1
 Net 55 "" ""
- SJ4 1
- J2 3
+ SJ1 1
+ J3 3
 Net 56 "" ""
- P5 1
- J2 4
+ P6 1
+ J3 4
 Net 57 "/USB/USB_D+" "USB_D+"
  J1 3
- SJ4 2
- J3 3
- R2 1
-Net 58 "/USB/USB_D-" "USB_D-"
- J3 2
- J1 2
- SJ3 2
+ SJ1 2
+ J2 3
  R1 1
+Net 58 "/USB/USB_D-" "USB_D-"
+ J2 2
+ J1 2
+ SJ2 2
+ R2 1
 }
 #End
