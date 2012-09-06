@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Thu Sep  6 12:00:25 2012
+EESchema Schematic File Version 2  date Thu Sep  6 14:10:41 2012
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -139,7 +139,7 @@ F 1 "+3.3V" H 3700 6060 30  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Sheet
-S 6650 2900 1000 250 
+S 6650 2900 1000 300 
 U 504995A0
 F0 "USB" 60
 F1 "usb.sch" 60

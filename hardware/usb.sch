@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Thu Sep  6 12:00:25 2012
+EESchema Schematic File Version 2  date Thu Sep  6 14:10:41 2012
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -184,7 +184,7 @@ L CONN_1 P5
 U 1 1 5047107A
 P 5400 5450
 F 0 "P5" H 5480 5450 40  0000 L CNN
-F 1 "CONN_1" H 5400 5505 30  0001 C CNN
+F 1 "ID" H 5400 5505 30  0000 C CNN
 F 2 "SparkFun-PAD.03X.03" H 5400 5605 30  0001 C CNN
 	1    5400 5450
 	1    0    0    -1  

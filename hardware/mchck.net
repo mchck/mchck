@@ -1,4 +1,4 @@
-# EESchema Netlist Version 1.1 created  Thu Sep  6 12:00:31 2012
+# EESchema Netlist Version 1.1 created  Thu Sep  6 14:10:47 2012
 (
  ( /4F3D2CED SparkFun-1X05_LOCK  P3 DEBUG {Lib=CONN_5}
   (    1 +BATT )
@@ -88,7 +88,7 @@
   (    3 /USB/USB_D+ )
   (    4 GNDPWR )
  )
- ( /504995A0/5047107A SparkFun-PAD.03X.03  P5 CONN_1 {Lib=CONN_1}
+ ( /504995A0/5047107A SparkFun-PAD.03X.03  P5 ID {Lib=CONN_1}
   (    1 N-000056 )
  )
  ( /4F22DD51/4F22EB14 SOD-523F-NC  D2 CDBU0530 {Lib=DIODE-SCHOTTKY_}
@@ -103,7 +103,7 @@
   (    1 N-000043 )
   (    2 GNDPWR )
  )
- ( /4F22DD51/4F22E691 SparkFun-PAD.03X.03  P7 CHRG_STAT {Lib=CONN_1}
+ ( /4F22DD51/4F22E691 SparkFun-PAD.03X.03  P7 CHRG {Lib=CONN_1}
   (    1 N-000044 )
  )
  ( /4F22DD51/4F22DEC3 SOT23-5  U3 MCP73831-SOT {Lib=MCP73831-SOT}
@@ -188,7 +188,7 @@
   (    2 N-000051 )
  )
  ( /50474F32/4E4181C7 SM0603_Capa  C5 100n {Lib=C}
-  (    1 N-000049 )
+  (    1 /MCU/~RESET )
   (    2 VSS )
  )
  ( /50474F32/4F22C5A2 SM0603_Capa  C2 100n {Lib=C}
@@ -221,7 +221,7 @@
   (   23 VSS )
   (   24 /MCU/PL6 )
   (   25 /MCU/PL7 )
-  (   26 N-000049 )
+  (   26 /MCU/~RESET )
   (   27 /MCU/PL8 )
   (   28 /MCU/PL9 )
   (   29 /MCU/PL10 )
@@ -250,9 +250,9 @@
   (   X2 N-000050 )
  )
  ( /50474F32/50466EFD EVQP2  S1 TAC_SWITCHSMD_EVQP2 {Lib=TAC_SWITCHSMD_EVQP2}
-  (    1 N-000049 )
+  (    1 /MCU/~RESET )
   (    2 VSS )
-  (    3 /MCU/~RESET )
+  (    3 ? )
   (    4 VSS )
  )
  ( /50474F32/50477093 SM0603_Capa  C1 100n {Lib=C}
@@ -363,25 +363,25 @@ $endfootprintlist
 }
 { Pin List by Nets
 Net 1 "/MCU/+5V" "+5V"
- D3 C
  U1 6
- D2 A
  C11 1
+ U3 4
+ D2 A
  J1 1
  SJ2 2
  J3 1
- U3 4
+ D3 C
 Net 2 "/MCU/VREGOUT" "VREGOUT"
- FB3 1
- C8 1
- C6 1
  U1 5
+ FB3 1
  L2 3
+ C6 1
+ C8 1
  SJ1 2
 Net 3 "/USB/VLIPO" "VLIPO"
  U3 3
- D3 A
  C9 1
+ D3 A
  J3 5
 Net 4 "/MCU/USB_DM" "USB_DM"
  R1 2
@@ -390,45 +390,47 @@ Net 5 "/MCU/PR5" "PR5"
  P4 5
  U1 32
 Net 6 "/MCU/PU10" "PU10"
- P1 10
  U1 39
+ P1 10
 Net 7 "/MCU/PL2" "PL2"
  U1 8
  P2 2
 Net 8 "/MCU/PU14" "PU14"
- U1 35
  P1 14
+ U1 35
 Net 9 "/MCU/PU13" "PU13"
- U1 36
  P1 13
+ U1 36
 Net 10 "+3.3V" "+3.3V"
- SJ5 1
- U1 22
- SJ6 1
- FB3 2
  P2 14
- U2 8
+ U1 22
+ FB3 2
+ SJ5 1
+ U1 9
  C2 1
- U1 1
+ U2 8
  U2 7
  U2 3
  C4 1
  C10 1
  C3 1
- U1 9
+ SJ6 1
+ U1 1
 Net 11 "/MCU/~RESET" "~RESET"
+ U1 26
  P4 2
- S1 3
+ C5 1
+ S1 1
 Net 12 "/MCU/PR3" "PR3"
  U1 34
  P4 3
 Net 13 "/MCU/PR4" "PR4"
+ D1 1
  P4 4
  U1 33
- D1 1
 Net 14 "/MCU/PL1" "PL1"
- P2 1
  U1 7
+ P2 1
 Net 15 "/MCU/SWD_DIO" "SWD_DIO"
  U1 20
  P3 5
@@ -439,33 +441,33 @@ Net 17 "/MCU/TRACE_SWO" "TRACE_SWO"
  P3 3
  U1 19
 Net 18 "VSS" "VSS"
- C10 2
- U2 4
- C4 2
- U1 12
- C6 2
- C1 2
- U1 23
- C12 2
  U1 11
+ U1 12
+ C12 2
+ P3 2
+ C6 2
+ C4 2
+ C1 2
+ P2 13
+ U1 23
  S1 4
  S1 2
- FB4 2
- P3 2
- C11 2
+ C10 2
+ U1 2
+ C2 2
+ C5 2
  R4 2
  C3 2
- C5 2
- C2 2
- U1 2
- P2 13
+ FB4 2
+ C11 2
+ U2 4
 Net 19 "/MCU/USB_DP" "USB_DP"
- R2 2
  U1 3
+ R2 2
 Net 20 "/MCU/PU6/FLASH_MOSI" "PU6/FLASH_MOSI"
- U2 5
- P1 6
  U1 43
+ P1 6
+ U2 5
 Net 21 "/MCU/PL11" "PL11"
  U1 30
  P2 11
@@ -473,48 +475,48 @@ Net 22 "/MCU/PL12" "PL12"
  P2 12
  U1 31
 Net 23 "/MCU/PU1" "PU1"
- U1 48
  P1 1
+ U1 48
 Net 24 "/MCU/PU2" "PU2"
  U1 47
  P1 2
 Net 25 "/MCU/PU3" "PU3"
- P1 3
  U1 46
+ P1 3
 Net 26 "/MCU/PU4/FLASH_CS" "PU4/FLASH_CS"
  U2 1
  P1 4
  U1 45
 Net 27 "/MCU/PU5/FLASH_MISO" "PU5/FLASH_MISO"
  U1 44
- P1 5
  U2 2
+ P1 5
 Net 28 "/MCU/PL10" "PL10"
- P2 10
  U1 29
+ P2 10
 Net 29 "/MCU/PU7/FLASH_SCK" "PU7/FLASH_SCK"
  U1 42
  P1 7
  U2 6
 Net 30 "/MCU/PU8" "PU8"
- P1 8
  U1 41
+ P1 8
 Net 31 "/MCU/PU9" "PU9"
- U1 40
  P1 9
+ U1 40
 Net 32 "/MCU/PU11" "PU11"
- P1 11
  U1 38
+ P1 11
 Net 33 "/MCU/PU12" "PU12"
- P1 12
  U1 37
+ P1 12
 Net 34 "/MCU/PL3" "PL3"
- U1 13
  P2 3
+ U1 13
  C1 1
 Net 35 "/MCU/PL4" "PL4"
- U1 18
  P2 4
+ U1 18
 Net 36 "/MCU/PL5" "PL5"
  U1 21
  P2 5
@@ -522,56 +524,52 @@ Net 37 "/MCU/PL6" "PL6"
  P2 6
  U1 24
 Net 38 "/MCU/PL7" "PL7"
- U1 25
  P2 7
+ U1 25
 Net 39 "/MCU/PL8" "PL8"
  P2 8
  U1 27
 Net 40 "/MCU/PL9" "PL9"
- P2 9
  U1 28
+ P2 9
 Net 41 "/power/VRAW" "VRAW"
- D2 C
- U4 1
  L2 1
  U4 3
- C7 1
+ U4 1
+ D2 C
  P4 1
+ C7 1
 Net 42 "+BATT" "+BATT"
- P3 1
  SJ5 2
  U1 16
+ P3 1
 Net 43 "" ""
- U3 5
  R6 1
+ U3 5
 Net 44 "" ""
  U3 1
  P7 1
 Net 45 "GNDPWR" "GNDPWR"
+ J3 4
  FB4 1
  J2 5
- J3 4
- R6 2
- U4 2
  C9 2
  U3 2
- C8 2
  C7 2
+ R6 2
+ U4 2
+ C8 2
  J1 4
 Net 46 "" ""
- SJ1 1
  U4 4
+ SJ1 1
 Net 47 "" ""
- U4 5
  L2 2
+ U4 5
 Net 48 "" ""
  SJ6 2
  C12 1
  U1 10
-Net 49 "" ""
- C5 1
- S1 1
- U1 26
 Net 50 "" ""
  U1 15
  Y1 X2

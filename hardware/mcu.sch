@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Thu Sep  6 12:00:25 2012
+EESchema Schematic File Version 2  date Thu Sep  6 14:10:41 2012
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -383,7 +383,7 @@ Text HLabel 7650 3450 2    40   3State ~ 0
 PR4
 Text HLabel 7650 3550 2    40   3State ~ 0
 PR5
-Text HLabel 8850 4400 2    40   BiDi ~ 0
+Text HLabel 8100 3950 1    40   BiDi ~ 0
 ~RESET
 Text HLabel 4250 3350 0    40   3State ~ 0
 USB_DP
@@ -698,9 +698,8 @@ Connection ~ 8300 4150
 Wire Wire Line
 	8300 4150 7150 4150
 Wire Wire Line
-	8800 4150 8600 4150
-Wire Wire Line
-	8600 4150 8600 4400
-Wire Wire Line
-	8600 4400 8850 4400
+	8100 4150 8100 3950
+Connection ~ 8100 4150
+Connection ~ 8100 4150
+NoConn ~ 8800 4150
 $EndSCHEMATC

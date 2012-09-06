@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Thu Sep  6 12:00:25 2012
+EESchema Schematic File Version 2  date Thu Sep  6 14:10:41 2012
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -109,7 +109,7 @@ L CONN_1 P7
 U 1 1 4F22E691
 P 1600 6400
 F 0 "P7" H 1680 6400 40  0000 L CNN
-F 1 "CHRG_STAT" H 1600 6455 30  0000 C CNN
+F 1 "CHRG" H 1600 6455 30  0000 C CNN
 F 2 "SparkFun-PAD.03X.03" H 1600 6555 30  0001 C CNN
 	1    1600 6400
 	-1   0    0    1   
