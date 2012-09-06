@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by CvPcb (2012-03-22 BZR 3475)-stable date = Wed Sep  5 18:55:00 2012
+Cmp-Mod V01 Created by CvPcb (2012-03-22 BZR 3475)-stable date = Thu Sep  6 11:44:02 2012
 
 BeginCmp
 TimeStamp = /50474F32/50477093;
@@ -306,13 +306,6 @@ TimeStamp = /50474F32/5045BE79;
 Reference = Y1;
 ValeurCmp = CRYSTAL32-SMD;
 IdModule  = SparkFun-CRYSTAL-32KHZ-SMD;
-EndCmp
-
-BeginCmp
-TimeStamp = /50474F32/50475FDA;
-Reference = Y2;
-ValeurCmp = CRYSTALSMD;
-IdModule  = SparkFun-HC49UP;
 EndCmp
 
 EndListe

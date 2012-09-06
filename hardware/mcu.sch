@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Thu Sep  6 00:41:00 2012
+EESchema Schematic File Version 2  date Thu Sep  6 12:00:25 2012
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -51,7 +51,7 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 4 4
 Title "MC HCK micro controller board"
-Date "5 sep 2012"
+Date "6 sep 2012"
 Rev "4"
 Comp "(c) 2011,2012 Simon Schubert"
 Comment1 "CERN OHL v.1.1 or later"
@@ -104,34 +104,34 @@ $EndComp
 $Comp
 L R R4
 U 1 1 4E4186C6
-P 8450 3450
-F 0 "R4" V 8550 3450 50  0000 C CNN
-F 1 "1k" V 8450 3450 50  0000 C CNN
-F 2 "SM0603" H 8450 3450 60  0001 C CNN
-	1    8450 3450
+P 8900 3450
+F 0 "R4" V 9000 3450 50  0000 C CNN
+F 1 "1k" V 8900 3450 50  0000 C CNN
+F 2 "SM0603" H 8900 3450 60  0001 C CNN
+	1    8900 3450
 	0    -1   -1   0   
 $EndComp
 $Comp
 L LED D1
 U 1 1 4E418482
-P 8950 3450
-F 0 "D1" H 8950 3350 50  0000 C CNN
-F 1 "LED" V 9050 3600 50  0001 C CNN
-F 2 "LED-0603" H 8950 3450 60  0001 C CNN
-	1    8950 3450
+P 8400 3450
+F 0 "D1" H 8400 3350 50  0000 C CNN
+F 1 "LED" V 8500 3600 50  0001 C CNN
+F 2 "LED-0603" H 8400 3450 60  0001 C CNN
+	1    8400 3450
 	1    0    0    1   
 $EndComp
 $Comp
 L C C5
 U 1 1 4E4181C7
-P 8650 4450
-F 0 "C5" H 8700 4550 50  0000 L CNN
-F 1 "100n" H 8700 4350 50  0000 L CNN
-F 2 "SM0603_Capa" H 8650 4450 60  0001 C CNN
-	1    8650 4450
+P 8300 4450
+F 0 "C5" H 8350 4550 50  0000 L CNN
+F 1 "100n" H 8350 4350 50  0000 L CNN
+F 2 "SM0603_Capa" H 8300 4450 60  0001 C CNN
+	1    8300 4450
 	1    0    0    -1  
 $EndComp
-Text Notes 8250 4050 0    40   ~ 0
+Text Notes 8250 3950 0    40   ~ 0
 RESET internally\npulled high
 $Comp
 L C C2
@@ -258,10 +258,10 @@ $EndComp
 $Comp
 L VSS #PWR026
 U 1 1 50460578
-P 8650 4700
-F 0 "#PWR026" H 8650 4700 30  0001 C CNN
-F 1 "VSS" H 8650 4630 30  0000 C CNN
-	1    8650 4700
+P 8300 4700
+F 0 "#PWR026" H 8300 4700 30  0001 C CNN
+F 1 "VSS" H 8300 4630 30  0000 C CNN
+	1    8300 4700
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -314,7 +314,7 @@ XXX cuttable trace?
 Text Notes 5000 6500 0    40   Italic 0
 Optional RTC\ncrystal
 Text Notes 6800 5300 0    40   Italic 0
-Optional 4MHz crystal
+Optional 4MHz crystal\non pads PL6/PL7
 $Comp
 L TAC_SWITCHSMD_EVQP2 S1
 U 1 1 50466EFD
@@ -353,16 +353,6 @@ F 1 "+BATT" H 5650 6200 30  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CRYSTALSMD Y2
-U 1 1 50475FDA
-P 7100 5100
-F 0 "Y2" H 7200 5140 50  0000 L BNN
-F 1 "CRYSTALSMD" H 7200 5000 50  0001 L BNN
-F 2 "SparkFun-HC49UP" H 7100 5250 50  0001 C CNN
-	1    7100 5100
-	1    0    0    -1  
-$EndComp
-$Comp
 L C C1
 U 1 1 50477093
 P 4700 5400
@@ -393,7 +383,7 @@ Text HLabel 7650 3450 2    40   3State ~ 0
 PR4
 Text HLabel 7650 3550 2    40   3State ~ 0
 PR5
-Text HLabel 8100 4050 1    40   BiDi ~ 0
+Text HLabel 8850 4400 2    40   BiDi ~ 0
 ~RESET
 Text HLabel 4250 3350 0    40   3State ~ 0
 USB_DP
@@ -444,7 +434,7 @@ U 1 1 50478946
 P 3750 4050
 F 0 "SJ6" H 3600 3950 50  0000 L BNN
 F 1 "SOLDERJUMPERNC" H 3750 4050 50  0001 L BNN
-F 2 "SparkFun-SJ_2S" H 3750 4200 50  0001 C CNN
+F 2 "SM0603_NC" H 3750 4200 50  0001 C CNN
 	1    3750 4050
 	1    0    0    -1  
 $EndComp
@@ -485,7 +475,7 @@ Wire Wire Line
 Wire Wire Line
 	9300 4150 9200 4150
 Wire Wire Line
-	8650 4650 8650 4700
+	8300 4650 8300 4700
 Wire Wire Line
 	9950 1300 10050 1300
 Wire Wire Line
@@ -508,9 +498,6 @@ Wire Wire Line
 	10800 1400 10800 1500
 Wire Wire Line
 	2200 3650 2200 3550
-Wire Wire Line
-	8650 4050 8650 4250
-Connection ~ 8650 4150
 Wire Wire Line
 	3250 4450 4450 4450
 Wire Wire Line
@@ -636,9 +623,6 @@ Wire Wire Line
 Wire Wire Line
 	5550 2350 5550 1850
 Wire Wire Line
-	8100 4050 8100 4150
-Connection ~ 8100 4150
-Wire Wire Line
 	5450 5050 5450 5850
 Wire Wire Line
 	5450 5850 5250 5850
@@ -654,8 +638,6 @@ Wire Wire Line
 	5550 6200 5650 6200
 Wire Wire Line
 	5650 6200 5650 6100
-Wire Wire Line
-	8700 3450 8750 3450
 Wire Wire Line
 	4700 5650 4700 5600
 Wire Wire Line
@@ -707,8 +689,18 @@ Wire Wire Line
 Wire Wire Line
 	7150 3450 8200 3450
 Wire Wire Line
-	8800 4050 8650 4050
+	8600 3450 8650 3450
 Wire Wire Line
-	8650 4150 7150 4150
-NoConn ~ 8800 4150
+	8300 4050 8300 4250
+Wire Wire Line
+	8800 4050 8300 4050
+Connection ~ 8300 4150
+Wire Wire Line
+	8300 4150 7150 4150
+Wire Wire Line
+	8800 4150 8600 4150
+Wire Wire Line
+	8600 4150 8600 4400
+Wire Wire Line
+	8600 4400 8850 4400
 $EndSCHEMATC

@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Thu Sep  6 00:41:00 2012
+EESchema Schematic File Version 2  date Thu Sep  6 12:00:25 2012
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -51,7 +51,7 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 2 4
 Title "MC HCK micro controller board"
-Date "5 sep 2012"
+Date "6 sep 2012"
 Rev "4"
 Comp "(c) 2011,2012 Simon Schubert"
 Comment1 "CERN OHL v.1.1 or later"
@@ -201,10 +201,6 @@ Text HLabel 4950 3900 1    40   Output ~ 0
 VBUS
 Text HLabel 5250 5050 1    40   Output ~ 0
 VBUS
-Text HLabel 7500 1750 0    40   Input ~ 0
-VBUS
-Text HLabel 7500 1900 0    40   BiDi ~ 0
-VLIPO
 Wire Wire Line
 	4750 5350 4800 5350
 Wire Wire Line
@@ -271,10 +267,6 @@ Wire Wire Line
 	6150 4150 6150 5350
 Wire Wire Line
 	6100 5250 5200 5250
-Wire Wire Line
-	7800 1750 7500 1750
-Wire Wire Line
-	7800 1900 7500 1900
 Wire Wire Line
 	5950 2950 5950 4150
 Connection ~ 6100 4050

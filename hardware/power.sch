@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Thu Sep  6 00:41:00 2012
+EESchema Schematic File Version 2  date Thu Sep  6 12:00:25 2012
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -49,9 +49,9 @@ EELAYER 25  0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 4 4
+Sheet 3 4
 Title "MC HCK power distribution"
-Date "5 sep 2012"
+Date "6 sep 2012"
 Rev "4"
 Comp "(c) 2011,2012 Simon Schubert"
 Comment1 "CERN OHL v.1.1 or later"

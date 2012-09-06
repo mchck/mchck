@@ -1,4 +1,4 @@
-update=Wed Sep  5 11:37:58 2012
+update=Thu Sep  6 12:03:37 2012
 version=1
 last_client=pcbnew
 [general]
@@ -114,8 +114,9 @@ LibName27=SparkFun-1X13_LOCK_INVERSE
 LibName28=CR2032SMT
 LibName29=SM0603_NC
 LibName30=SparkFun-USB-MICROB
-LibName31=SparkFun
-LibName32=SOT89
-LibName33=SM0805-3WAY-NC
-LibName34=ohwlogo-6mm
-LibName35=SM0805-3WAY
+LibName31=SparkFun-CRYSTAL-32KHZ-SMD
+LibName32=SparkFun
+LibName33=SOT89
+LibName34=SM0805-3WAY-NC
+LibName35=ohwlogo-6mm
+LibName36=SM0805-3WAY
