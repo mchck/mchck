@@ -72,6 +72,14 @@ ci-fab: ${GERBERS} ${PDFS} ${PNGS} ${PNG_PREVIEWS} ${LICENSE_FILES}
 
 .PHONY: ci-fab
 
+update-wiki:
+	cd ../wiki && git pull
+	cp ${PNGS} ${PNG_PREVIEWS} ../wiki/gen-images
+	cd ../wiki/gen-images && git add ${PNGS} ${PNG_PREVIEWS} && git commit -m 'update generated images' && git push
+	git commit -m 'update wiki' ../wiki
+
+.PHONY: update-wiki
+
 zip: ${P}.zip
 
 .PHONY: zip
