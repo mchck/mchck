@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Thu Sep  6 14:10:41 2012
+EESchema Schematic File Version 2  date Thu Sep  6 17:25:29 2012
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -60,12 +60,9 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L SOLDERJUMPERNO SJ?
+L SOLDERJUMPERNO SJ2
 U 1 1 4FEDD8B1
 P 5000 5150
-AR Path="/4FEDCF32" Ref="SJ?"  Part="1" 
-AR Path="/4FEDD8B1" Ref="SJ2"  Part="1" 
-AR Path="/504995A0/4FEDD8B1" Ref="SJ2"  Part="1" 
 F 0 "SJ2" H 5050 5200 50  0000 L TNN
 F 1 "SOLDERJUMPERNO" H 5000 5150 50  0001 L BNN
 F 2 "SparkFun-SJ_2VerySmall-NO" H 5000 5300 50  0001 C CNN
