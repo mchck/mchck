@@ -1,4 +1,4 @@
-# EESchema Netlist Version 1.1 created  Thu Sep  6 17:26:39 2012
+# EESchema Netlist Version 1.1 created  Fri Sep  7 12:59:11 2012
 (
  ( /4F3D2CED SparkFun-1X05_LOCK  P2 DEBUG {Lib=CONN_5}
   (    1 +BATT )
@@ -47,6 +47,9 @@
   (   14 /MCU/PU14 )
  )
  ( /503C1464 OHW-LOGO-6mm  G1 OHW_LOGO {Lib=LOGO}
+ )
+ ( /5049CF35 $noname  H1 MOUNTHOLE {Lib=MOUNTHOLE}
+  (    1 VSS )
  )
  ( /504995A0/4FEDD8B1 SparkFun-SJ_2VerySmall-NO  SJ3 SOLDERJUMPERNO {Lib=SOLDERJUMPERNO}
   (    1 N-000054 )
@@ -362,204 +365,205 @@ $endlist
 $endfootprintlist
 }
 { Pin List by Nets
-Net 1 "/MCU/+5V" "+5V"
- U1 6
- C2 1
- U2 4
- D3 A
- J1 1
- SJ3 2
- J2 1
- D2 C
-Net 2 "/MCU/VREGOUT" "VREGOUT"
- U1 5
- FB2 1
- L1 3
- C1 1
- C11 1
- SJ5 2
-Net 3 "/USB/VLIPO" "VLIPO"
- U2 3
- C7 1
- D2 A
- J2 5
-Net 4 "/MCU/USB_DM" "USB_DM"
- R2 2
- U1 4
-Net 5 "/MCU/PR5" "PR5"
- P1 5
- U1 32
-Net 6 "/MCU/PU10" "PU10"
- U1 39
- P3 10
-Net 7 "/MCU/PL2" "PL2"
- U1 8
- P4 2
-Net 8 "/MCU/PU14" "PU14"
- P3 14
- U1 35
-Net 9 "/MCU/PU13" "PU13"
- P3 13
- U1 36
-Net 10 "+3.3V" "+3.3V"
- P4 14
- U1 22
- FB2 2
- SJ6 1
- U1 9
- C3 1
- U3 8
- U3 7
- U3 3
- C4 1
- C10 1
- C5 1
- SJ4 1
- U1 1
-Net 11 "/MCU/~RESET" "~RESET"
- U1 26
- P1 2
- C6 1
- S1 1
-Net 12 "/MCU/PR3" "PR3"
- U1 34
- P1 3
-Net 13 "/MCU/PR4" "PR4"
- D1 1
- P1 4
- U1 33
-Net 14 "/MCU/PL1" "PL1"
- U1 7
- P4 1
-Net 15 "/MCU/SWD_DIO" "SWD_DIO"
- U1 20
- P2 5
-Net 16 "/MCU/SWD_CLK" "SWD_CLK"
- U1 17
- P2 4
-Net 17 "/MCU/TRACE_SWO" "TRACE_SWO"
- P2 3
- U1 19
-Net 18 "VSS" "VSS"
- U1 11
- U1 12
- C9 2
- P2 2
- C1 2
- C4 2
- C8 2
- P4 13
- U1 23
- S1 4
- S1 2
- C10 2
- U1 2
- C3 2
- C6 2
- R3 2
- C5 2
- FB1 2
- C2 2
- U3 4
-Net 19 "/MCU/USB_DP" "USB_DP"
- U1 3
- R1 2
-Net 20 "/MCU/PU6/FLASH_MOSI" "PU6/FLASH_MOSI"
- U1 43
- P3 6
- U3 5
-Net 21 "/MCU/PL11" "PL11"
- U1 30
- P4 11
-Net 22 "/MCU/PL12" "PL12"
- P4 12
- U1 31
-Net 23 "/MCU/PU1" "PU1"
- P3 1
- U1 48
-Net 24 "/MCU/PU2" "PU2"
- U1 47
- P3 2
-Net 25 "/MCU/PU3" "PU3"
- U1 46
- P3 3
-Net 26 "/MCU/PU4/FLASH_CS" "PU4/FLASH_CS"
- U3 1
- P3 4
- U1 45
-Net 27 "/MCU/PU5/FLASH_MISO" "PU5/FLASH_MISO"
- U1 44
- U3 2
- P3 5
-Net 28 "/MCU/PL10" "PL10"
- U1 29
- P4 10
-Net 29 "/MCU/PU7/FLASH_SCK" "PU7/FLASH_SCK"
- U1 42
- P3 7
- U3 6
-Net 30 "/MCU/PU8" "PU8"
- U1 41
- P3 8
-Net 31 "/MCU/PU9" "PU9"
- P3 9
- U1 40
-Net 32 "/MCU/PU11" "PU11"
- U1 38
- P3 11
-Net 33 "/MCU/PU12" "PU12"
- U1 37
- P3 12
-Net 34 "/MCU/PL3" "PL3"
- P4 3
- U1 13
- C8 1
-Net 35 "/MCU/PL4" "PL4"
- P4 4
- U1 18
-Net 36 "/MCU/PL5" "PL5"
- U1 21
- P4 5
-Net 37 "/MCU/PL6" "PL6"
- P4 6
- U1 24
-Net 38 "/MCU/PL7" "PL7"
- P4 7
- U1 25
-Net 39 "/MCU/PL8" "PL8"
- P4 8
- U1 27
-Net 40 "/MCU/PL9" "PL9"
+Net 1 "/MCU/PL9" "PL9"
  U1 28
  P4 9
+Net 2 "/MCU/PU11" "PU11"
+ U1 38
+ P3 11
+Net 3 "/MCU/PU5/FLASH_MISO" "PU5/FLASH_MISO"
+ U3 2
+ U1 44
+ P3 5
+Net 4 "/MCU/PL12" "PL12"
+ P4 12
+ U1 31
+Net 5 "/MCU/PL10" "PL10"
+ U1 29
+ P4 10
+Net 6 "/MCU/PL8" "PL8"
+ P4 8
+ U1 27
+Net 7 "/MCU/PL6" "PL6"
+ U1 24
+ P4 6
+Net 8 "/MCU/PL4" "PL4"
+ U1 18
+ P4 4
+Net 9 "/MCU/PL5" "PL5"
+ U1 21
+ P4 5
+Net 10 "/MCU/PL7" "PL7"
+ U1 25
+ P4 7
+Net 11 "/MCU/PU2" "PU2"
+ P3 2
+ U1 47
+Net 12 "/MCU/PL11" "PL11"
+ P4 11
+ U1 30
+Net 13 "/MCU/PU6/FLASH_MOSI" "PU6/FLASH_MOSI"
+ U1 43
+ U3 5
+ P3 6
+Net 14 "/MCU/PU4/FLASH_CS" "PU4/FLASH_CS"
+ U1 45
+ U3 1
+ P3 4
+Net 15 "/MCU/PU12" "PU12"
+ P3 12
+ U1 37
+Net 16 "/MCU/PU3" "PU3"
+ U1 46
+ P3 3
+Net 17 "/MCU/PL3" "PL3"
+ U1 13
+ P4 3
+ C8 1
+Net 18 "/MCU/PU1" "PU1"
+ U1 48
+ P3 1
+Net 19 "/MCU/PU8" "PU8"
+ U1 41
+ P3 8
+Net 20 "/MCU/PU10" "PU10"
+ P3 10
+ U1 39
+Net 21 "/MCU/~RESET" "~RESET"
+ U1 26
+ S1 1
+ C6 1
+ P1 2
+Net 22 "/MCU/VREGOUT" "VREGOUT"
+ U1 5
+ L1 3
+ C11 1
+ SJ5 2
+ C1 1
+ FB2 1
+Net 23 "/MCU/PR3" "PR3"
+ P1 3
+ U1 34
+Net 24 "/MCU/PR4" "PR4"
+ U1 33
+ P1 4
+ D1 1
+Net 25 "/MCU/PR5" "PR5"
+ U1 32
+ P1 5
+Net 26 "/MCU/PL2" "PL2"
+ U1 8
+ P4 2
+Net 27 "/MCU/USB_DP" "USB_DP"
+ U1 3
+ R1 2
+Net 28 "/MCU/USB_DM" "USB_DM"
+ U1 4
+ R2 2
+Net 29 "/MCU/+5V" "+5V"
+ SJ3 2
+ U1 6
+ J2 1
+ D3 A
+ U2 4
+ C2 1
+ J1 1
+ D2 C
+Net 30 "VSS" "VSS"
+ U1 23
+ U1 11
+ U1 12
+ C10 2
+ C4 2
+ U3 4
+ C5 2
+ R3 2
+ C6 2
+ C3 2
+ U1 2
+ C8 2
+ S1 4
+ S1 2
+ FB1 2
+ C2 2
+ P2 2
+ C9 2
+ C1 2
+ H1 1
+ P4 13
+Net 31 "/MCU/PU9" "PU9"
+ U1 40
+ P3 9
+Net 32 "/MCU/PU7/FLASH_SCK" "PU7/FLASH_SCK"
+ U1 42
+ U3 6
+ P3 7
+Net 33 "/USB/VLIPO" "VLIPO"
+ J2 5
+ U2 3
+ D2 A
+ C7 1
+Net 34 "+3.3V" "+3.3V"
+ U3 7
+ U3 8
+ P4 14
+ U3 3
+ C4 1
+ SJ4 1
+ FB2 2
+ C3 1
+ U1 1
+ SJ6 1
+ U1 9
+ U1 22
+ C5 1
+ C10 1
+Net 35 "/MCU/PL1" "PL1"
+ U1 7
+ P4 1
+Net 36 "/MCU/PU14" "PU14"
+ P3 14
+ U1 35
+Net 37 "/MCU/PU13" "PU13"
+ P3 13
+ U1 36
+Net 38 "/MCU/SWD_DIO" "SWD_DIO"
+ P2 5
+ U1 20
+Net 39 "/MCU/SWD_CLK" "SWD_CLK"
+ U1 17
+ P2 4
+Net 40 "/MCU/TRACE_SWO" "TRACE_SWO"
+ P2 3
+ U1 19
 Net 41 "/power/VRAW" "VRAW"
- L1 1
- U4 3
  U4 1
- D3 C
  P1 1
+ D3 C
+ U4 3
+ L1 1
  C12 1
 Net 42 "+BATT" "+BATT"
  SJ6 2
- U1 16
  P2 1
+ U1 16
 Net 43 "" ""
- R4 1
  U2 5
+ R4 1
 Net 44 "" ""
  U2 1
  P5 1
 Net 45 "GNDPWR" "GNDPWR"
- J2 4
- FB1 1
- J3 5
- C7 2
- U2 2
- C12 2
  R4 2
- U4 2
+ J3 5
+ C12 2
+ J2 4
+ U2 2
+ FB1 1
  C11 2
  J1 4
+ U4 2
+ C7 2
 Net 46 "" ""
  U4 4
  SJ5 1
@@ -568,11 +572,11 @@ Net 47 "" ""
  U4 5
 Net 48 "" ""
  SJ4 2
- C9 1
  U1 10
+ C9 1
 Net 50 "" ""
- U1 15
  Y1 X2
+ U1 15
 Net 51 "" ""
  R3 1
  D1 2

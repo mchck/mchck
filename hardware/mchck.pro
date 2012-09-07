@@ -1,4 +1,4 @@
-update=Thu Sep  6 12:03:37 2012
+update=Fri Sep  7 12:37:38 2012
 version=1
 last_client=pcbnew
 [general]
@@ -65,12 +65,13 @@ LibName42=multireg
 LibName43=inductor_select
 LibName44=logo
 LibName45=MK20LF
+LibName46=mounthole
 [pcbnew]
 version=1
 LastNetListRead=mchck.net
-PadDrlX=0
-PadDimH=0
-PadDimV=0
+PadDrlX=1339
+PadDimH=1340
+PadDimV=1340
 BoardThickness=630
 TxtPcbV=354
 TxtPcbH=354
@@ -120,3 +121,4 @@ LibName33=SOT89
 LibName34=SM0805-3WAY-NC
 LibName35=ohwlogo-6mm
 LibName36=SM0805-3WAY
+LibName37=mounthole_3mm

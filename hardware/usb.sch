@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Thu Sep  6 17:26:35 2012
+EESchema Schematic File Version 2  date Fri Sep  7 13:28:10 2012
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -44,6 +44,7 @@ LIBS:multireg
 LIBS:inductor_select
 LIBS:logo
 LIBS:MK20LF
+LIBS:mounthole
 LIBS:mchck-cache
 EELAYER 25  0
 EELAYER END
@@ -51,7 +52,7 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 2 4
 Title "MC HCK micro controller board"
-Date "6 sep 2012"
+Date "7 sep 2012"
 Rev "4"
 Comp "(c) 2011,2012 Simon Schubert"
 Comment1 "CERN OHL v.1.1 or later"
@@ -150,28 +151,28 @@ F 7 "GND" H 4875 3950 50  0001 C CNN "Ground"
 	1    0    0    -1  
 $EndComp
 $Comp
-L GNDPWR #PWR04
+L GNDPWR #PWR05
 U 1 1 5046077E
 P 4950 4350
-F 0 "#PWR04" H 4950 4400 40  0001 C CNN
+F 0 "#PWR05" H 4950 4400 40  0001 C CNN
 F 1 "GNDPWR" H 4950 4270 40  0000 C CNN
 	1    4950 4350
 	1    0    0    -1  
 $EndComp
 $Comp
-L GNDPWR #PWR05
+L GNDPWR #PWR06
 U 1 1 50460857
 P 5250 5700
-F 0 "#PWR05" H 5250 5750 40  0001 C CNN
+F 0 "#PWR06" H 5250 5750 40  0001 C CNN
 F 1 "GNDPWR" H 5250 5620 40  0000 C CNN
 	1    5250 5700
 	1    0    0    -1  
 $EndComp
 $Comp
-L GNDPWR #PWR06
+L GNDPWR #PWR07
 U 1 1 504608AE
 P 5400 3400
-F 0 "#PWR06" H 5400 3450 40  0001 C CNN
+F 0 "#PWR07" H 5400 3450 40  0001 C CNN
 F 1 "GNDPWR" H 5400 3320 40  0000 C CNN
 	1    5400 3400
 	1    0    0    -1  
