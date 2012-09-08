@@ -1,4 +1,4 @@
-# EESchema Netlist Version 1.1 created  Fri Sep  7 12:59:11 2012
+# EESchema Netlist Version 1.1 created  Sat Sep  8 14:24:40 2012
 (
  ( /4F3D2CED SparkFun-1X05_LOCK  P2 DEBUG {Lib=CONN_5}
   (    1 +BATT )
@@ -48,7 +48,7 @@
  )
  ( /503C1464 OHW-LOGO-6mm  G1 OHW_LOGO {Lib=LOGO}
  )
- ( /5049CF35 $noname  H1 MOUNTHOLE {Lib=MOUNTHOLE}
+ ( /5049CF35 mounthole_3mm  H1 MOUNTHOLE {Lib=MOUNTHOLE}
   (    1 VSS )
  )
  ( /504995A0/4FEDD8B1 SparkFun-SJ_2VerySmall-NO  SJ3 SOLDERJUMPERNO {Lib=SOLDERJUMPERNO}
@@ -106,7 +106,7 @@
   (    1 N-000043 )
   (    2 GNDPWR )
  )
- ( /4F22DD51/4F22E691 SparkFun-PAD.03X.03  P5 CHRG {Lib=CONN_1}
+ ( /4F22DD51/4F22E691 SparkFun-PAD.03X.03  P5 CHG {Lib=CONN_1}
   (    1 N-000044 )
  )
  ( /4F22DD51/4F22DEC3 SOT23-5  U2 MCP73831-SOT {Lib=MCP73831-SOT}

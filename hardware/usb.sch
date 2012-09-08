@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Fri Sep  7 13:28:10 2012
+EESchema Schematic File Version 2  date Sat Sep  8 14:24:32 2012
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -52,7 +52,7 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 2 4
 Title "MC HCK micro controller board"
-Date "7 sep 2012"
+Date "8 sep 2012"
 Rev "4"
 Comp "(c) 2011,2012 Simon Schubert"
 Comment1 "CERN OHL v.1.1 or later"

@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Fri Sep  7 13:28:10 2012
+EESchema Schematic File Version 2  date Sat Sep  8 14:24:32 2012
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -52,7 +52,7 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 3 4
 Title "MC HCK power distribution"
-Date "7 sep 2012"
+Date "8 sep 2012"
 Rev "4"
 Comp "(c) 2011,2012 Simon Schubert"
 Comment1 "CERN OHL v.1.1 or later"
@@ -110,7 +110,7 @@ L CONN_1 P5
 U 1 1 4F22E691
 P 1600 6400
 F 0 "P5" H 1680 6400 40  0000 L CNN
-F 1 "CHRG" H 1600 6455 30  0000 C CNN
+F 1 "CHG" H 1600 6455 30  0000 C CNN
 F 2 "SparkFun-PAD.03X.03" H 1600 6555 30  0001 C CNN
 	1    1600 6400
 	-1   0    0    1   
@@ -197,7 +197,7 @@ F 1 "PWR_FLAG" H 8700 2580 30  0000 C CNN
 	-1   0    0    1   
 $EndComp
 Text Notes 4600 1550 0    40   ~ 0
-LDO, e.g. MIC5205 (16V, 150mA, 1uA Iq): bridge L2/out\n\nany DC/DC regulator: bridge SJ1\nstep-down, e.g. LM3671 (5.5V, 600mA, 16uA Iq): place L across L2/out \nstep-up, e.g. TPS61097 (5.5V, 350mA, 5uA Iq): place L across L2/in
+LDO, e.g. MIC5205 (16V, 150mA, 1uA Iq): bridge L2/out\n\nany DC/DC regulator: bridge SJ5\nstep-down, e.g. LM3671 (5.5V, 600mA, 16uA Iq): place L across L2/out \nstep-up, e.g. TPS61097 (5.5V, 350mA, 5uA Iq): place L across L2/in
 Text Notes 5450 2050 0    40   ~ 0
 in
 Text Notes 5750 2050 0    40   ~ 0
