@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Sat Sep  8 14:38:05 2012
+EESchema Schematic File Version 2  date Tue Sep 11 21:36:26 2012
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -52,7 +52,7 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 4
 Title "MC HCK micro controller board"
-Date "8 sep 2012"
+Date "11 sep 2012"
 Rev "4"
 Comp "(c) 2011,2012 Simon Schubert"
 Comment1 "CERN OHL v.1.1 or later"
@@ -113,28 +113,28 @@ F 2 "OHW-LOGO-6mm" H 10300 650 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L VSS #PWR01
+L VSS #PWR3
 U 1 1 5046C971
 P 7100 4550
-F 0 "#PWR01" H 7100 4550 30  0001 C CNN
+F 0 "#PWR3" H 7100 4550 30  0001 C CNN
 F 1 "VSS" H 7100 4480 30  0000 C CNN
 	1    7100 4550
 	-1   0    0    -1  
 $EndComp
 $Comp
-L VSS #PWR02
+L VSS #PWR2
 U 1 1 5047C978
 P 4200 5600
-F 0 "#PWR02" H 4200 5600 30  0001 C CNN
+F 0 "#PWR2" H 4200 5600 30  0001 C CNN
 F 1 "VSS" H 4200 5530 30  0000 C CNN
 	1    4200 5600
 	1    0    0    -1  
 $EndComp
 $Comp
-L +3.3V #PWR03
+L +3.3V #PWR1
 U 1 1 5047C987
 P 3700 5950
-F 0 "#PWR03" H 3700 5910 30  0001 C CNN
+F 0 "#PWR1" H 3700 5910 30  0001 C CNN
 F 1 "+3.3V" H 3700 6060 30  0000 C CNN
 	1    3700 5950
 	1    0    0    -1  
@@ -207,10 +207,10 @@ F 2 "mounthole_3mm" H 9650 1200 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L VSS #PWR04
+L VSS #PWR4
 U 1 1 5049D46F
 P 9650 1050
-F 0 "#PWR04" H 9650 1050 30  0001 C CNN
+F 0 "#PWR4" H 9650 1050 30  0001 C CNN
 F 1 "VSS" H 9650 980 30  0000 C CNN
 	1    9650 1050
 	1    0    0    -1  

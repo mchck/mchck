@@ -1,4 +1,4 @@
-# EESchema Netlist Version 1.1 created  Sat Sep  8 14:38:08 2012
+# EESchema Netlist Version 1.1 created  Tue Sep 11 21:37:59 2012
 (
  ( /4F3D2CED SparkFun-1X05_LOCK  P2 DEBUG {Lib=CONN_5}
   (    1 +BATT )
@@ -270,9 +270,9 @@
   (    1 /MCU/+5V )
   (    2 VSS )
  )
- ( /4F22DD51/50478372 SM0603_NC  SJ6 SOLDERJUMPERNC {Lib=SOLDERJUMPERNC}
-  (    1 +3.3V )
-  (    2 +BATT )
+ ( /4F22DD51/504F92BA SOD-523F-NC  D4 CDBU0530 {Lib=DIODE-SCHOTTKY_}
+  (    A +BATT )
+  (    C +3.3V )
  )
 )
 *
@@ -366,9 +366,9 @@ $endfootprintlist
 }
 { Pin List by Nets
 Net 1 "/MCU/PL3" "PL3"
+ U1 13
  C8 1
  P4 3
- U1 13
 Net 2 "/MCU/PL4" "PL4"
  U1 18
  P4 4
@@ -382,11 +382,11 @@ Net 5 "/MCU/PL9" "PL9"
  U1 28
  P4 9
 Net 6 "/MCU/PL11" "PL11"
- P4 11
  U1 30
+ P4 11
 Net 7 "/MCU/PU6/FLASH_MOSI" "PU6/FLASH_MOSI"
- U1 43
  U3 5
+ U1 43
  P3 6
 Net 8 "/MCU/PU4/FLASH_CS" "PU4/FLASH_CS"
  P3 4
@@ -426,17 +426,17 @@ Net 19 "+3.3V" "+3.3V"
  U3 3
  C4 1
  U3 7
- SJ6 1
  C10 1
+ D4 C
  C3 1
  U1 1
  FB2 2
  U1 9
  P4 14
- U1 22
- SJ4 1
- C5 1
  U3 8
+ C5 1
+ SJ4 1
+ U1 22
 Net 20 "/MCU/PR3" "PR3"
  P1 3
  U1 34
@@ -511,20 +511,20 @@ Net 35 "/MCU/+5V" "+5V"
  SJ3 2
  D3 A
  J1 1
- C2 1
  D2 C
- U1 6
  U2 4
+ C2 1
+ U1 6
 Net 36 "/MCU/VREGOUT" "VREGOUT"
  C1 1
- L1 3
  SJ5 2
- C11 1
+ L1 3
  FB2 1
  U1 5
+ C11 1
 Net 37 "/USB/VLIPO" "VLIPO"
- C7 1
  J2 5
+ C7 1
  U2 3
  D2 A
 Net 38 "/MCU/TRACE_SWO" "TRACE_SWO"
@@ -538,7 +538,7 @@ Net 40 "/MCU/SWD_DIO" "SWD_DIO"
  U1 20
 Net 41 "+BATT" "+BATT"
  P2 1
- SJ6 2
+ D4 A
  U1 16
 Net 42 "/power/VRAW" "VRAW"
  C12 1
