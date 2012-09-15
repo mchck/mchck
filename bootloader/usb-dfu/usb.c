@@ -1,37 +1,5 @@
 #include <inttypes.h>
-
-/**
- * USB state machine
- * =================
- *
- * Setup
- * -----
- *
- * Token sequence:
- * 1.  SETUP
- * 2a. OUT
- * 3a. IN
- *
- * or
- * 1.  SETUP
- * 2b. IN
- * 3b. OUT
- *
- * Report errors by STALLing the EP (both in/out I guess) after (1) or
- * (2), so that (3) will STALL.
- *
- *
- * Device configuration states:
- *
- * Attached <-> Powered
- * Powered -(reset)-> Default
- * Default -(SET_ADDRESS)-> Address
- * Address -(SET_CONFIGURATION)-> Configured
- * Configured -(SET_CONFIGURATION 0)-> Address
- * Address -(SET_ADDRESS 0)-> Default
- * [Default, Configured, Address] -(reset)-> Default
- *
- */
+#include <wchar.h>
 
 /**
  * Note: bitfields ahead.
@@ -104,7 +72,7 @@ struct usb_desc_dev_t {
 	uint8_t prod_strdesc;
 	uint8_t serial_strdesc;
 	uint8_t numconfig;
-};
+} __packed;
 CTASSERT_SIZE_BYTE(struct usb_desc_dev_t, 18);
 
 struct usb_desc_config_t {
@@ -149,7 +117,7 @@ struct usb_desc_iface_t {
 	enum usb_iface_subclass : 8;
 	enum usb_iface_proto : 8;
 	uint8_t iface_strdesc;
-};
+} __packed;
 CTASSERT_SIZE_BYTE(struct usb_desc_iface_t, 9);
 
 struct usb_desc_ep_t {
@@ -182,7 +150,7 @@ struct usb_desc_ep_t {
 			USB_EP_ISO_IMPLICIT = 2
 		} usage_type : 2;
 		uint8_t _rsvd1 : 2;
-	};
+	} __packed;
 	struct {
 		uint16_t maxsize : 11;
 		uint16_t _rsvd2 : 5;
@@ -203,44 +171,59 @@ struct usb_desc_string_t {
  */
 
 struct usb_ctrl_req_t {
-	union {
-		struct {
-			enum usb_ctrl_req_recp {
-				USB_CTRL_REQ_DEV = 0,
-				USB_CTRL_REQ_IFACE = 1,
-				USB_CTRL_REQ_EP = 2,
-				USB_CTRL_REQ_OTHER = 3
-			} recp : 5;
-			enum usb_ctrl_req_type {
-				USB_CTRL_REQ_STD = 0,
-				USB_CTRL_REQ_CLASS = 1,
-				USB_CTRL_REQ_VENDOR = 2
-			} type : 2;
-			enum usb_ctrl_req_dir {
-				USB_CTRL_REQ_OUT = 0,
-				USB_CTRL_REQ_IN = 1
-			} in : 1;
-		};
-		uint8_t reqtype;
-	};
-	enum usb_ctrl_req_code {
-		USB_CTRL_REQ_GET_STATUS = 0,
-		USB_CTRL_REQ_CLEAR_FEATURE = 1,
-		USB_CTRL_REQ_SET_FEATURE = 3,
-		USB_CTRL_REQ_SET_ADDRESS = 5,
-		USB_CTRL_REQ_GET_DESCRIPTOR = 6,
-		USB_CTRL_REQ_SET_DESCRIPTOR = 7,
-		USB_CTRL_REQ_GET_CONFIGURATION = 8,
-		USB_CTRL_REQ_SET_CONFIGURATION = 9,
-		USB_CTRL_REQ_GET_INTERFACE = 10,
-		USB_CTRL_REQ_SET_INTERFACE = 11,
-		USB_CTRL_REQ_SYNC_FRAME = 12
-	} request : 8;
+	union /* reqtype and request & u16 */ {
+		struct /* reqtype and request */ {
+			union /* reqtype in bitfield & u8 */ {
+				struct /* reqtype */ {
+					enum usb_ctrl_req_recp {
+						USB_CTRL_REQ_DEV = 0,
+						USB_CTRL_REQ_IFACE = 1,
+						USB_CTRL_REQ_EP = 2,
+						USB_CTRL_REQ_OTHER = 3
+					} recp : 5;
+					enum usb_ctrl_req_type {
+						USB_CTRL_REQ_STD = 0,
+						USB_CTRL_REQ_CLASS = 1,
+						USB_CTRL_REQ_VENDOR = 2
+					} type : 2;
+					enum usb_ctrl_req_dir {
+						USB_CTRL_REQ_OUT = 0,
+						USB_CTRL_REQ_IN = 1
+					} in : 1;
+				} __packed;
+				uint8_t reqtype;
+			}; /* union */
+			enum usb_ctrl_req_code {
+				USB_CTRL_REQ_GET_STATUS = 0,
+				USB_CTRL_REQ_CLEAR_FEATURE = 1,
+				USB_CTRL_REQ_SET_FEATURE = 3,
+				USB_CTRL_REQ_SET_ADDRESS = 5,
+				USB_CTRL_REQ_GET_DESCRIPTOR = 6,
+				USB_CTRL_REQ_SET_DESCRIPTOR = 7,
+				USB_CTRL_REQ_GET_CONFIGURATION = 8,
+				USB_CTRL_REQ_SET_CONFIGURATION = 9,
+				USB_CTRL_REQ_GET_INTERFACE = 10,
+				USB_CTRL_REQ_SET_INTERFACE = 11,
+				USB_CTRL_REQ_SYNC_FRAME = 12
+			} request : 8;
+		} __packed; /* struct */
+		uint16_t type_and_req;
+	}; /* union */
 	uint16_t value;
 	uint16_t index;
 	uint16_t length;
 } __packed;
 CTASSERT_SIZE_BYTE(struct usb_ctrl_req_t, 8);
+
+#define USB_CTRL_REQ_DIR_SHIFT 0
+#define USB_CTRL_REQ_TYPE_SHIFT 1
+#define USB_CTRL_REQ_RECP_SHIFT 3
+#define USB_CTRL_REQ_CODE_SHIFT 8
+#define USB_CTRL_REQ(req_inout, req_type, req_code)		\
+	(uint16_t)							\
+	((USB_CTRL_REQ_##req_inout << USB_CTRL_REQ_DIR_SHIFT)		\
+	 |(USB_CTRL_REQ_##req_type << USB_CTRL_REQ_TYPE_SHIFT)		\
+	 |(USB_CTRL_REQ_##req_code << USB_CTRL_REQ_CODE_SHIFT))
 
 /**
  * status replies for GET_STATUS.
@@ -283,6 +266,10 @@ enum usb_ctrl_req_feature {
 };
 
 
+/**
+ * Hardware structures
+ */
+
 union USB_BD_t {
 	struct /* common */ {
 		uint32_t _rsvd0	 : 6;
@@ -324,6 +311,47 @@ union USB_BD_t {
 CTASSERT_SIZE_BYTE(union USB_BD_t, 8);
 
 
+/**
+ * Internal driver structures
+ */
+
+/**
+ * USB state machine
+ * =================
+ *
+ * Device configuration states:
+ *
+ * Attached <-> Powered
+ * Powered -(reset)-> Default
+ * Default -(SET_ADDRESS)-> Address
+ * Address -(SET_CONFIGURATION)-> Configured
+ * Configured -(SET_CONFIGURATION 0)-> Address
+ * Address -(SET_ADDRESS 0)-> Default
+ * [Default, Configured, Address] -(reset)-> Default
+ */
+
+enum usbd_dev_state {
+	USBD_STATE_DISABLED = 0,
+	USBD_STATE_DEFAULT,
+	USBD_STATE_ADDRESS,
+	USBD_STATE_CONFIGURED
+};
+
+struct usbd_t {
+	union USB_BD_t *bdt;
+	enum usbd_dev_state state;
+	enum usbd_ctrl_state {
+		USBD_CTRL_STATE_IDLE,
+		USBD_CTRL_STATE_WAIT_IN,
+		USBD_CTRL_STATE_WAIT_OUT,
+		USBD_CTRL_STATE_ERROR
+	} ctrl_state;
+};
+
+
+struct usbd_t usbd;
+
+
 void
 usb_enable(void)
 {
@@ -341,4 +369,96 @@ usb_intr(void)
 	/* check STAT->(ENDP,TX,ODD) */
 	/* check ERRSTAT->(DMAERR) */
 	/* read BDT entry */
+}
+
+/**
+ * Kinetis USB driver notes:
+ * We need to manually maintain the DATA0/1 toggling for the SIE.
+ * SETUP transactions always start with a DATA0.
+ *
+ * The SIE internally uses pingpong (double) buffering, which is
+ * easily confused with DATA0/DATA1 toggling, and I think even the
+ * Freescale docs confuse the two notions.  When BD->DTS is set,
+ * BD->DATA01 will be used to verify/discard incoming DATAx and it
+ * will set the DATAx PID for outgoing tokens.  This is not described
+ * as such in the Freescale Kinetis docs, but the Microchip PIC32 OTG
+ * docs are more clear on this;  it seems that both Freescale and
+ * Microchip use different versions of the same USB OTG IP core.
+ * 
+ * http://ww1.microchip.com/downloads/en/DeviceDoc/61126F.pdf
+ *
+ * Clear CTL->TOKEN_BUSY after SETUP tokens.
+ */
+
+/**
+ *
+ * Great resource: http://wiki.osdev.org/Universal_Serial_Bus
+ *
+ * Setup
+ * -----
+ *
+ * Token sequence (data toggle):
+ * 1.  SETUP (0)
+ * (2a. OUT (1) ... (toggling))
+ * 3a. IN (1)
+ *
+ * or
+ * 1.  SETUP (0)
+ * 2b. IN (1) ... (toggling)
+ * 3b. OUT (1)
+ *
+ * Report errors by STALLing the control EP after (1) or (2), so that
+ * (3) will STALL.  Seems we need to clear the STALL after that so
+ * that the next SETUP can make it through.
+ *
+ *
+ */
+
+/**
+ * The following code is not written defensively, but instead only
+ * asserts values that are essential for correct execution.  It
+ * accepts a superset of the protocol defined by the standard.  We do
+ * this to save space.
+ */
+
+int
+usb_handle_control(struct usb_ctrl_req_t *req)
+{
+	if (req->type != USB_CTRL_REQ_STD) {
+		/* XXX pass on to higher levels */
+		goto err;
+	}
+
+	/* Only STD requests here */
+	switch (req->request) {
+	case USB_CTRL_REQ_GET_STATUS:
+		break;
+	case USB_CTRL_REQ_CLEAR_FEATURE:
+		break;
+	case USB_CTRL_REQ_SET_FEATURE:
+		break;
+	case USB_CTRL_REQ_SET_ADDRESS:
+		usb_set_address(req->value);
+		/* XXX reset configuration */
+		break;
+	case USB_CTRL_REQ_GET_DESCRIPTOR:
+		/* return descriptor */
+		break;
+	case USB_CTRL_REQ_GET_CONFIGURATION:
+		break;
+	case USB_CTRL_REQ_SET_CONFIGURATION:
+		break;
+	case USB_CTRL_REQ_GET_INTERFACE:
+		break;
+	case USB_CTRL_REQ_SET_INTERFACE:
+		break;
+	default:
+		goto err;
+	}
+
+	return (0);
+
+err:
+	usb_stall_ep(0);
+	return (-1);
 }
