@@ -1,4 +1,5 @@
 #include <inttypes.h>
+#include <string.h>
 #include <wchar.h>
 
 /**
@@ -270,46 +271,62 @@ enum usb_ctrl_req_feature {
  * Hardware structures
  */
 
-union USB_BD_t {
-	struct /* common */ {
-		uint32_t _rsvd0	 : 6;
-		uint32_t data1	 : 1;
-		uint32_t own	 : 1;
-		uint32_t _rsvd1	 : 8;
-		uint32_t bc	 : 10;
-		uint32_t _rsvd2	 : 6;
-	};
-	struct /* USB-FS */ {
-		uint32_t _rsvd3	 : 2;
-		uint32_t stall	 : 1;
-		uint32_t dts	 : 1;
-		uint32_t ninc	 : 1;
-		uint32_t keep	 : 1;
-		uint32_t _rsvd4	 : 26;
-	};
-	struct /* processor */ {
-		uint32_t _rsvd5	 : 2;
-		enum usb_tok_pid {
-			USB_PID_TIMEOUT = 0,
-			USB_PID_OUT = 1,
-			USB_PID_ACK = 2,
-			USB_PID_DATA0 = 3,
-			USB_PID_IN = 9,
-			USB_PID_NAK = 10,
-			USB_PID_DATA1 = 11,
-			USB_PID_SETUP = 13,
-			USB_PID_STALL = 14,
-			USB_PID_DATAERR = 15
-		} tok_pid : 4;
-		uint32_t _rsvd6	 : 26;
-	};
-	struct /* non-bitfields */ {
+struct USB_BD_t {
+	union /* bitfields */ {
+		struct /* common */ {
+			uint32_t _rsvd0	 : 6;
+			enum usb_data01 {
+				USB_DATA01_DATA0 = 0,
+				USB_DATA01_DATA1 = 1
+			} data01	 : 1;
+			uint32_t own	 : 1;
+			uint32_t _rsvd1	 : 8;
+			uint32_t bc	 : 10;
+			uint32_t _rsvd2	 : 6;
+		} __packed;
+		struct /* USB-FS */ {
+			uint32_t _rsvd3	 : 2;
+			uint32_t stall	 : 1;
+			uint32_t dts	 : 1;
+			uint32_t ninc	 : 1;
+			uint32_t keep	 : 1;
+			uint32_t _rsvd4	 : 26;
+		} __packed;
+		struct /* processor */ {
+			uint32_t _rsvd5	 : 2;
+			enum usb_tok_pid {
+				USB_PID_TIMEOUT = 0,
+				USB_PID_OUT = 1,
+				USB_PID_ACK = 2,
+				USB_PID_DATA0 = 3,
+				USB_PID_IN = 9,
+				USB_PID_NAK = 10,
+				USB_PID_DATA1 = 11,
+				USB_PID_SETUP = 13,
+				USB_PID_STALL = 14,
+				USB_PID_DATAERR = 15
+			} tok_pid : 4;
+			uint32_t _rsvd6	 : 26;
+		} __packed;
 		uint32_t bd;
-		uint32_t addr;
-	};
-};
-CTASSERT_SIZE_BYTE(union USB_BD_t, 8);
+	}; /* union bitfields */
+	void *addr;
+} __packed;
+CTASSERT_SIZE_BYTE(struct USB_BD_t, 8);
 
+struct USB_STAT_t {
+	uint8_t _rsvd : 2;
+	enum usb_ep_pingpong {
+		USB_EP_PINGPONG_EVEN = 0,
+		USB_EP_PINGPONG_ODD = 1
+	} pingpong : 1;
+	enum usb_ep_dir {
+		USB_EP_RX = 0,
+		USB_EP_TX = 1
+	} dir : 1;
+	uint8_t ep : 4;
+} __packed;
+CTASSERT_SIZE_BIT(struct USB_STAT_t, 8);
 
 /**
  * Internal driver structures
@@ -330,26 +347,59 @@ CTASSERT_SIZE_BYTE(union USB_BD_t, 8);
  * [Default, Configured, Address] -(reset)-> Default
  */
 
+
+/**
+ * Kinetis USB driver notes:
+ * We need to manually maintain the DATA0/1 toggling for the SIE.
+ * SETUP transactions always start with a DATA0.
+ *
+ * The SIE internally uses pingpong (double) buffering, which is
+ * easily confused with DATA0/DATA1 toggling, and I think even the
+ * Freescale docs confuse the two notions.  When BD->DTS is set,
+ * BD->DATA01 will be used to verify/discard incoming DATAx and it
+ * will set the DATAx PID for outgoing tokens.  This is not described
+ * as such in the Freescale Kinetis docs, but the Microchip PIC32 OTG
+ * docs are more clear on this;  it seems that both Freescale and
+ * Microchip use different versions of the same USB OTG IP core.
+ *
+ * http://ww1.microchip.com/downloads/en/DeviceDoc/61126F.pdf
+ *
+ * Clear CTL->TOKEN_BUSY after SETUP tokens.
+ */
+
+#define EP0_BUFSIZE 64
+
+
 enum usbd_dev_state {
 	USBD_STATE_DISABLED = 0,
 	USBD_STATE_DEFAULT,
+	USBD_STATE_SETTING_ADDRESS,
 	USBD_STATE_ADDRESS,
 	USBD_STATE_CONFIGURED
 };
 
+struct usbd_ep_state_t {
+	enum usb_ep_pingpong pingpong[2]; /* odd/even for RX (0) and TX (1) */
+	enum usb_data01 data01;	/* data toggle state on the ep */
+};
+
 struct usbd_t {
-	union USB_BD_t *bdt;
+	struct USB_BD_t *bdt;
 	enum usbd_dev_state state;
 	enum usbd_ctrl_state {
 		USBD_CTRL_STATE_IDLE,
-		USBD_CTRL_STATE_WAIT_IN,
-		USBD_CTRL_STATE_WAIT_OUT,
-		USBD_CTRL_STATE_ERROR
+		USBD_CTRL_STATE_DATA,
+		USBD_CTRL_STATE_STATUS
 	} ctrl_state;
+	enum usb_ctrl_req_dir ctrl_dir;
+	int address;
+	int config;
+	struct usbd_ep_state_t ep0_state;
+	uint8_t ep0_buf[EP0_BUFSIZE][2];
 };
 
 
-struct usbd_t usbd;
+struct usbd_t usb;
 
 
 void
@@ -371,31 +421,72 @@ usb_intr(void)
 	/* read BDT entry */
 }
 
+static struct USB_BD_t *
+usb_get_bd(int ep, enum usb_ep_dir dir, enum usb_ep_pingpong pingpong)
+{
+	return (&usb.bdt[(ep << 2) | (dir << 1) | pingpong]);
+}
+
+static struct USB_BD_t *
+usb_get_bd_stat(struct USB_STAT_t stat)
+{
+	return (usb_get_bd(stat.ep, stat.dir, stat.pingpong));
+}
+
 /**
- * Kinetis USB driver notes:
- * We need to manually maintain the DATA0/1 toggling for the SIE.
- * SETUP transactions always start with a DATA0.
- *
- * The SIE internally uses pingpong (double) buffering, which is
- * easily confused with DATA0/DATA1 toggling, and I think even the
- * Freescale docs confuse the two notions.  When BD->DTS is set,
- * BD->DATA01 will be used to verify/discard incoming DATAx and it
- * will set the DATAx PID for outgoing tokens.  This is not described
- * as such in the Freescale Kinetis docs, but the Microchip PIC32 OTG
- * docs are more clear on this;  it seems that both Freescale and
- * Microchip use different versions of the same USB OTG IP core.
- * 
- * http://ww1.microchip.com/downloads/en/DeviceDoc/61126F.pdf
- *
- * Clear CTL->TOKEN_BUSY after SETUP tokens.
+ * Stalls the EP.  SETUP transactions automatically unstall an EP.
  */
+void
+usb_ep_stall(int ep)
+{
+	USB0_ENDPT[ep].stall = 1;
+}
+
+/**
+ * send USB data (IN device transaction), copy data to internal
+ * buffer.
+ *
+ * So far this function is specialized for EP 0 only.
+ *
+ * Returns: size to be transfered, or -1 on error.
+ */
+int
+usb_tx_cp(void *buf, size_t len)
+{
+	enum usb_ep_pingpong pp = usb.ep0_state.pingpong[USB_EP_TX];
+	void *destbuf = usb.ep0_buf[pp];
+
+	if (len > EP0_BUFSIZE)
+		return (-1);
+	memcpy(destbuf, buf, len);
+
+	/* XXX need to find right way of keeping pingpong & data01 in
+	   sync */
+	usb.ep0_state.pingpong[USB_EP_TX] ^= 1;
+
+	struct USB_BD_t *bd = usb_get_bd(0, USB_EP_TX, pp);
+	bd->addr = destbuf;
+	bd->bd = ((struct USB_BD_t)
+		{
+			.bc = len,
+			.dts = 1,
+			.data01 = usb.ep0_state.data01,
+			.own = 1
+		}).bd;
+
+	return (len);
+}
 
 /**
  *
  * Great resource: http://wiki.osdev.org/Universal_Serial_Bus
  *
- * Setup
- * -----
+ * Control Transfers
+ * -----------------
+ *
+ * A control transfer consists of a SETUP transaction (1), zero or
+ * more data transactions (IN or OUT) (2), and a final status
+ * transaction (3).
  *
  * Token sequence (data toggle):
  * 1.  SETUP (0)
@@ -421,9 +512,11 @@ usb_intr(void)
  * this to save space.
  */
 
-int
+static int
 usb_handle_control(struct usb_ctrl_req_t *req)
 {
+	uint16_t zero16 = 0;
+
 	if (req->type != USB_CTRL_REQ_STD) {
 		/* XXX pass on to higher levels */
 		goto err;
@@ -432,26 +525,45 @@ usb_handle_control(struct usb_ctrl_req_t *req)
 	/* Only STD requests here */
 	switch (req->request) {
 	case USB_CTRL_REQ_GET_STATUS:
-		break;
+		/**
+		 * Because we don't support remote wakeup or
+		 * self-powered operation, and we are specialized to
+		 * only EP 0 so far, all GET_STATUS replies are just
+		 * empty.
+		 */
+		return (usb_tx_cp(&zero16, sizeof(zero16)));
 	case USB_CTRL_REQ_CLEAR_FEATURE:
-		break;
 	case USB_CTRL_REQ_SET_FEATURE:
+		/**
+		 * Nothing to do.  Maybe return STALLs on illegal
+		 * accesses?
+		 */
 		break;
 	case USB_CTRL_REQ_SET_ADDRESS:
-		usb_set_address(req->value);
-		/* XXX reset configuration */
+		/**
+		 * We must keep our previous address until the end of
+		 * the status stage;  therefore we can't set the
+		 * address right now.  Since this is a special case,
+		 * the EP 0 handler will take care of this later on.
+		 */
+		usb.address = req->value & 0x7f;
+		usb.state = USBD_STATE_SETTING_ADDRESS;
 		break;
 	case USB_CTRL_REQ_GET_DESCRIPTOR:
-		/* return descriptor */
+		/* XXX locate descriptor and usb_tx it */
 		break;
 	case USB_CTRL_REQ_GET_CONFIGURATION:
-		break;
+		return (usb_tx_cp(&usb.config, 1)); /* XXX implicit LE */
 	case USB_CTRL_REQ_SET_CONFIGURATION:
+		/* XXX check config */
+		/* XXX set config, adjust usb state */
 		break;
 	case USB_CTRL_REQ_GET_INTERFACE:
-		break;
+		/* We only support iface setting 0 */
+		return (usb_tx_cp(&zero16, 1));
 	case USB_CTRL_REQ_SET_INTERFACE:
-		break;
+		/* We don't support alternate iface settings */
+		goto err;
 	default:
 		goto err;
 	}
@@ -459,6 +571,62 @@ usb_handle_control(struct usb_ctrl_req_t *req)
 	return (0);
 
 err:
-	usb_stall_ep(0);
 	return (-1);
+}
+
+void
+usb_handle_control_ep(struct USB_STAT_t stat)
+{
+	struct USB_BD_t *bd;
+	struct usb_ctrl_req_t *req;
+	int r;
+
+	bd = usb_get_bd_stat(stat);
+
+	switch (bd->tok_pid) {
+	case USB_PID_SETUP:
+		/* XXX clear old state */
+		req = bd->addr;
+		r = usb_handle_control(req);
+		switch (r) {
+		default:
+			/* Data transfer outstanding */
+			usb.ctrl_state = USBD_CTRL_STATE_DATA;
+			usb.ctrl_dir = req->in;
+			break;
+		case 0:
+			usb.ctrl_state = USBD_CTRL_STATE_STATUS;
+			usb.ctrl_dir = !req->in;
+			break;
+		case -1:
+			/* error */
+			usb_ep_stall(0);
+			/* XXX set up buffers again */
+			break;
+		}
+		/* XXX enable processing again: clear CTL->TXD_SUSPEND */
+		break;
+	case USB_PID_IN:
+	case USB_PID_OUT:
+		switch (usb.ctrl_state) {
+		case USBD_CTRL_STATE_DATA:
+			/* XXX perform data transfer, data01 sync */
+			if (1 /* done with DATA */) {
+				usb.ctrl_state = USBD_CTRL_STATE_STATUS;
+				usb.ctrl_dir = !usb.ctrl_dir;
+			}
+			break;
+		default:
+			/* Done */
+			if (usb.state == USBD_STATE_SETTING_ADDRESS) {
+				usb.state = USBD_STATE_ADDRESS;
+				USB0_ADDR = usb.address;
+			}
+			usb.ctrl_state = USBD_CTRL_STATE_IDLE;
+			usb_ep_stall(0);
+			/* XXX set up buffers again */
+			break;
+		}
+		break;
+	}
 }
