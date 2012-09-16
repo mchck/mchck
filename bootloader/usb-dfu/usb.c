@@ -220,7 +220,7 @@ CTASSERT_SIZE_BYTE(struct usb_ctrl_req_t, 8);
 #define USB_CTRL_REQ_TYPE_SHIFT 1
 #define USB_CTRL_REQ_RECP_SHIFT 3
 #define USB_CTRL_REQ_CODE_SHIFT 8
-#define USB_CTRL_REQ(req_inout, req_type, req_code)		\
+#define USB_CTRL_REQ(req_inout, req_type, req_code)			\
 	(uint16_t)							\
 	((USB_CTRL_REQ_##req_inout << USB_CTRL_REQ_DIR_SHIFT)		\
 	 |(USB_CTRL_REQ_##req_type << USB_CTRL_REQ_TYPE_SHIFT)		\
@@ -311,22 +311,51 @@ struct USB_BD_t {
 		uint32_t bd;
 	}; /* union bitfields */
 	void *addr;
-} __packed;
+};
 CTASSERT_SIZE_BYTE(struct USB_BD_t, 8);
 
 struct USB_STAT_t {
-	uint8_t _rsvd : 2;
-	enum usb_ep_pingpong {
-		USB_EP_PINGPONG_EVEN = 0,
-		USB_EP_PINGPONG_ODD = 1
-	} pingpong : 1;
-	enum usb_ep_dir {
-		USB_EP_RX = 0,
-		USB_EP_TX = 1
-	} dir : 1;
-	uint8_t ep : 4;
+	union {
+		struct {
+			uint8_t _rsvd0 : 2;
+			enum usb_ep_pingpong {
+				USB_EP_PINGPONG_EVEN = 0,
+				USB_EP_PINGPONG_ODD = 1
+			} pingpong : 1;
+			enum usb_ep_dir {
+				USB_EP_RX = 0,
+				USB_EP_TX = 1
+			} dir : 1;
+			uint8_t ep : 4;
+		};
+		uint32_t stat;
+	};
+};
+CTASSERT_SIZE_BIT(struct USB_STAT_t, 32);
+
+struct USB_ENDPT_t {
+	uint8_t ephshk : 1;
+	uint8_t epstall : 1;
+	uint8_t eptxen : 1;
+	uint8_t eprxen : 1;
+	uint8_t epctldis : 1;
+	uint8_t _rsvd0 : 1;
+	uint8_t retrydis : 1;
+	uint8_t hostwohub : 1;
+	uint32_t _rsvd1 : 24;
 } __packed;
-CTASSERT_SIZE_BIT(struct USB_STAT_t, 8);
+CTASSERT_SIZE_BIT(struct USB_ENDPT_t, 32);
+
+struct USB_ADDR_t {
+	uint8_t addr : 7;
+	uint8_t lsen : 1;
+} __packed;
+CTASSERT_SIZE_BIT(struct USB_ADDR_t, 8);
+
+
+extern volatile struct USB_ENDPT_t USB0_ENDPT[16];
+extern volatile struct USB_ADDR_t USB0_ADDR;
+
 
 /**
  * Internal driver structures
@@ -430,7 +459,7 @@ usb_get_bd(int ep, enum usb_ep_dir dir, enum usb_ep_pingpong pingpong)
 static struct USB_BD_t *
 usb_get_bd_stat(struct USB_STAT_t stat)
 {
-	return (usb_get_bd(stat.ep, stat.dir, stat.pingpong));
+	return (((void *)(uintptr_t)usb.bdt + (stat.stat << 1)));
 }
 
 /**
@@ -439,7 +468,7 @@ usb_get_bd_stat(struct USB_STAT_t stat)
 void
 usb_ep_stall(int ep)
 {
-	USB0_ENDPT[ep].stall = 1;
+	USB0_ENDPT[ep].epstall = 1;
 }
 
 /**
@@ -466,8 +495,8 @@ usb_tx_cp(void *buf, size_t len)
 
 	struct USB_BD_t *bd = usb_get_bd(0, USB_EP_TX, pp);
 	bd->addr = destbuf;
-	bd->bd = ((struct USB_BD_t)
-		{
+	/* XXX terribly inefficient assignment */
+	bd->bd = ((struct USB_BD_t) {
 			.bc = len,
 			.dts = 1,
 			.data01 = usb.ep0_state.data01,
@@ -532,6 +561,7 @@ usb_handle_control(struct usb_ctrl_req_t *req)
 		 * empty.
 		 */
 		return (usb_tx_cp(&zero16, sizeof(zero16)));
+
 	case USB_CTRL_REQ_CLEAR_FEATURE:
 	case USB_CTRL_REQ_SET_FEATURE:
 		/**
@@ -539,6 +569,7 @@ usb_handle_control(struct usb_ctrl_req_t *req)
 		 * accesses?
 		 */
 		break;
+
 	case USB_CTRL_REQ_SET_ADDRESS:
 		/**
 		 * We must keep our previous address until the end of
@@ -549,21 +580,29 @@ usb_handle_control(struct usb_ctrl_req_t *req)
 		usb.address = req->value & 0x7f;
 		usb.state = USBD_STATE_SETTING_ADDRESS;
 		break;
+
 	case USB_CTRL_REQ_GET_DESCRIPTOR:
 		/* XXX locate descriptor and usb_tx it */
 		break;
+
 	case USB_CTRL_REQ_GET_CONFIGURATION:
-		return (usb_tx_cp(&usb.config, 1)); /* XXX implicit LE */
+		return (usb_tx_cp(&usb.config, 1)); /* XXX implicit LE
+						     * */
+
 	case USB_CTRL_REQ_SET_CONFIGURATION:
 		/* XXX check config */
-		/* XXX set config, adjust usb state */
+		usb.config = req->value;
+		usb.state = USBD_STATE_CONFIGURED;
 		break;
+
 	case USB_CTRL_REQ_GET_INTERFACE:
 		/* We only support iface setting 0 */
 		return (usb_tx_cp(&zero16, 1));
+
 	case USB_CTRL_REQ_SET_INTERFACE:
 		/* We don't support alternate iface settings */
 		goto err;
+
 	default:
 		goto err;
 	}
@@ -620,7 +659,7 @@ usb_handle_control_ep(struct USB_STAT_t stat)
 			/* Done */
 			if (usb.state == USBD_STATE_SETTING_ADDRESS) {
 				usb.state = USBD_STATE_ADDRESS;
-				USB0_ADDR = usb.address;
+				USB0_ADDR.addr = usb.address;
 			}
 			usb.ctrl_state = USBD_CTRL_STATE_IDLE;
 			usb_ep_stall(0);
