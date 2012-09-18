@@ -1,3 +1,5 @@
+#include <sys/types.h>
+
 #include <inttypes.h>
 #include <string.h>
 #include <wchar.h>
@@ -352,9 +354,37 @@ struct USB_ADDR_t {
 } __packed;
 CTASSERT_SIZE_BIT(struct USB_ADDR_t, 8);
 
+struct USB_CTL_t {
+	union {
+		struct /* common */ {
+			uint8_t _rsvd1 : 1;
+			uint8_t oddrst : 1;
+			uint8_t resume : 1;
+			uint8_t _rsvd2 : 3;
+			uint8_t se0 : 1;
+			uint8_t jstate : 1;
+		} __packed;
+		struct /* host */ {
+			uint8_t sofen : 1;
+			uint8_t _rsvd3 : 2;
+			uint8_t hostmodeen : 1;
+			uint8_t reset : 1;
+			uint8_t token_busy : 1;
+			uint8_t _rsvd4 : 2;
+		} __packed;
+		struct /* device */ {
+			uint8_t usben : 1;
+			uint8_t _rsvd5 : 4;
+			uint8_t txd_suspend : 1;
+			uint8_t _rsvd6 : 2;
+		} __packed;
+	};
+} __packed;
+CTASSERT_SIZE_BIT(struct USB_CTL_t, 8);
 
 extern volatile struct USB_ENDPT_t USB0_ENDPT[16];
 extern volatile struct USB_ADDR_t USB0_ADDR;
+extern volatile struct USB_CTL_t USB0_CTL;
 
 
 /**
@@ -407,9 +437,29 @@ enum usbd_dev_state {
 	USBD_STATE_CONFIGURED
 };
 
+typedef void (*ep_callback_t)(void *buf, ssize_t len, void *data);
+
+
+struct usbd_ep_pipe_state_t {
+	enum usb_ep_pingpong pingpong; /* next desc to use */
+	enum usb_data01 data01;
+	size_t transfer_size;
+	size_t pos;
+	uint8_t *data_buf;
+	int short_transfer;
+	ep_callback_t callback;
+	void *callback_data;
+	size_t ep_maxsize;
+};
+
 struct usbd_ep_state_t {
-	enum usb_ep_pingpong pingpong[2]; /* odd/even for RX (0) and TX (1) */
-	enum usb_data01 data01;	/* data toggle state on the ep */
+	union {
+		struct usbd_ep_pipe_state_t pipe[2];
+		struct {
+			struct usbd_ep_pipe_state_t rx;
+			struct usbd_ep_pipe_state_t tx;
+		};
+	};
 };
 
 struct usbd_t {
@@ -471,40 +521,199 @@ usb_ep_stall(int ep)
 	USB0_ENDPT[ep].epstall = 1;
 }
 
+static void
+usb_tx_queue_next(struct usbd_ep_pipe_state_t *s)
+{
+	struct USB_BD_t *bd = usb_get_bd(0, USB_EP_TX, s->pingpong);
+	size_t thislen = s->transfer_size;
+
+	if (thislen > s->ep_maxsize)
+		thislen = s->ep_maxsize;
+
+	bd->addr = s->data_buf + s->pos;
+	s->pos += thislen;
+	s->transfer_size -= thislen;
+
+	/* XXX fairly inefficient assignment */
+	bd->bd = ((struct USB_BD_t) {
+			.bc = thislen,
+			.dts = 1,
+			.data01 = s->data01,
+			.own = 1
+		}).bd;
+	s->pingpong ^= 1;
+}
+
 /**
- * send USB data (IN device transaction), copy data to internal
- * buffer.
+ * Returns: 0 when this is was the last transfer, 1 if there is still
+ * more to go.
+ */
+/* Defaults to EP0 for now */
+static int
+usb_tx_next(void)
+{
+	struct usbd_ep_pipe_state_t *s = &usb.ep0_state.tx;
+
+	/**
+	 * Us being here means the previous transfer just completed
+	 * successfully.  That means the host just toggled its data
+	 * sync bit, and so do we.
+	 */
+	s->data01 ^= 1;
+
+	if (s->transfer_size > 0) {
+		usb_tx_queue_next(s);
+		return (1);
+	}
+
+	/**
+	 * All data has been shipped.  Do we need to send a short
+	 * packet?
+	 */
+	if (s->short_transfer) {
+		s->short_transfer = 0;
+		usb_tx_queue_next(s);
+		return (1);
+	}
+
+	if (s->callback)
+		s->callback(s->data_buf, 0, s->callback_data);
+
+	return (0);
+}
+
+/**
+ * send USB data (IN device transaction)
  *
  * So far this function is specialized for EP 0 only.
  *
  * Returns: size to be transfered, or -1 on error.
  */
 int
+usb_tx(void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_data)
+{
+	struct usbd_ep_pipe_state_t *s = &usb.ep0_state.tx;
+
+	s->data_buf = buf;
+	s->transfer_size = len;
+	s->pos = 0;
+	s->callback = cb;
+	s->callback_data = cb_data;
+	if (s->transfer_size > reqlen)
+		s->transfer_size = reqlen;
+	if (s->transfer_size == reqlen)
+		s->short_transfer = 0;
+	else
+		s->short_transfer = 1;
+
+	usb_tx_queue_next(s);
+	return (s->transfer_size);
+}
+
+int
 usb_tx_cp(void *buf, size_t len)
 {
-	enum usb_ep_pingpong pp = usb.ep0_state.pingpong[USB_EP_TX];
+	enum usb_ep_pingpong pp = usb.ep0_state.tx.pingpong;
 	void *destbuf = usb.ep0_buf[pp];
 
 	if (len > EP0_BUFSIZE)
 		return (-1);
 	memcpy(destbuf, buf, len);
 
-	/* XXX need to find right way of keeping pingpong & data01 in
-	   sync */
-	usb.ep0_state.pingpong[USB_EP_TX] ^= 1;
+	return (usb_tx(destbuf, len, len, NULL, NULL));
+}
 
-	struct USB_BD_t *bd = usb_get_bd(0, USB_EP_TX, pp);
-	bd->addr = destbuf;
-	/* XXX terribly inefficient assignment */
+
+static void
+usb_rx_queue_next(struct usbd_ep_pipe_state_t *s)
+{
+	struct USB_BD_t *bd = usb_get_bd(0, USB_EP_RX, s->pingpong);
+	size_t thislen = s->transfer_size;
+
+	if (thislen > s->ep_maxsize)
+		thislen = s->ep_maxsize;
+
+	bd->addr = s->data_buf + s->pos;
+
+	/* XXX fairly inefficient assignment */
 	bd->bd = ((struct USB_BD_t) {
-			.bc = len,
+			.bc = thislen,
 			.dts = 1,
-			.data01 = usb.ep0_state.data01,
+			.data01 = s->data01,
 			.own = 1
 		}).bd;
+}
 
+/**
+ * Returns: 0 when this is was the last transfer, 1 if there is still
+ * more to go.
+ */
+/* Defaults to EP0 for now */
+/* XXX pass usb_stat to validate pingpong */
+static int
+usb_rx_next(void)
+{
+	struct usbd_ep_pipe_state_t *s = &usb.ep0_state.rx;
+
+	/**
+	 * Us being here means the previous transfer just completed
+	 * successfully.  That means the host just toggled its data
+	 * sync bit, and so do we.
+	 */
+	s->data01 ^= 1;
+
+	struct USB_BD_t *bd = usb_get_bd(0, USB_EP_RX, s->pingpong);
+	size_t thislen = bd->bc;
+
+	s->transfer_size -= thislen;
+	s->pos += thislen;
+
+	/**
+	 * We're done with this buffer now.  Switch the pingpong now
+	 * before we might have to receive the next piece of data.
+	 */
+	s->pingpong ^= 1;
+
+	/**
+	 * If this is a short transfer, or we received what we
+	 * expected, we're done.
+	 */
+	if (thislen < s->ep_maxsize || s->transfer_size == 0) {
+		if (s->callback)
+			s->callback(s->data_buf, s->pos, s->callback_data);
+		return (0);
+	}
+
+	/**
+	 * Otherwise we still need to receive more data.
+	 */
+	usb_rx_queue_next(s);
+
+	return (1);
+}
+
+/**
+ * Receive USB data (OUT device transaction)
+ *
+ * So far this function is specialized for EP 0 only.
+ *
+ * Returns: size to be received, or -1 on error.
+ */
+int
+usb_rx(void *buf, size_t len, ep_callback_t cb, void *cb_data)
+{
+	struct usbd_ep_pipe_state_t *s = &usb.ep0_state.rx;
+
+	s->data_buf = buf;
+	s->transfer_size = len;
+	s->pos = 0;
+	s->callback = cb;
+	s->callback_data = cb_data;
+
+	usb_rx_queue_next(s);
 	return (len);
 }
+
 
 /**
  *
@@ -613,6 +822,25 @@ err:
 	return (-1);
 }
 
+/* Only EP0 for now; clears all pending transfers. XXX invoke callbacks? */
+static void
+usb_clear_transfers(void)
+{
+	struct USB_BD_t *bd = usb.bdt;
+
+	memset(bd, 0, sizeof(*bd) * 4);
+}
+
+static void
+usb_setup_control(void)
+{
+	void *buf = usb.ep0_buf[usb.ep0_state.rx.pingpong];
+
+	usb.ep0_state.rx.data01 = USB_DATA01_DATA0;
+	usb.ep0_state.tx.data01 = USB_DATA01_DATA1;
+	usb_rx(buf, EP0_BUFSIZE, NULL, NULL);
+}
+
 void
 usb_handle_control_ep(struct USB_STAT_t stat)
 {
@@ -624,46 +852,67 @@ usb_handle_control_ep(struct USB_STAT_t stat)
 
 	switch (bd->tok_pid) {
 	case USB_PID_SETUP:
-		/* XXX clear old state */
+		usb_clear_transfers();
+
 		req = bd->addr;
 		r = usb_handle_control(req);
 		switch (r) {
 		default:
 			/* Data transfer outstanding */
 			usb.ctrl_state = USBD_CTRL_STATE_DATA;
-			usb.ctrl_dir = req->in;
 			break;
+
 		case 0:
 			usb.ctrl_state = USBD_CTRL_STATE_STATUS;
-			usb.ctrl_dir = !req->in;
+			usb_tx(NULL, 0, 0, NULL, NULL); /* empty status transfer */
 			break;
+
 		case -1:
 			/* error */
 			usb_ep_stall(0);
-			/* XXX set up buffers again */
+			usb_setup_control();
 			break;
 		}
-		/* XXX enable processing again: clear CTL->TXD_SUSPEND */
+		USB0_CTL.txd_suspend = 0;
 		break;
+
 	case USB_PID_IN:
+		if (usb_tx_next())
+			break;
+
+		goto status_or_done;
+
 	case USB_PID_OUT:
+		if (usb_rx_next())
+			break;
+
+status_or_done:
 		switch (usb.ctrl_state) {
 		case USBD_CTRL_STATE_DATA:
-			/* XXX perform data transfer, data01 sync */
-			if (1 /* done with DATA */) {
-				usb.ctrl_state = USBD_CTRL_STATE_STATUS;
-				usb.ctrl_dir = !usb.ctrl_dir;
+			usb.ctrl_state = USBD_CTRL_STATE_STATUS;
+
+			/* empty status transfer */
+			switch (bd->tok_pid) {
+			case USB_PID_IN:
+				usb.ep0_state.rx.data01 = USB_DATA01_DATA1;
+				usb_rx(NULL, 0, NULL, NULL);
+				break;
+
+			default:
+				usb.ep0_state.tx.data01 = USB_DATA01_DATA1;
+				usb_tx(NULL, 0, 0, NULL, NULL);
+				break;
 			}
 			break;
+
 		default:
-			/* Done */
+			/* done with status */
+			usb.ctrl_state = USBD_CTRL_STATE_IDLE;
 			if (usb.state == USBD_STATE_SETTING_ADDRESS) {
 				usb.state = USBD_STATE_ADDRESS;
 				USB0_ADDR.addr = usb.address;
 			}
-			usb.ctrl_state = USBD_CTRL_STATE_IDLE;
-			usb_ep_stall(0);
-			/* XXX set up buffers again */
+			usb_setup_control();
 			break;
 		}
 		break;
