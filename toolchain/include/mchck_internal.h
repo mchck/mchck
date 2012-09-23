@@ -1,18 +1,10 @@
 #ifndef __MCHCK_INTERNAL_H
 #define __MCHCK_INTERNAL_H
 
-#ifndef __XTAL
-#define __XTAL  8000000L
-#endif
-
-#ifndef HSE_VALUE
-#define HSE_VALUE       __XTAL
-#endif
-
-#define STM32L151C8
-#define STM32L1XX_MD
-#define __STM32L1XX_MD
-
-#define assert_param(x) do {} while (0)
+#define __CM4_REV 0x000
+#define __FPU_PRESENT 0
+#define __MPU_PRESENT 0
+#define __NVIC_PRIO_BITS 4
+#define __Vendor_SysTickConfig 0
 
 #endif

@@ -7,15 +7,13 @@ AR=	arm-none-eabi-ar
 AS=	arm-none-eabi-as
 OBJCOPY=	arm-none-eabi-objcopy
 
-XTALFREQ?=	8000000
-TARGET?=	STM32L151C8
+TARGET?=	MK20DX32VLF5
 
 COPTFLAGS?=	-Os
 CWARNFLAGS?=	-Wall
 
-CFLAGS+=	-mcpu=cortex-m3 -msoft-float -mthumb -ffunction-sections -std=gnu99
-CFLAGS+=	-I${_libdir}/include -I.
-CFLAGS+=	-D__XTAL='(${XTALFREQ}L)'
+CFLAGS+=	-mcpu=cortex-m4 -msoft-float -mthumb -ffunction-sections -std=gnu99
+CFLAGS+=	-I${_libdir}/include -I${_libdir}/CMSIS/Include -I.
 CFLAGS+=	-include ${_libdir}/include/mchck_internal.h
 CFLAGS+=	-g
 ifndef DEBUG
@@ -33,7 +31,7 @@ endif
 LDFLAGS+=	-T link.ld
 LDFLAGS+=       -nostartfiles
 
-STARTFILE_SRC=	startup_stm32l15xxx.c system_stm32l1xx.c
+STARTFILE_SRC=	startup_k20.c system_k20.c
 STARTFILE_OBJ=	$(addsuffix .o, $(basename ${STARTFILE_SRC}))
 #STARTFILE_LIB=	libcrtnuc1xx.a
 #STARTFILE_LIBSHORT=	-lcrtnuc1xx
