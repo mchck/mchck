@@ -99,9 +99,6 @@ class FtdiSwd
   ACK_WAIT = 2
   ACK_FAULT = 4
 
-  class ProtocolError < RuntimeError
-  end
-
   def initialize(opt = {})
     @opt = opt
     @outbuf = ""
@@ -124,6 +121,9 @@ class FtdiSwd
 
   def raw_out(seq, seqlen=nil)
     seqlen ||= seq.length * 8
+    Debug "  swd raw: #{seq.unpack("B#{seqlen}").first}"
+    @cur_dir = :out
+    set_line_mode(:out)
     if seqlen >= 8
       write_bytes(seq[0..(seqlen / 8)])
     end
@@ -161,7 +161,7 @@ class FtdiSwd
     when ACK_FAULT
       raise Fault
     else
-      raise ProtocolError
+      raise Adiv5Swd::ProtocolError
     end
 
     case dir
@@ -175,7 +175,7 @@ class FtdiSwd
       par = read_bits 1
       cal_par = calc_parity data
       if par != cal_par
-        raise ParityError
+        raise Adiv5Swd::ParityError
       end
       data
     end

@@ -5,14 +5,21 @@ class Adiv5Swd
   ABORT = 0
   SELECT = 8
   RESEND = 8
+  RDBUFF = 12
+
+  class ProtocolError < RuntimeError
+  end
+
+  class ParityError < RuntimeError
+  end
 
 
   def initialize(drv, opt)
     @drv = drv.new opt
 
     switch_to_swd
-    write_dp(ABORT, 0x1e)           # clear all errors
-    write_dp(SELECT, 0)             # select DP bank 0
+    write(:dp, ABORT, 0x1e)           # clear all errors
+    write(:dp, SELECT, 0)             # select DP bank 0
     @drv.flush!
   end
 
@@ -25,6 +32,7 @@ class Adiv5Swd
   def reset
     @drv.raw_out(255.chr * 7)        # at least 50 high
     @drv.raw_out(0.chr)              # at least 1 low
+    @drv.flush!
     begin
       @drv.transact(0xa5)       # read DPIDR
     rescue
@@ -35,28 +43,27 @@ class Adiv5Swd
     end
   end
 
-  def read_ap(addr)
-    transact(:ap, :in, addr)
-    read_dp(RESEND)
-  end
-
-  def write_ap(addr, val)
-    transact(:ap, :out, addr, val)
-  end
-
-  def read_dp(addr)
-    Debug 'read dp %x' % addr
-    ret = transact(:dp, :in, addr)
+  def read(port, addr)
+    Debug 'read %s %x' % [port, addr]
+    ret = transact(port, :in, addr)
+    # reads to the AP are posted, so we need to get the result in a
+    # separate transaction.
+    if port == :ap
+      ret = transact(:dp, :in, RDBUFF)
+    end
     Debug '==> %08x' % ret
     ret
   end
 
-  def write_dp(addr, val)
-    Debug 'write dp %x = %08x' % [addr, val]
-    transact(:dp, :out, addr, val)
+  def write(port, addr, val)
+    Debug 'write %s %x = %08x' % [port, addr, val]
+    transact(port, :out, addr, val)
   end
 
   def transact(port, dir, addr, data=nil)
+    try ||= 0
+    try += 1
+
     cmd = 0x81
     case port
     when :ap
@@ -75,6 +82,25 @@ class Adiv5Swd
       cmd |= 0x20
     end
     @drv.transact(cmd, data)
+  rescue ProtocolError
+    if try <= 3
+      Log 'SWD protocol error, retrying'
+      reset
+      retry
+    else
+      Log 'SWD protocol error unrecoverable, aborting'
+      raise
+    end
+  rescue ParityError
+    Log 'SWD parity error, restarting'
+    if port == :ap || addr == RDBUFF
+      # If this transfer read from the AP, we have to read from RESEND
+      # instead.
+      read(:dp, RESEND)
+    else
+      # We can repeat simple DP reads
+      retry
+    end
   end
 end
 
