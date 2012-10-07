@@ -13,6 +13,12 @@ class Adiv5Swd
   class ParityError < RuntimeError
   end
 
+  class Wait < RuntimeError
+  end
+
+  class Fault < RuntimeError
+  end
+
 
   def initialize(drv, opt)
     @drv = drv.new opt
@@ -82,6 +88,9 @@ class Adiv5Swd
       cmd |= 0x20
     end
     @drv.transact(cmd, data)
+  rescue Wait
+    Debug 'SWD WAIT, retrying'
+    retry
   rescue ProtocolError
     if try <= 3
       Log 'SWD protocol error, retrying'

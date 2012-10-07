@@ -157,9 +157,9 @@ class FtdiSwd
     when ACK_OK
       # empty
     when ACK_WAIT
-      raise Wait
+      raise Adiv5Swd::Wait
     when ACK_FAULT
-      raise Fault
+      raise Adiv5Swd::Fault
     else
       raise Adiv5Swd::ProtocolError
     end
