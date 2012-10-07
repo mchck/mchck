@@ -1,4 +1,5 @@
 require 'swd-ftdi'
+require 'log'
 
 class Adiv5Swd
   ABORT = 0
@@ -44,10 +45,14 @@ class Adiv5Swd
   end
 
   def read_dp(addr)
-    transact(:dp, :in, addr)
+    Debug 'read dp %x' % addr
+    ret = transact(:dp, :in, addr)
+    Debug '==> %08x' % ret
+    ret
   end
 
   def write_dp(addr, val)
+    Debug 'write dp %x = %08x' % [addr, val]
     transact(:dp, :out, addr, val)
   end
 
@@ -61,7 +66,7 @@ class Adiv5Swd
     when :in
       cmd |= 0x4
     end
-    cmd |= (addr & 0xc)
+    cmd |= ((addr & 0xc) << 1)
     parity = cmd
     parity ^= parity >> 4
     parity ^= parity >> 2
@@ -75,6 +80,6 @@ end
 
 
 if $0 == __FILE__
-  s = Adiv5Swd.new(FtdiSwd, :vid => Integer(ARGV[0]), :pid => Integer(ARGV[1]), :debug => true)
+  s = Adiv5Swd.new(FtdiSwd, :vid => Integer(ARGV[0]), :pid => Integer(ARGV[1]))
   
 end

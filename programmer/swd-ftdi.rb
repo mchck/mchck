@@ -1,4 +1,5 @@
 require 'ftdi'
+require 'log'
 
 module Ftdi
   # This data comes from ftdi.h
@@ -105,7 +106,6 @@ class FtdiSwd
     @opt = opt
     @outbuf = ""
     @inbuf = ""
-    @debug = opt[:debug]
 
     self.speed = opt[:speed] || 1000
     @bits = 0xbc02
@@ -134,12 +134,13 @@ class FtdiSwd
 
   def flush!
     return if @outbuf.empty?
-    debug 'flush', hexify(@outbuf)
+    Debug '  flush', hexify(@outbuf)
     @dev.write_data(@outbuf)
     @outbuf = ""
   end
 
   def transact(cmd, data=nil)
+    Debug '  transact %08b' % cmd
     case cmd & 0x4
     when 0
       dir = :out
@@ -258,7 +259,7 @@ class FtdiSwd
 
     data = expect_bytes(len)
     ret = data.unpack('V').first
-    debug 'read_bytes: %08x' % ret
+    Debug '  read_bytes: %08x' % ret
     ret
   end
 
@@ -271,7 +272,7 @@ class FtdiSwd
 
     data = expect_bytes(1)
     ret = data.unpack('C').first >> (8 - len)
-    debug 'read_bits: %0*b' % [len, ret]
+    Debug '  read_bits: %0*b' % [len, ret]
     ret
   end
 
@@ -279,17 +280,11 @@ class FtdiSwd
     while @inbuf.length < num
       @inbuf << @dev.read_data
     end
-    debug 'inbuf:', hexify(@inbuf)
+    Debug '    inbuf:', hexify(@inbuf)
     ret = @inbuf.byteslice(0, num)
     @inbuf = @inbuf.byteslice(num..-1)
-    debug 'read:', hexify(ret)
+    Debug '    read:', hexify(ret)
     ret
-  end
-
-  def debug(*args)
-    if @debug
-      $stderr.puts args.join(' ')
-    end
   end
 
   def hexify(str)
@@ -298,7 +293,7 @@ class FtdiSwd
 end
 
 if $0 == __FILE__
-  s = FtdiSwd.new(:vid => Integer(ARGV[0]), :pid => Integer(ARGV[1]), :debug => true)
+  s = FtdiSwd.new(:vid => Integer(ARGV[0]), :pid => Integer(ARGV[1]))
 
   s.raw_out(255.chr * 7)
   s.raw_out([0xe79e].pack('v'))
