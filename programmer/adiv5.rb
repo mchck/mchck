@@ -120,11 +120,128 @@ class Adiv5
     BASE_PRESENT = 1
 
 
-    # standard mem registers
+    class DebugDevice
+      # standard mem registers
 
-    PERIPHERAL4 = 0xfd0
-    PERIPHERAL0 = 0xfe0
-    COMPONENT0 = 0xff0
+      PERIPHERAL4 = 0xfd0
+      PERIPHERAL0 = 0xfe0
+      PERIPHERAL_4KBCOUNT_SHIFT = 36
+      PERIPHERAL_4KBCOUNT_MASK = 0xf << PERIPHERAL_4KBCOUNT_SHIFT
+      PERIPHERAL_JEP106CC_SHIFT = 32
+      PERIPHERAL_JEP106CC_MASK = 0xf << PERIPHERAL_JEP106CC_SHIFT
+      PERIPHERAL_REVAND_SHIFT = 28
+      PERIPHERAL_REVAND_MASK = 0xf << PERIPHERAL_REVAND_SHIFT
+      PERIPHERAL_CUSTMOD_SHIFT = 24
+      PERIPHERAL_CUSTMOD_MASK = 0xf << PERIPHERAL_CUSTMOD_SHIFT
+      PERIPHERAL_REVISION_SHIFT = 20
+      PERIPHERAL_REVISION_MASK = 0xf << PERIPHERAL_REVISION_SHIFT
+      PERIPHERAL_JEP106USED = 1 << 19
+      PERIPHERAL_JEP106_SHIFT = 12
+      PERIPHERAL_JEP106_MASK = 0x3f << PERIPHERAL_JEP106_SHIFT
+      PERIPHERAL_PARTNO_MASK = 0xfff
+
+      COMPONENT0 = 0xff0
+      COMPONENT_PREAMBLE_MASK = 0xffff0fff
+      COMPONENT_PREAMBLE = 0xb105000d
+      COMPONENT_CLASS_SHIFT = 12
+      COMPONENT_CLASS_MASK = 0xf << COMPONENT_CLASS_SHIFT
+      COMPONENT_CLASSES = Hash.new{|h,k| k}.merge({
+                                                    0 => :generic_verify,
+                                                    1 => :rom,
+                                                    9 => :debug,
+                                                    11 => :ptb,
+                                                    13 => :dess,
+                                                    14 => :generic_ip,
+                                                    15 => :primecell
+                                                  }).freeze
+
+      def self.probe(memap, base)
+        dev = new(memap, base)
+
+        if dev.component_class == :rom && dev.device_size == 4096
+          dev = ROMTable.new(memap, base)
+        end
+      end
+
+      attr_reader :component_class, :device_size
+
+      def initialize(memap, base)
+        @mem, @base = memap, base
+
+        comps = @mem.read(@base + COMPONENT0, :count => 4)
+        comp = 0
+        comps.each_with_index do |c, i|
+          comp |= (c & 0xff) << (i * 8)
+        end
+        if comp & COMPONENT_PREAMBLE_MASK == COMPONENT_PREAMBLE
+          @component_class = COMPONENT_CLASSES[(comp & COMPONENT_CLASS_MASK) >> COMPONENT_CLASS_SHIFT]
+          Debug 'device component class:', @component_class
+        end
+
+        periphs = @mem.read(@base + PERIPHERAL4, :count => 8)
+        periphs = periphs[4..7] + periphs[0..3]
+        periph = 0
+        periphs.each_with_index do |c, i|
+          periph |= (c & 0xff) << (i * 8)
+        end
+        @device_size = 4 * 1024 << ((periph & PERIPHERAL_4KBCOUNT_MASK) >> PERIPHERAL_4KBCOUNT_SHIFT)
+        Debug 'device perhiph id: %016x' % periph
+        Debug 'device size: %d' % @device_size
+      end
+    end
+
+    class ROMTable < DebugDevice
+      MEMTYPE = 0xfcc
+      MEMTYPE_SYSMEM = 1
+
+      ENTRY_ADDROFFS_SHIFT = 12
+      ENTRY_ADDROFFS_MASK = 0xfffff << ENTRY_ADDROFFS_SHIFT
+      ENTRY_FORMAT = 1 << 1
+      ENTRY_PRESENT = 1
+
+      def initialize(*args)
+        super(*args)
+
+        memtype = @mem.read(@base + MEMTYPE)
+        @sysmem = memtype & MEMTYPE_SYSMEM != 0
+
+        format = @mem.read(@base)
+        if format & ENTRY_FORMAT != 0
+          @format = 32
+        else
+          @format = 8
+        end
+
+        scan
+      end
+
+      def scan
+        @devs = []
+        addr = 0
+        while true
+          entry = read_entry(addr)
+          break if entry == 0
+          addr += 4
+          Debug 'rom table entry %08x' % entry
+          next if entry & ENTRY_PRESENT == 0
+          devbase = (@base + (entry & ENTRY_ADDROFFS_MASK)) & 0xffffffff
+          dev = DebugDevice.probe(@mem, devbase)
+          devs << dev if dev
+        end
+      end
+
+      def read_entry(addr)
+        if @format == 32
+          @mem.read(@base + addr)
+        else
+          val = 0
+          4.times do |i|
+            val |= @mem.read(@base + addr + i * 4) << (i * 8)
+          end
+          val
+        end
+      end
+    end
 
 
     def mem?
@@ -141,28 +258,20 @@ class Adiv5
       csw = (csw & ~CSW_MODE_MASK)
       write_ap(CSW, csw)
       @endian = (read_ap(CFG) & CFG_BIGENDIAN_MASK) != 0 ? :big : :little
-      @base = read_ap(BASE)
+      base = read_ap(BASE)
 
-      if @base == 0xffffffff || @base & BASE_FORMAT == 0 || @base & BASE_PRESENT == 0
-        @base = nil
-      else
-        @base &= BASE_BASEADDR_MASK
-        comps = read_mem(@base + COMPONENT0, :count => 4)
-        comp = 0
-        comps.each_with_index do |c, i|
-          comp |= (c & 0xff) << (i * 8)
-        end
-
-        Debug 'memap component id: %08x' % comp
+      if base != 0xffffffff && @base & BASE_FORMAT != 0 && @base & BASE_PRESENT != 0
+        base &= BASE_BASEADDR_MASK
+        @dev = DebugDevice.probe(self, base)
       end
     end
 
-    def read_mem(addr, opt={})
+    def read(addr, opt={})
       write_ap(TAR, addr)
       read_ap(DRW, opt)
     end
 
-    def write_mem(addr, val)
+    def write(addr, val)
       write_ap(TAR, addr)
       write_ap(DRW, val)
     end
