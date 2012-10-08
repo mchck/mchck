@@ -207,6 +207,7 @@ class FtdiSwd
     opspeed = 12000000
     div = opspeed / hz - 2
     div = 0 if div < 0
+    div = 65535 if div > 65535
     @speed = opspeed / (div + 2)
 
     @outbuf << Ftdi::EN_DIV_5
