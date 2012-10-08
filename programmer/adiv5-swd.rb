@@ -104,6 +104,9 @@ class Adiv5Swd
   rescue Wait
     Debug 'SWD WAIT, retrying'
     retry
+
+  # XXX we might have to repeat the previous write instead of this transaction
+  # the fault/protocolerror might actually refer to the preceeding transaction.
   rescue ProtocolError
     if try <= 3
       Log 'SWD protocol error, retrying'
