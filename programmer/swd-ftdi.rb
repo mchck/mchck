@@ -104,7 +104,7 @@ class FtdiSwd
     @outbuf = ""
     @inbuf = ""
 
-    self.speed = opt[:speed] || 1000
+    self.speed = opt[:speed] || 10000000
     @bits = 0xbc02
     @dirs = 0xff2b
     @swdoe = opt[:swdoe_data] || 0x1000
