@@ -175,7 +175,7 @@ class Adiv5
         end
         if comp & COMPONENT_PREAMBLE_MASK == COMPONENT_PREAMBLE
           @component_class = COMPONENT_CLASSES[(comp & COMPONENT_CLASS_MASK) >> COMPONENT_CLASS_SHIFT]
-          Debug 'device component class:', @component_class
+          Log :ap, 2, 'device component class:', @component_class
         end
 
         periphs = @mem.read(@base + PERIPHERAL4, :count => 8)
@@ -185,8 +185,8 @@ class Adiv5
           periph |= (c & 0xff) << (i * 8)
         end
         @device_size = 4 * 1024 << ((periph & PERIPHERAL_4KBCOUNT_MASK) >> PERIPHERAL_4KBCOUNT_SHIFT)
-        Debug 'device perhiph id: %016x' % periph
-        Debug 'device size: %d' % @device_size
+        Log :ap, 3, 'device perhiph id: %016x' % periph
+        Log :ap, 2, 'device size: %d' % @device_size
       end
     end
 
@@ -222,7 +222,7 @@ class Adiv5
           entry = read_entry(addr)
           break if entry == 0
           addr += 4
-          Debug 'rom table entry %08x' % entry
+          Log :ap, 2, 'rom table entry %08x' % entry
           next if entry & ENTRY_PRESENT == 0
           devbase = (@base + (entry & ENTRY_ADDROFFS_MASK)) & 0xffffffff
           dev = DebugDevice.probe(@mem, devbase)
@@ -251,7 +251,7 @@ class Adiv5
     def initialize(*args)
       super(*args)
 
-      Debug "initializing memap #@apsel"
+      Log :ap, 1, "initializing memap #@apsel"
       csw = read_ap(CSW)
       csw = (csw & ~CSW_SIZE_MASK) | CSW_SIZE_32
       csw = (csw & ~CSW_ADDRINC_MASK) | CSW_ADDRINC(:single)
@@ -304,7 +304,7 @@ class Adiv5
     #   sleep 0.01
     # end
 
-    Debug "all systems up"
+    Log :ap, 1, "all systems up"
   end
 
   def write(apsel, addr, val)
@@ -344,9 +344,9 @@ class Adiv5
     256.times do |apsel|
       ap = AP.probe(self, apsel)
       if ap
-        Debug "found AP #{apsel}", ap.id, "mem: #{ap.mem?}"
+        Log :ap, 1, "found AP #{apsel}", ap.id, "mem: #{ap.mem?}"
       else
-        Debug "no AP on #{apsel}, stopping probe"
+        Log :ap, 1, "no AP on #{apsel}, stopping probe"
         break
       end
     end

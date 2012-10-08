@@ -1,34 +1,31 @@
 class Log
-  Levels = Hash.new(0).merge({
-    :debug => 0,
-    :info => 1,
-    :notice => 2,
-    :warning => 3,
-    :error => 4,
-  }).freeze
+  @@levels = Hash.new(0)
 
-  @@level = Levels[:warning]
-
-  case ENV["DEBUG"]
-  when 1, 'y'
-    @@level = Levels[:debug]
+  def self.level(*lvls)
+    case lvls.count
+    when 2
+      sub = lvls.shift
+      @@levels[sub.to_sym] = Integer(lvls.first)
+    when 1
+      @@levels.default = Integer(lvls.first)
+    end
   end
 
-  def self.level=(lvl)
-    @@level = Levels[lvl]
+  def self.log(subsys, level, *args)
+    if level <= @@levels[subsys]
+      spc = "  " * (level - 1)
+      $stderr.puts '%s%s: %s' % [spc, subsys.to_s.upcase, args.join(' ')]
+    end
   end
 
-  def self.log(level, *args)
-    if @@level <= Levels[level]
-      $stderr.puts args.join(' ')
+  if ENV["DEBUG"]
+      ENV["DEBUG"].split(/[,;]/).each do |d|
+      lvls = d.split(/[:=]/, 2)
+      self.level(*lvls)
     end
   end
 end
 
 def Log(*args)
-  Log.log(:info, *args)
-end
-
-def Debug(*args)
-  Log.log(:debug, *args)
+  Log.log(*args)
 end
