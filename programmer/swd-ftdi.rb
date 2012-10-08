@@ -153,12 +153,6 @@ class FtdiSwd
     turn :in
     ack = read_bits 3
 
-    # we read data right now, just to make sure that we will never
-    # work against the protocol
-    if dir == :in
-      data, par = read_word_and_parity
-    end
-
     case ack
     when ACK_OK
       # empty
@@ -167,6 +161,12 @@ class FtdiSwd
     when ACK_FAULT
       raise Adiv5Swd::Fault
     else
+      # we read data right now, just to make sure that we will never
+      # work against the protocol
+      if dir == :in
+        data, par = read_word_and_parity
+      end
+
       raise Adiv5Swd::ProtocolError
     end
 
@@ -177,6 +177,7 @@ class FtdiSwd
       write_bits calc_parity(data), 1
       nil
     when :in
+      data, par = read_word_and_parity
       cal_par = calc_parity data
       if par != cal_par
         raise Adiv5Swd::ParityError
