@@ -2,7 +2,7 @@ require 'adiv5-swd'
 require 'log'
 
 class Adiv5
-  class DP
+  module DP
     ABORT = 0
     CTRLSTAT = 4
 
@@ -74,18 +74,12 @@ class Adiv5
       false
     end
 
+    def read_ap(addr, opt={})
+      @dp.read(@apsel, addr, opt)
+    end
+
     def write_ap(addr, val)
-      select addr
-      @dp.write(:ap, addr & 0xc, val)
-    end
-
-    def read_ap(addr)
-      select addr
-      @dp.read(:ap, addr & 0xc)
-    end
-
-    def select(addr)
-      @dp.write(:dp, DP::SELECT, DP::APSEL(@apsel) | DP::APBANKSEL(addr >> 4))
+      @dp.write(@apsel, addr, val)
     end
   end
 
@@ -152,7 +146,7 @@ class Adiv5
         @base = nil
       else
         @base &= BASE_BASEADDR_MASK
-        comps = read_mem(@base + COMPONENT0, 4)
+        comps = read_mem(@base + COMPONENT0, :count => 4)
         comp = 0
         comps.each_with_index do |c, i|
           comp |= (c & 0xff) << (i * 8)
@@ -162,23 +156,14 @@ class Adiv5
       end
     end
 
-    def read_mem(addr, count=nil)
+    def read_mem(addr, opt={})
       write_ap(TAR, addr)
-      ret = (count || 1).times.map do
-        read_ap(DRW)
-      end
-
-      ret = ret.first if not count
-      ret
+      read_ap(DRW, opt)
     end
 
     def write_mem(addr, val)
-      val = [val] if not val.respond_to? :each
-
       write_ap(TAR, addr)
-      val.each do |v|
-        write_ap(DRW, v)
-      end
+      write_ap(DRW, val)
     end
   end
 
@@ -212,9 +197,26 @@ class Adiv5
     Debug "all systems up"
   end
 
+  def write(apsel, addr, val)
+    select apsel, addr
+    @dp.write(:ap, addr & 0xc, val)
+  end
+
+  def read(apsel, addr, opt={})
+    select apsel, addr
+    @dp.read(:ap, addr & 0xc, opt)
+  end
+
+  def select(apsel, addr)
+    select = DP::APSEL(apsel) | DP::APBANKSEL(addr >> 4)
+    return if @last_select == select
+    @dp.write(:dp, DP::SELECT, select)
+    @last_select = select
+  end
+
   def probe
     256.times do |apsel|
-      ap = AP.probe(@dp, apsel)
+      ap = AP.probe(self, apsel)
       if ap
         Debug "found AP #{apsel}", ap.id, "mem: #{ap.mem?}"
       else

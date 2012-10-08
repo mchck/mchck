@@ -49,21 +49,34 @@ class Adiv5Swd
     end
   end
 
-  def read(port, addr)
-    Debug 'read %s %x' % [port, addr]
-    ret = transact(port, :in, addr)
+  def read(port, addr, opt={})
+    readcount = opt[:count] || 1
+    ret = []
+
+    readcount.times do |i|
+      Debug 'read %s %x' % [port, addr]
+      ret << transact(port, :in, addr)
+    end
     # reads to the AP are posted, so we need to get the result in a
     # separate transaction.
     if port == :ap
-      ret = transact(:dp, :in, RDBUFF)
+      # first discard the first bogus result
+      ret.shift
+      # add last posted result
+      ret << transact(:dp, :in, RDBUFF)
     end
-    Debug '==> %08x' % ret
+    Debug '==>', *ret.map{|e| "%08x" % e}
+
+    ret = ret.first if not opt[:count]
     ret
   end
 
   def write(port, addr, val)
-    Debug 'write %s %x = %08x' % [port, addr, val]
-    transact(port, :out, addr, val)
+    val = [val] unless val.respond_to? :each
+    Debug 'write %s %x =' % [port, addr], *val.map{|e| "%08x" % e}
+    val.each do |v|
+      transact(port, :out, addr, v)
+    end
   end
 
   def transact(port, dir, addr, data=nil)

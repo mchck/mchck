@@ -171,8 +171,7 @@ class FtdiSwd
       write_bits calc_parity(data), 1
       nil
     when :in
-      data = read_word
-      par = read_bits 1
+      data, par = read_word_and_parity
       cal_par = calc_parity data
       if par != cal_par
         raise Adiv5Swd::ParityError
@@ -250,17 +249,20 @@ class FtdiSwd
     @outbuf << byte
   end
 
-  def read_word
+  def read_word_and_parity
     len = 4
     @outbuf << (XFER_MODE | Ftdi::MPSSE_DO_READ)
     @outbuf << (len - 1) % 256
     @outbuf << (len - 1) / 256
+    @outbuf << (XFER_MODE | Ftdi::MPSSE_DO_READ | Ftdi::MPSSE_BITMODE)
+    @outbuf << 0                # 1 bit
     flush!
 
-    data = expect_bytes(len)
-    ret = data.unpack('V').first
-    Debug '  read_bytes: %08x' % ret
-    ret
+    data = expect_bytes(len + 1)
+    ret, par = data.unpack('VC')
+    par >>= 7
+    Debug '  read_bytes: %08x, parity %d' % [ret, par]
+    [ret, par]
   end
 
   def read_bits(len)
