@@ -60,6 +60,7 @@ class Adiv5
       idr = read_ap(IDR)
       if idr != 0
         @id = {
+          :idr => idr,
           :revision => (idr & IDR_REVISION_MASK) >> IDR_REVISION_SHIFT,
           :jep106 => (idr & IDR_JEP106_MASK) >> IDR_JEP106_SHIFT,
           :class => (idr & IDR_CLASS_MASK) != 0 ? :mem : nil,
@@ -215,6 +216,22 @@ class Adiv5
   end
 
   def probe
+    # Kinetis hack: hold system & core in reset, so that flash and
+    # security will have a chance to init, and we have a chance to
+    # access the system.  If we don't hold the system in reset, it
+    # might loop resetting itself.  While the system resets, it will
+    # block debugger access until it has read the security bits.  If
+    # the core loops in reset (e.g. because of empty flash), we will
+    # get kicked in the nuts regularly.  Holding the system & core in
+    # reset prevents this.
+    mdmap = AP.probe(self, 1)
+    if mdmap && mdmap.id[:idr] == 0x001c0000
+      # XXX hack
+      while mdmap.read_ap(0) & 0b110 != 0b010
+        mdmap.write_ap(4, 0b11100)
+      end
+    end
+
     256.times do |apsel|
       ap = AP.probe(self, apsel)
       if ap
