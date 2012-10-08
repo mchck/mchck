@@ -168,6 +168,8 @@ class Adiv5
       def initialize(memap, base)
         @mem, @base = memap, base
 
+        Log :ap, 1, '%s at %08x' % [self.class, @base]
+
         comps = @mem.read(@base + COMPONENT0, :count => 4)
         comp = 0
         comps.each_with_index do |c, i|
