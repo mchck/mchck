@@ -7,16 +7,16 @@ class Adiv5Swd
   RESEND = 8
   RDBUFF = 12
 
-  class ProtocolError < RuntimeError
+  class ProtocolError < StandardError
   end
 
-  class ParityError < RuntimeError
+  class ParityError < StandardError
   end
 
-  class Wait < RuntimeError
+  class Wait < StandardError
   end
 
-  class Fault < RuntimeError
+  class Fault < StandardError
   end
 
 

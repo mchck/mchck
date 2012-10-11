@@ -47,7 +47,8 @@ class Adiv5
       end
 
       ap
-    rescue RuntimeError
+    rescue Exception => e
+      Log :ap, 1, "could not probe AP #{apsel}: #{e}"
       nil
     end
 
