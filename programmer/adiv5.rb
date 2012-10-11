@@ -246,10 +246,15 @@ class Adiv5
       end
     end
 
+    class UnalignedAccessError < RuntimeError
+    end
+
 
     def mem?
       true
     end
+
+    attr_reader :endian
 
     def initialize(*args)
       super(*args)
@@ -270,16 +275,22 @@ class Adiv5
     end
 
     def read(addr, opt={})
+      raise UnalignedAccessError if addr & 0x3 != 0
       write_ap(TAR, addr)
       read_ap(DRW, opt)
     end
+    alias :[] :read
 
     def write(addr, val)
+      raise UnalignedAccessError if addr & 0x3 != 0
       write_ap(TAR, addr)
       write_ap(DRW, val)
     end
+    alias :[]= :write
   end
 
+
+  attr_reader :ap
 
   def initialize(drv, opt)
     @dp = Adiv5Swd.new(drv, opt)
@@ -306,6 +317,8 @@ class Adiv5
     # while @dp.read(:dp, DP::CTRLSTAT) & waitflags == waitflags
     #   sleep 0.01
     # end
+
+    @ap = []
 
     Log :ap, 1, "all systems up"
   end
@@ -339,8 +352,13 @@ class Adiv5
     mdmap = AP.probe(self, 1)
     if mdmap && mdmap.id[:idr] == 0x001c0000
       # XXX hack
-      while mdmap.read_ap(0) & 0b110 != 0b010
+      # This waits until the system is in reset
+      while mdmap.read_ap(0) & 0b1110 != 0b0010
         mdmap.write_ap(4, 0b11100)
+      end
+      # Now take system out of reset, but keep core in reset
+      while mdmap.read_ap(0) & 0b1110 != 0b1010
+        mdmap.write_ap(4, 0b10100)
       end
     end
 
@@ -348,12 +366,13 @@ class Adiv5
       ap = AP.probe(self, apsel)
       if ap
         Log :ap, 1, "found AP #{apsel}", ap.id, "mem: #{ap.mem?}"
+        @ap << ap
       else
         Log :ap, 1, "no AP on #{apsel}, stopping probe"
         break
       end
     end
-    nil
+    @ap
   end
 end
 
