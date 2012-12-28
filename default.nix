@@ -4,7 +4,7 @@ import <nixpkgs> {
   crossSystem = {
     config = "arm-none-eabi";
     bigEndian = false;
-    arch = "armv7-m";
+    arch = "arm";
     float = "soft";
     #withTLS = true;
     libc = "uclibc";
