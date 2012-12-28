@@ -7,14 +7,14 @@ import <nixpkgs> {
     arch = "arm";
     float = "soft";
     #withTLS = true;
-    libc = "uclibc";
+    libc = "newlib";
     platform = {
       name = "mchck";
-      #kernelMajor = "2.6";
-      #kernelBaseConfig = "bcm63xx_defconfig";
-      #kernelHeadersBaseConfig = "bcm63xx_defconfig";
+      kernelMajor = "2.6";
+      kernelBaseConfig = "bcm63xx_defconfig";
+      kernelHeadersBaseConfig = "bcm63xx_defconfig";
       #uboot = null;
-      #kernelArch = "mips";
+      kernelArch = "arm";
       #kernelAutoModules = false;
       #kernelTarget = "vmlinux.bin";
     };
