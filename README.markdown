@@ -7,6 +7,12 @@ where spending >$20 for an Arduino is just too much.
 
 Find up-to-date information and get involved at <http://mchck.org>.
 
-## Cross build environment
+## Cross toolchain
+
+### Using summon-arm-toolchain
+
+https://github.com/esden/summon-arm-toolchain
+
+### Using nix
 
 % nix-build -A pkgs.gccCrossStageStatic
