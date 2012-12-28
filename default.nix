@@ -21,6 +21,7 @@ import <nixpkgs> {
     #openssl.system = "linux-generic32";
     gcc = {
       arch = "armv7-m";
+      mode = "thumb";
     };
   };
 }
