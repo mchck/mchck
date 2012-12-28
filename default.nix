@@ -1,14 +1,13 @@
 { version ? "0", revision ? "local" }:
 
-with import <nixpkgs> {};
-{
+import <nixpkgs> {
   crossSystem = {
     config = "arm-none-eabi";
     bigEndian = false;
-    arch = "arm";
+    arch = "armv7-m";
     float = "soft";
     #withTLS = true;
-    #libc = "newlib";
+    libc = "uclibc";
     platform = {
       name = "mchck";
       #kernelMajor = "2.6";
@@ -21,7 +20,7 @@ with import <nixpkgs> {};
     };
     #openssl.system = "linux-generic32";
     gcc = {
-      arch = "arm";
+      arch = "armv7-m";
     };
   };
 }

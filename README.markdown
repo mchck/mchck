@@ -9,4 +9,4 @@ Find up-to-date information and get involved at <http://mchck.org>.
 
 ## Cross build environment
 
-% nix-env -p cross -iA nixos.pkgs.gccCrossStageStatic -f default.nix
+% nix-build -A pkgs.gccCrossStageStatic
