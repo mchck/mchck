@@ -111,7 +111,7 @@ class FtdiSwd
 
     @dev = Ftdi::Context.new
     @dev.interface = opt[:iface] || :interface_any
-    @dev.usb_open_desc_index(opt[:vid] || 0, opt[:pid] || 0, opt[:desc], opt[:serial], opt[:idx] || 0)
+    @dev.usb_open(opt[:vid] || 0, opt[:pid] || 0)
     @dev.usb_reset
     @dev.set_bitmode(0, 0)      # reset
     @dev.set_bitmode(0, 2)      # mpsse
