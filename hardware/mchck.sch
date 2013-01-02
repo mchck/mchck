@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Tue Sep 11 21:36:26 2012
+EESchema Schematic File Version 2  date 12/31/2012 1:27:42 AM
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -45,14 +45,15 @@ LIBS:inductor_select
 LIBS:logo
 LIBS:MK20LF
 LIBS:mounthole
+LIBS:crystal3x2
 LIBS:mchck-cache
 EELAYER 25  0
 EELAYER END
-$Descr A4 11693 8268
+$Descr A4 11700 8267
 encoding utf-8
 Sheet 1 4
 Title "MC HCK micro controller board"
-Date "11 sep 2012"
+Date "31 dec 2012"
 Rev "4"
 Comp "(c) 2011,2012 Simon Schubert"
 Comment1 "CERN OHL v.1.1 or later"
@@ -60,6 +61,156 @@ Comment2 ""
 Comment3 ""
 Comment4 ""
 $EndDescr
+Connection ~ 4000 4400
+Wire Wire Line
+	4000 4400 4000 4300
+Wire Wire Line
+	4000 4300 3200 4300
+Wire Wire Line
+	3200 4300 3200 2600
+Wire Wire Line
+	3200 2600 6550 2600
+Wire Wire Line
+	6550 2600 6550 2900
+Wire Wire Line
+	6550 2900 6650 2900
+Wire Wire Line
+	9650 900  9650 1050
+Wire Wire Line
+	3700 5950 3700 6000
+Wire Wire Line
+	7250 4450 6800 4450
+Wire Wire Line
+	6800 4450 6800 4200
+Wire Wire Line
+	6800 4200 7850 4200
+Wire Wire Line
+	7850 4200 7850 3950
+Wire Wire Line
+	7850 3950 7650 3950
+Wire Wire Line
+	7650 3850 8100 3850
+Wire Wire Line
+	6800 5000 6800 5100
+Wire Wire Line
+	6800 5000 8100 5000
+Wire Wire Line
+	8100 5000 8100 3850
+Wire Wire Line
+	7950 3000 7950 3650
+Wire Wire Line
+	7950 3000 7650 3000
+Wire Wire Line
+	7950 3650 7650 3650
+Wire Wire Line
+	7650 3100 7900 3100
+Wire Wire Line
+	7900 3100 7900 3550
+Wire Wire Line
+	7900 3550 7650 3550
+Wire Wire Line
+	6400 3750 6650 3750
+Wire Wire Line
+	6650 3650 6400 3650
+Wire Wire Line
+	6650 3100 6400 3100
+Wire Wire Line
+	6400 3000 6650 3000
+Wire Wire Line
+	7100 4550 7250 4550
+Wire Wire Line
+	7250 4650 6400 4650
+Wire Wire Line
+	7250 4750 6400 4750
+Wire Wire Line
+	7250 4850 6400 4850
+Wire Wire Line
+	3800 5600 4200 5600
+Wire Wire Line
+	3700 6000 3850 6000
+Wire Wire Line
+	3850 6000 3850 5700
+Wire Wire Line
+	7250 5500 6400 5500
+Wire Wire Line
+	7250 5400 6400 5400
+Wire Wire Line
+	7250 5300 6400 5300
+Wire Wire Line
+	6400 5200 7250 5200
+Wire Wire Line
+	6800 5100 7250 5100
+Wire Wire Line
+	3850 5700 3800 5700
+Wire Wire Line
+	4800 4100 3800 4100
+Wire Wire Line
+	3800 4200 4800 4200
+Wire Notes Line
+	7800 4900 7850 4900
+Wire Notes Line
+	7850 4900 7850 4500
+Wire Notes Line
+	7850 4500 7800 4500
+Wire Wire Line
+	3800 4400 4800 4400
+Wire Wire Line
+	3800 4500 4800 4500
+Wire Wire Line
+	4800 3800 3800 3800
+Wire Wire Line
+	3800 3600 4800 3600
+Wire Wire Line
+	4800 2900 3800 2900
+Wire Wire Line
+	4800 4600 3800 4600
+Wire Wire Line
+	3800 3100 4800 3100
+Wire Wire Line
+	3800 4000 4800 4000
+Wire Wire Line
+	3800 3200 4800 3200
+Wire Wire Line
+	4800 3400 3800 3400
+Wire Wire Line
+	3800 5400 4800 5400
+Wire Wire Line
+	3800 5200 4800 5200
+Wire Wire Line
+	3800 5000 4800 5000
+Wire Wire Line
+	3800 4800 4800 4800
+Wire Wire Line
+	3800 4700 4800 4700
+Wire Wire Line
+	4800 4900 3800 4900
+Wire Wire Line
+	4800 5100 3800 5100
+Wire Wire Line
+	4800 5300 3800 5300
+Wire Wire Line
+	4800 5500 3800 5500
+Wire Wire Line
+	4800 3300 3800 3300
+Wire Wire Line
+	4800 3900 3800 3900
+Wire Wire Line
+	4800 3000 3800 3000
+Wire Wire Line
+	4800 3500 3800 3500
+Wire Wire Line
+	4800 3700 3800 3700
+$Sheet
+S 6650 2800 1000 400 
+U 504995A0
+F0 "USB" 60
+F1 "usb.sch" 60
+F2 "VBUS" O R 7650 3100 60 
+F3 "VLIPO" B R 7650 3000 60 
+F4 "USB_DM" T L 6650 3100 60 
+F5 "USB_DP" T L 6650 3000 60 
+F6 "USB_OTG" B L 6650 2900 60 
+$EndSheet
 $Comp
 L CONN_5 P2
 U 1 1 4F3D2CED
@@ -113,42 +264,32 @@ F 2 "OHW-LOGO-6mm" H 10300 650 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L VSS #PWR3
+L VSS #PWR01
 U 1 1 5046C971
 P 7100 4550
-F 0 "#PWR3" H 7100 4550 30  0001 C CNN
+F 0 "#PWR01" H 7100 4550 30  0001 C CNN
 F 1 "VSS" H 7100 4480 30  0000 C CNN
 	1    7100 4550
 	-1   0    0    -1  
 $EndComp
 $Comp
-L VSS #PWR2
+L VSS #PWR02
 U 1 1 5047C978
 P 4200 5600
-F 0 "#PWR2" H 4200 5600 30  0001 C CNN
+F 0 "#PWR02" H 4200 5600 30  0001 C CNN
 F 1 "VSS" H 4200 5530 30  0000 C CNN
 	1    4200 5600
 	1    0    0    -1  
 $EndComp
 $Comp
-L +3.3V #PWR1
+L +3.3V #PWR03
 U 1 1 5047C987
 P 3700 5950
-F 0 "#PWR1" H 3700 5910 30  0001 C CNN
+F 0 "#PWR03" H 3700 5910 30  0001 C CNN
 F 1 "+3.3V" H 3700 6060 30  0000 C CNN
 	1    3700 5950
 	1    0    0    -1  
 $EndComp
-$Sheet
-S 6650 2900 1000 300 
-U 504995A0
-F0 "USB" 60
-F1 "usb.sch" 60
-F2 "VBUS" O R 7650 3100 60 
-F3 "VLIPO" B R 7650 3000 60 
-F4 "USB_DM" T L 6650 3100 60 
-F5 "USB_DP" T L 6650 3000 60 
-$EndSheet
 Text Label 6850 5100 0    40   ~ 0
 VRAW
 Text Label 6850 4450 0    40   ~ 0
@@ -207,140 +348,14 @@ F 2 "mounthole_3mm" H 9650 1200 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L VSS #PWR4
+L VSS #PWR04
 U 1 1 5049D46F
 P 9650 1050
-F 0 "#PWR4" H 9650 1050 30  0001 C CNN
+F 0 "#PWR04" H 9650 1050 30  0001 C CNN
 F 1 "VSS" H 9650 980 30  0000 C CNN
 	1    9650 1050
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	4800 3700 3800 3700
-Wire Wire Line
-	4800 3500 3800 3500
-Wire Wire Line
-	4800 3000 3800 3000
-Wire Wire Line
-	4800 3900 3800 3900
-Wire Wire Line
-	4800 3300 3800 3300
-Wire Wire Line
-	4800 5500 3800 5500
-Wire Wire Line
-	4800 5300 3800 5300
-Wire Wire Line
-	4800 5100 3800 5100
-Wire Wire Line
-	4800 4900 3800 4900
-Wire Wire Line
-	3800 4700 4800 4700
-Wire Wire Line
-	3800 4800 4800 4800
-Wire Wire Line
-	3800 5000 4800 5000
-Wire Wire Line
-	3800 5200 4800 5200
-Wire Wire Line
-	3800 5400 4800 5400
-Wire Wire Line
-	4800 3400 3800 3400
-Wire Wire Line
-	3800 3200 4800 3200
-Wire Wire Line
-	3800 4000 4800 4000
-Wire Wire Line
-	3800 3100 4800 3100
-Wire Wire Line
-	4800 4600 3800 4600
-Wire Wire Line
-	4800 2900 3800 2900
-Wire Wire Line
-	3800 3600 4800 3600
-Wire Wire Line
-	4800 3800 3800 3800
-Wire Wire Line
-	3800 4500 4800 4500
-Wire Wire Line
-	3800 4400 4800 4400
-Wire Notes Line
-	7800 4500 7850 4500
-Wire Notes Line
-	7850 4500 7850 4900
-Wire Notes Line
-	7850 4900 7800 4900
-Wire Wire Line
-	3800 4200 4800 4200
-Wire Wire Line
-	4800 4100 3800 4100
-Wire Wire Line
-	3850 5700 3800 5700
-Wire Wire Line
-	6800 5100 7250 5100
-Wire Wire Line
-	6400 5200 7250 5200
-Wire Wire Line
-	7250 5300 6400 5300
-Wire Wire Line
-	7250 5400 6400 5400
-Wire Wire Line
-	7250 5500 6400 5500
-Wire Wire Line
-	3850 5700 3850 6000
-Wire Wire Line
-	3850 6000 3700 6000
-Wire Wire Line
-	3800 5600 4200 5600
-Wire Wire Line
-	7250 4850 6400 4850
-Wire Wire Line
-	7250 4750 6400 4750
-Wire Wire Line
-	7250 4650 6400 4650
-Wire Wire Line
-	7100 4550 7250 4550
-Wire Wire Line
-	6400 3000 6650 3000
-Wire Wire Line
-	6650 3100 6400 3100
-Wire Wire Line
-	6650 3650 6400 3650
-Wire Wire Line
-	6400 3750 6650 3750
-Wire Wire Line
-	7650 3550 7900 3550
-Wire Wire Line
-	7900 3550 7900 3100
-Wire Wire Line
-	7900 3100 7650 3100
-Wire Wire Line
-	7950 3650 7650 3650
-Wire Wire Line
-	7950 3000 7650 3000
-Wire Wire Line
-	7950 3000 7950 3650
-Wire Wire Line
-	8100 3850 8100 5000
-Wire Wire Line
-	8100 5000 6800 5000
-Wire Wire Line
-	6800 5000 6800 5100
-Wire Wire Line
-	8100 3850 7650 3850
-Wire Wire Line
-	7650 3950 7850 3950
-Wire Wire Line
-	7850 3950 7850 4200
-Wire Wire Line
-	7850 4200 6800 4200
-Wire Wire Line
-	6800 4200 6800 4450
-Wire Wire Line
-	6800 4450 7250 4450
-Wire Wire Line
-	3700 6000 3700 5950
-Wire Wire Line
-	9650 900  9650 1050
 $Sheet
 S 6650 3450 1000 600 
 U 4F22DD51

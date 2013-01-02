@@ -1,0 +1,26 @@
+EESchema-LIBRARY Version 2.3  Date: 11/26/2012 10:20:48 PM
+#encoding utf-8
+#
+# CRYSTAL3x2
+#
+DEF CRYSTAL3x2 Y 0 40 Y Y 1 F N
+F0 "Y" 100 40 50 H V L BNN
+F1 "CRYSTAL3x2" 100 -100 50 H V L BNN
+F2 "SparkFun-CRYSTAL-SMD-3x2" 0 150 50 H I C CNN
+DRAW
+T 0 -68 -28 34 0 1 0 1  Normal 0 C C
+T 0 77 -28 34 0 1 0 2  Normal 0 C C
+P 2 1 0 0  -100 0  -40 0 N
+P 2 1 0 0  -40 70  -40 -70 N
+P 2 1 0 0  -15 -60  15 -60 N
+P 2 1 0 0  -15 60  -15 -60 N
+P 2 1 0 0  15 -60  15 60 N
+P 2 1 0 0  15 60  -15 60 N
+P 2 1 0 0  40 0  100 0 N
+P 2 1 0 0  40 70  40 -70 N
+X 1 1 -100 0 0 R 40 40 1 1 P
+X 2 3 100 0 0 L 40 40 1 1 P
+ENDDRAW
+ENDDEF
+#
+#End Library
