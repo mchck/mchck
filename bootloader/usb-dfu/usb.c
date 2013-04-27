@@ -173,6 +173,19 @@ struct usb_desc_string_t {
  * USB request data structures.
  */
 
+enum usb_tok_pid {
+	USB_PID_TIMEOUT = 0,
+	USB_PID_OUT = 1,
+	USB_PID_ACK = 2,
+	USB_PID_DATA0 = 3,
+	USB_PID_IN = 9,
+	USB_PID_NAK = 10,
+	USB_PID_DATA1 = 11,
+	USB_PID_SETUP = 13,
+	USB_PID_STALL = 14,
+	USB_PID_DATAERR = 15
+};
+
 struct usb_ctrl_req_t {
 	union /* reqtype and request & u16 */ {
 		struct /* reqtype and request */ {
@@ -270,124 +283,6 @@ enum usb_ctrl_req_feature {
 
 
 /**
- * Hardware structures
- */
-
-struct USB_BD_t {
-	union /* bitfields */ {
-		struct /* common */ {
-			uint32_t _rsvd0	 : 6;
-			enum usb_data01 {
-				USB_DATA01_DATA0 = 0,
-				USB_DATA01_DATA1 = 1
-			} data01	 : 1;
-			uint32_t own	 : 1;
-			uint32_t _rsvd1	 : 8;
-			uint32_t bc	 : 10;
-			uint32_t _rsvd2	 : 6;
-		} __packed;
-		struct /* USB-FS */ {
-			uint32_t _rsvd3	 : 2;
-			uint32_t stall	 : 1;
-			uint32_t dts	 : 1;
-			uint32_t ninc	 : 1;
-			uint32_t keep	 : 1;
-			uint32_t _rsvd4	 : 26;
-		} __packed;
-		struct /* processor */ {
-			uint32_t _rsvd5	 : 2;
-			enum usb_tok_pid {
-				USB_PID_TIMEOUT = 0,
-				USB_PID_OUT = 1,
-				USB_PID_ACK = 2,
-				USB_PID_DATA0 = 3,
-				USB_PID_IN = 9,
-				USB_PID_NAK = 10,
-				USB_PID_DATA1 = 11,
-				USB_PID_SETUP = 13,
-				USB_PID_STALL = 14,
-				USB_PID_DATAERR = 15
-			} tok_pid : 4;
-			uint32_t _rsvd6	 : 26;
-		} __packed;
-		uint32_t bd;
-	}; /* union bitfields */
-	void *addr;
-};
-CTASSERT_SIZE_BYTE(struct USB_BD_t, 8);
-
-struct USB_STAT_t {
-	union {
-		struct {
-			uint8_t _rsvd0 : 2;
-			enum usb_ep_pingpong {
-				USB_EP_PINGPONG_EVEN = 0,
-				USB_EP_PINGPONG_ODD = 1
-			} pingpong : 1;
-			enum usb_ep_dir {
-				USB_EP_RX = 0,
-				USB_EP_TX = 1
-			} dir : 1;
-			uint8_t ep : 4;
-		};
-		uint32_t stat;
-	};
-};
-CTASSERT_SIZE_BIT(struct USB_STAT_t, 32);
-
-struct USB_ENDPT_t {
-	uint8_t ephshk : 1;
-	uint8_t epstall : 1;
-	uint8_t eptxen : 1;
-	uint8_t eprxen : 1;
-	uint8_t epctldis : 1;
-	uint8_t _rsvd0 : 1;
-	uint8_t retrydis : 1;
-	uint8_t hostwohub : 1;
-	uint32_t _rsvd1 : 24;
-} __packed;
-CTASSERT_SIZE_BIT(struct USB_ENDPT_t, 32);
-
-struct USB_ADDR_t {
-	uint8_t addr : 7;
-	uint8_t lsen : 1;
-} __packed;
-CTASSERT_SIZE_BIT(struct USB_ADDR_t, 8);
-
-struct USB_CTL_t {
-	union {
-		struct /* common */ {
-			uint8_t _rsvd1 : 1;
-			uint8_t oddrst : 1;
-			uint8_t resume : 1;
-			uint8_t _rsvd2 : 3;
-			uint8_t se0 : 1;
-			uint8_t jstate : 1;
-		} __packed;
-		struct /* host */ {
-			uint8_t sofen : 1;
-			uint8_t _rsvd3 : 2;
-			uint8_t hostmodeen : 1;
-			uint8_t reset : 1;
-			uint8_t token_busy : 1;
-			uint8_t _rsvd4 : 2;
-		} __packed;
-		struct /* device */ {
-			uint8_t usben : 1;
-			uint8_t _rsvd5 : 4;
-			uint8_t txd_suspend : 1;
-			uint8_t _rsvd6 : 2;
-		} __packed;
-	};
-} __packed;
-CTASSERT_SIZE_BIT(struct USB_CTL_t, 8);
-
-extern volatile struct USB_ENDPT_t USB0_ENDPT[16];
-extern volatile struct USB_ADDR_t USB0_ADDR;
-extern volatile struct USB_CTL_t USB0_CTL;
-
-
-/**
  * Internal driver structures
  */
 
@@ -428,6 +323,20 @@ extern volatile struct USB_CTL_t USB0_CTL;
 
 #define EP0_BUFSIZE 64
 
+enum usb_ep_pingpong {
+	USB_EP_PINGPONG_EVEN = 0,
+	USB_EP_PINGPONG_ODD = 1
+};
+
+enum usb_ep_dir {
+	USB_EP_RX = 0,
+	USB_EP_TX = 1
+};
+
+enum usb_data01 {
+	USB_DATA01_DATA0 = 0,
+	USB_DATA01_DATA1 = 1
+};
 
 enum usbd_dev_state {
 	USBD_STATE_DISABLED = 0,
@@ -481,68 +390,8 @@ struct usbd_t {
 struct usbd_t usb;
 
 
-void
-usb_enable(void)
-{
-	/* clock distribution? */
-	/* INTEN->(TOKDNE,USBRST)=1 */
-	/* BDTPAGE1,2,3 */
-	/* ENDPT0->(EPRXEN,EPTXEN,EPHSHK)=1 */
-	/* USBCTRL->(SUSP,PDE)=0 */
-	/* CTL->USBENSOFEN=1 */
-}
+#include "vusb.c"
 
-void
-usb_intr(void)
-{
-	/* check STAT->(ENDP,TX,ODD) */
-	/* check ERRSTAT->(DMAERR) */
-	/* read BDT entry */
-}
-
-static struct USB_BD_t *
-usb_get_bd(int ep, enum usb_ep_dir dir, enum usb_ep_pingpong pingpong)
-{
-	return (&usb.bdt[(ep << 2) | (dir << 1) | pingpong]);
-}
-
-static struct USB_BD_t *
-usb_get_bd_stat(struct USB_STAT_t stat)
-{
-	return (((void *)(uintptr_t)usb.bdt + (stat.stat << 1)));
-}
-
-/**
- * Stalls the EP.  SETUP transactions automatically unstall an EP.
- */
-void
-usb_ep_stall(int ep)
-{
-	USB0_ENDPT[ep].epstall = 1;
-}
-
-static void
-usb_tx_queue_next(struct usbd_ep_pipe_state_t *s)
-{
-	struct USB_BD_t *bd = usb_get_bd(0, USB_EP_TX, s->pingpong);
-	size_t thislen = s->transfer_size;
-
-	if (thislen > s->ep_maxsize)
-		thislen = s->ep_maxsize;
-
-	bd->addr = s->data_buf + s->pos;
-	s->pos += thislen;
-	s->transfer_size -= thislen;
-
-	/* XXX fairly inefficient assignment */
-	bd->bd = ((struct USB_BD_t) {
-			.bc = thislen,
-			.dts = 1,
-			.data01 = s->data01,
-			.own = 1
-		}).bd;
-	s->pingpong ^= 1;
-}
 
 /**
  * Returns: 0 when this is was the last transfer, 1 if there is still
@@ -624,26 +473,6 @@ usb_tx_cp(void *buf, size_t len)
 }
 
 
-static void
-usb_rx_queue_next(struct usbd_ep_pipe_state_t *s)
-{
-	struct USB_BD_t *bd = usb_get_bd(0, USB_EP_RX, s->pingpong);
-	size_t thislen = s->transfer_size;
-
-	if (thislen > s->ep_maxsize)
-		thislen = s->ep_maxsize;
-
-	bd->addr = s->data_buf + s->pos;
-
-	/* XXX fairly inefficient assignment */
-	bd->bd = ((struct USB_BD_t) {
-			.bc = thislen,
-			.dts = 1,
-			.data01 = s->data01,
-			.own = 1
-		}).bd;
-}
-
 /**
  * Returns: 0 when this is was the last transfer, 1 if there is still
  * more to go.
@@ -662,8 +491,7 @@ usb_rx_next(void)
 	 */
 	s->data01 ^= 1;
 
-	struct USB_BD_t *bd = usb_get_bd(0, USB_EP_RX, s->pingpong);
-	size_t thislen = bd->bc;
+	size_t thislen = usb_ep_get_transfer_size(0, USB_EP_RX, s->pingpong);
 
 	s->transfer_size -= thislen;
 	s->pos += thislen;
@@ -822,15 +650,6 @@ err:
 	return (-1);
 }
 
-/* Only EP0 for now; clears all pending transfers. XXX invoke callbacks? */
-static void
-usb_clear_transfers(void)
-{
-	struct USB_BD_t *bd = usb.bdt;
-
-	memset(bd, 0, sizeof(*bd) * 4);
-}
-
 static void
 usb_setup_control(void)
 {
@@ -842,19 +661,16 @@ usb_setup_control(void)
 }
 
 void
-usb_handle_control_ep(struct USB_STAT_t stat)
+usb_handle_control_ep(usb_xfer_info_t stat)
 {
-	struct USB_BD_t *bd;
 	struct usb_ctrl_req_t *req;
 	int r;
 
-	bd = usb_get_bd_stat(stat);
-
-	switch (bd->tok_pid) {
+	switch (usb_get_xfer_pid(stat)) {
 	case USB_PID_SETUP:
 		usb_clear_transfers();
 
-		req = bd->addr;
+		req = usb_get_xfer_data(stat);
 		r = usb_handle_control(req);
 		switch (r) {
 		default:
@@ -873,7 +689,7 @@ usb_handle_control_ep(struct USB_STAT_t stat)
 			usb_setup_control();
 			break;
 		}
-		USB0_CTL.txd_suspend = 0;
+		usb_enable_xfers();
 		break;
 
 	case USB_PID_IN:
@@ -892,7 +708,7 @@ status_or_done:
 			usb.ctrl_state = USBD_CTRL_STATE_STATUS;
 
 			/* empty status transfer */
-			switch (bd->tok_pid) {
+			switch (usb_get_xfer_pid(stat)) {
 			case USB_PID_IN:
 				usb.ep0_state.rx.data01 = USB_DATA01_DATA1;
 				usb_rx(NULL, 0, NULL, NULL);
@@ -910,7 +726,7 @@ status_or_done:
 			usb.ctrl_state = USBD_CTRL_STATE_IDLE;
 			if (usb.state == USBD_STATE_SETTING_ADDRESS) {
 				usb.state = USBD_STATE_ADDRESS;
-				USB0_ADDR.addr = usb.address;
+				usb_set_addr(usb.address);
 			}
 			usb_setup_control();
 			break;
