@@ -61,37 +61,37 @@ union usb_bcd_t {
 CTASSERT_SIZE_BYTE(union usb_bcd_t, 2);
 
 struct usb_desc_dev_t {
-	uint8_t desc_length;
-	enum usb_desc_type desc_type : 8; /* = USB_DESC_DEV */
-	union usb_bcd_t usbver;	     /* = 0x0200 */
-	enum usb_dev_class devclass : 8;
-	enum usb_dev_subclass devsubclass : 8;
-	enum usb_dev_proto : 8;
-	uint8_t ep0_maxsize;
-	uint16_t vid;
-	uint16_t pid;
-	union usb_bcd_t devver;
-	uint8_t manuf_strdesc;
-	uint8_t prod_strdesc;
-	uint8_t serial_strdesc;
-	uint8_t numconfig;
+	uint8_t bLength;
+	enum usb_desc_type bDescriptorType : 8; /* = USB_DESC_DEV */
+	union usb_bcd_t bcdUSB;	     /* = 0x0200 */
+	enum usb_dev_class bDeviceClass : 8;
+	enum usb_dev_subclass bDeviceSubClass : 8;
+	enum usb_dev_proto bDeviceProtocol : 8;
+	uint8_t bMaxPacketSize0;
+	uint16_t idVendor;
+	uint16_t idProduct;
+	union usb_bcd_t bcdDevice;
+	uint8_t iManufacturer;
+	uint8_t iProduct;
+	uint8_t iSerialNumber;
+	uint8_t bNumConfigurations;
 } __packed;
 CTASSERT_SIZE_BYTE(struct usb_desc_dev_t, 18);
 
 struct usb_desc_config_t {
-	uint8_t desc_length;
-	enum usb_desc_type desc_type : 8; /* = USB_DESC_CONFIG */
-	uint16_t total_length;	     /* size of config, iface, ep */
-	uint8_t num_ifaces;
-	uint8_t config_val;
-	uint8_t config_strdesc;
+	uint8_t bLength;
+	enum usb_desc_type bDescriptorType : 8; /* = USB_DESC_CONFIG */
+	uint16_t wTotalLength;	     /* size of config, iface, ep */
+	uint8_t bNumInterfaces;
+	uint8_t bConfigurationValue;
+	uint8_t iConfiguration;
 	struct {
 		uint8_t _rsvd0 : 5;
 		uint8_t remote_wakeup : 1;
 		uint8_t self_powered : 1;
 		uint8_t one : 1; /* = 1 for historical reasons */
 	};
-	uint8_t maxpower;	/* units of 2mA */
+	uint8_t bMaxPower;	/* units of 2mA */
 } __packed;
 CTASSERT_SIZE_BYTE(struct usb_desc_config_t, 9);
 
@@ -111,28 +111,28 @@ enum usb_iface_proto {
 };
 
 struct usb_desc_iface_t {
-	uint8_t desc_length;
-	enum usb_desc_type desc_type : 8; /* = USB_DESC_IFACE */
-	uint8_t iface_num;
-	uint8_t alternate;
-	uint8_t num_ep;
-	enum usb_iface_class : 8;
-	enum usb_iface_subclass : 8;
-	enum usb_iface_proto : 8;
-	uint8_t iface_strdesc;
+	uint8_t bLength;
+	enum usb_desc_type bDescriptorType : 8; /* = USB_DESC_IFACE */
+	uint8_t bInterfaceNumber;
+	uint8_t bAlternateSetting;
+	uint8_t bNumEndpoints;
+	enum usb_iface_class bInterfaceClass : 8;
+	enum usb_iface_subclass bInterfaceSubClass: 8;
+	enum usb_iface_proto bInterfaceProtocol : 8;
+	uint8_t iInterface;
 } __packed;
 CTASSERT_SIZE_BYTE(struct usb_desc_iface_t, 9);
 
 struct usb_desc_ep_t {
-	uint8_t desc_length;
-	enum usb_desc_type desc_type : 8; /* = USB_DESC_EP */
+	uint8_t bLength;
+	enum usb_desc_type bDescriptorType : 8; /* = USB_DESC_EP */
 	union {
 		struct {
 			uint8_t ep_num : 4;
 			uint8_t _rsvd0 : 3;
 			uint8_t in : 1;
 		};
-		uint8_t addr;
+		uint8_t bEndpointAddress;
 	};
 	struct {
 		enum usb_ep_type {
@@ -155,17 +155,17 @@ struct usb_desc_ep_t {
 		uint8_t _rsvd1 : 2;
 	} __packed;
 	struct {
-		uint16_t maxsize : 11;
+		uint16_t wMaxPacketSize : 11;
 		uint16_t _rsvd2 : 5;
 	};
-	uint8_t interval;
+	uint8_t bInterval;
 } __packed;
 CTASSERT_SIZE_BYTE(struct usb_desc_ep_t, 7);
 
 struct usb_desc_string_t {
-	uint8_t desc_length;
-	enum usb_desc_type desc_type : 8; /* = USB_DESC_STRING */
-	wchar_t string[];
+	uint8_t bLength;
+	enum usb_desc_type bDescriptorType : 8; /* = USB_DESC_STRING */
+	wchar_t bString[];
 };
 
 
@@ -207,7 +207,7 @@ struct usb_ctrl_req_t {
 						USB_CTRL_REQ_IN = 1
 					} in : 1;
 				} __packed;
-				uint8_t reqtype;
+				uint8_t bmRequestType;
 			}; /* union */
 			enum usb_ctrl_req_code {
 				USB_CTRL_REQ_GET_STATUS = 0,
@@ -221,13 +221,13 @@ struct usb_ctrl_req_t {
 				USB_CTRL_REQ_GET_INTERFACE = 10,
 				USB_CTRL_REQ_SET_INTERFACE = 11,
 				USB_CTRL_REQ_SYNC_FRAME = 12
-			} request : 8;
+			} bRequest : 8;
 		} __packed; /* struct */
 		uint16_t type_and_req;
 	}; /* union */
-	uint16_t value;
-	uint16_t index;
-	uint16_t length;
+	uint16_t wValue;
+	uint16_t wIndex;
+	uint16_t wLength;
 } __packed;
 CTASSERT_SIZE_BYTE(struct usb_ctrl_req_t, 8);
 
@@ -399,3 +399,6 @@ void usb_clear_transfers(void);
 size_t usb_ep_get_transfer_size(int, enum usb_ep_dir, enum usb_ep_pingpong);
 void usb_tx_queue_next(struct usbd_ep_pipe_state_t *);
 void usb_rx_queue_next(struct usbd_ep_pipe_state_t *);
+
+void usb_start(void);
+void usb_handle_transaction(struct usb_xfer_info *);

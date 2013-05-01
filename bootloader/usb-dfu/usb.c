@@ -206,7 +206,7 @@ usb_handle_control(struct usb_ctrl_req_t *req)
 	}
 
 	/* Only STD requests here */
-	switch (req->request) {
+	switch (req->bRequest) {
 	case USB_CTRL_REQ_GET_STATUS:
 		/**
 		 * Because we don't support remote wakeup or
@@ -231,7 +231,7 @@ usb_handle_control(struct usb_ctrl_req_t *req)
 		 * address right now.  Since this is a special case,
 		 * the EP 0 handler will take care of this later on.
 		 */
-		usb.address = req->value & 0x7f;
+		usb.address = req->wValue & 0x7f;
 		usb.state = USBD_STATE_SETTING_ADDRESS;
 		break;
 
@@ -245,7 +245,7 @@ usb_handle_control(struct usb_ctrl_req_t *req)
 
 	case USB_CTRL_REQ_SET_CONFIGURATION:
 		/* XXX check config */
-		usb.config = req->value;
+		usb.config = req->wValue;
 		usb.state = USBD_STATE_CONFIGURED;
 		break;
 
@@ -353,4 +353,20 @@ status_or_done:
 		}
 		break;
 	}
+}
+
+void
+usb_start(void)
+{
+	usb_setup_control();
+}
+
+/**
+ * This is called by the interrupt handler
+ */
+void
+usb_handle_transaction(struct usb_xfer_info *info)
+{
+	/* XXX for now only control EP */
+	usb_handle_control_ep(info);
 }
