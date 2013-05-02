@@ -181,42 +181,29 @@ usb_ep_get_transfer_size(int ep, enum usb_ep_dir dir, enum usb_ep_pingpong pingp
 }
 
 static void
-usb_tx_queue_next(struct usbd_ep_pipe_state_t *s)
+usb_tx_queue_next(struct usbd_ep_pipe_state_t *s, void *addr, size_t len)
 {
         struct USB_BD_t *bd = usb_get_bd(0, USB_EP_TX, s->pingpong);
-        size_t thislen = s->transfer_size;
-
-        if (thislen > s->ep_maxsize)
-                thislen = s->ep_maxsize;
-
-        bd->addr = s->data_buf + s->pos;
-        s->pos += thislen;
-        s->transfer_size -= thislen;
 
         /* XXX fairly inefficient assignment */
+        bd->addr = addr;
         bd->bd = ((struct USB_BD_t) {
-                        .bc = thislen,
+                        .bc = len,
                                 .dts = 1,
                                 .data01 = s->data01,
                                 .own = 1
                                 }).bd;
-        s->pingpong ^= 1;
 }
 
 static void
-usb_rx_queue_next(struct usbd_ep_pipe_state_t *s)
+usb_rx_queue_next(struct usbd_ep_pipe_state_t *s, void *addr, size_t len)
 {
         struct USB_BD_t *bd = usb_get_bd(0, USB_EP_RX, s->pingpong);
-        size_t thislen = s->transfer_size;
-
-        if (thislen > s->ep_maxsize)
-                thislen = s->ep_maxsize;
-
-        bd->addr = s->data_buf + s->pos;
 
         /* XXX fairly inefficient assignment */
+        bd->addr = addr;
         bd->bd = ((struct USB_BD_t) {
-                        .bc = thislen,
+                        .bc = len,
                                 .dts = 1,
                                 .data01 = s->data01,
                                 .own = 1

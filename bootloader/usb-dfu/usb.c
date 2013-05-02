@@ -28,7 +28,18 @@ usb_tx_next(void)
 	s->data01 ^= 1;
 
 	if (s->transfer_size > 0) {
-		usb_tx_queue_next(s);
+		size_t thislen = s->transfer_size;
+
+		if (thislen > s->ep_maxsize)
+			thislen = s->ep_maxsize;
+
+		void *addr = s->data_buf + s->pos;
+		s->pos += thislen;
+		s->transfer_size -= thislen;
+
+		usb_tx_queue_next(s, addr, thislen);
+		s->pingpong ^= 1;
+
 		return (1);
 	}
 
@@ -38,7 +49,8 @@ usb_tx_next(void)
 	 */
 	if (s->short_transfer) {
 		s->short_transfer = 0;
-		usb_tx_queue_next(s);
+		usb_tx_queue_next(s, NULL, 0);
+		s->pingpong ^= 1;
 		return (1);
 	}
 
@@ -67,12 +79,14 @@ usb_tx(void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_data)
 	s->callback_data = cb_data;
 	if (s->transfer_size > reqlen)
 		s->transfer_size = reqlen;
-	if (s->transfer_size == reqlen)
-		s->short_transfer = 0;
-	else
+	if (s->transfer_size < reqlen && s->transfer_size % s->ep_maxsize == 0)
 		s->short_transfer = 1;
+	else
+		s->short_transfer = 0;
 
-	usb_tx_queue_next(s);
+	/* usb_tx_next() flips the data toggle, so invert this here. */
+	s->data01 ^= 1;
+	usb_tx_next();
 	return (s->transfer_size);
 }
 
@@ -132,7 +146,13 @@ usb_rx_next(void)
 	/**
 	 * Otherwise we still need to receive more data.
 	 */
-	usb_rx_queue_next(s);
+	size_t nextlen = s->transfer_size;
+
+        if (nextlen > s->ep_maxsize)
+                nextlen = s->ep_maxsize;
+
+        void *addr = s->data_buf + s->pos;
+	usb_rx_queue_next(s, addr, nextlen);
 
 	return (1);
 }
@@ -155,7 +175,11 @@ usb_rx(void *buf, size_t len, ep_callback_t cb, void *cb_data)
 	s->callback = cb;
 	s->callback_data = cb_data;
 
-	usb_rx_queue_next(s);
+	size_t thislen = s->transfer_size;
+	if (thislen > s->ep_maxsize)
+		thislen = s->ep_maxsize;
+
+	usb_rx_queue_next(s, s->data_buf, thislen);
 	return (len);
 }
 
@@ -235,9 +259,23 @@ usb_handle_control(struct usb_ctrl_req_t *req)
 		usb.state = USBD_STATE_SETTING_ADDRESS;
 		break;
 
-	case USB_CTRL_REQ_GET_DESCRIPTOR:
-		/* XXX locate descriptor and usb_tx it */
-		break;
+	case USB_CTRL_REQ_GET_DESCRIPTOR: {
+		struct usb_desc_generic_t *desc;
+
+		switch (req->wValue >> 8) {
+		case USB_DESC_DEV:
+			desc = (void *)usb.dev_desc;
+			break;
+		case USB_DESC_CONFIG:
+			desc = (void *)usb.config_desc;
+			break;
+		case USB_DESC_STRING:
+			/* XXX */
+		default:
+			goto err;
+		}
+		return (usb_tx(desc, desc->bLength, req->wLength, NULL, NULL));
+	}
 
 	case USB_CTRL_REQ_GET_CONFIGURATION:
 		return (usb_tx_cp(&usb.config, 1)); /* XXX implicit LE
@@ -274,6 +312,8 @@ usb_setup_control(void)
 
 	usb.ep0_state.rx.data01 = USB_DATA01_DATA0;
 	usb.ep0_state.tx.data01 = USB_DATA01_DATA1;
+	usb.ep0_state.rx.ep_maxsize = EP0_BUFSIZE;
+	usb.ep0_state.tx.ep_maxsize = EP0_BUFSIZE;
 	usb_rx(buf, EP0_BUFSIZE, NULL, NULL);
 }
 
@@ -356,9 +396,12 @@ status_or_done:
 }
 
 void
-usb_start(void)
+usb_start(struct usb_desc_dev_t *dev_desc, struct usb_desc_config_t *config_desc)
 {
+	usb.dev_desc = dev_desc;
+	usb.config_desc = config_desc;
 	usb_setup_control();
+	usb_enable_xfers();
 }
 
 /**

@@ -50,6 +50,18 @@ enum usb_dev_proto {
 	USB_DEV_PROTO_VENDOR = 0xff
 };
 
+enum usb_iface_class {
+	USB_IFACE_CLASS_VENDOR = 0xff
+};
+
+enum usb_iface_subclass {
+	USB_IFACE_SUBCLASS_VENDOR = 0xff
+};
+
+enum usb_iface_proto {
+	USB_IFACE_PROTO_VENDOR = 0xff
+};
+
 union usb_bcd_t {
 	struct {
 		uint8_t sub : 4;
@@ -59,6 +71,13 @@ union usb_bcd_t {
 	uint16_t bcd;
 };
 CTASSERT_SIZE_BYTE(union usb_bcd_t, 2);
+
+struct usb_desc_generic_t {
+	uint8_t bLength;
+	enum usb_desc_type bDescriptorType : 8;
+	uint8_t data[];
+} __packed;
+CTASSERT_SIZE_BYTE(struct usb_desc_generic_t, 2);
 
 struct usb_desc_dev_t {
 	uint8_t bLength;
@@ -77,51 +96,6 @@ struct usb_desc_dev_t {
 	uint8_t bNumConfigurations;
 } __packed;
 CTASSERT_SIZE_BYTE(struct usb_desc_dev_t, 18);
-
-struct usb_desc_config_t {
-	uint8_t bLength;
-	enum usb_desc_type bDescriptorType : 8; /* = USB_DESC_CONFIG */
-	uint16_t wTotalLength;	     /* size of config, iface, ep */
-	uint8_t bNumInterfaces;
-	uint8_t bConfigurationValue;
-	uint8_t iConfiguration;
-	struct {
-		uint8_t _rsvd0 : 5;
-		uint8_t remote_wakeup : 1;
-		uint8_t self_powered : 1;
-		uint8_t one : 1; /* = 1 for historical reasons */
-	};
-	uint8_t bMaxPower;	/* units of 2mA */
-} __packed;
-CTASSERT_SIZE_BYTE(struct usb_desc_config_t, 9);
-
-enum usb_iface_class {
-	USB_IFACE_CLASS_SEE_IFACE = 0,
-	USB_IFACE_CLASS_VENDOR = 0xff
-};
-
-enum usb_iface_subclass {
-	USB_IFACE_SUBCLASS_SEE_IFACE = 0,
-	USB_IFACE_SUBCLASS_VENDOR = 0xff
-};
-
-enum usb_iface_proto {
-	USB_IFACE_PROTO_SEE_IFACE = 0,
-	USB_IFACE_PROTO_VENDOR = 0xff
-};
-
-struct usb_desc_iface_t {
-	uint8_t bLength;
-	enum usb_desc_type bDescriptorType : 8; /* = USB_DESC_IFACE */
-	uint8_t bInterfaceNumber;
-	uint8_t bAlternateSetting;
-	uint8_t bNumEndpoints;
-	enum usb_iface_class bInterfaceClass : 8;
-	enum usb_iface_subclass bInterfaceSubClass: 8;
-	enum usb_iface_proto bInterfaceProtocol : 8;
-	uint8_t iInterface;
-} __packed;
-CTASSERT_SIZE_BYTE(struct usb_desc_iface_t, 9);
 
 struct usb_desc_ep_t {
 	uint8_t bLength;
@@ -161,6 +135,38 @@ struct usb_desc_ep_t {
 	uint8_t bInterval;
 } __packed;
 CTASSERT_SIZE_BYTE(struct usb_desc_ep_t, 7);
+
+struct usb_desc_iface_t {
+	uint8_t bLength;
+	enum usb_desc_type bDescriptorType : 8; /* = USB_DESC_IFACE */
+	uint8_t bInterfaceNumber;
+	uint8_t bAlternateSetting;
+	uint8_t bNumEndpoints;
+	enum usb_iface_class bInterfaceClass : 8;
+	enum usb_iface_subclass bInterfaceSubClass: 8;
+	enum usb_iface_proto bInterfaceProtocol : 8;
+	uint8_t iInterface;
+	struct usb_desc_ep_t ep_descs[];
+} __packed;
+CTASSERT_SIZE_BYTE(struct usb_desc_iface_t, 9);
+
+struct usb_desc_config_t {
+	uint8_t bLength;
+	enum usb_desc_type bDescriptorType : 8; /* = USB_DESC_CONFIG */
+	uint16_t wTotalLength;	     /* size of config, iface, ep */
+	uint8_t bNumInterfaces;
+	uint8_t bConfigurationValue;
+	uint8_t iConfiguration;
+	struct {
+		uint8_t _rsvd0 : 5;
+		uint8_t remote_wakeup : 1;
+		uint8_t self_powered : 1;
+		uint8_t one : 1; /* = 1 for historical reasons */
+	};
+	uint8_t bMaxPower;	/* units of 2mA */
+	struct usb_desc_iface_t iface_descs[];
+} __packed;
+CTASSERT_SIZE_BYTE(struct usb_desc_config_t, 9);
 
 struct usb_desc_string_t {
 	uint8_t bLength;
@@ -383,6 +389,9 @@ struct usbd_t {
 	int address;
 	int config;
 	struct usbd_ep_state_t ep0_state;
+	struct usb_desc_dev_t *dev_desc;
+	struct usb_desc_config_t *config_desc;
+	struct usb_desc_string_t **string_descs;
 	uint8_t ep0_buf[EP0_BUFSIZE][2];
 };
 
@@ -397,8 +406,8 @@ void usb_set_addr(int);
 void usb_ep_stall(int);
 void usb_clear_transfers(void);
 size_t usb_ep_get_transfer_size(int, enum usb_ep_dir, enum usb_ep_pingpong);
-void usb_tx_queue_next(struct usbd_ep_pipe_state_t *);
-void usb_rx_queue_next(struct usbd_ep_pipe_state_t *);
+void usb_tx_queue_next(struct usbd_ep_pipe_state_t *, void *, size_t);
+void usb_rx_queue_next(struct usbd_ep_pipe_state_t *, void *, size_t);
 
-void usb_start(void);
+void usb_start(struct usb_desc_dev_t *, struct usb_desc_config_t *);
 void usb_handle_transaction(struct usb_xfer_info *);
