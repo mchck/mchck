@@ -211,7 +211,7 @@ usb_handle_control_status(void *data, ssize_t len, void *cbdata)
 
 	default:
 		usb.ep0_state.tx.data01 = USB_DATA01_DATA1;
-		usb_tx(NULL, 0, 0, usb_handle_control_done, NULL);
+		usb_tx(NULL, 0, 1 /* short packet */, usb_handle_control_done, NULL);
 		break;
 	}
 }
@@ -285,6 +285,7 @@ usb_handle_control(void *data, ssize_t len, void *cbdata)
 		 * Nothing to do.  Maybe return STALLs on illegal
 		 * accesses?
 		 */
+		usb_handle_control_status(NULL, 0, NULL);
 		break;
 
 	case USB_CTRL_REQ_SET_ADDRESS:
@@ -296,6 +297,7 @@ usb_handle_control(void *data, ssize_t len, void *cbdata)
 		 */
 		usb.address = req->wValue & 0x7f;
 		usb.state = USBD_STATE_SETTING_ADDRESS;
+		usb_handle_control_status(NULL, 0, NULL);
 		break;
 
 	case USB_CTRL_REQ_GET_DESCRIPTOR: {
@@ -327,6 +329,7 @@ usb_handle_control(void *data, ssize_t len, void *cbdata)
 		/* XXX check config */
 		usb.config = req->wValue;
 		usb.state = USBD_STATE_CONFIGURED;
+		usb_handle_control_status(NULL, 0, NULL);
 		break;
 
 	case USB_CTRL_REQ_GET_INTERFACE:
