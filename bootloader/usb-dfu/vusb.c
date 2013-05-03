@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <poll.h>
 
 #include "usb.h"
 
@@ -431,6 +432,16 @@ vusb_deliver_packet(struct vusb_pipe_state_t *ps)
         usb_handle_transaction(&stat);
 }
 
+static void
+vusb_urb_to_req(struct vusb_urb_t *urb, struct usbip_header_basic *h)
+{
+        h->command = htonl(USBIP_RET_SUBMIT);
+        h->seqnum = htonl(urb->seqnum);
+        h->devid = htonl(urb->devid);
+        h->direction = htonl(urb->direction);
+        h->ep = htonl(urb->ep);
+}
+
 static enum usb_tok_pid
 vusb_tx_one(int ep, enum usb_tok_pid tok, void *addr, size_t len)
 {
@@ -438,6 +449,11 @@ vusb_tx_one(int ep, enum usb_tok_pid tok, void *addr, size_t len)
 
         if (!vusb_dev.running)
                 return (USB_PID_TIMEOUT);
+
+        if (ep == 0 && tok == USB_PID_SETUP) {
+                es->stalled = 0;
+                vusb_dev.running = 0;
+        }
 
         if (es->stalled)
                 return (USB_PID_STALL);
@@ -505,19 +521,21 @@ vusb_tx(struct vusb_urb_t *urb)
                           USB_PID_OUT,
                           urb->data + urb->actual_length,
                           thislen);
-        if (tok == USB_PID_STALL) {
+        switch (tok) {
+        case USB_PID_STALL:
                 urb->status = -EPIPE;
-                /* XXX return urb */
-        } else if (tok == USB_PID_ACK) {
+                return (-1);
+        case USB_PID_ACK:
                 urb->actual_length += thislen;
                 /* Are we done? */
                 if (urb->actual_length == urb->transfer_length &&
                     /* short packet sent or no zero asked for */
                     (thislen < ep_len ||
                      !(urb->transfer_flags & URB_ZERO_PACKET))) {
-                        /* XXX return urb */
                         return (1);
                 }
+        default:
+                break;
         }
 
         return (0);
@@ -540,27 +558,65 @@ vusb_rx(struct vusb_urb_t *urb)
                           urb->data + urb->actual_length,
                           thislen,
                           &rxlen);
-        if (tok == USB_PID_STALL) {
+        switch (tok) {
+        case USB_PID_STALL:
                 urb->status = -EPIPE;
-                /* XXX return urb */
-        } else if (tok == USB_PID_ACK) {
+                return (-1);
+        case USB_PID_ACK:
                  if (rxlen < thislen &&
                      (urb->transfer_flags & URB_SHORT_NOT_OK)) {
                          urb->status = -EREMOTEIO;
-                         /* XXX return urb */
+                         return (-1);
                  } else {
                          urb->actual_length += rxlen;
                          /* Are we done? */
                          if (urb->actual_length == urb->transfer_length ||
                              rxlen < thislen) {
-                                 /* XXX return urb */
                                  return (1);
                          }
                  }
+        default:
+                break;
         }
 
         return (0);
 }
+
+static int
+vusb_setup_status(struct vusb_urb_t *urb)
+{
+        int direction = !urb->direction;
+
+        if (direction == USBIP_DIR_OUT) {
+                switch (vusb_tx_one(urb->ep, USB_PID_OUT, NULL, 0)) {
+                case USB_PID_ACK:
+                        urb->setup_state = VUSB_SETUP_DONE;
+                        return (1);
+                case USB_PID_STALL:
+                        urb->status = -EPIPE;
+                        return (-1);
+                default:
+                        return (0);
+                }
+        } else {
+                size_t rxlen;
+
+                switch (vusb_rx_one(urb->ep, USB_PID_IN, NULL, 0, &rxlen)) {
+                case USB_PID_STALL:
+                        urb->status = -EPIPE;
+                        return (-1);
+                case USB_PID_ACK:
+                        if (rxlen > 0)
+                                urb->status = -EOVERFLOW;
+                        urb->setup_state = VUSB_SETUP_DONE;
+                        return (1);
+                default:
+                        return (0);
+                }
+        }
+        /* NOTREACHED */
+}
+
 
 
 static int
@@ -577,28 +633,7 @@ vusb_process_urb(struct vusb_urb_t *urb)
                 return (0);
 
         case VUSB_SETUP_STATUS:
-                direction = !direction;
-                if (direction == USBIP_DIR_OUT) {
-                        if (vusb_tx_one(urb->ep, USB_PID_OUT, NULL, 0) != USB_PID_ACK)
-                                return (-1);
-                        urb->setup_state = VUSB_SETUP_DONE;
-                        /* XXX return urb */
-                } else {
-                        size_t rxlen;
-                        enum usb_tok_pid tok;
-
-                        tok = vusb_rx_one(urb->ep, USB_PID_IN, NULL, 0, &rxlen);
-                        if (tok == USB_PID_STALL) {
-                                urb->status = -EPIPE;
-                                /* XXX return urb */
-                        } else if (tok == USB_PID_ACK) {
-                                if (rxlen > 0)
-                                        urb->status = -EOVERFLOW;
-                                urb->setup_state = VUSB_SETUP_DONE;
-                                /* XXX return urb */
-                        }
-                }
-                break;
+                return (vusb_setup_status(urb));
 
         case VUSB_SETUP_DATA:
         case VUSB_SETUP_NONE:
@@ -608,12 +643,45 @@ vusb_process_urb(struct vusb_urb_t *urb)
                 else
                         status = vusb_rx(urb);
 
-                if (status > 0 && urb->setup_state == VUSB_SETUP_DATA)
+                if (status > 0 && urb->setup_state == VUSB_SETUP_DATA) {
                         urb->setup_state = VUSB_SETUP_STATUS;
-                break;
+                        status = 0;
+                }
+
+                return (status);
         }
 
         return (-1);
+}
+
+static void
+vusb_ret_submit(struct vusb_urb_t *urb)
+{
+        struct usbip_header requn;
+        struct iovec iov[3];
+        int iovcnt = 0;
+        struct usbip_header_ret_submit *r = &requn.u.ret_submit;
+
+        vusb_urb_to_req(urb, &requn.base);
+        r->status = htonl(urb->status);
+        r->actual_length = htonl(urb->actual_length);
+        r->start_frame = htonl(urb->start_frame);
+        r->number_of_packets = htonl(urb->number_of_packets);
+        r->error_count = htonl(urb->error_count);
+
+        iov[iovcnt].iov_base = &requn;
+        iov[iovcnt].iov_len = sizeof(requn);
+        iovcnt++;
+
+        if (urb->direction == USBIP_DIR_IN) {
+                iov[iovcnt].iov_base = urb->data;
+                iov[iovcnt].iov_len = urb->actual_length;
+                iovcnt++;
+        }
+
+        /* XXX iso */
+        if (writev(vusb_sock, iov, iovcnt) < 0)
+                err(1, "send urb return");
 }
 
 static void
@@ -622,8 +690,9 @@ vusb_process_urbs(void)
         struct vusb_urb_t **p;
         struct vusb_urb_t *urb;
 
-        for (p = &urbs, urb = *p; urb != NULL; p = &(*p)->next, urb = *p) {
-                if (vusb_process_urb(urb) > 0) {
+        for (p = &urbs; (urb = *p) != NULL; p = *p ? &(*p)->next : p) {
+                if (vusb_process_urb(urb)) {
+                        vusb_ret_submit(urb);
                         *p = urb->next;
                         free(urb);
                 }
@@ -631,10 +700,20 @@ vusb_process_urbs(void)
 }
 
 static void
-vusb_rcv(void)
+vusb_rcv(int block)
 {
         struct usbip_header requn;
         struct usbip_header_basic *h = &requn.base;
+
+        if (!block) {
+                struct pollfd pfd;
+
+                /* check if there is data */
+                pfd.fd = vusb_sock;
+                pfd.events = POLLIN;
+                if (poll(&pfd, 1, 0) <= 0)
+                        return;
+        }
 
         sockread(&requn, sizeof(requn));
 
@@ -705,7 +784,7 @@ main(void)
         usb_start(&dev_desc, &config_desc);
         vusb_attach();
         for (;;) {
-                vusb_rcv();
+                vusb_rcv(urbs == NULL);
                 vusb_process_urbs();
         }
 }

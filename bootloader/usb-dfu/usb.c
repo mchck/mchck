@@ -91,7 +91,7 @@ usb_tx(void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_data)
 }
 
 int
-usb_tx_cp(void *buf, size_t len)
+usb_tx_cp(void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_data)
 {
 	enum usb_ep_pingpong pp = usb.ep0_state.tx.pingpong;
 	void *destbuf = usb.ep0_buf[pp];
@@ -184,6 +184,38 @@ usb_rx(void *buf, size_t len, ep_callback_t cb, void *cb_data)
 }
 
 
+static void usb_setup_control(void);
+
+static void
+usb_handle_control_done(void *data, ssize_t len, void *cbdata)
+{
+	usb.ctrl_state = USBD_CTRL_STATE_IDLE;
+	if (usb.state == USBD_STATE_SETTING_ADDRESS) {
+		usb.state = USBD_STATE_ADDRESS;
+		usb_set_addr(usb.address);
+	}
+	usb_setup_control();
+}
+
+void
+usb_handle_control_status(void *data, ssize_t len, void *cbdata)
+{
+	usb.ctrl_state = USBD_CTRL_STATE_STATUS;
+
+	/* empty status transfer */
+	switch (usb.ctrl_dir) {
+	case USB_CTRL_REQ_IN:
+		usb.ep0_state.rx.data01 = USB_DATA01_DATA1;
+		usb_rx(NULL, 0, usb_handle_control_done, NULL);
+		break;
+
+	default:
+		usb.ep0_state.tx.data01 = USB_DATA01_DATA1;
+		usb_tx(NULL, 0, 0, usb_handle_control_done, NULL);
+		break;
+	}
+}
+
 /**
  *
  * Great resource: http://wiki.osdev.org/Universal_Serial_Bus
@@ -219,10 +251,15 @@ usb_rx(void *buf, size_t len, ep_callback_t cb, void *cb_data)
  * this to save space.
  */
 
-int
-usb_handle_control(struct usb_ctrl_req_t *req)
+static void
+usb_handle_control(void *data, ssize_t len, void *cbdata)
 {
+	struct usb_ctrl_req_t *req = data;
 	uint16_t zero16 = 0;
+
+	usb_clear_transfers();
+	usb.ctrl_state = USBD_CTRL_STATE_DATA;
+	usb.ctrl_dir = req->in;
 
 	if (req->type != USB_CTRL_REQ_STD) {
 		/* XXX pass on to higher levels */
@@ -238,7 +275,9 @@ usb_handle_control(struct usb_ctrl_req_t *req)
 		 * only EP 0 so far, all GET_STATUS replies are just
 		 * empty.
 		 */
-		return (usb_tx_cp(&zero16, sizeof(zero16)));
+		usb_tx_cp(&zero16, sizeof(zero16), req->wLength,
+			  usb_handle_control_status, NULL);
+		break;
 
 	case USB_CTRL_REQ_CLEAR_FEATURE:
 	case USB_CTRL_REQ_SET_FEATURE:
@@ -274,12 +313,15 @@ usb_handle_control(struct usb_ctrl_req_t *req)
 		default:
 			goto err;
 		}
-		return (usb_tx(desc, desc->bLength, req->wLength, NULL, NULL));
+		usb_tx(desc, desc->bLength, req->wLength,
+		       usb_handle_control_status, NULL);
+		break;
 	}
 
 	case USB_CTRL_REQ_GET_CONFIGURATION:
-		return (usb_tx_cp(&usb.config, 1)); /* XXX implicit LE
-						     * */
+		usb_tx_cp(&usb.config, 1, req->wLength,
+			  usb_handle_control_status, NULL); /* XXX implicit LE */
+		break;
 
 	case USB_CTRL_REQ_SET_CONFIGURATION:
 		/* XXX check config */
@@ -289,7 +331,9 @@ usb_handle_control(struct usb_ctrl_req_t *req)
 
 	case USB_CTRL_REQ_GET_INTERFACE:
 		/* We only support iface setting 0 */
-		return (usb_tx_cp(&zero16, 1));
+		usb_tx_cp(&zero16, 1, req->wLength,
+			  usb_handle_control_status, NULL);
+		break;
 
 	case USB_CTRL_REQ_SET_INTERFACE:
 		/* We don't support alternate iface settings */
@@ -299,10 +343,13 @@ usb_handle_control(struct usb_ctrl_req_t *req)
 		goto err;
 	}
 
-	return (0);
+	goto out;
 
 err:
-	return (-1);
+	usb_ep_stall(0);
+	usb_setup_control();
+out:
+	usb_enable_xfers();
 }
 
 void
@@ -314,83 +361,21 @@ usb_setup_control(void)
 	usb.ep0_state.tx.data01 = USB_DATA01_DATA1;
 	usb.ep0_state.rx.ep_maxsize = EP0_BUFSIZE;
 	usb.ep0_state.tx.ep_maxsize = EP0_BUFSIZE;
-	usb_rx(buf, EP0_BUFSIZE, NULL, NULL);
+	usb_rx(buf, EP0_BUFSIZE, usb_handle_control, NULL);
 }
 
 void
 usb_handle_control_ep(struct usb_xfer_info *stat)
 {
-	struct usb_ctrl_req_t *req;
-	int r;
-
 	switch (usb_get_xfer_pid(stat)) {
-	default:
-		/* unknown PID? */
-		break;
 	case USB_PID_SETUP:
-		usb_clear_transfers();
-
-		req = usb_get_xfer_data(stat);
-		r = usb_handle_control(req);
-		switch (r) {
-		default:
-			/* Data transfer outstanding */
-			usb.ctrl_state = USBD_CTRL_STATE_DATA;
-			break;
-
-		case 0:
-			usb.ctrl_state = USBD_CTRL_STATE_STATUS;
-			usb_tx(NULL, 0, 0, NULL, NULL); /* empty status transfer */
-			break;
-
-		case -1:
-			/* error */
-			usb_ep_stall(0);
-			usb_setup_control();
-			break;
-		}
-		usb_enable_xfers();
-		break;
-
-	case USB_PID_IN:
-		if (usb_tx_next())
-			break;
-
-		goto status_or_done;
-
 	case USB_PID_OUT:
-		if (usb_rx_next())
-			break;
-
-status_or_done:
-		switch (usb.ctrl_state) {
-		case USBD_CTRL_STATE_DATA:
-			usb.ctrl_state = USBD_CTRL_STATE_STATUS;
-
-			/* empty status transfer */
-			switch (usb_get_xfer_pid(stat)) {
-			case USB_PID_IN:
-				usb.ep0_state.rx.data01 = USB_DATA01_DATA1;
-				usb_rx(NULL, 0, NULL, NULL);
-				break;
-
-			default:
-				usb.ep0_state.tx.data01 = USB_DATA01_DATA1;
-				usb_tx(NULL, 0, 0, NULL, NULL);
-				break;
-			}
-			break;
-
-		default:
-			/* done with status */
-			usb.ctrl_state = USBD_CTRL_STATE_IDLE;
-			if (usb.state == USBD_STATE_SETTING_ADDRESS) {
-				usb.state = USBD_STATE_ADDRESS;
-				usb_set_addr(usb.address);
-			}
-			usb_setup_control();
-			break;
-		}
+		usb_rx_next();
+		break;
+	case USB_PID_IN:
+		usb_tx_next();
+		break;
+	default:
 		break;
 	}
 }
