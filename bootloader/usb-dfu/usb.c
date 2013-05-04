@@ -68,11 +68,11 @@ usb_tx_next(void)
  * Returns: size to be transfered, or -1 on error.
  */
 int
-usb_tx(void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_data)
+usb_tx(const void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_data)
 {
 	struct usbd_ep_pipe_state_t *s = &usb.ep0_state.tx;
 
-	s->data_buf = buf;
+	s->data_buf = (void *)buf;
 	s->transfer_size = len;
 	s->pos = 0;
 	s->callback = cb;
@@ -91,7 +91,7 @@ usb_tx(void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_data)
 }
 
 int
-usb_tx_cp(void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_data)
+usb_tx_cp(const void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_data)
 {
 	enum usb_ep_pingpong pp = usb.ep0_state.tx.pingpong;
 	void *destbuf = usb.ep0_buf[pp];
@@ -301,17 +301,25 @@ usb_handle_control(void *data, ssize_t len, void *cbdata)
 		break;
 
 	case USB_CTRL_REQ_GET_DESCRIPTOR: {
-		struct usb_desc_generic_t *desc;
+		const struct usb_desc_generic_t *desc;
 
 		switch (req->wValue >> 8) {
 		case USB_DESC_DEV:
-			desc = (void *)usb.dev_desc;
+			desc = (const void *)usb.dev_desc;
 			break;
 		case USB_DESC_CONFIG:
-			desc = (void *)usb.config_desc;
+			desc = (const void *)usb.config_desc;
 			break;
-		case USB_DESC_STRING:
-			/* XXX */
+		case USB_DESC_STRING: {
+			int idx = req->wValue & 0xff;
+			const struct usb_desc_string_t * const *d;
+			for (d = usb.string_descs; idx != 0 && *d != NULL; ++d)
+				--idx;
+			if (*d == NULL)
+				goto err;
+			desc = (const void *)*d;
+			break;
+		}
 		default:
 			goto err;
 		}
@@ -384,10 +392,13 @@ usb_handle_control_ep(struct usb_xfer_info *stat)
 }
 
 void
-usb_start(struct usb_desc_dev_t *dev_desc, struct usb_desc_config_t *config_desc)
+usb_start(const struct usb_desc_dev_t *dev_desc,
+	  const struct usb_desc_config_t *config_desc,
+	  const struct usb_desc_string_t * const *string_descs)
 {
 	usb.dev_desc = dev_desc;
 	usb.config_desc = config_desc;
+	usb.string_descs = string_descs;
 	usb_setup_control();
 	usb_enable_xfers();
 }

@@ -2,7 +2,7 @@
 
 #include <inttypes.h>
 #include <string.h>
-#include <wchar.h>
+#include <uchar.h>
 
 /**
  * Note: bitfields ahead.
@@ -171,8 +171,9 @@ CTASSERT_SIZE_BYTE(struct usb_desc_config_t, 9);
 struct usb_desc_string_t {
 	uint8_t bLength;
 	enum usb_desc_type bDescriptorType : 8; /* = USB_DESC_STRING */
-	wchar_t bString[];
-};
+	const char16_t bString[];
+} __packed;
+CTASSERT_SIZE_BYTE(struct usb_desc_string_t, 2);
 
 
 /**
@@ -389,9 +390,9 @@ struct usbd_t {
 	int address;
 	int config;
 	struct usbd_ep_state_t ep0_state;
-	struct usb_desc_dev_t *dev_desc;
-	struct usb_desc_config_t *config_desc;
-	struct usb_desc_string_t **string_descs;
+	const struct usb_desc_dev_t *dev_desc;
+	const struct usb_desc_config_t *config_desc;
+	const struct usb_desc_string_t * const *string_descs;
 	uint8_t ep0_buf[EP0_BUFSIZE][2];
 };
 
@@ -409,5 +410,5 @@ size_t usb_ep_get_transfer_size(int, enum usb_ep_dir, enum usb_ep_pingpong);
 void usb_tx_queue_next(struct usbd_ep_pipe_state_t *, void *, size_t);
 void usb_rx_queue_next(struct usbd_ep_pipe_state_t *, void *, size_t);
 
-void usb_start(struct usb_desc_dev_t *, struct usb_desc_config_t *);
+void usb_start(const struct usb_desc_dev_t *, const struct usb_desc_config_t *, const struct usb_desc_string_t * const *);
 void usb_handle_transaction(struct usb_xfer_info *);

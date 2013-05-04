@@ -447,20 +447,44 @@ vusb_tx_one(int ep, enum usb_tok_pid tok, void *addr, size_t len)
 {
         struct vusb_ep_state_t *es = &vusb_dev.ep[ep];
 
-        if (!vusb_dev.running)
+        switch (tok) {
+        case USB_PID_SETUP:
+                printf("SETUP\n");
+                break;
+        case USB_PID_OUT:
+                printf("OUT\n");
+                break;
+        default:
+                printf("weh\n");
+                break;
+        }
+        for (size_t i = 0; i < len; ++i)
+                printf("%02x%s",
+                       ((unsigned char *)addr)[i],
+                       (i + 1) % 8 ? " " : "\n");
+        if (len % 8 != 0)
+                printf("\n");
+
+        if (!vusb_dev.running) {
+                printf("-> TIMEOUT\n");
                 return (USB_PID_TIMEOUT);
+        }
 
         if (ep == 0 && tok == USB_PID_SETUP) {
                 es->stalled = 0;
                 vusb_dev.running = 0;
         }
 
-        if (es->stalled)
+        if (es->stalled) {
+                printf("-> STALL\n");
                 return (USB_PID_STALL);
+        }
 
         struct vusb_pipe_state_t *ps = &es->rx[es->pingpong_rx];
-        if (!ps->ready)
+        if (!ps->ready) {
+                printf("-> NAK\n");
                 return (USB_PID_NAK);
+        }
 
         size_t xlen = len;
         if (xlen > ps->len)
@@ -469,7 +493,11 @@ vusb_tx_one(int ep, enum usb_tok_pid tok, void *addr, size_t len)
         memcpy(ps->addr, addr, xlen);
         ps->recv_len = len;
         ps->tok = tok;
+        ps->ready = 0;
         es->pingpong_rx ^= 1;
+
+        printf("-> ACK%s\n",
+               xlen < len ? " (short)" : "");
 
         vusb_deliver_packet(ps);
 
@@ -481,15 +509,40 @@ vusb_rx_one(int ep, enum usb_tok_pid tok, void *addr, size_t len, size_t *rxlen)
 {
         struct vusb_ep_state_t *es = &vusb_dev.ep[ep];
 
-        if (!vusb_dev.running)
-                return (USB_PID_TIMEOUT);
+        switch (tok) {
+        case USB_PID_IN:
+                printf("IN\n");
+                break;
+        default:
+                printf("weh\n");
+                break;
+        }
 
-        if (es->stalled)
+        if (!vusb_dev.running) {
+                printf("-> TIMEOUT\n");
+                return (USB_PID_TIMEOUT);
+        }
+
+        if (es->stalled) {
+                printf("-> STALL\n");
                 return (USB_PID_STALL);
+        }
 
         struct vusb_pipe_state_t *ps = &es->tx[es->pingpong_tx];
-        if (!ps->ready)
+        if (!ps->ready) {
+                printf("-> NAK\n");
                 return (USB_PID_NAK);
+        }
+
+        for (size_t i = 0; i < ps->len; ++i)
+                printf("%02x%s",
+                       ((unsigned char *)ps->addr)[i],
+                       (i + 1) % 8 ? " " : "\n");
+        if (ps->len % 8 != 0)
+                printf("\n");
+
+        printf("-> ACK%s\n",
+               len > ps->len ? " (short)" : "");
 
         size_t xlen = len;
         if (xlen > ps->len)
@@ -498,7 +551,8 @@ vusb_rx_one(int ep, enum usb_tok_pid tok, void *addr, size_t len, size_t *rxlen)
         memcpy(addr, ps->addr, xlen);
         ps->recv_len = len;
         ps->tok = tok;
-        es->pingpong_rx ^= 1;
+        ps->ready = 0;
+        es->pingpong_tx ^= 1;
         *rxlen = ps->len;
 
         vusb_deliver_packet(ps);
@@ -629,7 +683,10 @@ vusb_process_urb(struct vusb_urb_t *urb)
         case VUSB_SETUP_SETUP:
                 if (vusb_tx_one(urb->ep, USB_PID_SETUP, urb->setup, sizeof(urb->setup)) != USB_PID_ACK)
                         return (-1);
-                urb->setup_state = VUSB_SETUP_DATA;
+                if (urb->transfer_length > 0)
+                        urb->setup_state = VUSB_SETUP_DATA;
+                else
+                        urb->setup_state = VUSB_SETUP_STATUS;
                 return (0);
 
         case VUSB_SETUP_STATUS:
@@ -737,7 +794,7 @@ vusb_rcv(int block)
         }
 }
 
-static struct usb_desc_dev_t dev_desc = {
+const static struct usb_desc_dev_t dev_desc = {
         .bLength = sizeof(struct usb_desc_dev_t),
         .bDescriptorType = USB_DESC_DEV,
         .bcdUSB = { .maj = 2 },
@@ -748,13 +805,13 @@ static struct usb_desc_dev_t dev_desc = {
         .idVendor = 0x2323,
         .idProduct = 1,
         .bcdDevice = { .bcd = 0 },
-        .iManufacturer = 0,
-        .iProduct = 0,
+        .iManufacturer = 1,
+        .iProduct = 1,
         .iSerialNumber = 0,
         .bNumConfigurations = 1,
 };
 
-static struct usb_desc_config_t config_desc = {
+const static struct usb_desc_config_t config_desc = {
         .bLength = sizeof(struct usb_desc_config_t),
         .bDescriptorType = USB_DESC_CONFIG,
         .wTotalLength = sizeof(config_desc),
@@ -778,10 +835,26 @@ static struct usb_desc_config_t config_desc = {
                 }},
 };
 
+const static struct usb_desc_string_t * const string_descs[] = {
+#define USB_DEF_DESC_STRING(s)                  \
+        (void *)&(struct {                                              \
+        struct usb_desc_string_t dsc;                                   \
+        char16_t str[sizeof(s) / 2 - 1];                                 \
+        } __packed) {{                                                  \
+                .bLength = sizeof(struct usb_desc_string_t) + sizeof(s) - 2, \
+                .bDescriptorType = USB_DESC_STRING,                     \
+                },                                                      \
+           s                                                            \
+        }
+        USB_DEF_DESC_STRING(u"\x0409"),
+        USB_DEF_DESC_STRING(u"MCHCK test"),
+        NULL
+};
+
 int
 main(void)
 {
-        usb_start(&dev_desc, &config_desc);
+        usb_start(&dev_desc, &config_desc, string_descs);
         vusb_attach();
         for (;;) {
                 vusb_rcv(urbs == NULL);
