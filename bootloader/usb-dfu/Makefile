@@ -1,4 +1,4 @@
-CFLAGS+= -Wall -std=c99 -g
+CFLAGS+= -Wall -std=gnu99 -g
 
 vusb: usb.o vusb.o
 
