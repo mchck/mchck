@@ -191,6 +191,7 @@ struct vusb_pipe_state_t {
 struct vusb_dev_t {
         int address;
         int running;
+        int activity;
         struct vusb_ep_state_t {
                 int stalled;
                 int pingpong_rx;
@@ -330,6 +331,7 @@ void
 usb_enable_xfers(void)
 {
         vusb_dev.running = 1;
+        vusb_dev.activity = 1;
 }
 
 void
@@ -367,6 +369,7 @@ usb_tx_queue_next(struct usbd_ep_pipe_state_t *s, void *addr, size_t len)
         ps->addr = addr;
         ps->len = len;
         ps->ready = 1;
+        vusb_dev.activity = 1;
 }
 
 void
@@ -378,49 +381,9 @@ usb_rx_queue_next(struct usbd_ep_pipe_state_t *s, void *addr, size_t len)
         ps->addr = addr;
         ps->len = len;
         ps->ready = 1;
+        vusb_dev.activity = 1;
 }
 
-
-static void
-handle_cmd_submit(struct usbip_header *requn)
-{
-        struct usbip_header_basic *h = &requn->base;
-        struct usbip_header_cmd_submit *req = &requn->u.cmd_submit;
-        struct vusb_urb_t *urb;
-        int len;
-
-        len = ntohl(req->transfer_buffer_length);
-
-        urb = calloc(1, sizeof(*urb) + len);
-        if (urb == NULL)
-                err(1, "cannot allocate urb");
-
-        urb->seqnum = h->seqnum;
-        urb->devid = h->devid;
-        urb->direction = h->direction;
-        urb->ep = h->ep;
-
-        urb->transfer_flags = ntohl(req->transfer_flags);
-        urb->transfer_length = ntohl(req->transfer_buffer_length);
-        urb->start_frame = ntohl(req->start_frame);
-        urb->number_of_packets = ntohl(req->number_of_packets);
-        urb->interval = ntohl(req->interval);
-
-        memcpy(urb->setup, req->setup, sizeof(urb->setup));
-
-        /* unfortunately we have to infer a setup transfer */
-        char zeros[8] = {0};
-        if (urb->ep == 0 && memcmp(urb->setup, zeros, sizeof(zeros)) != 0) {
-                urb->setup_state = VUSB_SETUP_SETUP;
-        }
-
-        if (urb->direction == USBIP_DIR_OUT) {
-                sockread(urb->data, urb->transfer_length);
-        }
-
-        urb->next = urbs;
-        urbs = urb;
-}
 
 static void
 vusb_deliver_packet(struct vusb_pipe_state_t *ps)
@@ -473,6 +436,7 @@ vusb_tx_one(int ep, enum usb_tok_pid tok, void *addr, size_t len)
         if (ep == 0 && tok == USB_PID_SETUP) {
                 es->stalled = 0;
                 vusb_dev.running = 0;
+                vusb_dev.activity = 1;
         }
 
         if (es->stalled) {
@@ -500,6 +464,7 @@ vusb_tx_one(int ep, enum usb_tok_pid tok, void *addr, size_t len)
                xlen < len ? " (short)" : "");
 
         vusb_deliver_packet(ps);
+        vusb_dev.activity = 1;
 
         return (USB_PID_ACK);
 }
@@ -556,6 +521,7 @@ vusb_rx_one(int ep, enum usb_tok_pid tok, void *addr, size_t len, size_t *rxlen)
         *rxlen = ps->len;
 
         vusb_deliver_packet(ps);
+        vusb_dev.activity = 1;
 
         return (USB_PID_ACK);
 }
@@ -712,6 +678,48 @@ vusb_process_urb(struct vusb_urb_t *urb)
 }
 
 static void
+handle_cmd_submit(struct usbip_header *requn)
+{
+        struct usbip_header_basic *h = &requn->base;
+        struct usbip_header_cmd_submit *req = &requn->u.cmd_submit;
+        struct vusb_urb_t *urb;
+        int len;
+
+        len = ntohl(req->transfer_buffer_length);
+
+        urb = calloc(1, sizeof(*urb) + len);
+        if (urb == NULL)
+                err(1, "cannot allocate urb");
+
+        urb->seqnum = h->seqnum;
+        urb->devid = h->devid;
+        urb->direction = h->direction;
+        urb->ep = h->ep;
+
+        urb->transfer_flags = ntohl(req->transfer_flags);
+        urb->transfer_length = ntohl(req->transfer_buffer_length);
+        urb->start_frame = ntohl(req->start_frame);
+        urb->number_of_packets = ntohl(req->number_of_packets);
+        urb->interval = ntohl(req->interval);
+
+        memcpy(urb->setup, req->setup, sizeof(urb->setup));
+
+        /* unfortunately we have to infer a setup transfer */
+        char zeros[8] = {0};
+        if (urb->ep == 0 && memcmp(urb->setup, zeros, sizeof(zeros)) != 0) {
+                urb->setup_state = VUSB_SETUP_SETUP;
+        }
+
+        if (urb->direction == USBIP_DIR_OUT) {
+                sockread(urb->data, urb->transfer_length);
+        }
+
+        urb->next = urbs;
+        urbs = urb;
+        vusb_dev.activity = 1;
+}
+
+static void
 vusb_ret_submit(struct vusb_urb_t *urb)
 {
         struct usbip_header requn;
@@ -857,7 +865,8 @@ main(void)
         usb_start(&dev_desc, &config_desc, string_descs);
         vusb_attach();
         for (;;) {
-                vusb_rcv(urbs == NULL);
+                vusb_rcv(urbs == NULL || vusb_dev.activity == 0);
+                vusb_dev.activity = 0;
                 vusb_process_urbs();
         }
 }
