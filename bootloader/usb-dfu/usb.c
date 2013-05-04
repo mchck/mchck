@@ -100,7 +100,7 @@ usb_tx_cp(const void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb
 		return (-1);
 	memcpy(destbuf, buf, len);
 
-	return (usb_tx(destbuf, len, len, NULL, NULL));
+	return (usb_tx(destbuf, len, reqlen, cb, cb_data));
 }
 
 
