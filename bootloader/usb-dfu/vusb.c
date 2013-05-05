@@ -819,50 +819,45 @@ const static struct usb_desc_dev_t dev_desc = {
         .bNumConfigurations = 1,
 };
 
-const static struct usb_desc_config_t config_desc = {
-        .bLength = sizeof(struct usb_desc_config_t),
-        .bDescriptorType = USB_DESC_CONFIG,
-        .wTotalLength = sizeof(config_desc),
-        .bNumInterfaces = 1,
-        .bConfigurationValue = 0,
-        .iConfiguration = 0,
-        .remote_wakeup = 0,
-        .self_powered = 0,
-        .one = 1,
-        .bMaxPower = 50,
-        .iface_descs = {{
-                        .bLength = sizeof(struct usb_desc_iface_t),
-                        .bDescriptorType = USB_DESC_IFACE,
-                        .bInterfaceNumber = 0,
-                        .bAlternateSetting = 0,
-                        .bNumEndpoints = 0,
-                        .bInterfaceClass = USB_IFACE_CLASS_VENDOR,
-                        .bInterfaceSubClass = 0,
-                        .bInterfaceProtocol = 0,
-                        .iInterface = 0,
-                }},
+const static struct {
+        struct usb_desc_config_t config;
+        struct usb_desc_iface_t iface;
+} __packed config_desc = {
+        .config = {
+                .bLength = sizeof(struct usb_desc_config_t),
+                .bDescriptorType = USB_DESC_CONFIG,
+                .wTotalLength = sizeof(config_desc),
+                .bNumInterfaces = 1,
+                .bConfigurationValue = 0,
+                .iConfiguration = 0,
+                .remote_wakeup = 0,
+                .self_powered = 0,
+                .one = 1,
+                .bMaxPower = 50
+        },
+        .iface = {
+                .bLength = sizeof(struct usb_desc_iface_t),
+                .bDescriptorType = USB_DESC_IFACE,
+                .bInterfaceNumber = 0,
+                .bAlternateSetting = 0,
+                .bNumEndpoints = 0,
+                .bInterfaceClass = USB_DEV_CLASS_VENDOR,
+                .bInterfaceSubClass = 0,
+                .bInterfaceProtocol = 0,
+                .iInterface = 0,
+        }
 };
 
 const static struct usb_desc_string_t * const string_descs[] = {
-#define USB_DEF_DESC_STRING(s)                  \
-        (void *)&(struct {                                              \
-        struct usb_desc_string_t dsc;                                   \
-        char16_t str[sizeof(s) / 2 - 1];                                 \
-        } __packed) {{                                                  \
-                .bLength = sizeof(struct usb_desc_string_t) + sizeof(s) - 2, \
-                .bDescriptorType = USB_DESC_STRING,                     \
-                },                                                      \
-           s                                                            \
-        }
-        USB_DEF_DESC_STRING(u"\x0409"),
-        USB_DEF_DESC_STRING(u"MCHCK test"),
+        USB_DESC_STRING_LANG_ENUS,
+        USB_DESC_STRING(u"MCHCK test"),
         NULL
 };
 
 int
 main(void)
 {
-        usb_start(&dev_desc, &config_desc, string_descs);
+        usb_start(&dev_desc, &config_desc.config, string_descs);
         vusb_attach();
         for (;;) {
                 vusb_rcv(urbs == NULL || vusb_dev.activity == 0);

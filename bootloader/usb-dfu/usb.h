@@ -35,31 +35,36 @@ enum usb_desc_type {
 	USB_DESC_POWER = 8
 };
 
+union usb_desc_type_t {
+	struct {
+		uint8_t id : 5;
+		enum usb_desc_type_type {
+			USB_DESC_TYPE_STD = 0,
+			USB_DESC_TYPE_CLASS = 1,
+			USB_DESC_TYPE_VENDOR = 2
+		} type_type : 2;
+		uint8_t _rsvd0 : 1;
+	} __packed;
+	uint8_t type;
+} __packed;
+CTASSERT_SIZE_BYTE(union usb_desc_type_t, 1);
+
 enum usb_dev_class {
 	USB_DEV_CLASS_SEE_IFACE = 0,
+	USB_DEV_CLASS_APP = 0xfe,
 	USB_DEV_CLASS_VENDOR = 0xff
 };
 
 enum usb_dev_subclass {
 	USB_DEV_SUBCLASS_SEE_IFACE = 0,
+	USB_DEV_SUBCLASS_APP_DFU = 0x01,
 	USB_DEV_SUBCLASS_VENDOR = 0xff
 };
 
 enum usb_dev_proto {
 	USB_DEV_PROTO_SEE_IFACE = 0,
+	USB_DEV_PROTO_DFU = 0x01,
 	USB_DEV_PROTO_VENDOR = 0xff
-};
-
-enum usb_iface_class {
-	USB_IFACE_CLASS_VENDOR = 0xff
-};
-
-enum usb_iface_subclass {
-	USB_IFACE_SUBCLASS_VENDOR = 0xff
-};
-
-enum usb_iface_proto {
-	USB_IFACE_PROTO_VENDOR = 0xff
 };
 
 union usb_bcd_t {
@@ -74,7 +79,7 @@ CTASSERT_SIZE_BYTE(union usb_bcd_t, 2);
 
 struct usb_desc_generic_t {
 	uint8_t bLength;
-	enum usb_desc_type bDescriptorType : 8;
+	union usb_desc_type_t bDescriptorType;
 	uint8_t data[];
 } __packed;
 CTASSERT_SIZE_BYTE(struct usb_desc_generic_t, 2);
@@ -142,11 +147,10 @@ struct usb_desc_iface_t {
 	uint8_t bInterfaceNumber;
 	uint8_t bAlternateSetting;
 	uint8_t bNumEndpoints;
-	enum usb_iface_class bInterfaceClass : 8;
-	enum usb_iface_subclass bInterfaceSubClass: 8;
-	enum usb_iface_proto bInterfaceProtocol : 8;
+	enum usb_dev_class bInterfaceClass : 8;
+	enum usb_dev_subclass bInterfaceSubClass: 8;
+	enum usb_dev_proto bInterfaceProtocol : 8;
 	uint8_t iInterface;
-	struct usb_desc_ep_t ep_descs[];
 } __packed;
 CTASSERT_SIZE_BYTE(struct usb_desc_iface_t, 9);
 
@@ -164,7 +168,6 @@ struct usb_desc_config_t {
 		uint8_t one : 1; /* = 1 for historical reasons */
 	};
 	uint8_t bMaxPower;	/* units of 2mA */
-	struct usb_desc_iface_t iface_descs[];
 } __packed;
 CTASSERT_SIZE_BYTE(struct usb_desc_config_t, 9);
 
@@ -175,6 +178,18 @@ struct usb_desc_string_t {
 } __packed;
 CTASSERT_SIZE_BYTE(struct usb_desc_string_t, 2);
 
+#define USB_DESC_STRING(s)					\
+        (void *)&(struct {					\
+			struct usb_desc_string_t dsc;		\
+			char16_t str[sizeof(s) / 2 - 1];	\
+        } __packed) {{						\
+			.bLength = sizeof(struct usb_desc_string_t) +	\
+				sizeof(s) - 2,			\
+			.bDescriptorType = USB_DESC_STRING,	\
+			},					\
+			s					\
+	}
+#define USB_DESC_STRING_LANG_ENUS USB_DESC_STRING(u"\x0409")
 
 /**
  * USB request data structures.
