@@ -302,13 +302,16 @@ usb_handle_control(void *data, ssize_t len, void *cbdata)
 
 	case USB_CTRL_REQ_GET_DESCRIPTOR: {
 		const struct usb_desc_generic_t *desc;
+		size_t len;
 
 		switch (req->wValue >> 8) {
 		case USB_DESC_DEV:
 			desc = (const void *)usb.dev_desc;
+			len = desc->bLength;
 			break;
 		case USB_DESC_CONFIG:
 			desc = (const void *)usb.config_desc;
+			len = usb.config_desc->wTotalLength;
 			break;
 		case USB_DESC_STRING: {
 			int idx = req->wValue & 0xff;
@@ -318,12 +321,13 @@ usb_handle_control(void *data, ssize_t len, void *cbdata)
 			if (*d == NULL)
 				goto err;
 			desc = (const void *)*d;
+			len = desc->bLength;
 			break;
 		}
 		default:
 			goto err;
 		}
-		usb_tx(desc, desc->bLength, req->wLength,
+		usb_tx(desc, len, req->wLength,
 		       usb_handle_control_status, NULL);
 		break;
 	}
