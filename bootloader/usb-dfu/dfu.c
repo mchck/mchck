@@ -1,4 +1,5 @@
 #include "usb.h"
+#include "dfu.h"
 
 enum dfu_dev_subclass {
         USB_DEV_SUBCLASS_APP_DFU = 0x01
@@ -37,25 +38,6 @@ struct dfu_desc_function_t {
         union usb_bcd_t bcdDFUVersion;
 } __packed;
 CTASSERT_SIZE_BYTE(struct dfu_desc_function_t, 9);
-
-enum dfu_status {
-        DFU_STATUS_OK = 0x00,
-        DFU_STATUS_errTARGET = 0x01,
-        DFU_STATUS_errFILE = 0x02,
-        DFU_STATUS_errWRITE = 0x03,
-        DFU_STATUS_errERASE = 0x04,
-        DFU_STATUS_errCHECK_ERASED = 0x05,
-        DFU_STATUS_errPROG = 0x06,
-        DFU_STATUS_errVERIFY = 0x07,
-        DFU_STATUS_errADDRESS = 0x08,
-        DFU_STATUS_errNOTDONE = 0x09,
-        DFU_STATUS_errFIRMWARE = 0x0a,
-        DFU_STATUS_errVENDOR = 0x0b,
-        DFU_STATUS_errUSBR = 0x0c,
-        DFU_STATUS_errPOR = 0x0d,
-        DFU_STATUS_errUNKNOWN = 0x0e,
-        DFU_STATUS_errSTALLEDPKT = 0x0f
-};
 
 enum dfu_state {
         DFU_STATE_appIDLE = 0,
@@ -149,9 +131,9 @@ const struct usb_desc_string_t * const dfu_string_descs[] = {
 struct dfu_dev_t {
         enum dfu_state state;
         enum dfu_status status;
+        dfu_setup_write_t setup_write;
+        dfu_finish_write_t finish_write;
         size_t off;
-        enum dfu_status (*setup_write)(size_t off, size_t len, void **buf);
-        enum dfu_status (*finish_write)(size_t off, size_t len);
 };
 
 static struct dfu_dev_t dfu_dev;
@@ -254,7 +236,9 @@ err:
 }
 
 void
-dfu_start(void)
+dfu_start(dfu_setup_write_t setup_write, dfu_finish_write_t finish_write)
 {
         dfu_dev.state = DFU_STATE_dfuIDLE;
+        dfu_dev.setup_write = setup_write;
+        dfu_dev.finish_write = finish_write;
 }
