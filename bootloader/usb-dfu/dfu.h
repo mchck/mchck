@@ -21,5 +21,4 @@ typedef enum dfu_status (*dfu_setup_write_t)(size_t off, size_t len, void **buf)
 typedef enum dfu_status (*dfu_finish_write_t)(size_t off, size_t len);
 
 void dfu_start(dfu_setup_write_t, dfu_finish_write_t);
-int dfu_handle_control(struct usb_ctrl_req_t *);
 void dfu_write_done(enum dfu_status);

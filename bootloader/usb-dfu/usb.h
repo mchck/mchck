@@ -424,7 +424,10 @@ size_t usb_ep_get_transfer_size(int, enum usb_ep_dir, enum usb_ep_pingpong);
 void usb_tx_queue_next(struct usbd_ep_pipe_state_t *, void *, size_t);
 void usb_rx_queue_next(struct usbd_ep_pipe_state_t *, void *, size_t);
 
-void usb_start(const struct usb_desc_dev_t *, const struct usb_desc_config_t *, const struct usb_desc_string_t * const *);
+void usb_start(const struct usb_desc_dev_t *,
+	       const struct usb_desc_config_t *,
+	       const struct usb_desc_string_t * const *,
+	       int (*)(struct usb_ctrl_req_t *));
 void usb_handle_transaction(struct usb_xfer_info *);
 void usb_setup_control(void);
 void usb_handle_control_status(void *, ssize_t, void *);

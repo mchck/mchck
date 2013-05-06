@@ -61,7 +61,7 @@ struct dfu_status_t {
 } __packed;
 CTASSERT_SIZE_BYTE(struct dfu_status_t, 6);
 
-const struct usb_desc_dev_t dfu_dev_desc = {
+const static struct usb_desc_dev_t dfu_dev_desc = {
         .bLength = sizeof(struct usb_desc_dev_t),
         .bDescriptorType = USB_DESC_DEV,
         .bcdUSB = { .maj = 2 },
@@ -78,7 +78,7 @@ const struct usb_desc_dev_t dfu_dev_desc = {
         .bNumConfigurations = 1,
 };
 
-const struct {
+const static struct {
         struct usb_desc_config_t config;
         struct usb_desc_iface_t iface;
         struct dfu_desc_function_t dfu;
@@ -110,7 +110,7 @@ const struct {
                 .bLength = sizeof(struct dfu_desc_function_t),
                 .bDescriptorType = {
                         .id = 0x1,
-                        .type = USB_DESC_TYPE_CLASS
+                        .type_type = USB_DESC_TYPE_CLASS
                 },
                 .manifestation_tolerant = 1,
                 .can_upload = 1,
@@ -134,6 +134,7 @@ struct dfu_dev_t {
         dfu_setup_write_t setup_write;
         dfu_finish_write_t finish_write;
         size_t off;
+        size_t len;
 };
 
 static struct dfu_dev_t dfu_dev;
@@ -142,28 +143,39 @@ void
 dfu_write_done(enum dfu_status err)
 {
         dfu_dev.status = err;
-        if (dfu_dev.status == DFU_STATUS_OK)
-                dfu_dev.state = DFU_STATE_dfuDNLOAD_SYNC;
-        else
+        if (dfu_dev.status == DFU_STATUS_OK) {
+                switch (dfu_dev.state) {
+                case DFU_STATE_dfuDNBUSY:
+                        dfu_dev.state = DFU_STATE_dfuDNLOAD_SYNC;
+                        break;
+                case DFU_STATE_dfuMANIFEST:
+                        dfu_dev.state = DFU_STATE_dfuIDLE;
+                        break;
+                default:
+                        break;
+                }
+        } else {
                 dfu_dev.state = DFU_STATE_dfuERROR;
+        }
 }
 
 static void
 dfu_dnload_complete(void *buf, ssize_t len, void *cbdata)
 {
-        dfu_dev.state = DFU_STATE_dfuDNBUSY;
+        if (len > 0)
+                dfu_dev.state = DFU_STATE_dfuDNBUSY;
+        else
+                dfu_dev.state = DFU_STATE_dfuMANIFEST;
         dfu_dev.status = dfu_dev.finish_write(dfu_dev.off, len);
         dfu_dev.off += len;
+        dfu_dev.len = len;
 
-        if (dfu_dev.status == DFU_STATUS_OK) {
-                usb_handle_control_status(NULL, 0, NULL);
-        } else {
+        if (dfu_dev.status != DFU_STATUS_OK)
                 dfu_dev.state = DFU_STATE_dfuERROR;
-                usb_setup_control();
-        }
+        usb_handle_control_status(NULL, 0, NULL);
 }
 
-int
+static int
 dfu_handle_control(struct usb_ctrl_req_t *req)
 {
         switch ((enum dfu_ctrl_req_code)req->bRequest) {
@@ -180,11 +192,20 @@ dfu_handle_control(struct usb_ctrl_req_t *req)
                         goto err;
                 }
 
+                /**
+                 * XXX we are not allowed to STALL here, and we need to eat all transferred data.
+                 * better not allow setup_write to break the protocol.
+                 */
                 dfu_dev.status = dfu_dev.setup_write(dfu_dev.off, req->wLength, &buf);
-                if (dfu_dev.status != DFU_STATUS_OK)
-                        goto err;
+                if (dfu_dev.status != DFU_STATUS_OK) {
+                        dfu_dev.state = DFU_STATE_dfuERROR;
+                        goto err_have_status;
+                }
 
-                usb_rx(buf, req->wLength, dfu_dnload_complete, NULL);
+                if (req->wLength > 0)
+                        usb_rx(buf, req->wLength, dfu_dnload_complete, NULL);
+                else
+                        dfu_dnload_complete(NULL, 0, NULL);
                 break;
         }
         case USB_CTRL_REQ_DFU_GETSTATUS: {
@@ -205,6 +226,7 @@ dfu_handle_control(struct usb_ctrl_req_t *req)
         }
         case USB_CTRL_REQ_DFU_CLRSTATUS:
                 dfu_dev.state = DFU_STATE_dfuIDLE;
+                dfu_dev.status = DFU_STATUS_OK;
                 usb_handle_control_status(NULL, 0, NULL);
                 break;
         case USB_CTRL_REQ_DFU_GETSTATE: {
@@ -222,15 +244,18 @@ dfu_handle_control(struct usb_ctrl_req_t *req)
                 default:
                         goto err;
                 }
+                usb_handle_control_status(NULL, 0, NULL);
+                break;
         case USB_CTRL_REQ_DFU_UPLOAD:
         default:
-                dfu_dev.status = DFU_STATUS_errSTALLEDPKT;
                 goto err;
         }
 
         return (1);
 
 err:
+        dfu_dev.status = DFU_STATUS_errSTALLEDPKT;
+err_have_status:
         dfu_dev.state = DFU_STATE_dfuERROR;
         return (-1);
 }
@@ -241,4 +266,5 @@ dfu_start(dfu_setup_write_t setup_write, dfu_finish_write_t finish_write)
         dfu_dev.state = DFU_STATE_dfuIDLE;
         dfu_dev.setup_write = setup_write;
         dfu_dev.finish_write = finish_write;
+        usb_start(&dfu_dev_desc, &dfu_config_desc.config, dfu_string_descs, dfu_handle_control);
 }

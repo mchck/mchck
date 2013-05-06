@@ -407,11 +407,13 @@ usb_handle_control_ep(struct usb_xfer_info *stat)
 void
 usb_start(const struct usb_desc_dev_t *dev_desc,
 	  const struct usb_desc_config_t *config_desc,
-	  const struct usb_desc_string_t * const *string_descs)
+	  const struct usb_desc_string_t * const *string_descs,
+	  int (*class_control)(struct usb_ctrl_req_t *))
 {
 	usb.dev_desc = dev_desc;
 	usb.config_desc = config_desc;
 	usb.string_descs = string_descs;
+	usb.class_control = class_control;
 	usb_setup_control();
 	usb_enable_xfers();
 }
