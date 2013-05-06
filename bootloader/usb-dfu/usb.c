@@ -15,7 +15,7 @@ struct usbd_t usb;
  * more to go.
  */
 /* Defaults to EP0 for now */
-int
+static int
 usb_tx_next(void)
 {
 	struct usbd_ep_pipe_state_t *s = &usb.ep0_state.tx;
@@ -110,7 +110,7 @@ usb_tx_cp(const void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb
  */
 /* Defaults to EP0 for now */
 /* XXX pass usb_stat to validate pingpong */
-int
+static int
 usb_rx_next(void)
 {
 	struct usbd_ep_pipe_state_t *s = &usb.ep0_state.rx;
@@ -183,8 +183,6 @@ usb_rx(void *buf, size_t len, ep_callback_t cb, void *cb_data)
 	return (len);
 }
 
-
-static void usb_setup_control(void);
 
 static void
 usb_handle_control_done(void *data, ssize_t len, void *cbdata)
@@ -261,8 +259,18 @@ usb_handle_control(void *data, ssize_t len, void *cbdata)
 	usb.ctrl_state = USBD_CTRL_STATE_DATA;
 	usb.ctrl_dir = req->in;
 
-	if (req->type != USB_CTRL_REQ_STD) {
-		/* XXX pass on to higher levels */
+	switch (req->type) {
+	case USB_CTRL_REQ_STD:
+		break;
+	case USB_CTRL_REQ_CLASS:
+		if (usb.class_control == NULL)
+			goto err;
+		if (usb.class_control(req) > 0)
+			goto out;
+		else
+			goto err;
+		/* NOTREACHED */
+	default:
 		goto err;
 	}
 
@@ -376,6 +384,7 @@ usb_setup_control(void)
 	usb.ep0_state.tx.data01 = USB_DATA01_DATA1;
 	usb.ep0_state.rx.ep_maxsize = EP0_BUFSIZE;
 	usb.ep0_state.tx.ep_maxsize = EP0_BUFSIZE;
+	usb_ep_stall(0);
 	usb_rx(buf, EP0_BUFSIZE, usb_handle_control, NULL);
 }
 

@@ -1,5 +1,14 @@
 #include "usb.h"
 
+enum dfu_dev_subclass {
+        USB_DEV_SUBCLASS_APP_DFU = 0x01
+};
+
+enum dfu_dev_proto {
+	USB_DEV_PROTO_DFU_APP = 0x01,
+        USB_DEV_PROTO_DFU_DFU = 0x02
+};
+
 enum dfu_ctrl_req_code {
         USB_CTRL_REQ_DFU_DETACH = 0,
         USB_CTRL_REQ_DFU_DNLOAD = 1,
@@ -31,40 +40,41 @@ CTASSERT_SIZE_BYTE(struct dfu_desc_function_t, 9);
 
 enum dfu_status {
         DFU_STATUS_OK = 0x00,
-        DFU_STATUS_errTARGET,
-        DFU_STATUS_errFILE,
-        DFU_STATUS_errWRITE,
-        DFU_STATUS_errERASE,
-        DFU_STATUS_errCHECK_ERASED,
-        DFU_STATUS_errPROG,
-        DFU_STATUS_errVERIFY,
-        DFU_STATUS_errADDRESS,
-        DFU_STATUS_errNOTDONE,
-        DFU_STATUS_errFIRMWARE,
-        DFU_STATUS_errVENDOR,
-        DFU_STATUS_errUSBR,
-        DFU_STATUS_errPOR,
-        DFU_STATUS_errUNKNOWN,
-        DFU_STATUS_errSTALLEDPKT
+        DFU_STATUS_errTARGET = 0x01,
+        DFU_STATUS_errFILE = 0x02,
+        DFU_STATUS_errWRITE = 0x03,
+        DFU_STATUS_errERASE = 0x04,
+        DFU_STATUS_errCHECK_ERASED = 0x05,
+        DFU_STATUS_errPROG = 0x06,
+        DFU_STATUS_errVERIFY = 0x07,
+        DFU_STATUS_errADDRESS = 0x08,
+        DFU_STATUS_errNOTDONE = 0x09,
+        DFU_STATUS_errFIRMWARE = 0x0a,
+        DFU_STATUS_errVENDOR = 0x0b,
+        DFU_STATUS_errUSBR = 0x0c,
+        DFU_STATUS_errPOR = 0x0d,
+        DFU_STATUS_errUNKNOWN = 0x0e,
+        DFU_STATUS_errSTALLEDPKT = 0x0f
 };
 
 enum dfu_state {
         DFU_STATE_appIDLE = 0,
-        DFU_STATE_appDETACH,
-        DFU_STATE_dfuDNLOAD_SYNC,
-        DFU_STATE_dfuDNBUSY,
-        DFU_STATE_dfuDNLOAD_IDLE,
-        DFU_STATE_dfuMANIFEST_SYNC,
-        DFU_STATE_dfuMANIFEST,
-        DFU_STATE_dfuMANIFEST_WAIT_RESET,
-        DFU_STATE_dfuUPLOAD_IDLE,
-        DFU_STATE_dfuERROR
+        DFU_STATE_appDETACH = 1,
+        DFU_STATE_dfuIDLE = 2,
+        DFU_STATE_dfuDNLOAD_SYNC = 3,
+        DFU_STATE_dfuDNBUSY = 4,
+        DFU_STATE_dfuDNLOAD_IDLE = 5,
+        DFU_STATE_dfuMANIFEST_SYNC = 6,
+        DFU_STATE_dfuMANIFEST = 7,
+        DFU_STATE_dfuMANIFEST_WAIT_RESET = 8,
+        DFU_STATE_dfuUPLOAD_IDLE = 9,
+        DFU_STATE_dfuERROR = 10
 };
 
 struct dfu_status_t {
-        uint8_t bStatus;
+        enum dfu_status bStatus : 8;
         uint32_t bwPollTimeout : 24;
-        uint8_t bState;
+        enum dfu_state bState : 8;
         uint8_t iString;
 } __packed;
 CTASSERT_SIZE_BYTE(struct dfu_status_t, 6);
@@ -111,7 +121,7 @@ const struct {
                 .bNumEndpoints = 0,
                 .bInterfaceClass = USB_DEV_CLASS_APP,
                 .bInterfaceSubClass = USB_DEV_SUBCLASS_APP_DFU,
-                .bInterfaceProtocol = USB_DEV_PROTO_DFU,
+                .bInterfaceProtocol = USB_DEV_PROTO_DFU_DFU,
                 .iInterface = 0,
         },
         .dfu = {
@@ -136,11 +146,115 @@ const struct usb_desc_string_t * const dfu_string_descs[] = {
         NULL
 };
 
+struct dfu_dev_t {
+        enum dfu_state state;
+        enum dfu_status status;
+        size_t off;
+        enum dfu_status (*setup_write)(size_t off, size_t len, void **buf);
+        enum dfu_status (*finish_write)(size_t off, size_t len);
+};
+
+static struct dfu_dev_t dfu_dev;
+
+void
+dfu_write_done(enum dfu_status err)
+{
+        dfu_dev.status = err;
+        if (dfu_dev.status == DFU_STATUS_OK)
+                dfu_dev.state = DFU_STATE_dfuDNLOAD_SYNC;
+        else
+                dfu_dev.state = DFU_STATE_dfuERROR;
+}
+
+static void
+dfu_dnload_complete(void *buf, ssize_t len, void *cbdata)
+{
+        dfu_dev.state = DFU_STATE_dfuDNBUSY;
+        dfu_dev.status = dfu_dev.finish_write(dfu_dev.off, len);
+        dfu_dev.off += len;
+
+        if (dfu_dev.status == DFU_STATUS_OK) {
+                usb_handle_control_status(NULL, 0, NULL);
+        } else {
+                dfu_dev.state = DFU_STATE_dfuERROR;
+                usb_setup_control();
+        }
+}
+
 int
 dfu_handle_control(struct usb_ctrl_req_t *req)
 {
         switch ((enum dfu_ctrl_req_code)req->bRequest) {
-        default:
+        case USB_CTRL_REQ_DFU_DNLOAD: {
+                void *buf;
+
+                switch (dfu_dev.state) {
+                case DFU_STATE_dfuIDLE:
+                        dfu_dev.off = 0;
+                        break;
+                case DFU_STATE_dfuDNLOAD_IDLE:
+                        break;
+                default:
+                        goto err;
+                }
+
+                dfu_dev.status = dfu_dev.setup_write(dfu_dev.off, req->wLength, &buf);
+                if (dfu_dev.status != DFU_STATUS_OK)
+                        goto err;
+
+                usb_rx(buf, req->wLength, dfu_dnload_complete, NULL);
                 break;
         }
+        case USB_CTRL_REQ_DFU_GETSTATUS: {
+                struct dfu_status_t st;
+
+                switch (dfu_dev.state) {
+                case DFU_STATE_dfuDNLOAD_SYNC:
+                        dfu_dev.state = DFU_STATE_dfuDNLOAD_IDLE;
+                        break;
+                default:
+                        break;
+                }
+                st.bState = dfu_dev.state;
+                st.bStatus = dfu_dev.status;
+                st.bwPollTimeout = 1000; /* XXX */
+                usb_tx_cp(&st, sizeof(st), req->wLength, usb_handle_control_status, NULL);
+                break;
+        }
+        case USB_CTRL_REQ_DFU_CLRSTATUS:
+                dfu_dev.state = DFU_STATE_dfuIDLE;
+                usb_handle_control_status(NULL, 0, NULL);
+                break;
+        case USB_CTRL_REQ_DFU_GETSTATE: {
+                uint8_t st = dfu_dev.state;
+                usb_tx_cp(&st, sizeof(st), req->wLength, usb_handle_control_status, NULL);
+                break;
+        }
+        case USB_CTRL_REQ_DFU_ABORT:
+                switch (dfu_dev.state) {
+                case DFU_STATE_dfuIDLE:
+                case DFU_STATE_dfuDNLOAD_IDLE:
+                case DFU_STATE_dfuUPLOAD_IDLE:
+                        dfu_dev.state = DFU_STATE_dfuIDLE;
+                        break;
+                default:
+                        goto err;
+                }
+        case USB_CTRL_REQ_DFU_UPLOAD:
+        default:
+                dfu_dev.status = DFU_STATUS_errSTALLEDPKT;
+                goto err;
+        }
+
+        return (1);
+
+err:
+        dfu_dev.state = DFU_STATE_dfuERROR;
+        return (-1);
+}
+
+void
+dfu_start(void)
+{
+        dfu_dev.state = DFU_STATE_dfuIDLE;
 }

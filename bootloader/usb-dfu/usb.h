@@ -57,13 +57,11 @@ enum usb_dev_class {
 
 enum usb_dev_subclass {
 	USB_DEV_SUBCLASS_SEE_IFACE = 0,
-	USB_DEV_SUBCLASS_APP_DFU = 0x01,
 	USB_DEV_SUBCLASS_VENDOR = 0xff
 };
 
 enum usb_dev_proto {
 	USB_DEV_PROTO_SEE_IFACE = 0,
-	USB_DEV_PROTO_DFU = 0x01,
 	USB_DEV_PROTO_VENDOR = 0xff
 };
 
@@ -408,6 +406,7 @@ struct usbd_t {
 	const struct usb_desc_dev_t *dev_desc;
 	const struct usb_desc_config_t *config_desc;
 	const struct usb_desc_string_t * const *string_descs;
+	int (*class_control)(struct usb_ctrl_req_t *);
 	uint8_t ep0_buf[EP0_BUFSIZE][2];
 };
 
@@ -427,3 +426,8 @@ void usb_rx_queue_next(struct usbd_ep_pipe_state_t *, void *, size_t);
 
 void usb_start(const struct usb_desc_dev_t *, const struct usb_desc_config_t *, const struct usb_desc_string_t * const *);
 void usb_handle_transaction(struct usb_xfer_info *);
+void usb_setup_control(void);
+void usb_handle_control_status(void *, ssize_t, void *);
+int usb_rx(void *, size_t, ep_callback_t, void *);
+int usb_tx(const void *, size_t, size_t, ep_callback_t, void *);
+int usb_tx_cp(const void *, size_t, size_t, ep_callback_t, void *);
