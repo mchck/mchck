@@ -18,7 +18,7 @@ endif
 TARGET?=	MK20DX32VLF5
 
 COPTFLAGS?=	-Os
-CWARNFLAGS?=	-Wall
+CWARNFLAGS?=	-Wall -Wno-main
 
 CFLAGS+=	-mcpu=cortex-m4 -msoft-float -mthumb -ffunction-sections -std=gnu99
 CFLAGS+=	-I${_libdir}/include -I${_libdir}/CMSIS/Include -I.

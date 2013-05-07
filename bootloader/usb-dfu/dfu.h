@@ -1,3 +1,5 @@
+#include <sys/types.h>
+
 enum dfu_status {
         DFU_STATUS_OK = 0x00,
         DFU_STATUS_errTARGET = 0x01,

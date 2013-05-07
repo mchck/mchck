@@ -16,7 +16,7 @@ PROG=	dfu
 SRCS=	usb.c dfu.c
 
 ifeq ($(ARCH),mchck)
-SRCS+=	kinetis.c
+SRCS+=	usb-kinetis.c main-kinetis.c
 
 include $(SRCDIR)/../../toolchain/mchck.mk
 endif
