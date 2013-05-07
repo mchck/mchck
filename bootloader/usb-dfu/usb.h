@@ -2,7 +2,9 @@
 
 #include <inttypes.h>
 #include <string.h>
-#include <uchar.h>
+
+//#include <uchar.h>
+typedef __CHAR16_TYPE__ char16_t;
 
 /**
  * Note: bitfields ahead.

@@ -1,6 +1,30 @@
 CFLAGS+= -Wall -std=c11 -g
 
-vusb: usb.o dfu.o vusb.o
+ifndef ARCH
+all: vusb mchck
+
+vusb mchck::
+	mkdir -p obj-$@
+	make ARCH=$@ SRCDIR=$(CURDIR) -C obj-$@ -f $(CURDIR)/Makefile
 
 clean:
-	-rm -f vusb usb.o vusb.o dfu.o
+	-rm -rf obj-*
+else
+
+VPATH=	$(SRCDIR)
+PROG=	dfu
+SRCS=	usb.c dfu.c
+
+ifeq ($(ARCH),mchck)
+SRCS+=	kinetis.c
+
+include $(SRCDIR)/../../toolchain/mchck.mk
+endif
+
+ifeq ($(ARCH),vusb)
+SRCS+=	vusb.c
+
+OBJS+=	$(addsuffix .o, $(basename $(SRCS)))
+$(PROG): $(OBJS)
+endif
+endif

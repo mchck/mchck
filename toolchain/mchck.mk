@@ -1,11 +1,19 @@
 _libdir:=       $(dir $(lastword ${MAKEFILE_LIST}))
-VPATH=	${_libdir}/crt0:${_libdir}/lib
+VPATH:=	${_libdir}/crt0:${_libdir}/lib:$(VPATH)
 
 CC=	arm-none-eabi-gcc
 LD=	arm-none-eabi-ld
 AR=	arm-none-eabi-ar
 AS=	arm-none-eabi-as
 OBJCOPY=	arm-none-eabi-objcopy
+
+ifeq ($(shell which $(CC) 2>/dev/null),)
+SATDIR?=	$(HOME)/sat
+endif
+ifdef SATDIR
+PATH:=	${SATDIR}/bin:${PATH}
+export PATH
+endif
 
 TARGET?=	MK20DX32VLF5
 
