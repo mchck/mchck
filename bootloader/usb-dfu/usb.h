@@ -324,25 +324,6 @@ enum usb_ctrl_req_feature {
  */
 
 
-/**
- * Kinetis USB driver notes:
- * We need to manually maintain the DATA0/1 toggling for the SIE.
- * SETUP transactions always start with a DATA0.
- *
- * The SIE internally uses pingpong (double) buffering, which is
- * easily confused with DATA0/DATA1 toggling, and I think even the
- * Freescale docs confuse the two notions.  When BD->DTS is set,
- * BD->DATA01 will be used to verify/discard incoming DATAx and it
- * will set the DATAx PID for outgoing tokens.  This is not described
- * as such in the Freescale Kinetis docs, but the Microchip PIC32 OTG
- * docs are more clear on this;  it seems that both Freescale and
- * Microchip use different versions of the same USB OTG IP core.
- *
- * http://ww1.microchip.com/downloads/en/DeviceDoc/61126F.pdf
- *
- * Clear CTL->TOKEN_BUSY after SETUP tokens.
- */
-
 #define EP0_BUFSIZE 64
 
 enum usb_ep_pingpong {

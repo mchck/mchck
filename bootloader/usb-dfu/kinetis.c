@@ -1,3 +1,27 @@
+#define usb_xfer_info USB_STAT_t
+
+#include "usb.h"
+
+
+/**
+ * Kinetis USB driver notes:
+ * We need to manually maintain the DATA0/1 toggling for the SIE.
+ * SETUP transactions always start with a DATA0.
+ *
+ * The SIE internally uses pingpong (double) buffering, which is
+ * easily confused with DATA0/DATA1 toggling, and I think even the
+ * Freescale docs confuse the two notions.  When BD->DTS is set,
+ * BD->DATA01 will be used to verify/discard incoming DATAx and it
+ * will set the DATAx PID for outgoing tokens.  This is not described
+ * as such in the Freescale Kinetis docs, but the Microchip PIC32 OTG
+ * docs are more clear on this;  it seems that both Freescale and
+ * Microchip use different versions of the same USB OTG IP core.
+ *
+ * http://ww1.microchip.com/downloads/en/DeviceDoc/61126F.pdf
+ *
+ * Clear CTL->TOKEN_BUSY after SETUP tokens.
+ */
+
 /**
  * Hardware structures
  */
@@ -95,8 +119,11 @@ extern volatile struct USB_ENDPT_t USB0_ENDPT[16];
 extern volatile struct USB_ADDR_t USB0_ADDR;
 extern volatile struct USB_CTL_t USB0_CTL;
 
+#ifndef USB_NUM_EP
+#define USB_NUM_EP 1
+#endif
 
-typedef struct USB_STAT_t usb_xfer_info_t;
+static struct USB_BD_t bdt[USB_NUM_EP * 2 *2];
 
 
 void
@@ -121,34 +148,34 @@ usb_intr(void)
 static struct USB_BD_t *
 usb_get_bd(int ep, enum usb_ep_dir dir, enum usb_ep_pingpong pingpong)
 {
-        return (&usb.bdt[(ep << 2) | (dir << 1) | pingpong]);
+        return (&bdt[(ep << 2) | (dir << 1) | pingpong]);
 }
 
 static struct USB_BD_t *
-usb_get_bd_stat(struct USB_STAT_t stat)
+usb_get_bd_stat(struct USB_STAT_t *stat)
 {
-        return (((void *)(uintptr_t)usb.bdt + (stat.stat << 1)));
+        return (((void *)(uintptr_t)bdt + (stat->stat << 1)));
 }
 
-static void *
-usb_get_xfer_data(usb_xfer_info_t i)
+void *
+usb_get_xfer_data(struct usb_xfer_info *i)
 {
-        return (usb_get_db_stat(i)->addr);
+        return (usb_get_bd_stat(i)->addr);
 }
 
-static enum usb_tok_pid
-usb_get_xfer_pid(usb_xfer_info_t i)
+enum usb_tok_pid
+usb_get_xfer_pid(struct usb_xfer_info *i)
 {
-        return (usb_get_db_stat(i)->tok_pid);
+        return (usb_get_bd_stat(i)->tok_pid);
 }
 
-static void
+void
 usb_enable_xfers(void)
 {
         USB0_CTL.txd_suspend = 0;
 }
 
-static void
+void
 usb_set_addr(int addr)
 {
         USB0_ADDR.addr = addr;
@@ -165,22 +192,22 @@ usb_ep_stall(int ep)
 }
 
 /* Only EP0 for now; clears all pending transfers. XXX invoke callbacks? */
-static void
+void
 usb_clear_transfers(void)
 {
-        struct USB_BD_t *bd = usb.bdt;
+        struct USB_BD_t *bd = bdt;
 
-        memset(bd, 0, sizeof(*bd) * 4);
+        memset(bd, 0, USB_NUM_EP * sizeof(*bd) * 4);
 }
 
-static inline size_t
+inline size_t
 usb_ep_get_transfer_size(int ep, enum usb_ep_dir dir, enum usb_ep_pingpong pingpong)
 {
         struct USB_BD_t *bd = usb_get_bd(ep, dir, pingpong);
         return (bd->bc);
 }
 
-static void
+void
 usb_tx_queue_next(struct usbd_ep_pipe_state_t *s, void *addr, size_t len)
 {
         struct USB_BD_t *bd = usb_get_bd(0, USB_EP_TX, s->pingpong);
@@ -195,7 +222,7 @@ usb_tx_queue_next(struct usbd_ep_pipe_state_t *s, void *addr, size_t len)
                                 }).bd;
 }
 
-static void
+void
 usb_rx_queue_next(struct usbd_ep_pipe_state_t *s, void *addr, size_t len)
 {
         struct USB_BD_t *bd = usb_get_bd(0, USB_EP_RX, s->pingpong);
