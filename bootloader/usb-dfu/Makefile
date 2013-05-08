@@ -1,4 +1,4 @@
-CFLAGS+= -Wall -std=c11 -g
+CFLAGS+= -Wall -std=c11 -g -DSHORT_ISR
 
 ifndef ARCH
 all: vusb mchck
@@ -14,6 +14,7 @@ else
 VPATH=	$(SRCDIR)
 PROG=	dfu
 SRCS=	usb.c dfu.c
+LOADER=	1
 
 ifeq ($(ARCH),mchck)
 SRCS+=	usb-kinetis.c main-kinetis.c
