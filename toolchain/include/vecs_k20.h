@@ -17,6 +17,7 @@ V(Hard_Fault)
 V(Mem_Manage_Fault)
 V(Bus_Fault)
 V(Usage_Fault)
+#ifndef SHORT_ISR
 V_reserved()
 V_reserved()
 V_reserved()
@@ -130,3 +131,4 @@ V_reserved()
 V_reserved()
 V_reserved()
 V_reserved()
+#endif
