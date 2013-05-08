@@ -61,72 +61,6 @@ struct dfu_status_t {
 } __packed;
 CTASSERT_SIZE_BYTE(struct dfu_status_t, 6);
 
-const static struct usb_desc_dev_t dfu_dev_desc = {
-        .bLength = sizeof(struct usb_desc_dev_t),
-        .bDescriptorType = USB_DESC_DEV,
-        .bcdUSB = { .maj = 2 },
-        .bDeviceClass = USB_DEV_CLASS_SEE_IFACE,
-        .bDeviceSubClass = USB_DEV_SUBCLASS_SEE_IFACE,
-        .bDeviceProtocol = USB_DEV_PROTO_SEE_IFACE,
-        .bMaxPacketSize0 = EP0_BUFSIZE,
-        .idVendor = 0x2323,
-        .idProduct = 1,
-        .bcdDevice = { .bcd = 0 },
-        .iManufacturer = 1,
-        .iProduct = 2,
-        .iSerialNumber = 0,
-        .bNumConfigurations = 1,
-};
-
-const static struct {
-        struct usb_desc_config_t config;
-        struct usb_desc_iface_t iface;
-        struct dfu_desc_function_t dfu;
-} __packed dfu_config_desc = {
-        .config = {
-                .bLength = sizeof(struct usb_desc_config_t),
-                .bDescriptorType = USB_DESC_CONFIG,
-                .wTotalLength = sizeof(dfu_config_desc),
-                .bNumInterfaces = 1,
-                .bConfigurationValue = 0,
-                .iConfiguration = 0,
-                .remote_wakeup = 0,
-                .self_powered = 0,
-                .one = 1,
-                .bMaxPower = 50
-        },
-        .iface = {
-                .bLength = sizeof(struct usb_desc_iface_t),
-                .bDescriptorType = USB_DESC_IFACE,
-                .bInterfaceNumber = 0,
-                .bAlternateSetting = 0,
-                .bNumEndpoints = 0,
-                .bInterfaceClass = USB_DEV_CLASS_APP,
-                .bInterfaceSubClass = USB_DEV_SUBCLASS_APP_DFU,
-                .bInterfaceProtocol = USB_DEV_PROTO_DFU_DFU,
-                .iInterface = 0,
-        },
-        .dfu = {
-                .bLength = sizeof(struct dfu_desc_function_t),
-                .bDescriptorType = {
-                        .id = 0x1,
-                        .type_type = USB_DESC_TYPE_CLASS
-                },
-                .manifestation_tolerant = 1,
-                .can_upload = 1,
-                .can_download = 1,
-                .wDetachTimeOut = 0,
-                .wTransferSize = 4096,
-                .bcdDFUVersion = { .maj = 1, .min = 1 }
-        }
-};
-
-const struct usb_desc_string_t * const dfu_string_descs[] = {
-        USB_DESC_STRING_LANG_ENUS,
-        USB_DESC_STRING(u"mchck.org"),
-        USB_DESC_STRING(u"MCHCK bootloader"),
-        NULL
-};
 
 struct dfu_dev_t {
         enum dfu_state state;
@@ -137,7 +71,9 @@ struct dfu_dev_t {
         size_t len;
 };
 
+
 static struct dfu_dev_t dfu_dev;
+
 
 void
 dfu_write_done(enum dfu_status err)
@@ -260,11 +196,87 @@ err_have_status:
         return (-1);
 }
 
+
+const static struct usb_desc_dev_t dfu_dev_desc = {
+        .bLength = sizeof(struct usb_desc_dev_t),
+        .bDescriptorType = USB_DESC_DEV,
+        .bcdUSB = { .maj = 2 },
+        .bDeviceClass = USB_DEV_CLASS_SEE_IFACE,
+        .bDeviceSubClass = USB_DEV_SUBCLASS_SEE_IFACE,
+        .bDeviceProtocol = USB_DEV_PROTO_SEE_IFACE,
+        .bMaxPacketSize0 = EP0_BUFSIZE,
+        .idVendor = 0x2323,
+        .idProduct = 1,
+        .bcdDevice = { .bcd = 0 },
+        .iManufacturer = 1,
+        .iProduct = 2,
+        .iSerialNumber = 0,
+        .bNumConfigurations = 1,
+};
+
+const static struct {
+        struct usb_desc_config_t config;
+        struct usb_desc_iface_t iface;
+        struct dfu_desc_function_t dfu;
+} __packed dfu_config_desc = {
+        .config = {
+                .bLength = sizeof(struct usb_desc_config_t),
+                .bDescriptorType = USB_DESC_CONFIG,
+                .wTotalLength = sizeof(dfu_config_desc),
+                .bNumInterfaces = 1,
+                .bConfigurationValue = 0,
+                .iConfiguration = 0,
+                .remote_wakeup = 0,
+                .self_powered = 0,
+                .one = 1,
+                .bMaxPower = 50
+        },
+        .iface = {
+                .bLength = sizeof(struct usb_desc_iface_t),
+                .bDescriptorType = USB_DESC_IFACE,
+                .bInterfaceNumber = 0,
+                .bAlternateSetting = 0,
+                .bNumEndpoints = 0,
+                .bInterfaceClass = USB_DEV_CLASS_APP,
+                .bInterfaceSubClass = USB_DEV_SUBCLASS_APP_DFU,
+                .bInterfaceProtocol = USB_DEV_PROTO_DFU_DFU,
+                .iInterface = 0,
+        },
+        .dfu = {
+                .bLength = sizeof(struct dfu_desc_function_t),
+                .bDescriptorType = {
+                        .id = 0x1,
+                        .type_type = USB_DESC_TYPE_CLASS
+                },
+                .manifestation_tolerant = 1,
+                .can_upload = 1,
+                .can_download = 1,
+                .wDetachTimeOut = 0,
+                .wTransferSize = 4096,
+                .bcdDFUVersion = { .maj = 1, .min = 1 }
+        }
+};
+
+const struct usb_desc_string_t * const dfu_string_descs[] = {
+        USB_DESC_STRING_LANG_ENUS,
+        USB_DESC_STRING(u"mchck.org"),
+        USB_DESC_STRING(u"MCHCK bootloader"),
+        NULL
+};
+
+const struct usbd_identity_t dfu_identity = {
+        .dev_desc = &dfu_dev_desc,
+        .config_desc = &dfu_config_desc.config,
+        .string_descs = dfu_string_descs,
+        .class_control = dfu_handle_control
+};
+
+
 void
 dfu_start(dfu_setup_write_t setup_write, dfu_finish_write_t finish_write)
 {
         dfu_dev.state = DFU_STATE_dfuIDLE;
         dfu_dev.setup_write = setup_write;
         dfu_dev.finish_write = finish_write;
-        usb_start(&dfu_dev_desc, &dfu_config_desc.config, dfu_string_descs, dfu_handle_control);
+        usb_start(&dfu_identity);
 }

@@ -42,6 +42,10 @@ struct usbd_ep_state_t {
 };
 
 struct usbd_t {
+	struct usbd_ep_state_t ep0_state;
+	const struct usbd_identity_t *identity;
+	int address;
+	int config;
 	enum usbd_dev_state {
 		USBD_STATE_DISABLED = 0,
 		USBD_STATE_DEFAULT,
@@ -55,11 +59,4 @@ struct usbd_t {
 		USBD_CTRL_STATE_STATUS
 	} ctrl_state;
 	enum usb_ctrl_req_dir ctrl_dir;
-	int address;
-	int config;
-	struct usbd_ep_state_t ep0_state;
-	const struct usb_desc_dev_t *dev_desc;
-	const struct usb_desc_config_t *config_desc;
-	const struct usb_desc_string_t * const *string_descs;
-	int (*class_control)(struct usb_ctrl_req_t *);
 };

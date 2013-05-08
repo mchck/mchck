@@ -264,9 +264,9 @@ usb_handle_control(void *data, ssize_t len, void *cbdata)
 	case USB_CTRL_REQ_STD:
 		break;
 	case USB_CTRL_REQ_CLASS:
-		if (usb.class_control == NULL)
+		if (usb.identity->class_control == NULL)
 			goto err;
-		if (usb.class_control(req) > 0)
+		if (usb.identity->class_control(req) > 0)
 			goto out;
 		else
 			goto err;
@@ -315,17 +315,17 @@ usb_handle_control(void *data, ssize_t len, void *cbdata)
 
 		switch (req->wValue >> 8) {
 		case USB_DESC_DEV:
-			desc = (const void *)usb.dev_desc;
+			desc = (const void *)usb.identity->dev_desc;
 			len = desc->bLength;
 			break;
 		case USB_DESC_CONFIG:
-			desc = (const void *)usb.config_desc;
-			len = usb.config_desc->wTotalLength;
+			desc = (const void *)usb.identity->config_desc;
+			len = usb.identity->config_desc->wTotalLength;
 			break;
 		case USB_DESC_STRING: {
 			int idx = req->wValue & 0xff;
 			const struct usb_desc_string_t * const *d;
-			for (d = usb.string_descs; idx != 0 && *d != NULL; ++d)
+			for (d = usb.identity->string_descs; idx != 0 && *d != NULL; ++d)
 				--idx;
 			if (*d == NULL)
 				goto err;
@@ -406,15 +406,9 @@ usb_handle_control_ep(struct usb_xfer_info *stat)
 }
 
 void
-usb_start(const struct usb_desc_dev_t *dev_desc,
-	  const struct usb_desc_config_t *config_desc,
-	  const struct usb_desc_string_t * const *string_descs,
-	  int (*class_control)(struct usb_ctrl_req_t *))
+usb_start(const struct usbd_identity_t *identity)
 {
-	usb.dev_desc = dev_desc;
-	usb.config_desc = config_desc;
-	usb.string_descs = string_descs;
-	usb.class_control = class_control;
+	usb.identity = identity;
 	usb_setup_control();
 	usb_enable_xfers();
 }
