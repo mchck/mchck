@@ -1,6 +1,7 @@
 #define usb_xfer_info USB_STAT_t
 
 #include "usb.h"
+#include "usb-internal.h"
 
 
 /**
@@ -123,7 +124,7 @@ extern volatile struct USB_CTL_t USB0_CTL;
 #define USB_NUM_EP 1
 #endif
 
-static struct USB_BD_t bdt[USB_NUM_EP * 2 *2];
+static struct USB_BD_t bdt[USB_NUM_EP * 2 *2] __attribute__((section(".usb_bdt")));
 
 
 void

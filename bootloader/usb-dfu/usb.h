@@ -179,7 +179,7 @@ struct usb_desc_string_t {
 CTASSERT_SIZE_BYTE(struct usb_desc_string_t, 2);
 
 #define USB_DESC_STRING(s)					\
-        (void *)&(struct {					\
+        (const void *)&(const struct {				\
 			struct usb_desc_string_t dsc;		\
 			char16_t str[sizeof(s) / 2 - 1];	\
         } __packed) {{						\
@@ -305,27 +305,8 @@ enum usb_ctrl_req_feature {
 
 
 /**
- * Internal driver structures
+ * Internal types
  */
-
-/**
- * USB state machine
- * =================
- *
- * Device configuration states:
- *
- * Attached <-> Powered
- * Powered -(reset)-> Default
- * Default -(SET_ADDRESS)-> Address
- * Address -(SET_CONFIGURATION)-> Configured
- * Configured -(SET_CONFIGURATION 0)-> Address
- * Address -(SET_ADDRESS 0)-> Default
- * [Default, Configured, Address] -(reset)-> Default
- */
-
-
-#define EP0_BUFSIZE 64
-
 enum usb_ep_pingpong {
 	USB_EP_PINGPONG_EVEN = 0,
 	USB_EP_PINGPONG_ODD = 1
@@ -341,60 +322,15 @@ enum usb_data01 {
 	USB_DATA01_DATA1 = 1
 };
 
-enum usbd_dev_state {
-	USBD_STATE_DISABLED = 0,
-	USBD_STATE_DEFAULT,
-	USBD_STATE_SETTING_ADDRESS,
-	USBD_STATE_ADDRESS,
-	USBD_STATE_CONFIGURED
-};
-
-typedef void (*ep_callback_t)(void *buf, ssize_t len, void *data);
-
-
-struct usbd_ep_pipe_state_t {
-	enum usb_ep_pingpong pingpong; /* next desc to use */
-	enum usb_data01 data01;
-	size_t transfer_size;
-	size_t pos;
-	uint8_t *data_buf;
-	int short_transfer;
-	ep_callback_t callback;
-	void *callback_data;
-	size_t ep_maxsize;
-};
-
-struct usbd_ep_state_t {
-	union {
-		struct usbd_ep_pipe_state_t pipe[2];
-		struct {
-			struct usbd_ep_pipe_state_t rx;
-			struct usbd_ep_pipe_state_t tx;
-		};
-	};
-};
-
-struct usbd_t {
-	struct USB_BD_t *bdt;
-	enum usbd_dev_state state;
-	enum usbd_ctrl_state {
-		USBD_CTRL_STATE_IDLE,
-		USBD_CTRL_STATE_DATA,
-		USBD_CTRL_STATE_STATUS
-	} ctrl_state;
-	enum usb_ctrl_req_dir ctrl_dir;
-	int address;
-	int config;
-	struct usbd_ep_state_t ep0_state;
-	const struct usb_desc_dev_t *dev_desc;
-	const struct usb_desc_config_t *config_desc;
-	const struct usb_desc_string_t * const *string_descs;
-	int (*class_control)(struct usb_ctrl_req_t *);
-	uint8_t ep0_buf[EP0_BUFSIZE][2];
+enum {
+	EP0_BUFSIZE = 64
 };
 
 struct usb_xfer_info;
-
+enum usb_ep_dir;
+enum usb_ep_pingpong;
+struct usbd_ep_pipe_state_t;
+typedef void (*ep_callback_t)(void *buf, ssize_t len, void *data);
 
 void usb_enable(void);
 void *usb_get_xfer_data(struct usb_xfer_info *);

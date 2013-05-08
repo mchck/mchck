@@ -10,6 +10,7 @@
 
 #include "usb.h"
 #include "dfu.h"
+#include "usb-internal.h"
 
 
 /* From usbip_common.h */

@@ -5,9 +5,10 @@
 #include <wchar.h>
 
 #include "usb.h"
+#include "usb-internal.h"
 
-
-struct usbd_t usb;
+static uint8_t ep0_buf[EP0_BUFSIZE][2] __attribute__((aligned(4)));
+static struct usbd_t usb;
 
 
 /**
@@ -94,7 +95,7 @@ int
 usb_tx_cp(const void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_data)
 {
 	enum usb_ep_pingpong pp = usb.ep0_state.tx.pingpong;
-	void *destbuf = usb.ep0_buf[pp];
+	void *destbuf = ep0_buf[pp];
 
 	if (len > EP0_BUFSIZE)
 		return (-1);
@@ -378,7 +379,7 @@ out:
 void
 usb_setup_control(void)
 {
-	void *buf = usb.ep0_buf[usb.ep0_state.rx.pingpong];
+	void *buf = ep0_buf[usb.ep0_state.rx.pingpong];
 
 	usb.ep0_state.rx.data01 = USB_DATA01_DATA0;
 	usb.ep0_state.tx.data01 = USB_DATA01_DATA1;
