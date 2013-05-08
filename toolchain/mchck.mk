@@ -37,9 +37,9 @@ else
 LDFLAGS+=	-T app.ld
 endif
 LDFLAGS+=	-T link.ld
-LDFLAGS+=       -nostartfiles
+LDFLAGS+=       -nostartfiles -fno-builtin
 
-STARTFILE_SRC=	startup_k20.c system_k20.c
+STARTFILE_SRC=	startup_k20.c system_k20.c mchck-builtins.c
 STARTFILE_OBJ=	$(addsuffix .o, $(basename ${STARTFILE_SRC}))
 #STARTFILE_LIB=	libcrtnuc1xx.a
 #STARTFILE_LIBSHORT=	-lcrtnuc1xx
