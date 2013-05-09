@@ -23,7 +23,7 @@ include $(SRCDIR)/../../toolchain/mchck.mk
 endif
 
 ifeq ($(ARCH),vusb)
-SRCS+=	vusb.c
+SRCS+=	vusb.c vdfu.c
 
 OBJS+=	$(addsuffix .o, $(basename $(SRCS)))
 $(PROG): $(OBJS)
