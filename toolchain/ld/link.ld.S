@@ -1,3 +1,8 @@
+/* -*- mode: ld-script; -*- */
+
+#include TARGET_LDSCRIPT
+#include MEMCFG_LDSCRIPT
+
 OUTPUT_FORMAT ("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 
 /* Section Definitions */
@@ -5,10 +10,14 @@ SECTIONS
 {
     .text :
     {
+#ifdef TEXT_LDSCRIPT
+#include TEXT_LDSCRIPT
+#else
         KEEP(*(.isr_vector .isr_vector.*))
         *(.text .text.* .gnu.linkonce.t.*)
         *(.glue_7t) *(.glue_7)
         *(.rodata .rodata* .gnu.linkonce.r.*)
+#endif
     } > rom
 
     .ARM.extab :

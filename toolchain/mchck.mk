@@ -1,5 +1,5 @@
 _libdir:=       $(dir $(lastword ${MAKEFILE_LIST}))
-VPATH:=	${_libdir}/crt0:${_libdir}/lib:$(VPATH)
+VPATH:=	${_libdir}/crt0:${_libdir}/lib:${_libdir}/ld:${_libdir}:$(VPATH)
 
 CC=	arm-none-eabi-gcc
 LD=	arm-none-eabi-ld
@@ -17,6 +17,8 @@ endif
 
 TARGET?=	MK20DX32VLF5
 
+include ${_libdir}/${TARGET}.mk
+
 COPTFLAGS?=	-Os
 CWARNFLAGS?=	-Wall -Wno-main
 
@@ -29,17 +31,25 @@ CFLAGS+=	${COPTFLAGS}
 endif
 CFLAGS+=	${CWARNFLAGS}
 
-LDFLAGS+=	-Wl,--gc-sections -L${_libdir} -L${_libdir}/ld
-LDFLAGS+=	-T ${TARGETLD}
+LDFLAGS+=	-Wl,--gc-sections
+CPPFLAGS.ld+=	-P -CC -I${_libdir}/ld -I.
+CPPFLAGS.ld+=	-DTARGET_LDSCRIPT='"${TARGETLD}"'
+
 ifdef LOADER
-LDFLAGS+=	-T loader.ld
+STARTFILE_SRC+=	flashconfig_k20.c
+CPPFLAGS.ld+=	-DMEMCFG_LDSCRIPT='"loader.ld"'
+LDSCRIPTS+=	loader.ld
+CPPFLAGS.ld+=	-DTEXT_LDSCRIPT='"sorted-sections.ld"'
+LDSCRIPTS+=	sorted-sections.ld
 else
-LDFLAGS+=	-T app.ld
+CPPFLAGS.ld+=	-DMEMCFG_LDSCRIPT='"app.ld"'
+LDSCRIPTS+=	app.ld
 endif
-LDFLAGS+=	-T link.ld
+
+LDFLAGS+=	-T ${PROG}.ld
 LDFLAGS+=       -nostartfiles -fno-builtin
 
-STARTFILE_SRC=	startup_k20.c system_k20.c mchck-builtins.c
+STARTFILE_SRC+=	startup_k20.c system_k20.c mchck-builtins.c
 STARTFILE_OBJ=	$(addsuffix .o, $(basename ${STARTFILE_SRC}))
 #STARTFILE_LIB=	libcrtnuc1xx.a
 #STARTFILE_LIBSHORT=	-lcrtnuc1xx
@@ -58,7 +68,7 @@ CLEANFILES+=	${PROG}.hex ${PROG}.elf ${PROG}.bin
 
 all: ${PROG}.hex ${PROG}.bin
 
-${PROG}.elf: ${OBJS} ${STARTFILES}
+${PROG}.elf: ${OBJS} ${STARTFILES} ${LDLIBS} ${PROG}.ld
 	${CC} -o $@ ${CFLAGS} ${LDFLAGS} ${STARTFILES} ${OBJS} ${LDLIBS}
 
 %.hex: %.elf
@@ -69,6 +79,14 @@ ${PROG}.elf: ${OBJS} ${STARTFILES}
 
 ${STARTFILE_LIB}: ${STARTFILE_OBJ}
 	${AR} r $@ $^
+
+${PROG}.ld: link.ld.S ${LDSCRIPTS}
+	cpp -o $@ ${CPPFLAGS.ld} $<
+CLEANFILES+=	${PROG}.ld
+
+sorted-sections.ld: ${OBJS}
+	ruby ${_libdir}/scripts/pack-sections.rb -o $@ ${FIXED_SECTIONS} ${OBJS} ${STARTFILES} ${LDLIBS}
+CLEANFILES+=	sorted-sections.ld
 
 clean:
 	-rm -f ${CLEANFILES}
