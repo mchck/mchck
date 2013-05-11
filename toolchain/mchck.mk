@@ -22,7 +22,7 @@ include ${_libdir}/${TARGET}.mk
 COPTFLAGS?=	-Os
 CWARNFLAGS?=	-Wall -Wno-main
 
-CFLAGS+=	-mcpu=cortex-m4 -msoft-float -mthumb -ffunction-sections -fdata-sections -std=c11
+CFLAGS+=	-mcpu=cortex-m4 -msoft-float -mthumb -ffunction-sections -fdata-sections -std=c11 -fplan9-extensions
 CFLAGS+=	-I${_libdir}/include -I${_libdir}/CMSIS/Include -I.
 CFLAGS+=	-include ${_libdir}/include/mchck_internal.h
 CFLAGS+=	-g
