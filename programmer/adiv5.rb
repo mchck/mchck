@@ -143,7 +143,7 @@ class Adiv5
 
       COMPONENT0 = 0xff0
       COMPONENT_PREAMBLE_MASK = 0xffff0fff
-      COMPONENT_PREAMBLE = 0xb105000d
+      COMPONENT_PREAMBLES = [0xb105000d, 0xb102000d]
       COMPONENT_CLASS_SHIFT = 12
       COMPONENT_CLASS_MASK = 0xf << COMPONENT_CLASS_SHIFT
       COMPONENT_CLASSES = Hash.new{|h,k| k}.merge({
@@ -160,7 +160,9 @@ class Adiv5
         dev = new(memap, base)
 
         if dev.component_class == :rom && dev.device_size == 4096
-          dev = ROMTable.new(memap, base)
+          ROMTable.new(memap, base).devs
+        else
+          [dev]
         end
       end
 
@@ -176,7 +178,7 @@ class Adiv5
         comps.each_with_index do |c, i|
           comp |= (c & 0xff) << (i * 8)
         end
-        if comp & COMPONENT_PREAMBLE_MASK == COMPONENT_PREAMBLE
+        if COMPONENT_PREAMBLES.include?(comp & COMPONENT_PREAMBLE_MASK)
           @component_class = COMPONENT_CLASSES[(comp & COMPONENT_CLASS_MASK) >> COMPONENT_CLASS_SHIFT]
           Log :ap, 2, 'device component class:', @component_class
         end
@@ -202,6 +204,8 @@ class Adiv5
       ENTRY_FORMAT = 1 << 1
       ENTRY_PRESENT = 1
 
+      attr_reader :devs
+
       def initialize(*args)
         super(*args)
 
@@ -221,15 +225,20 @@ class Adiv5
       def scan
         @devs = []
         addr = 0
-        while true
+        while addr < MEMTYPE
           entry = read_entry(addr)
-          break if entry == 0
+          case entry
+          when 0
+            break
+          when 0x00000002
+            next
+          end
           addr += 4
           Log :ap, 2, 'rom table entry %08x' % entry
           next if entry & ENTRY_PRESENT == 0
           devbase = (@base + (entry & ENTRY_ADDROFFS_MASK)) & 0xffffffff
-          dev = DebugDevice.probe(@mem, devbase)
-          devs << dev if dev
+          devs = DebugDevice.probe(@mem, devbase)
+          @devs += devs if devs
         end
       end
 
@@ -255,6 +264,7 @@ class Adiv5
     end
 
     attr_reader :endian
+    attr_reader :devs
 
     def initialize(*args)
       super(*args)
@@ -270,7 +280,7 @@ class Adiv5
 
       if base != 0xffffffff && @base & BASE_FORMAT != 0 && @base & BASE_PRESENT != 0
         base &= BASE_BASEADDR_MASK
-        @dev = DebugDevice.probe(self, base)
+        @devs = DebugDevice.probe(self, base)
       end
     end
 
@@ -291,6 +301,7 @@ class Adiv5
 
 
   attr_reader :ap
+  attr_reader :dap
 
   def initialize(drv, opt)
     @dp = Adiv5Swd.new(drv, opt)
@@ -367,6 +378,9 @@ class Adiv5
       if ap
         Log :ap, 1, "found AP #{apsel}", ap.id, "mem: #{ap.mem?}"
         @ap << ap
+        if !@dap && ap.mem?
+          @dap = ap
+        end
       else
         Log :ap, 1, "no AP on #{apsel}, stopping probe"
         break
@@ -380,4 +394,6 @@ end
 if $0 == __FILE__
   p = Adiv5.new(FtdiSwd, :vid => Integer(ARGV[0]), :pid => Integer(ARGV[1]), :debug => true)
   p.probe
+  require 'pp'
+  pp p.ap[0].devs
 end
