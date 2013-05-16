@@ -18,6 +18,13 @@ class Log
     end
   end
 
+  def self.hexary(ary)
+    ary = [ary] unless ary.respond_to? :each
+    ary.map do |e|
+      "%08x" % e
+    end.join(", ")
+  end
+
   if ENV["DEBUG"]
       ENV["DEBUG"].split(/[,;]/).each do |d|
       lvls = d.split(/[:=]/, 2)
