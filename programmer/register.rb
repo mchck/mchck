@@ -1,3 +1,4 @@
+require 'set'
 require 'log'
 
 module Peripheral
@@ -11,17 +12,17 @@ module Peripheral
     def initialize(field)
       @read_set = {}
       @write_set = {}
-      if Array === field
-        field.each_with_index do |d, i|
-          @read_set[i] = d
+      if field.respond_to? :each
+        field.each do |addr, d|
+          @read_set[addr] = d
         end
       else
-        @field = field
+        @backing = field
       end
     end
 
     def [](idx)
-      @write_set[idx] || @read_set[idx] ||= @field.get_backing(idx)
+      @write_set[idx] || @read_set[idx] ||= @backing[idx]
     end
 
     def []=(idx, val)
@@ -52,7 +53,7 @@ module Peripheral
   end
 
   class BackingProxy
-    def initialize(backing, offset)
+    def initialize(backing, offset = 0)
       @backing, @offset = backing, offset
     end
 
@@ -88,8 +89,8 @@ module Peripheral
 
       @offset ||= 0
       if @offset % 4 != 0
-        @bit_offset += @offset % 3 * 8
-        @offset -= @offset % 3
+        @bit_offset += @offset % 4 * 8
+        @offset -= @offset % 4
       end
 
       raise ValueError, "field #{name} exceeds word size" if @bit_offset + @width > 32
@@ -134,15 +135,14 @@ module Peripheral
           end
           fields[f.name] = f
 
-          field_range ||= f.offset..f.offset
           begin
             # this will return class Range the first time...
-            field_range = self.class_variable_get(:@@range)
+            field_offsets = self.class_variable_get(:@@offsets)
           rescue NameError
+            field_offsets = Set.new
+            self.class_variable_set(:@@offsets, field_offsets)
           end
-          field_range = field_range.begin..f.offset if f.offset > field_range.end
-          field_range = f.offset..field_range.end if f.offset < field_range.begin
-          self.class_variable_set(:@@range, field_range)
+          field_offsets << f.offset
 
           yield f
         end
@@ -174,7 +174,7 @@ module Peripheral
             f.inverse_enum[read_field(f)]
           end
           define_method "#{name}=" do |sval|
-            set_field(f, f.enum.fetch(sval))
+            set_field(f, f.enum[sval] || sval)
           end
         end
       end
@@ -242,28 +242,39 @@ module Peripheral
       add_unsigned(name, range, opts)
     end
 
-    def self.bool(name, pos)
-      add_enum(name, pos, {true => 1, false => 0}, {})
+    def self.bool(name, pos, opts={})
+      add_enum(name, pos, {true => 1, false => 0}, opts)
     end
 
     def self.enum(name, range, enum)
       add_enum(name, range, enum, {})
     end
 
-    def initialize(backing)
-      @backing = backing
+    def initialize
+      @backing = CachingProxy.new(nil)
+      offsets = self.class.class_variable_get(:@@offsets)
+      offsets.each do |ofs|
+        @backing[ofs] = 0
+      end
+    end
+
+    def self.shadow(backing, offs=0)
+      c = self.allocate
+      c.instance_eval do
+        @backing = backing
+        @address = offs
+      end
+      c
     end
 
     def initialize_copy(other)
-      value = other.to_a
-      @backing = CachingProxy.new(other)
+      value = other.map{|o, d| [other.get_address(o), d]}
+      @backing = CachingProxy.new(value)
     end
 
     def transact
-      val ||= self.to_a
-      val = [val] unless val.respond_to? :[]
-      proxy = CachingProxy.new(val)
-      f = self.class.new(proxy)
+      proxy = CachingProxy.new(@backing)
+      f = self.class.shadow(proxy)
       yield f
       proxy.write_set.each do |o, d|
         set_backing(o, d)
@@ -277,20 +288,23 @@ module Peripheral
     end
 
     def zero!
-      self.class.class_variable_get(:@@range).map do |o|
+      self.class.class_variable_get(:@@offsets).map do |o|
         set_backing(o, 0)
       end
     end
 
     def to_i
-      range = self.class.class_variable_get(:@@range)
-      raise RuntimeError, "not a single word register #{range}" if range.count > 1
+      offset = self.class.class_variable_get(:@@offsets)
+      raise RuntimeError, "not a single word register #{offset.to_a}" if offset.count > 1
       get_backing(0)
     end
 
-    def to_a
-      self.class.class_variable_get(:@@range).map do |o|
-        get_backing(o)
+    include Enumerable
+
+    def each
+      offsets = self.class.class_variable_get(:@@offsets)
+      m = offsets.map do |o|
+        yield [o, get_backing(o)]
       end
     end
   end
@@ -304,6 +318,15 @@ module Peripheral
       add_field_constant(name, offset)
       define_method name do
         VectorProxy.new(self, name, len)
+      end
+      define_method "#{name}=" do |other|
+        other.each_with_index do |d, i|
+          ooffs = i * 4
+          if Array === d
+            ooffs, d = d
+          end
+          set_backing(offset + ooffs, d)
+        end
       end
       len.times do |i|
         ename = "#{name}[#{i}]"
@@ -319,12 +342,12 @@ module Peripheral
       if opts[:vector]
         self.add_vector(name, offset, opts[:vector]) do |ename, eoffs|
           define_method ename do
-            cl.new(BackingProxy.new(self, eoffs))
+            cl.shadow(BackingProxy.new(self), eoffs)
           end
         end
       else
         define_method name do
-          cl.new(BackingProxy.new(self, offset))
+          cl.shadow(BackingProxy.new(self), offset)
         end
       end
     end
@@ -344,9 +367,7 @@ module Peripheral
     end
 
     def default_address(val)
-      self.class_eval do
-        @@default_address = Integer(val)
-      end
+      self.class_variable_set(:@@default_address, Integer(val))
     end
   end
 
@@ -358,5 +379,13 @@ module Peripheral
   def initialize(mem, address=nil)
     @backing = mem
     @address = address if address
+  end
+
+  def read(addr, opt={})
+    @backing.read(get_address(addr), opt)
+  end
+
+  def write(addr, val)
+    @backing.write(get_address(addr), val)
   end
 end

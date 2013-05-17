@@ -69,6 +69,7 @@ class Adiv5
     end
 
     attr_reader :component_class, :device_size
+    attr_reader :base
 
     def initialize(memap, base)
       @base = base
@@ -122,7 +123,7 @@ class Adiv5
         break if entry.to_i == 0
         Log :ap, 2, 'rom table entry %08x' % entry.to_i
         next if !entry.present?
-        devbase = @base + entry.addroffs
+        devbase = (@base + entry.addroffs) % (1 << 32)
         devs = DebugDevice.probe(@backing, devbase)
         @devs += devs if devs
       end
@@ -226,7 +227,6 @@ class Adiv5
     end
 
     attr_reader :endian
-    attr_reader :devs
 
     def initialize(*args)
       super(*args)
@@ -238,8 +238,11 @@ class Adiv5
         csw.Mode = 0
       end
       @endian = self.CFG.endian
-      base = self.BASE.dup
+    end
 
+    def devs
+      return @devs if @devs
+      base = self.BASE.dup
       if base.to_i != 0xffffffff && base.format? && base.present?
         @devs = DebugDevice.probe(self, base.BASEADDR)
       end
@@ -257,7 +260,7 @@ class Adiv5
 
     def write(addr, val)
       raise UnalignedAccessError if addr & 0x3 != 0
-      Log :mem, 1,"read %08x = %s" % [addr, Log.hexary(val)]
+      Log :mem, 1,"write %08x = %s" % [addr, Log.hexary(val)]
       write_ap(TAR, addr)
       write_ap(DRW, val)
     end
