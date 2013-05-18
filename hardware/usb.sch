@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date 12/31/2012 1:27:42 AM
+EESchema Schematic File Version 2  date Tue Sep 11 21:36:26 2012
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -45,15 +45,14 @@ LIBS:inductor_select
 LIBS:logo
 LIBS:MK20LF
 LIBS:mounthole
-LIBS:crystal3x2
 LIBS:mchck-cache
 EELAYER 25  0
 EELAYER END
-$Descr A4 11700 8267
+$Descr A4 11693 8268
 encoding utf-8
 Sheet 2 4
 Title "MC HCK micro controller board"
-Date "31 dec 2012"
+Date "11 sep 2012"
 Rev "4"
 Comp "(c) 2011,2012 Simon Schubert"
 Comment1 "CERN OHL v.1.1 or later"
@@ -61,97 +60,6 @@ Comment2 ""
 Comment3 ""
 Comment4 ""
 $EndDescr
-$Comp
-L SOLDERJUMPERNC SJ6
-U 1 1 50E1546C
-P 6950 4300
-F 0 "SJ6" H 7000 4250 50  0000 L BNN
-F 1 "SOLDERJUMPERNC" H 6700 4100 50  0001 L BNN
-F 2 "SparkFun-SJ_2S" H 6950 4450 50  0001 C CNN
-	1    6950 4300
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	7450 4300 7150 4300
-Connection ~ 5650 5450
-Wire Wire Line
-	5650 5650 5650 5450
-Connection ~ 6150 4150
-Connection ~ 6100 4050
-Wire Wire Line
-	5950 4150 5950 2950
-Wire Wire Line
-	5200 5250 6100 5250
-Wire Wire Line
-	6150 4150 6150 5350
-Wire Wire Line
-	6100 4050 6100 5250
-Connection ~ 5950 4150
-Connection ~ 6000 4050
-Wire Wire Line
-	6000 2850 6000 4050
-Wire Wire Line
-	4750 4150 6700 4150
-Wire Wire Line
-	4950 3900 4950 3950
-Wire Wire Line
-	4950 2650 4950 2750
-Wire Wire Line
-	5250 5050 5250 5150
-Wire Wire Line
-	5050 5700 5050 5550
-Wire Wire Line
-	5400 3400 5400 3050
-Wire Wire Line
-	4750 3150 4950 3150
-Wire Wire Line
-	4750 5250 4800 5250
-Wire Notes Line
-	6000 5900 4150 5900
-Wire Wire Line
-	5250 5150 5200 5150
-Wire Wire Line
-	7200 4150 7450 4150
-Wire Notes Line
-	6000 5900 6000 4750
-Wire Notes Line
-	4150 5900 4150 4750
-Wire Wire Line
-	5950 2950 4750 2950
-Wire Wire Line
-	5400 3050 4750 3050
-Wire Wire Line
-	4950 2750 4750 2750
-Wire Wire Line
-	6000 2850 4750 2850
-Wire Wire Line
-	6150 5350 5200 5350
-Wire Wire Line
-	4950 4350 4950 4250
-Wire Wire Line
-	4950 4250 4750 4250
-Wire Wire Line
-	4950 3950 4750 3950
-Wire Wire Line
-	4750 4050 6700 4050
-Wire Wire Line
-	5050 5550 4750 5550
-Wire Wire Line
-	7200 4050 7450 4050
-Wire Notes Line
-	4150 4750 6000 4750
-Wire Wire Line
-	4750 5150 4800 5150
-Wire Wire Line
-	4750 5350 4800 5350
-Wire Wire Line
-	4750 5450 6200 5450
-Wire Wire Line
-	6200 5450 6200 4300
-Wire Wire Line
-	6200 4300 6750 4300
-Text HLabel 7450 4300 2    40   BiDi ~ 0
-USB_OTG
 $Comp
 L SOLDERJUMPERNO SJ3
 U 1 1 4FEDD8B1
@@ -243,28 +151,28 @@ F 7 "GND" H 4875 3950 50  0001 C CNN "Ground"
 	1    0    0    -1  
 $EndComp
 $Comp
-L GNDPWR #PWR05
+L GNDPWR #PWR5
 U 1 1 5046077E
 P 4950 4350
-F 0 "#PWR05" H 4950 4400 40  0001 C CNN
+F 0 "#PWR5" H 4950 4400 40  0001 C CNN
 F 1 "GNDPWR" H 4950 4270 40  0000 C CNN
 	1    4950 4350
 	1    0    0    -1  
 $EndComp
 $Comp
-L GNDPWR #PWR06
+L GNDPWR #PWR6
 U 1 1 50460857
-P 5050 5700
-F 0 "#PWR06" H 5050 5750 40  0001 C CNN
-F 1 "GNDPWR" H 5050 5620 40  0000 C CNN
-	1    5050 5700
+P 5250 5700
+F 0 "#PWR6" H 5250 5750 40  0001 C CNN
+F 1 "GNDPWR" H 5250 5620 40  0000 C CNN
+	1    5250 5700
 	1    0    0    -1  
 $EndComp
 $Comp
-L GNDPWR #PWR07
+L GNDPWR #PWR7
 U 1 1 504608AE
 P 5400 3400
-F 0 "#PWR07" H 5400 3450 40  0001 C CNN
+F 0 "#PWR7" H 5400 3450 40  0001 C CNN
 F 1 "GNDPWR" H 5400 3320 40  0000 C CNN
 	1    5400 3400
 	1    0    0    -1  
@@ -272,11 +180,11 @@ $EndComp
 $Comp
 L CONN_1 P6
 U 1 1 5047107A
-P 5800 5650
-F 0 "P6" H 5880 5650 40  0000 L CNN
-F 1 "ID" H 5800 5705 30  0000 C CNN
-F 2 "SparkFun-PAD.03X.03" H 5800 5805 30  0001 C CNN
-	1    5800 5650
+P 5400 5450
+F 0 "P6" H 5480 5450 40  0000 L CNN
+F 1 "ID" H 5400 5505 30  0000 C CNN
+F 2 "SparkFun-PAD.03X.03" H 5400 5605 30  0001 C CNN
+	1    5400 5450
 	1    0    0    -1  
 $EndComp
 Text Label 6300 4050 0    40   ~ 0
@@ -291,6 +199,76 @@ Text HLabel 4950 3900 1    40   Output ~ 0
 VBUS
 Text HLabel 5250 5050 1    40   Output ~ 0
 VBUS
+Wire Wire Line
+	4750 5350 4800 5350
+Wire Wire Line
+	4750 5150 4800 5150
+Wire Notes Line
+	4150 4750 5600 4750
+Wire Wire Line
+	7200 4050 7450 4050
+Wire Wire Line
+	4750 5550 5250 5550
+Wire Wire Line
+	4750 4050 6700 4050
+Wire Wire Line
+	4750 3950 4950 3950
+Wire Wire Line
+	4750 4250 4950 4250
+Wire Wire Line
+	4950 4250 4950 4350
+Wire Wire Line
+	6150 5350 5200 5350
+Wire Wire Line
+	4750 2850 6000 2850
+Wire Wire Line
+	4750 2750 4950 2750
+Wire Wire Line
+	4750 3050 5400 3050
+Wire Wire Line
+	4750 2950 5950 2950
+Wire Notes Line
+	4150 4750 4150 5900
+Wire Notes Line
+	5600 4750 5600 5900
+Wire Wire Line
+	7200 4150 7450 4150
+Wire Wire Line
+	5200 5150 5250 5150
+Wire Notes Line
+	5600 5900 4150 5900
+Wire Wire Line
+	4750 5250 4800 5250
+Wire Wire Line
+	4750 3150 4950 3150
+Wire Wire Line
+	5400 3050 5400 3400
+Wire Wire Line
+	5250 5550 5250 5700
+Wire Wire Line
+	4750 5450 5250 5450
+Wire Wire Line
+	5250 5150 5250 5050
+Wire Wire Line
+	4950 2750 4950 2650
+Wire Wire Line
+	4950 3950 4950 3900
+Wire Wire Line
+	4750 4150 6700 4150
+Wire Wire Line
+	6000 2850 6000 4050
+Connection ~ 6000 4050
+Connection ~ 5950 4150
+Wire Wire Line
+	6100 4050 6100 5250
+Wire Wire Line
+	6150 4150 6150 5350
+Wire Wire Line
+	6100 5250 5200 5250
+Wire Wire Line
+	5950 2950 5950 4150
+Connection ~ 6100 4050
+Connection ~ 6150 4150
 Text HLabel 7450 4050 2    40   3State ~ 0
 USB_DM
 Text HLabel 7450 4150 2    40   3State ~ 0

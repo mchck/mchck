@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by CvPcb (2012-01-19 BZR 3256)-stable date = 12/31/2012 1:23:08 AM
+Cmp-Mod V01 Created by CvPcb (2012-03-22 BZR 3475)-stable date = Fri Sep  7 13:28:01 2012
 
 BeginCmp
 TimeStamp = /50474F32/5048FC9E;
@@ -106,13 +106,6 @@ IdModule  = SOD-523F-NC;
 EndCmp
 
 BeginCmp
-TimeStamp = /4F22DD51/504F92BA;
-Reference = D4;
-ValeurCmp = CDBU0530;
-IdModule  = SOD-523F-NC;
-EndCmp
-
-BeginCmp
 TimeStamp = /4F22DD51/5046681B;
 Reference = FB1;
 ValeurCmp = FILTER;
@@ -130,7 +123,7 @@ BeginCmp
 TimeStamp = /503C1464;
 Reference = G1;
 ValeurCmp = OHW_LOGO;
-IdModule  = OHW-LOGO-3mm;
+IdModule  = OHW-LOGO-6mm;
 EndCmp
 
 BeginCmp
@@ -199,7 +192,7 @@ EndCmp
 BeginCmp
 TimeStamp = /4F22DD51/4F22E691;
 Reference = P5;
-ValeurCmp = CHG;
+ValeurCmp = CHRG;
 IdModule  = SparkFun-PAD.03X.03;
 EndCmp
 
@@ -281,10 +274,10 @@ IdModule  = SparkFun-SJ_2VerySmall-NO;
 EndCmp
 
 BeginCmp
-TimeStamp = /504995A0/50E1546C;
+TimeStamp = /4F22DD51/50478372;
 Reference = SJ6;
 ValeurCmp = SOLDERJUMPERNC;
-IdModule  = SparkFun-SJ_2VerySmall-NO;
+IdModule  = SM0603_NC;
 EndCmp
 
 BeginCmp
@@ -320,13 +313,6 @@ TimeStamp = /50474F32/5045BE79;
 Reference = Y1;
 ValeurCmp = CRYSTAL32-SMD;
 IdModule  = SparkFun-CRYSTAL-32KHZ-SMD;
-EndCmp
-
-BeginCmp
-TimeStamp = /50474F32/50B2DF30;
-Reference = Y2;
-ValeurCmp = 16_MHz;
-IdModule  = CRYSTAL3x2-LF;
 EndCmp
 
 EndListe
