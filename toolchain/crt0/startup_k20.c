@@ -89,12 +89,19 @@ __Default_Handler(void)
 
 extern uint32_t _sidata, _sdata, _edata, _sbss, _ebss;
 
+#include <mchck.h>
+
 void SystemInit(void);
 void main(void);
 
 void
 Default_Reset_Handler(void)
 {
+	/* Disable Watchdog */
+	WDOG_UNLOCK = 0xc520;
+	WDOG_UNLOCK = 0xd928;
+	WDOG_STCTRLH &= ~WDOG_STCTRLH_WDOGEN_MASK;
+
 	memcpy(&_sdata, &_sidata, (uintptr_t)&_edata - (uintptr_t)&_sdata);
 	memset(&_sbss, 0, (uintptr_t)&_ebss - (uintptr_t)&_sbss);
 
