@@ -13,7 +13,11 @@ module Peripheral
       @read_set = {}
       @write_set = {}
       if field.respond_to? :each
-        field.each do |addr, d|
+        field.each_with_index do |d, i|
+          addr = i * 4
+          if Array === d
+            addr, d = d
+          end
           @read_set[addr] = d
         end
       else
@@ -118,7 +122,7 @@ module Peripheral
         end
         self.const_set(name, val) unless self.const_defined?(name)
       rescue NameError => e
-        puts "could not add field name #{name}: #{e}"
+        #puts "could not add field name #{name}: #{e}"
       end
 
       def add_field(name, range, opts)
@@ -231,7 +235,24 @@ module Peripheral
     end
 
     def to_s
-      "<#{self.class}:#{self.object_id}>"
+      s = "<%s:%#x address: %#x backing: %s\n" % [self.class, self.object_id, get_address(0), @backing]
+      fs = self.class.class_variable_get(:@@fields)
+      s += fs.values.sort_by{|f| f.offset * 32 + f.bit_offset}.map do |f|
+        v = nil
+        begin
+          v = self.send(f.name)
+        rescue Exception => e
+          v = "(exception occured: #{e})"
+        end
+        v = "%#x" % v if Integer === v
+        va = "#{v}".split("\n")
+        fs = "  #{f.name}: #{va[0]}"
+        if va.count > 1
+          fs = ([fs] + va[1..-1]).join("\n  ")
+        end
+        fs
+      end.join("\n")
+      s += ">"
     end
   end
 
@@ -339,6 +360,9 @@ module Peripheral
       cl = Class.new(BitField)
       add_field_constant(name, cl)
       cl.class_eval &block
+      add_field(name, [offset, 31..0], {}) do |f|
+        # nothing to do, I think
+      end
       if opts[:vector]
         self.add_vector(name, offset, opts[:vector]) do |ename, eoffs|
           define_method ename do
