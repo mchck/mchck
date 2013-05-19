@@ -13,7 +13,7 @@ main(void)
 	GPIOC_PDDR = 1 << 0;
 
 	for (;;) {
-		GPIOC_PTOR = 1 << 0;
 		for (volatile int i = 1000000; i > 0; --i);
+		GPIOC_PTOR = 1 << 0;
 	}
 }
