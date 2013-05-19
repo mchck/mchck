@@ -6,6 +6,17 @@ class ARMv7
   class SCS
     include Peripheral
 
+    register :AIRCR, 0xe000ed0c do
+      enum :VECTKEY, 31..16, {
+        :key => 0x05fa
+      }
+      bool :ENDIANESS, 15
+      unsigned :PRIGROUP, 10..8
+      bool :SYSRESETREQ, 2
+      bool :VECTCLRACTIVE, 1
+      bool :VECTRESET, 0
+    end
+
     register :DFSR, 0xe000ed30 do
       bool :EXTERNAL, 4
       bool :VCATCH, 3
@@ -15,7 +26,9 @@ class ARMv7
     end
 
     register :DHCSR, 0xe000edf0 do
-      unsigned :DBGKEY, 31..16  # W
+      enum :DBGKEY, 31..16, {   # W
+        :key => 0xa05f
+      }
       bool :S_RESET_ST, 25      # R
       bool :S_RETIRE_ST, 24     # R
       bool :S_LOCKUP, 19        # R
@@ -104,24 +117,45 @@ class ARMv7
     Log :arm, 1, "enabling debug"
     @scs.DHCSR.transact do |dhcsr|
       dhcsr.zero!
-      dhcsr.DBGKEY = 0xa05f
+      dhcsr.DBGKEY = :key
       dhcsr.C_DEBUGEN = true
     end
   end
 
-  def catch_vector!(name)
+  def disable_debug!
+    Log :arm, 1, "disabling debug"
+    @scs.DHCSR.transact do |dhcsr|
+      dhcsr.DBGKEY = :key
+      dhcsr.C_HALT = false
+      dhcsr.C_DEBUGEN = false
+    end
+  end
+
+  def catch_vector!(name, do_catch=true)
     Log :arm, 1, "catching vector #{name}"
     vcname = "VC_#{name}"
-    @scs.DEMCR.send("#{vcname}=", true)
+    @scs.DEMCR.send("#{vcname}=", do_catch)
   end
 
   def halt_core!
     Log :arm, 1, "waiting for core to halt"
-    while !@scs.DHCSR.S_HALT
+    while !self.core_halted?
       @scs.DHCSR.transact do |dhcsr|
-        dhcsr.DBGKEY = 0xa05f
+        dhcsr.DBGKEY = :key
         dhcsr.C_HALT = true
       end
+    end
+  end
+
+  def core_halted?
+    @scs.DHCSR.S_HALT
+  end
+
+  def reset_system!
+    Log :arm, 1, "resetting system"
+    @scs.AIRCR.transact do |aircr|
+      aircr.VECTKEY = :key
+      aircr.SYSRESETREQ = true
     end
   end
 end
