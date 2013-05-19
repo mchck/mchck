@@ -112,6 +112,46 @@ class Kinetis < ARMv7
     default_address 0x14000000
   end
 
+  class Flash_Config_Field
+    include Peripheral
+
+    default_address 0x400
+
+    # XXX would be nice to use the same register from above
+    register :flash_config, 0x00 do
+      unsigned :KEY0, [0x00, 31..0], :endian => :big
+      unsigned :KEY1, [0x04, 31..0], :endian => :big
+      unsigned :FPROT, [0x08, 31..0], :endian => :big
+      enum :KEYEN, [0x0c, 7..6], {
+        :disabled0 => 0b00,
+        :disabled => 0b01,
+        :enabled => 0b10,
+        :disabled3 => 0b11
+      }
+      enum :MEEN, [0x0c, 5..4], {
+        :enabled0 => 0b00,
+        :enabled1 => 0b01,
+        :disabled => 0b10,
+        :enabled => 0b11
+      }
+      enum :FSLACC, [0x0c, 3..2], {
+        :granted0 => 0b00,
+        :denied1 => 0b01,
+        :denied => 0b10,
+        :granted => 0b11
+      }
+      enum :SEC, [0x0c, 1..0], {
+        :secure0 => 0b00,
+        :secure1 => 0b01,
+        :unsecure => 0b10,
+        :secure => 0b11
+      }
+      unsigned :FOPT, [0x0d, 7..0]
+      unsigned :FEPROT, [0x0e, 7..0]
+      unsigned :FDPROT, [0x0f, 7..0]
+    end
+  end
+
   def initialize(adiv5, magic_halt=true)
     super(adiv5)
     @mdmap = adiv5.ap(1)
@@ -148,19 +188,28 @@ class Kinetis < ARMv7
     @mdmap.write_ap(4, 0)
 
     self.halt_core!
+    self.catch_vector!(:CORERESET, false)
 
     @ftfl = Kinetis::FTFL.new(@dap)
     @flexram = Kinetis::FlexRAM.new(@dap)
     @sector_size = 1024
   end
 
-  def program_sector(data, addr)
+  def program_sector(addr, data)
     if String === data
       data = (data + "\0"*3).unpack('L*')
     end
 
     if data.size != @sector_size / 4 || (addr & (@sector_size - 1) != 0)
       raise RuntimeError, "invalid data size or alignment"
+    end
+
+    # Flash config field address
+    if addr == 0x400
+      fconfig = Flash_Config_Field.new(Peripheral::CachingProxy.new(data), 0).flash_config.dup
+      if fconfig.SEC != :unsecure
+        raise RuntimeError, "flash protection bits will brick device"
+      end
     end
 
     if true || !@ftfl.FSTAT.RAMRDY
@@ -171,14 +220,36 @@ class Kinetis < ARMv7
     @ftfl.cmd(FTFL::FCCOB_Erase_Sector.new(addr))
     @flexram.write(0, data)
     @ftfl.cmd(FTFL::FCCOB_Program_Section.new(addr, data.size))
+  end
 
-    @dap.read(addr, :count => data.size)
+  def program(addr, data)
+    if addr & (@sector_size - 1) != 0
+      raise RuntimeError, "program needs to start on sector boundary"
+    end
+
+    if !self.core_halted?
+      raise RuntimeError, "can only program flash when core is halted"
+    end
+
+    # pad data
+    if data.bytesize % @sector_size != 0
+      data += "\xff" * (@sector_size - data.bytesize % @sector_size)
+    end
+
+    datapos = 0
+    while datapos < data.bytesize
+      sectaddr = addr + datapos
+      sector = data.byteslice(datapos, @sector_size)
+      yield [sectaddr, datapos, data.bytesize]
+      program_sector(sectaddr, sector)
+      datapos += @sector_size
+    end
   end
 end
 
 if $0 == __FILE__
   adiv5 = Adiv5.new(FtdiSwd, :vid => Integer(ARGV[0]), :pid => Integer(ARGV[1]), :debug => true)
   k = Kinetis.new(adiv5)
-  r = k.program_sector("\xa5"*1024, 0x800)
+  r = k.program_sector(0x800, "\xa5"*1024)
   puts Log.hexary(adiv5.dap.read(0x800, :count => 1024/4))
 end
