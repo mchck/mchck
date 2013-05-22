@@ -234,14 +234,15 @@ module Peripheral
       @backing[get_address(offset)] = val
     end
 
-    def to_s
+    def inspect
       s = "<%s:%#x address: %#x backing: %s\n" % [self.class, self.object_id, get_address(0), @backing]
       fs = self.class.class_variable_get(:@@fields)
+      copy = self.dup
       s += fs.values.sort_by{|f| f.offset * 32 + f.bit_offset}.map do |f|
         v = nil
         begin
-          v = self.send(f.name)
-        rescue Exception => e
+          v = copy.send(f.name)
+        rescue StandardError => e
           v = "(exception occured: #{e})"
         end
         v = "%#x" % v if Integer === v
@@ -295,10 +296,10 @@ module Peripheral
 
     def transact
       proxy = CachingProxy.new(@backing)
-      f = self.class.shadow(proxy)
+      f = self.class.shadow(proxy, @address)
       yield f
       proxy.write_set.each do |o, d|
-        set_backing(o, d)
+        @backing[o] = d
       end
     end
 

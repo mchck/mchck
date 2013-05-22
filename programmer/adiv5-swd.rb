@@ -126,11 +126,14 @@ class Adiv5Swd
       # We can repeat simple DP reads
       retry
     end
+  rescue Fault
+    # clear sticky error
+    transact(:dp, :out, ABORT, 1 << 2)
+    raise
   end
 end
 
 
 if $0 == __FILE__
   s = Adiv5Swd.new(FtdiSwd, :vid => Integer(ARGV[0]), :pid => Integer(ARGV[1]))
-  
 end

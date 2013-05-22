@@ -150,7 +150,7 @@ class Adiv5
       end
 
       ap
-    rescue Exception => e
+    rescue StandardError => e
       Log :ap, 1, "could not probe AP #{apsel}: #{e}\n#{e.backtrace.join("\n")}"
       nil
     end
