@@ -16,7 +16,7 @@ class GDBServer
       @data = ""
       begin
         connection_loop
-      rescue EOFError
+      rescue EOFError, Errno::EPIPE
         Log(:gdb, 1){ "connection closed" }
       end
       @sock.close
@@ -24,6 +24,7 @@ class GDBServer
   end
 
   def connection_loop
+    attach
     while true
       cmd = read_packet
       repl = nil
@@ -41,6 +42,8 @@ class GDBServer
       end
       reply repl if repl
     end
+  ensure
+    detach
   end
 
   def read_packet
@@ -198,7 +201,12 @@ class GDBServer
       end
       sleep 0.1
     end
-    'T01'
+    halt_reason = @target.halt_reason
+    Log(:gdb, 2){ "halt reason #{halt_reason}" }
+    sig_num = Signal.list[halt_reason.to_s] || Signal.list["INT"]
+    pc_num = @target.reg_desc.index{|r| r[:name] == :pc}
+    cur_pc = @target.get_register(:pc, true)
+    'T%02x%02x:%s;' % [sig_num, pc_num, code_binary(cur_pc)]
   end
 
   def breakpoint(insertstr, typestr, addrstr, kindstr)
@@ -218,7 +226,7 @@ end
 
 if $0 == __FILE__
   adiv5 = Adiv5.new(FtdiSwd, :vid => Integer(ARGV[0]), :pid => Integer(ARGV[1]), :debug => true)
-  k = Kinetis.new(adiv5)
+  k = Kinetis.new(adiv5, false)
   g = GDBServer.new(k, 1234)
   g.run_loop
 end
