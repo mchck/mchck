@@ -248,21 +248,52 @@ class Adiv5
       end
     end
 
-    def read(addr, opt={})
+    def transfer(dir, addr, val_or_opt)
       raise UnalignedAccessError if addr & 0x3 != 0
 
-      write_ap(TAR, addr)
-      v = read_ap(DRW, opt)
+      count = 1
+      if Hash === val_or_opt
+        count = val_or_opt[:count] || 1
+      elsif val_or_opt.respond_to? :count
+        count = val_or_opt.count
+      end
+
+      transfer_reg = DRW
+      if count == 1 && @last_TAR && @last_TAR & 0xfffffff0 == addr & 0xfffffff0
+        ofs = addr & 0xf
+        transfer_reg = BD + ofs
+      elsif @last_TAR != addr
+        write_ap(TAR, addr)
+        @last_TAR = addr
+      end
+
+      if transfer_reg == DRW
+        # clear cache in case we run into an exception and lose track
+        @last_TAR = nil
+      end
+      v = case dir
+          when :in
+            read_ap(transfer_reg, val_or_opt)
+          when :out
+            write_ap(transfer_reg, val_or_opt)
+          end
+      if transfer_reg == DRW
+        @last_TAR = addr + count * 4
+      end
+
+      v
+    end
+
+    def read(addr, opt={})
+      v = transfer(:in, addr, opt)
       Log(:mem, 1){ "read %08x < %s" % [addr, Log.hexary(v)] }
       v
     end
     alias :[] :read
 
     def write(addr, val)
-      raise UnalignedAccessError if addr & 0x3 != 0
       Log(:mem, 1){ "write %08x = %s" % [addr, Log.hexary(val)] }
-      write_ap(TAR, addr)
-      write_ap(DRW, val)
+      transfer(:out, addr, val)
     end
     alias :[]= :write
   end
