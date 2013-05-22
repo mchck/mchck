@@ -304,8 +304,9 @@ module Peripheral
     end
 
     def replace!(val)
-      val.each_with_index do |i, d|
-        set_backing(i, d)
+      val = [val] unless val.respond_to? :each
+      val.each_with_index do |d, i|
+        set_backing(i * 4, d)
       end
     end
 
