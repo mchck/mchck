@@ -121,7 +121,7 @@ class FtdiSwd
 
   def raw_out(seq, seqlen=nil)
     seqlen ||= seq.length * 8
-    Log :phys, 1, "swd raw: #{seq.unpack("B#{seqlen}").first}"
+    Log(:phys, 1){ "swd raw: #{seq.unpack("B#{seqlen}").first}" }
     @cur_dir = :out
     set_line_mode(:out)
     if seqlen >= 8
@@ -134,13 +134,13 @@ class FtdiSwd
 
   def flush!
     return if @outbuf.empty?
-    Log :phys, 2, 'flush', hexify(@outbuf)
+    Log(:phys, 2){ ['flush', hexify(@outbuf)] }
     @dev.write_data(@outbuf)
     @outbuf = ""
   end
 
   def transact(cmd, data=nil)
-    Log :phys, 1, 'transact %08b' % cmd
+    Log(:phys, 1){ 'transact %08b' % cmd }
     case cmd & 0x4
     when 0
       dir = :out
@@ -268,7 +268,7 @@ class FtdiSwd
     data = expect_bytes(len + 1)
     ret, par = data.unpack('VC')
     par >>= 7
-    Log :phys, 2, 'read_bytes: %08x, parity %d' % [ret, par]
+    Log(:phys, 2){ 'read_bytes: %08x, parity %d' % [ret, par] }
     [ret, par]
   end
 
@@ -281,7 +281,7 @@ class FtdiSwd
 
     data = expect_bytes(1)
     ret = data.unpack('C').first >> (8 - len)
-    Log :phys, 2, 'read_bits: %0*b' % [len, ret]
+    Log(:phys, 2){ 'read_bits: %0*b' % [len, ret] }
     ret
   end
 
@@ -289,10 +289,10 @@ class FtdiSwd
     while @inbuf.length < num
       @inbuf << @dev.read_data
     end
-    Log :phys, 3, 'inbuf:', hexify(@inbuf)
+    Log(:phys, 3){ ['inbuf:', hexify(@inbuf)] }
     ret = @inbuf.byteslice(0, num)
     @inbuf = @inbuf.byteslice(num..-1)
-    Log :phys, 3, 'read:', hexify(ret)
+    Log(:phys, 3){ ['read:', hexify(ret)] }
     ret
   end
 

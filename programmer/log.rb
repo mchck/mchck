@@ -11,8 +11,10 @@ class Log
     end
   end
 
-  def self.log(subsys, level, *args)
+  def self.log(subsys, level)
     if level <= @@levels[subsys]
+      args = yield
+      args = [args] unless args.respond_to? :join
       spc = "  " * (level - 1)
       $stderr.puts '%s%s: %s' % [spc, subsys.to_s.upcase, args.join(' ')]
     end
@@ -33,6 +35,6 @@ class Log
   end
 end
 
-def Log(*args)
-  Log.log(*args)
+def Log(subsys, level, &block)
+  Log.log(subsys, level, &block)
 end

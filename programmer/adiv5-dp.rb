@@ -46,7 +46,7 @@ class Adiv5
     def ap_select(apsel, addr)
       apbanksel = addr >> 4
       return if @last_select == [apsel, apbanksel]
-      Log :dp, 3, "selecting %d:%x" % [apsel, apbanksel]
+      Log(:dp, 3){ "selecting %d:%x" % [apsel, apbanksel] }
       self.SELECT.transact do |select|
         select.zero!
         select.APSEL = apsel
@@ -57,12 +57,12 @@ class Adiv5
 
     def read(port, addr, opt={})
       v = @lower.read(port, addr, opt)
-      Log :dp, 2, "read %s %08x < %s" % [port, addr, Log.hexary(v)]
+      Log(:dp, 2){ "read %s %08x < %s" % [port, addr, Log.hexary(v)] }
       v
     end
 
     def write(port, addr, val)
-      Log :dp, 2, "write %s %08x = %s" % [port, addr, Log.hexary(val)]
+      Log(:dp, 2){ "write %s %08x = %s" % [port, addr, Log.hexary(val)] }
       @lower.write(port, addr, val)
     end
 

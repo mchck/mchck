@@ -77,7 +77,7 @@ class Adiv5
       @backing = memap
       @address = base
 
-      Log :ap, 1, '%s at %08x' % [self.class, @base]
+      Log(:ap, 1){ '%s at %08x' % [self.class, @base] }
 
       comp = 0
       @backing.read(get_address(COMPONENT), :count => 4).each_with_index do |v, i|
@@ -85,12 +85,12 @@ class Adiv5
       end
       if COMPONENT_PREAMBLES.include?(comp & COMPONENT_PREAMBLE_MASK)
         @component_class = COMPONENT_CLASSES[(comp & COMPONENT_CLASS_MASK) >> COMPONENT_CLASS_SHIFT]
-        Log :ap, 2, 'device component class:', @component_class
+        Log(:ap, 2){ "device component class: #@component_class" }
       end
 
       periph = PeripheralID.new(self)
       @device_size = 4 * 1024 << periph.PERIPHERAL4.count_4kb
-      Log :ap, 2, 'device size: %d' % @device_size
+      Log(:ap, 2){ 'device size: %d' % @device_size }
     end
   end
 
@@ -121,7 +121,7 @@ class Adiv5
       @devs = []
       self.entries.each do |entry|
         break if entry.to_i == 0
-        Log :ap, 2, 'rom table entry %08x' % entry.to_i
+        Log(:ap, 2){ 'rom table entry %08x' % entry.to_i }
         next if !entry.present?
         devbase = (@base + entry.addroffs) % (1 << 32)
         devs = DebugDevice.probe(@backing, devbase)
@@ -151,7 +151,7 @@ class Adiv5
 
       ap
     rescue StandardError => e
-      Log :ap, 1, "could not probe AP #{apsel}: #{e}\n#{e.backtrace.join("\n")}"
+      Log(:ap, 1){ "could not probe AP #{apsel}: #{e}\n#{e.backtrace.join("\n")}" }
       nil
     end
 
@@ -171,13 +171,13 @@ class Adiv5
     def read_ap(addr, opt={})
       @dp.ap_select(@apsel, addr)
       v = @dp.read(:ap, addr & 0xc, opt)
-      Log :ap, 3, "%d read %08x < %s" % [@apsel, addr, Log.hexary(v)]
+      Log(:ap, 3){ "%d read %08x < %s" % [@apsel, addr, Log.hexary(v)] }
       v
     end
     alias :get_backing :read_ap
 
     def write_ap(addr, val)
-      Log :ap, 3, "%d write %08x = %s" % [@apsel, addr, Log.hexary(val)]
+      Log(:ap, 3){ "%d write %08x = %s" % [@apsel, addr, Log.hexary(val)] }
       @dp.ap_select(@apsel, addr)
       @dp.write(:ap, addr & 0xc, val)
     end
@@ -231,7 +231,7 @@ class Adiv5
     def initialize(*args)
       super(*args)
 
-      Log :ap, 1, "initializing memap #@apsel"
+      Log(:ap, 1){ "initializing memap #@apsel" }
       self.CSW.transact do |csw|
         csw.Size = :word
         csw.AddrInc = :single
@@ -253,14 +253,14 @@ class Adiv5
 
       write_ap(TAR, addr)
       v = read_ap(DRW, opt)
-      Log :mem, 1, "read %08x < %s" % [addr, Log.hexary(v)]
+      Log(:mem, 1){ "read %08x < %s" % [addr, Log.hexary(v)] }
       v
     end
     alias :[] :read
 
     def write(addr, val)
       raise UnalignedAccessError if addr & 0x3 != 0
-      Log :mem, 1,"write %08x = %s" % [addr, Log.hexary(val)]
+      Log(:mem, 1){ "write %08x = %s" % [addr, Log.hexary(val)] }
       write_ap(TAR, addr)
       write_ap(DRW, val)
     end

@@ -53,7 +53,7 @@ class Adiv5Swd
     readcount = opt[:count] || 1
     ret = []
 
-    Log :swd, 2, 'read  %s %x ...' % [port, addr]
+    Log(:swd, 2){ 'read  %s %x ...' % [port, addr] }
     readcount.times do |i|
       ret << transact(port, :in, addr)
     end
@@ -65,7 +65,7 @@ class Adiv5Swd
       # add last posted result
       ret << transact(:dp, :in, RDBUFF)
     end
-    Log :swd, 1, 'read  %s %x <' % [port, addr], *ret.map{|e| "%08x" % e}
+    Log(:swd, 1){ ['read  %s %x <' % [port, addr], *ret.map{|e| "%08x" % e}] }
 
     ret = ret.first if not opt[:count]
     ret
@@ -73,7 +73,7 @@ class Adiv5Swd
 
   def write(port, addr, val)
     val = [val] unless val.respond_to? :each
-    Log :swd, 1, 'write %s %x =' % [port, addr], *val.map{|e| "%08x" % e}
+    Log(:swd, 1){ ['write %s %x =' % [port, addr], *val.map{|e| "%08x" % e}] }
     val.each do |v|
       transact(port, :out, addr, v)
     end
@@ -102,22 +102,22 @@ class Adiv5Swd
     end
     @drv.transact(cmd, data)
   rescue Wait
-    Log :swd, 2, 'SWD WAIT, retrying'
+    Log(:swd, 2){ 'SWD WAIT, retrying' }
     retry
 
   # XXX we might have to repeat the previous write instead of this transaction
   # the fault/protocolerror might actually refer to the preceeding transaction.
   rescue ProtocolError
     if try <= 3
-      Log :swd, 2, 'SWD protocol error, retrying'
+      Log(:swd, 2){ 'SWD protocol error, retrying' }
       reset
       retry
     else
-      Log :swd, 2, 'SWD protocol error unrecoverable, aborting'
+      Log(:swd, 2){ 'SWD protocol error unrecoverable, aborting' }
       raise
     end
   rescue ParityError
-    Log :swd, 2, 'SWD parity error, restarting'
+    Log(:swd, 2){ 'SWD parity error, restarting' }
     if port == :ap || addr == RDBUFF
       # If this transfer read from the AP, we have to read from RESEND
       # instead.

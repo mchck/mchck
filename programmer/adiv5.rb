@@ -35,7 +35,7 @@ class Adiv5
     #   sleep 0.01
     # end
 
-    Log :ap, 1, "all systems up"
+    Log(:ap, 1){ "all systems up" }
   end
 
   def ap(idx)
@@ -47,13 +47,13 @@ class Adiv5
     256.times do |apsel|
       ap = self.ap(apsel)
       if ap
-        Log :ap, 1, "found AP #{apsel}, #{ap.IDR}, mem: #{ap.mem?}"
+        Log(:ap, 1){ "found AP #{apsel}, #{ap.IDR}, mem: #{ap.mem?}" }
         if !@dap && ap.mem?
           @dap = ap
           break;
         end
       else
-        Log :ap, 1, "no AP on #{apsel}, stopping probe"
+        Log(:ap, 1){ "no AP on #{apsel}, stopping probe" }
         break
       end
     end

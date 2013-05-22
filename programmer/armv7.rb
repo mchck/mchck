@@ -114,7 +114,7 @@ class ARMv7
   end
 
   def enable_debug!
-    Log :arm, 1, "enabling debug"
+    Log(:arm, 1){ "enabling debug" }
     @scs.DHCSR.transact do |dhcsr|
       dhcsr.zero!
       dhcsr.DBGKEY = :key
@@ -123,7 +123,7 @@ class ARMv7
   end
 
   def disable_debug!
-    Log :arm, 1, "disabling debug"
+    Log(:arm, 1){ "disabling debug" }
     @scs.DHCSR.transact do |dhcsr|
       dhcsr.DBGKEY = :key
       dhcsr.C_HALT = false
@@ -136,7 +136,7 @@ class ARMv7
     if name == true
       name = SCS::DEMCR.instance_methods.map{|m| m.match(/^VC_(.*?)=$/) && $1}.compact
     end
-    Log :arm, 1, "catching vector #{name}"
+    Log(:arm, 1){ "catching vector #{name}" }
     name = [name] if not Array === name
     @scs.DEMCR.transact do |demcr|
       name.each do |n|
@@ -147,7 +147,7 @@ class ARMv7
   end
 
   def halt_core!
-    Log :arm, 1, "waiting for core to halt"
+    Log(:arm, 1){ "waiting for core to halt" }
     while !self.core_halted?
       @scs.DHCSR.transact do |dhcsr|
         dhcsr.DBGKEY = :key
@@ -158,7 +158,7 @@ class ARMv7
   end
 
   def continue!
-    Log :arm, 1, "releasing core"
+    Log(:arm, 1){ "releasing core" }
     @scs.DHCSR.transact do |dhcsr|
       dhcsr.DBGKEY = :key
       dhcsr.C_MASKINTS = false
@@ -168,7 +168,7 @@ class ARMv7
   end
 
   def single_step!
-    Log :arm, 1, "single stepping core"
+    Log(:arm, 1){ "single stepping core" }
     @scs.DHCSR.transact do |dhcsr|
       dhcsr.DBGKEY = :key
       dhcsr.C_MASKINTS = true
@@ -182,7 +182,7 @@ class ARMv7
   end
 
   def reset_system!
-    Log :arm, 1, "resetting system"
+    Log(:arm, 1){ "resetting system" }
     @scs.AIRCR.transact do |aircr|
       aircr.VECTKEY = :key
       aircr.SYSRESETREQ = true
@@ -199,7 +199,7 @@ class ARMv7
       sleep 0.01
     end
     val = @scs.DCRDR
-    Log :arm, 3, "get register %s < %08x" % [reg, val]
+    Log(:arm, 3){ "get register %s < %08x" % [reg, val] }
     val
   end
 
@@ -213,7 +213,7 @@ class ARMv7
     while !@scs.DHCSR.S_REGRDY
       sleep 0.01
     end
-    Log :arm, 3, "set register %s = %08x" % [reg, val]
+    Log(:arm, 3){ "set register %s = %08x" % [reg, val] }
     val
   end
 

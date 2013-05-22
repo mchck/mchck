@@ -12,12 +12,12 @@ class GDBServer
   def run_loop
     while true
       @sock = @servsock.accept
-      Log :gdb, 1, "accepted connection"
+      Log(:gdb, 1){ "accepted connection" }
       @data = ""
       begin
         connection_loop
       rescue EOFError
-        Log :gdb, 1, "connection closed"
+        Log(:gdb, 1){ "connection closed" }
       end
       @sock.close
     end
@@ -35,7 +35,7 @@ class GDBServer
         end
       rescue StandardError => e
         $stderr.puts "EEP"
-        Log :gdb, 1, ([e] + e.backtrace).join("\n")
+        Log(:gdb, 1){ ([e] + e.backtrace).join("\n") }
         $stderr.puts "OMP"
         repl = 'E01'
       end
@@ -45,12 +45,12 @@ class GDBServer
 
   def read_packet
     while !(m = /^(.*[$])([^#]*)[#]..(.*)/.match(@data))
-      Log :gdb, 3, "data #{@data.unpack('H*').first} no full packet, reading more"
+      Log(:gdb, 3){ "data #{@data.unpack('H*').first} no full packet, reading more" }
       @data += @sock.readpartial(1024)
     end
     _, discard, pkt, @data = m.to_a
     @sock.write('+')            # ack
-    Log :gdb, 2, "received pkt #{pkt}, discarded leading `#{discard}'"
+    Log(:gdb, 2){ "received pkt #{pkt}, discarded leading `#{discard}'" }
     pkt
   end
 
@@ -59,7 +59,7 @@ class GDBServer
     pkt.each_byte{|b| csum += b}
     csum = csum % 256
     fullpkt = "$%s#%02x" % [pkt, csum]
-    Log :gdb, 2, "sending pkt #{fullpkt}"
+    Log(:gdb, 2){ "sending pkt #{fullpkt}" }
     @sock.write(fullpkt)
     # we just ignore the ack, because we're on TCP
   end
@@ -112,7 +112,7 @@ class GDBServer
       breakpoint($1, $2, $3, $4)
     else
       # error
-      Log :gdb, 1, "invalid packet `#{pkt}'"
+      Log(:gdb, 1){ "invalid packet `#{pkt}'" }
       ''
     end
   end
@@ -191,7 +191,7 @@ class GDBServer
         @data += @sock.read_nonblock(1024)
         # check for telnet BREAK sequence
         if @data.include?([255, 243].pack('c*')) || @data.include?([3].pack('c'))
-          Log :gdb, 1, "received break - stopping core"
+          Log(:gdb, 1){ "received break - stopping core" }
           @target.halt_core!
         end
       rescue IO::WaitReadable

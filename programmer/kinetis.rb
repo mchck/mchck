@@ -99,7 +99,7 @@ class Kinetis < ARMv7
         fstat.FPVIOL = true
       end
       while !self.FSTAT.CCIF
-        Log :kinetis, 3, "waiting for flash operation completion"
+        Log(:kinetis, 3){ "waiting for flash operation completion" }
         sleep 0.01
       end
       raise RuntimeError, "error in flash execution" if self.FSTAT.MGSTAT0
@@ -169,7 +169,7 @@ class Kinetis < ARMv7
       # get kicked in the nuts regularly.  Holding the system & core in
       # reset prevents this.
       # XXX hack
-      Log :kinetis, 1, "holding system in reset"
+      Log(:kinetis, 1){ "holding system in reset" }
       # This waits until the system is in reset
       while @mdmap.read_ap(0) & 0b1110 != 0b0010
         @mdmap.write_ap(4, 0b11100)
@@ -184,7 +184,7 @@ class Kinetis < ARMv7
     self.catch_vector!(:CORERESET)
 
     # Now release the core from reset
-    Log :kinetis, 1, "releasing core from reset"
+    Log(:kinetis, 1){ "releasing core from reset" }
     @mdmap.write_ap(4, 0)
 
     self.halt_core!

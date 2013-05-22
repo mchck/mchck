@@ -192,7 +192,7 @@ module Peripheral
       v = get_backing(f.offset)
       v = v >> f.shift
       v = v & f.mask
-      Log :reg, 2, "reading %s.%s = %#010x" % [self.class, f.name, v]
+      Log(:reg, 2){ "reading %s.%s = %#010x" % [self.class, f.name, v] }
       v
     end
 
@@ -206,7 +206,7 @@ module Peripheral
         v = v & ~(f.mask << f.shift)
         v = v | (val << f.shift)
       end
-      Log :reg, 2, "writing %s.%s = %#010x" % [self.class, f.name, val]
+      Log(:reg, 2){ "writing %s.%s = %#010x" % [self.class, f.name, val] }
       set_backing(f.offset, v)
       val
     end
@@ -223,14 +223,14 @@ module Peripheral
 
     def get_backing(offset)
       v = @backing[get_address(offset)]
-      Log :reg, 2, "reading %s @ %#010x backing %s = %#010x" %
-        [@backing, get_address(offset), self.class, v]
+      Log(:reg, 2){ "reading %s @ %#010x backing %s = %#010x" %
+        [@backing, get_address(offset), self.class, v]}
       v
     end
 
     def set_backing(offset, val)
-      Log :reg, 2, "writing %s @ %#010x backing %s = %#010x" %
-        [@backing, get_address(offset), self.class, val]
+      Log(:reg, 2){ "writing %s @ %#010x backing %s = %#010x" %
+        [@backing, get_address(offset), self.class, val]}
       @backing[get_address(offset)] = val
     end
 
