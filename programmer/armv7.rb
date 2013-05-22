@@ -181,6 +181,26 @@ class ARMv7
     @scs.DHCSR.S_HALT
   end
 
+  def halt_reason
+    reason = @scs.DFSR.dup
+    # reset sticky bits
+    @scs.DFSR.replace!(reason.to_i)
+
+    if reason.EXTERNAL
+      :EXTERN
+    elsif reason.VCATCH
+      :SEGV
+    elsif reason.BKPT
+      :TRAP
+    else
+      if @scs.DHCSR.C_STEP
+        :TRAP
+      else
+        :INT
+      end
+    end
+  end
+
   def reset_system!
     Log(:arm, 1){ "resetting system" }
     @scs.AIRCR.transact do |aircr|
@@ -189,7 +209,7 @@ class ARMv7
     end
   end
 
-  def get_register(reg)
+  def get_register(reg, as_bytes=false)
     @scs.DCRSR.transact do |dcrsr|
       dcrsr.zero!
       dcrsr.REGWnR = :read
@@ -200,10 +220,12 @@ class ARMv7
     end
     val = @scs.DCRDR
     Log(:arm, 3){ "get register %s < %08x" % [reg, val] }
+    val = [val].pack('L') if as_bytes
     val
   end
 
   def set_register!(reg, val)
+    val = val.unpack('L').first if String === val
     @scs.DCRDR = val
     @scs.DCRSR.transact do |dcrsr|
       dcrsr.zero!
@@ -218,10 +240,11 @@ class ARMv7
   end
 
   def read_registers
-    res = self.reg_desc.map do |rd|
-      get_register(rd[:name])
+    res = ""
+    self.reg_desc.each do |rd|
+      res << get_register(rd[:name], true)
     end
-    res.pack('L*')
+    res
   end
 
   def write_registers!(regdata)
