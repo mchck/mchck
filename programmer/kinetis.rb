@@ -178,17 +178,18 @@ class Kinetis < ARMv7
       while @mdmap.read_ap(0) & 0b1110 != 0b1010
         @mdmap.write_ap(4, 0b10000)
       end
+
+      self.enable_debug!
+      self.catch_vector!(:CORERESET)
+
+      # Now release the core from reset
+      Log(:kinetis, 1){ "releasing core from reset" }
+      @mdmap.write_ap(4, 0)
+
+      self.halt_core!
+      self.catch_vector!(:CORERESET, false)
+      self.disable_debug!
     end
-
-    self.enable_debug!
-    self.catch_vector!(:CORERESET)
-
-    # Now release the core from reset
-    Log(:kinetis, 1){ "releasing core from reset" }
-    @mdmap.write_ap(4, 0)
-
-    self.halt_core!
-    self.catch_vector!(:CORERESET, false)
 
     @ftfl = Kinetis::FTFL.new(@dap)
     @flexram = Kinetis::FlexRAM.new(@dap)
