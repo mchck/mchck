@@ -44,6 +44,8 @@ class ARMv7
     Log(:arm, 1){ "disabling debug" }
     @scs.DHCSR.transact do |dhcsr|
       dhcsr.DBGKEY = :key
+      dhcsr.C_MASKINTS = false
+      dhcsr.C_STEP = false
       dhcsr.C_HALT = false
       dhcsr.C_DEBUGEN = false
     end
@@ -213,6 +215,115 @@ class ARMv7
     end
     @dap.write(addr, dary)
     nil
+  end
+
+  def enable_breakpoints!
+    Log(:arm, 1){ "enabling breakpoints" }
+    @fpb.FP_CTRL.NUM_CODE.times do |i|
+      @fpb.FP_COMP[i].ENABLE = false
+    end
+    @fpb.FP_CTRL.transact do |fpc|
+      fpc.KEY = :key
+      fpc.ENABLE = true
+    end
+  end
+
+  def disable_breakpoints!
+    Log(:arm, 1){ "disabling breakpoints" }
+    @fpb.FP_CTRL.NUM_CODE.times do |i|
+      @fpb.FP_COMP[i].ENABLE = false
+    end
+    @fpb.FP_CTRL.transact do |fpc|
+      fpc.KEY = :key
+      fpc.ENABLE = false
+    end
+  end
+
+  def add_breakpoint(type, addr, kind)
+    Log(:arm, 1){ "adding breakpoint %08x/%s" % [addr, kind] }
+    case type
+    when :break_software, :break_hardware
+      kindt = case kind
+              when 2
+                :half
+              when 3, 4
+                :word
+              end
+      add_breakpoint_fpb(addr, kindt)
+    else
+      raise RuntimeError, "unknown breakpoint type #{type}"
+    end
+  end
+
+  def remove_breakpoint(type, addr, kind)
+    Log(:arm, 1){ "removing breakpoint %08x/%s" % [addr, kind] }
+    case type
+    when :break_software, :break_hardware
+      kindt = case kind
+              when 2
+                :half
+              when 3, 4
+                :word
+              end
+      remove_breakpoint_fpb(addr, kindt)
+    else
+      raise RuntimeError, "unknown breakpoint type #{type}"
+    end
+  end
+
+  def fpb_calc_type(addr, kind)
+    cmpaddr = addr & ~3
+    cmpreplace = nil
+    case kind
+    when :word
+      cmpreplace = :both
+    when :half
+      case addr % 4
+      when 0
+        cmpreplace = :lower
+      when 2
+        cmpreplace = :upper
+      end
+    end
+    [cmpaddr, cmpreplace]
+  end
+
+  def add_breakpoint_fpb(addr, kind)
+    # idempotent: remove existing bp
+    begin
+      remove_breakpoint_fpb(addr, kind)
+    rescue RuntimeError
+    end
+    done = false
+    @fpb.FP_CTRL.NUM_CODE.times do |i|
+      @fpb.FP_COMP[i].transact do |cmp|
+        if !cmp.ENABLE
+          cmp.COMP, cmp.REPLACE = fpb_calc_type(addr, kind)
+          cmp.ENABLE = true
+          Log(:arm, 2){ "breakpoint at %08x/%s" % [cmp.COMP, cmp.REPLACE] }
+          done = true
+        end
+      end
+      Log(:arm, 3){ "breakpoint #{i} #{@fpb.FP_COMP[i].inspect_fields}" }
+      return i if done
+    end
+    raise RuntimeError, "all breakpoints used"
+  end
+
+  def remove_breakpoint_fpb(addr, kind)
+    cmpaddr, cmpreplace = fpb_calc_type(addr, kind)
+    done = false
+    @fpb.FP_CTRL.NUM_CODE.times do |i|
+      @fpb.FP_COMP[i].transact do |cmp|
+        if cmp.ENABLE && cmp.COMP == cmpaddr && cmp.REPLACE == cmpreplace
+          cmp.ENABLE = false
+          done = true
+        end
+      end
+      Log(:arm, 3){ "breakpoint #{i} #{@fpb.FP_COMP[i].inspect_fields}" }
+      return i if done
+    end
+    raise RuntimeError, "cannot find breakpoint for %08x/%s" % [cmpaddr, cmpreplace]
   end
 
   def reg_desc

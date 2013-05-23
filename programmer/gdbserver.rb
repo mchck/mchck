@@ -107,7 +107,7 @@ class GDBServer
       attach
     when /^vRun;$/
       reset_system(true)
-    when /^([zZ])([01234]),([[:xdigit:]]+),([[:xdigit:]]*)$/
+    when /^([zZ])([01234]),([[:xdigit:]]+),([[:xdigit:]]*).*/
       # remove/insert breakpoint
       breakpoint($1, $2, $3, $4)
     else
@@ -133,7 +133,15 @@ class GDBServer
     @target.enable_debug!
     @target.catch_vector!(true)
     @target.halt_core!
+    @target.enable_breakpoints!
     wait_stop
+  end
+
+  def detach
+    @target.disable_breakpoints!
+    @target.disable_debug!
+    @target.continue!
+    'OK'
   end
 
   def continue(addrstr)
@@ -142,11 +150,6 @@ class GDBServer
     end
     @target.continue!
     wait_stop
-  end
-
-  def detach
-    @target.disable_debug!
-    'OK'
   end
 
   def read_registers
@@ -207,7 +210,27 @@ class GDBServer
   end
 
   def breakpoint(insertstr, typestr, addrstr, kindstr)
-    # XXX
+    type = case typestr
+           when '0'
+             :break_software
+           when '1'
+             :break_hardware
+           when '2'
+             :watch_write
+           when '3'
+             :watch_read
+           when '4'
+             :watch_access
+           end
+    kind = parse_int(kindstr)
+    addr = parse_int(addrstr)
+    case insertstr
+    when 'Z'
+      @target.add_breakpoint(type, addr, kind)
+    when 'z'
+      @target.remove_breakpoint(type, addr, kind)
+    end
+    'OK'
   end
 
   def send_tdesc(addrstr, lenstr)
