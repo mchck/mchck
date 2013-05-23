@@ -12,18 +12,19 @@ class GDBServer
   def run_loop
     while true
       @sock = @servsock.accept
-      Log(:gdb, 1){ "accepted connection" }
-      @data = ""
       begin
-        connection_loop
-      rescue EOFError, Errno::EPIPE
+        handle_connection
+      rescue EOFError, Errno::EPIPE, Errno::ECONNRESET
         Log(:gdb, 1){ "connection closed" }
       end
       @sock.close
     end
   end
 
-  def connection_loop
+  def handle_connection
+    Log(:gdb, 1){ "accepted connection" }
+    @data = ""
+    @sock.setsockopt(:TCP, :NODELAY, true)
     attach
     while true
       cmd = read_packet
@@ -35,15 +36,11 @@ class GDBServer
           dispatch(cmd) || ''
         end
       rescue StandardError => e
-        $stderr.puts "EEP"
         Log(:gdb, 1){ ([e] + e.backtrace).join("\n") }
-        $stderr.puts "OMP"
         repl = 'E01'
       end
       reply repl if repl
     end
-  ensure
-    detach
   end
 
   def read_packet
