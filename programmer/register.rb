@@ -46,7 +46,7 @@ module Peripheral
     end
 
     def []=(idx, val)
-      @base.send("#{@name}[#{idx}]", val)
+      @base.send("#{@name}[#{idx}]=", val)
     end
 
     def each
@@ -341,7 +341,7 @@ module Peripheral
   module ClassMethods
     include FieldManager::ClassMethods
 
-    def add_vector(name, offset, len)
+    def add_vector(name, offset, len, opts={})
       add_field_constant(name, offset)
       define_method name do
         VectorProxy.new(self, name, len)
@@ -357,7 +357,7 @@ module Peripheral
       end
       len.times do |i|
         ename = "#{name}[#{i}]"
-        eoffs = offset + i * 4
+        eoffs = offset + i * (opts[:stride] || 4)
         yield ename, eoffs
       end
     end
@@ -370,7 +370,7 @@ module Peripheral
         # nothing to do, I think
       end
       if opts[:vector]
-        self.add_vector(name, offset, opts[:vector]) do |ename, eoffs|
+        self.add_vector(name, offset, opts[:vector], opts) do |ename, eoffs|
           define_method ename do
             cl.shadow(BackingProxy.new(self), eoffs)
           end
@@ -384,7 +384,7 @@ module Peripheral
 
     def unsigned(name, offset, opts={})
       if opts[:vector]
-        self.add_vector(name, offset, opts[:vector]) do |ename, eoffs|
+        self.add_vector(name, offset, opts[:vector], opts) do |ename, eoffs|
           self.unsigned(ename, eoffs)
         end
       else
