@@ -191,6 +191,8 @@ class Kinetis < ARMv7
       self.disable_debug!
     end
 
+    self.probe!
+
     @ftfl = Kinetis::FTFL.new(@dap)
     @flexram = Kinetis::FlexRAM.new(@dap)
     @sector_size = 1024

@@ -16,19 +16,18 @@ class ARMv7
 
   def probe!
     @dap.devs.each do |d|
-      puts "%s at %08x" % [d, d.base]
-      # case d.base
+      case d.base
       #   # when 0xe0001000
       #   #   @dwt = DWT.new(@dap)
-      #   # when 0xe0002000
-      #   #   @fpb = FPB.new(@dap)
+      when 0xe0002000
+        @fpb = FPB.new(@dap)
       #   # when 0xe0000000
       #   #   @itm = ITM.new(@dap)
       #   # when 0xe0040000
       #   #   @tpiu = TPIU.new(@dap)
       #   # when 0xe0041000
       #   #   @etm = ETM.new(@dap)
-      # end
+      end
     end
   end
 
