@@ -7,6 +7,7 @@ end
 
 require 'armv7-scs'
 require 'armv7-fpb'
+require 'armv7-dwt'
 
 class ARMv7
   def initialize(adiv5)
@@ -17,8 +18,8 @@ class ARMv7
   def probe!
     @dap.devs.each do |d|
       case d.base
-      #   # when 0xe0001000
-      #   #   @dwt = DWT.new(@dap)
+      when 0xe0001000
+        @dwt = DWT.new(@dap)
       when 0xe0002000
         @fpb = FPB.new(@dap)
       #   # when 0xe0000000
@@ -110,6 +111,15 @@ class ARMv7
       :EXTERN
     elsif reason.VCATCH
       :SEGV
+    elsif reason.DWTTRAP
+      i = dwt_find_matched_watchpoint
+      if i
+        addr = @dwt.DWT_COMP[i]
+        type = @dwt.DWT_FUNCTION[i].FUNCTION
+        [:TRAP, type, addr]
+      else
+        :TRAP
+      end
     elsif reason.BKPT
       :TRAP
     else
@@ -219,12 +229,16 @@ class ARMv7
 
   def enable_breakpoints!
     Log(:arm, 1){ "enabling breakpoints" }
+    @scs.DEMCR.TRCENA = true
     @fpb.FP_CTRL.NUM_CODE.times do |i|
       @fpb.FP_COMP[i].ENABLE = false
     end
     @fpb.FP_CTRL.transact do |fpc|
       fpc.KEY = :key
       fpc.ENABLE = true
+    end
+    @dwt.DWT_CTRL.NUMCOMP.times do |i|
+      @dwt.DWT_FUNCTION[i].FUNCTION = :disabled
     end
   end
 
@@ -237,37 +251,28 @@ class ARMv7
       fpc.KEY = :key
       fpc.ENABLE = false
     end
+    @dwt.DWT_CTRL.NUMCOMP.times do |i|
+      @dwt.DWT_FUNCTION[i].FUNCTION = :disabled
+    end
   end
 
   def add_breakpoint(type, addr, kind)
-    Log(:arm, 1){ "adding breakpoint %08x/%s" % [addr, kind] }
+    Log(:arm, 1){ "adding breakpoint %s/%08x/%s" % [type, addr, kind] }
     case type
     when :break_software, :break_hardware
-      kindt = case kind
-              when 2
-                :half
-              when 3, 4
-                :word
-              end
-      add_breakpoint_fpb(addr, kindt)
+      fpb_add_breakpoint(addr, kind)
     else
-      raise RuntimeError, "unknown breakpoint type #{type}"
+      dwt_add_watchpoint(type, addr, kind)
     end
   end
 
   def remove_breakpoint(type, addr, kind)
-    Log(:arm, 1){ "removing breakpoint %08x/%s" % [addr, kind] }
+    Log(:arm, 1){ "removing breakpoint %s/%08x/%s" % [type, addr, kind] }
     case type
     when :break_software, :break_hardware
-      kindt = case kind
-              when 2
-                :half
-              when 3, 4
-                :word
-              end
-      remove_breakpoint_fpb(addr, kindt)
+      fpb_remove_breakpoint(addr, kind)
     else
-      raise RuntimeError, "unknown breakpoint type #{type}"
+      dwt_remove_watchpoint(type, addr, kind)
     end
   end
 
@@ -275,9 +280,9 @@ class ARMv7
     cmpaddr = addr & ~3
     cmpreplace = nil
     case kind
-    when :word
+    when :word, 3, 4
       cmpreplace = :both
-    when :half
+    when :half, 2
       case addr % 4
       when 0
         cmpreplace = :lower
@@ -288,16 +293,17 @@ class ARMv7
     [cmpaddr, cmpreplace]
   end
 
-  def add_breakpoint_fpb(addr, kind)
+  def fpb_add_breakpoint(addr, kind)
     # idempotent: remove existing bp
     begin
-      remove_breakpoint_fpb(addr, kind)
+      fpb_remove_breakpoint(addr, kind)
     rescue RuntimeError
     end
     done = false
     @fpb.FP_CTRL.NUM_CODE.times do |i|
       @fpb.FP_COMP[i].transact do |cmp|
         if !cmp.ENABLE
+          cmp.zero!
           cmp.COMP, cmp.REPLACE = fpb_calc_type(addr, kind)
           cmp.ENABLE = true
           Log(:arm, 2){ "breakpoint at %08x/%s" % [cmp.COMP, cmp.REPLACE] }
@@ -310,7 +316,7 @@ class ARMv7
     raise RuntimeError, "all breakpoints used"
   end
 
-  def remove_breakpoint_fpb(addr, kind)
+  def fpb_remove_breakpoint(addr, kind)
     cmpaddr, cmpreplace = fpb_calc_type(addr, kind)
     done = false
     @fpb.FP_CTRL.NUM_CODE.times do |i|
@@ -324,6 +330,72 @@ class ARMv7
       return i if done
     end
     raise RuntimeError, "cannot find breakpoint for %08x/%s" % [cmpaddr, cmpreplace]
+  end
+
+  def dwt_calc_fields(type, addr, kind)
+    mask = case kind
+           when 1
+             0
+           when 2
+             1
+           when 4
+             2
+           else
+             raise RuntimeError, "invalid watchpoint size #{kind}"
+           end
+    bitmask = (1 << mask) - 1
+    if addr & bitmask != 0
+      raise RuntimeError, "address #{addr} not aligned to size #{kind}"
+    end
+    [type, addr, kind]
+  end
+
+  def dwt_add_watchpoint(type, addr, kind)
+    # idempotent: remove existing bp
+    begin
+      dwt_remove_watchpoint(type, addr, kind)
+    rescue RuntimeError
+    end
+    ctype, caddr, ckind = dwt_calc_fields(type, addr, kind)
+    done = false
+    @dwt.DWT_CTRL.NUMCOMP.times do |i|
+      @dwt.DWT_FUNCTION[i].transact do |fun|
+        if fun.FUNCTION == :disabled
+          fun.zero!
+          fun.FUNCTION = ctype
+          @dwt.DWT_COMP[i] = caddr
+          @dwt.DWT_MASK[i] = ckind
+          done = true
+        end
+      end
+      return i if done
+    end
+    raise RuntimeError, "all watchpoints used"
+  end
+
+  def dwt_remove_watchpoint(type, addr, kind)
+    ctype, caddr, ckind = dwt_calc_fields(type, addr, kind)
+    done = false
+    @dwt.DWT_CTRL.NUMCOMP.times do |i|
+      @dwt.DWT_FUNCTION[i].transact do |fun|
+        if fun.FUNCTION == ctype &&
+            @dwt.DWT_COMP[i] == caddr &&
+            @dwt.DWT_MASK[i] == ckind
+          fun.FUNCTION = :disabled
+          done = true
+        end
+      end
+      return i if done
+    end
+    raise RuntimeError, "cannot find watchpoint for %s/%08x/%s" % [type, addr, kind]
+  end
+
+  def dwt_find_matched_watchpoint
+    match = nil
+    @dwt.DWT_CTRL.NUMCOMP.times do |i|
+      match = i if @dwt.DWT_FUNCTION[i].MATCHED
+    end
+    match
   end
 
   def reg_desc

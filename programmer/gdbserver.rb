@@ -201,12 +201,26 @@ class GDBServer
       end
       sleep 0.1
     end
+
+    aux = ""
     halt_reason = @target.halt_reason
-    Log(:gdb, 2){ "halt reason #{halt_reason}" }
+    if Array === halt_reason
+      halt_reason, type, addr = halt_reason
+      typestr = case type
+                when :watch_write
+                  "watch"
+                when :watch_read
+                  "rwatch"
+                when :watch_access
+                  "awatch"
+                end
+      aux = "%s:%x;" % [typestr, addr]
+    end
+    Log(:gdb, 2){ "halt reason #{halt_reason}#{aux}" }
     sig_num = Signal.list[halt_reason.to_s] || Signal.list["INT"]
     pc_num = @target.reg_desc.index{|r| r[:name] == :pc}
     cur_pc = @target.get_register(:pc, true)
-    'T%02x%02x:%s;' % [sig_num, pc_num, code_binary(cur_pc)]
+    'T%02x%02x:%s;%s' % [sig_num, pc_num, code_binary(cur_pc), aux]
   end
 
   def breakpoint(insertstr, typestr, addrstr, kindstr)
