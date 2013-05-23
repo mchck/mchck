@@ -152,6 +152,10 @@ module Peripheral
         end
       end
 
+      def get_field(name)
+        self.class_variable_get(:@@fields)[name]
+      end
+
       def add_unsigned(name, range, opts)
         self.add_field(name, range, opts) do |f|
           define_method name do
