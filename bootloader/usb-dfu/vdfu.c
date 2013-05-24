@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "vusb.h"
 #include "usb.h"
 #include "dfu.h"
