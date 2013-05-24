@@ -11,9 +11,6 @@ MEMORY
 
 _eram = ORIGIN(ram) + LENGTH(ram);
 
-/* registers */
-USB0_CTL = 0x40072094;
-USB0_ADDR = 0x40072098;
-USB0_ENDPT = 0x400720c0;
-
+/* peripherals */
 FTFL = 0x40020000;
+USB0 = 0x40072000;
