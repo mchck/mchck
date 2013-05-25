@@ -32,7 +32,19 @@ class Kinetis < ARMv7
       unsigned :SEC, [0x02, 1..0], :desc => "Flash Security"
 
       # Flash Option Register, 0x03
-      unsigned :OPT, [0x03, 7..0], :desc => "Nonvolatile Option"
+      # Defined in 6.3.3
+      enum :NMI_DIS, [0x03, 2], {
+        :disabled => 0,
+        :enabled => 1
+      }
+      enum :EZPORT_DIS, [0x03, 1], {
+        :disabled => 0,
+        :enabled => 1
+      }
+      enum :LPBOOT, [0x03, 0], {
+        :slow => 0,
+        :fast => 1
+      }
     end
 
     unsigned :FCCOB, 0x04, :vector => 3
