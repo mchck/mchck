@@ -11,6 +11,9 @@ MEMORY
 
 _eram = ORIGIN(ram) + LENGTH(ram);
 
+/* PACK SECTIONS FIX .isr_vector = 0 */
+/* PACK SECTIONS FIX .flash_config = 0x400 */
+
 /* peripherals */
 FTFL = 0x40020000;
 USB0 = 0x40072000;

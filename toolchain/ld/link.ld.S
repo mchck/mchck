@@ -10,14 +10,17 @@ SECTIONS
 {
     .text :
     {
-#ifdef TEXT_LDSCRIPT
-#include TEXT_LDSCRIPT
-#else
+/*
+ * pack-sections.rb will replace the following block
+ * with sections packed and ordered according to the
+ * positioning restrictions defined in the TARGET_LDSCRIPT.
+ */
+/* PACK SECTIONS START */
         KEEP(*(.isr_vector .isr_vector.*))
         *(.text .text.* .gnu.linkonce.t.*)
         *(.glue_7t) *(.glue_7)
         *(.rodata .rodata* .gnu.linkonce.r.*)
-#endif
+/* PACK SECTIONS END */
     } > rom
 
     .ARM.extab :

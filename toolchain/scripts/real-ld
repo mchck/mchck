@@ -1,0 +1,84 @@
+#!/usr/bin/env ruby
+
+# This script is called by gcc's collect2 during link phase.  We
+# intercept linking to fix section packing.  This is really only
+# necessary for link-time-optimization (-flto) and loaders, because
+# gcc replaces the original object files with an optimized one.
+
+require 'tempfile'
+
+$: << File.dirname(__FILE__)
+require 'pack-sections'
+
+call_args = []
+object_files = []
+linker_out = nil
+linker_in = nil
+save_temps = false
+
+while arg = ARGV.shift
+  call_args << arg
+  case arg
+  when /^-o/
+    arg = ARGV.shift
+    call_args << arg
+  when /^-T/
+    linker_in = ARGV.shift
+    linker_out = Tempfile.new(['mchck-real-ld-', '.ld'])
+    call_args << linker_out.path
+  when /^-save-temps/
+    save_temps = true
+    # actually unknown to ld
+    call_args.pop
+  when /^-/
+    # nothing
+  else
+    object_files << arg
+  end
+end
+
+if linker_in
+  fixed_sects = []
+
+  ln = File.readlines(linker_in)
+  ln.grep(/PACK SECTIONS FIX\s+([^\s]+)\s*=\s*(0x[[:xdigit:]]+|[[:digit:]]+)[^\w]/) do |m|
+    s = Objdump::Section.new
+    s.name = $1
+    s.addr = Integer($2)
+    fixed_sects << s
+  end
+  all_sect = Objdump.new object_files
+  l = Linker.new(all_sect, fixed_sects)
+
+  if save_temps
+    path = linker_out.path
+    $stdout.puts "keeping temporary linker file #{path}"
+    linker_out.close(true)
+    linker_out = File.open(path, "w")
+  end
+
+  skipping = false
+  ln.each do |line|
+    case line
+    when /PACK SECTIONS START/
+      linker_out.write line
+      linker_out.puts l.pack.join("\n")
+      skipping = true
+    when /PACK SECTIONS END/
+      skipping = false
+    end
+    next if skipping
+    linker_out.write line
+  end
+
+  linker_out.close
+end
+
+err = 1
+begin
+  system("arm-none-eabi-ld", *call_args)
+  err = $?.exitstatus
+ensure
+  linker_out.unlink if linker_out && !save_temps
+end
+exit(err)

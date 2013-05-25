@@ -15,6 +15,9 @@ PATH:=	${SATDIR}/bin:${PATH}
 export PATH
 endif
 
+COMPILER_PATH=	${_libdir}/scripts
+export COMPILER_PATH
+
 TARGET?=	MK20DX32VLF5
 
 include ${_libdir}/${TARGET}.mk
@@ -22,7 +25,8 @@ include ${_libdir}/${TARGET}.mk
 COPTFLAGS?=	-Os
 CWARNFLAGS?=	-Wall -Wno-main
 
-CFLAGS+=	-mcpu=cortex-m4 -msoft-float -mthumb -ffunction-sections -fdata-sections -std=c11 -fplan9-extensions
+CFLAGS+=	-mcpu=cortex-m4 -msoft-float -mthumb -ffunction-sections -fdata-sections -std=c11 -fplan9-extensions -fno-builtin
+CFLAGS+=	-flto
 CFLAGS+=	-I${_libdir}/include -I${_libdir}/CMSIS/Include -I.
 CFLAGS+=	-include ${_libdir}/include/mchck_internal.h
 CFLAGS+=	-g
@@ -32,6 +36,7 @@ endif
 CFLAGS+=	${CWARNFLAGS}
 
 LDFLAGS+=	-Wl,--gc-sections
+LDFLAGS+=	-fwhole-program
 CPPFLAGS.ld+=	-P -CC -I${_libdir}/ld -I.
 CPPFLAGS.ld+=	-DTARGET_LDSCRIPT='"${TARGETLD}"'
 
@@ -39,15 +44,13 @@ ifdef LOADER
 STARTFILE_SRC+=	flashconfig_k20.c
 CPPFLAGS.ld+=	-DMEMCFG_LDSCRIPT='"loader.ld"'
 LDSCRIPTS+=	loader.ld
-CPPFLAGS.ld+=	-DTEXT_LDSCRIPT='"sorted-sections.ld"'
-LDSCRIPTS+=	sorted-sections.ld
 else
 CPPFLAGS.ld+=	-DMEMCFG_LDSCRIPT='"app.ld"'
 LDSCRIPTS+=	app.ld
 endif
 
 LDFLAGS+=	-T ${PROG}.ld
-LDFLAGS+=       -nostartfiles -fno-builtin
+LDFLAGS+=       -nostartfiles
 
 STARTFILE_SRC+=	startup_k20.c system_k20.c mchck-builtins.c
 STARTFILE_OBJ=	$(addsuffix .o, $(basename ${STARTFILE_SRC}))
@@ -83,10 +86,6 @@ ${STARTFILE_LIB}: ${STARTFILE_OBJ}
 ${PROG}.ld: link.ld.S ${LDSCRIPTS}
 	cpp -o $@ ${CPPFLAGS.ld} $<
 CLEANFILES+=	${PROG}.ld
-
-sorted-sections.ld: ${OBJS}
-	ruby ${_libdir}/scripts/pack-sections.rb -o $@ ${FIXED_SECTIONS} ${OBJS} ${STARTFILES} ${LDLIBS}
-CLEANFILES+=	sorted-sections.ld
 
 clean:
 	-rm -f ${CLEANFILES}
