@@ -1,3 +1,5 @@
+$: << File.realpath('..', __FILE__)
+
 require 'kinetis'
 
 if $0 == __FILE__
