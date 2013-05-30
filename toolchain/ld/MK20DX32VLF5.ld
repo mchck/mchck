@@ -16,4 +16,6 @@ _eram = ORIGIN(ram) + LENGTH(ram);
 
 /* peripherals */
 FTFL = 0x40020000;
+SIM = 0x40047000;
+MCG = 0x40064000;
 USB0 = 0x40072000;
