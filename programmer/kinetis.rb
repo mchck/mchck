@@ -164,46 +164,56 @@ class Kinetis < ARMv7
     end
   end
 
-  def initialize(adiv5, magic_halt=true)
+  def initialize(adiv5, magic_halt=false)
     super(adiv5)
     @mdmap = adiv5.ap(1)
     if !@mdmap || @mdmap.IDR.to_i != 0x001c0000
       raise RuntimeError, "not a Kinetis device"
     end
 
-    if magic_halt
-      # Kinetis hack: hold system & core in reset, so that flash and
-      # security will have a chance to init, and we have a chance to
-      # access the system.  If we don't hold the system in reset, it
-      # might loop resetting itself.  While the system resets, it will
-      # block debugger access until it has read the security bits.  If
-      # the core loops in reset (e.g. because of empty flash), we will
-      # get kicked in the nuts regularly.  Holding the system & core in
-      # reset prevents this.
-      # XXX hack
-      Log(:kinetis, 1){ "holding system in reset" }
-      # This waits until the system is in reset
-      while @mdmap.read_ap(0) & 0b1110 != 0b0010
-        @mdmap.write_ap(4, 0b11100)
+    begin
+      if magic_halt
+        # Kinetis hack: hold system & core in reset, so that flash and
+        # security will have a chance to init, and we have a chance to
+        # access the system.  If we don't hold the system in reset, it
+        # might loop resetting itself.  While the system resets, it will
+        # block debugger access until it has read the security bits.  If
+        # the core loops in reset (e.g. because of empty flash), we will
+        # get kicked in the nuts regularly.  Holding the system & core in
+        # reset prevents this.
+        # XXX hack
+        Log(:kinetis, 1){ "holding system in reset" }
+        # This waits until the system is in reset
+        while @mdmap.read_ap(0) & 0b1110 != 0b0010
+          @mdmap.write_ap(4, 0b11100)
+        end
+        # Now take system out of reset, but keep core in reset
+        while @mdmap.read_ap(0) & 0b1110 != 0b1010
+          @mdmap.write_ap(4, 0b10000)
+        end
+
+        self.enable_debug!
+        self.catch_vector!(:CORERESET)
+
+        # Now release the core from reset
+        Log(:kinetis, 1){ "releasing core from reset" }
+        @mdmap.write_ap(4, 0)
+
+        # self.halt_core!
+        # self.catch_vector!(:CORERESET, false)
+        # self.disable_debug!
       end
-      # Now take system out of reset, but keep core in reset
-      while @mdmap.read_ap(0) & 0b1110 != 0b1010
-        @mdmap.write_ap(4, 0b10000)
+      self.probe!
+    rescue
+      # If we were unsuccessful, maybe we need to do kinetis reset magic
+      if !magic_halt
+        Log(:kinetis, 1){ "trouble initializing, retrying with halt" }
+        magic_halt = true
+        retry
+      else
+        raise
       end
-
-      self.enable_debug!
-      self.catch_vector!(:CORERESET)
-
-      # Now release the core from reset
-      Log(:kinetis, 1){ "releasing core from reset" }
-      @mdmap.write_ap(4, 0)
-
-      self.halt_core!
-      self.catch_vector!(:CORERESET, false)
-      self.disable_debug!
     end
-
-    self.probe!
 
     @ftfl = Kinetis::FTFL.new(@dap)
     @flexram = Kinetis::FlexRAM.new(@dap)
