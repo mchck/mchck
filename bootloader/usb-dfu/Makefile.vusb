@@ -1,0 +1,7 @@
+SRCS+=	vusb.c vdfu.c
+
+OBJS+=	$(addsuffix .o, $(basename $(SRCS)))
+$(PROG): $(OBJS)
+
+clean:
+	-rm -f $(OBJS) $(PROG)
