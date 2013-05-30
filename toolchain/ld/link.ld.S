@@ -47,7 +47,7 @@ SECTIONS
     /* .bss section which is used for uninitialized data */
     .bss (NOLOAD) :
     {
-        *(SORT_BY_ALIGNMENT(.bss) SORT_BY_ALIGNMENT(COMMON))
+        *(SORT_BY_ALIGNMENT(.bss*) SORT_BY_ALIGNMENT(COMMON*))
         . = ALIGN(4);
         _ebss = . ;
     } > ram
