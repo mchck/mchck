@@ -26,7 +26,9 @@ COPTFLAGS?=	-Os
 CWARNFLAGS?=	-Wall -Wno-main
 
 CFLAGS+=	-mcpu=cortex-m4 -msoft-float -mthumb -ffunction-sections -fdata-sections -std=c11 -fplan9-extensions -fno-builtin
+ifndef NO_LTO
 CFLAGS+=	-flto
+endif
 CFLAGS+=	-I${_libdir}/include -I${_libdir}/CMSIS/Include -I.
 CFLAGS+=	-include ${_libdir}/include/mchck_internal.h
 CFLAGS+=	-g
