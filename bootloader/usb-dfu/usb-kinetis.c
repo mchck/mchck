@@ -38,95 +38,53 @@ static struct USB_BD_t bdt[USB_NUM_EP * 2 *2] __attribute__((section(".usb_bdt")
 void
 usb_enable(void)
 {
-        /* SIM.scgc4.usbotg = 1;    /\* enable usb clock *\/ */
+        SIM.scgc4.usbotg = 1;   /* enable usb clock */
 
-        /* USB0_USBCTRL = 0; */
+        /* reset module - not sure if needed */
+        USB0.usbtrc0.usbreset = 1;
+        while (USB0.usbtrc0.usbreset == 1)
+                /* NOTHING */;
 
-        /* USB0.usbtrc0.usbreset = 1; */
-        /* while (USB0.usbtrc0.usbreset == 1) */
-        /*         /\* NOTHING *\/; */
+        USB0.bdtpage1 = (uintptr_t)bdt >> 8;
+        USB0.bdtpage2 = (uintptr_t)bdt >> 16;
+        USB0.bdtpage3 = (uintptr_t)bdt >> 24;
 
-        /* USB0_USBTRC0 |= 0x40; */
+        USB0.control.dppullupnonotg = 1; /* enable pullup */
+        USB0.ctl.usben = 1;              /* enable SIE */
+        USB0.usbctrl.susp = 0;           /* resume peripheral */
 
-        /* USB0.bdtpage1 = (uintptr_t)bdt >> 8; */
-        /* USB0.bdtpage2 = (uintptr_t)bdt >> 16; */
-        /* USB0.bdtpage3 = (uintptr_t)bdt >> 24; */
+        /* clear all interrupt bits - not sure if needed */
+	USB0.istat.raw = 0xff;
+	USB0.errstat.raw = 0xff;
+	USB0.otgistat.raw = 0xff;
 
-        /* USB0.control.dppullupnonotg = 1; */
-
-        /* USB0.ctl.usben = 1; */
-
-        /* USB0.usbctrl.susp = 0;   /\* resume peripheral *\/ */
-
-        /* USB0.inten.tokdne = 1; */
-        /* USB0.inten.usbrst = 1; */
-
-        /* /\* USB0.otgctl.dphigh = 1; *\/ */
-        /* /\* USB0.otgctl.otgen = 1; *\/ */
-        /* USB0_OTGCTL = USB_OTGCTL_DPHIGH_MASK | USB_OTGCTL_OTGEN_MASK; */
-
-        /* USB0.endpt[0].ephshk = 1; */
-        /* USB0.endpt[0].eprxen = 1; */
-        /* USB0.endpt[0].eptxen = 1; */
-
-	// this basically follows the flowchart in the Kinetis
-	// Quick Reference User Guide, Rev. 1, 03/2012, page 141
-
-	// assume 48 MHz clock already running
-	// SIM - enable clock
-	SIM_SCGC4 |= SIM_SCGC4_USBOTG_MASK;
-
-	// reset USB module
-	USB0_USBTRC0 = USB_USBTRC0_USBRESET_MASK;
-	while ((USB0_USBTRC0 & USB_USBTRC0_USBRESET_MASK) != 0) ; // wait for reset to end
-
-	// set desc table base addr
-	USB0_BDTPAGE1 = ((uint32_t)bdt) >> 8;
-	USB0_BDTPAGE2 = ((uint32_t)bdt) >> 16;
-	USB0_BDTPAGE3 = ((uint32_t)bdt) >> 24;
-
-	// clear all ISR flags
-	USB0_ISTAT = 0xFF;
-	USB0_ERRSTAT = 0xFF;
-	USB0_OTGISTAT = 0xFF;
-
-	USB0_USBTRC0 |= 0x40; // undocumented bit
-
-	// enable USB
-	USB0_CTL = USB_CTL_USBENSOFEN_MASK;
-	USB0_USBCTRL = 0;
-
-	// enable reset interrupt
-	USB0_INTEN = USB_INTEN_USBRSTEN_MASK | USB_INTEN_TOKDNEEN_MASK;
-
-	/* // enable interrupt in NVIC... */
-	/* NVIC_ENABLE_IRQ(IRQ_USBOTG); */
-
-	// enable d+ pullup
-	USB0_CONTROL = USB_CONTROL_DPPULLUPNONOTG_MASK;
+        /* we're only interested in reset and transfers */
+        USB0.inten.tokdne = 1;
+        USB0.inten.usbrst = 1;
 }
-
-#define FSET(field, type, ...)                        \
-        (field = ({ type __field = __VA_ARGS__; __field; }))
 
 void
 usb_intr(void)
 {
         while (USB0.istat.usbrst) {
-                USB0_ERRSTAT = 0xFF;
-                USB0_ISTAT = 0xFF;
+                /* clear interrupts */
+                USB0.errstat.raw = 0xff;
+                USB0.istat.raw = 0xff;
+                /* reset pingpong state */
                 USB0.ctl.oddrst = 1;
-                USB0.addr.addr = 0;
+                /* zap also BDT pingpong & queued transactions */
                 memset(bdt, 0, sizeof(bdt));
                 USB0.endpt[0].eptxen = 1;
                 USB0.endpt[0].eprxen = 1;
                 USB0.endpt[0].ephshk = 1;
+                /* stop resetting pingpong state - not sure if needed */
                 USB0.ctl.oddrst = 0;
+                USB0.addr.addr = 0;
                 usb_restart();
         }
         while (USB0.istat.tokdne) {
                 struct usb_xfer_info stat = USB0.stat;
-                FSET(USB0.istat, struct USB_ISTAT_t, { .tokdne = 1 });
+                USB0.istat.raw = ((struct USB_ISTAT_t){ .tokdne = 1 }).raw;
                 usb_handle_transaction(&stat);
         }
 }
@@ -140,7 +98,7 @@ usb_get_bd(int ep, enum usb_ep_dir dir, enum usb_ep_pingpong pingpong)
 static struct USB_BD_t *
 usb_get_bd_stat(struct USB_STAT_t *stat)
 {
-        return (((void *)(uintptr_t)bdt + (stat->stat << 1)));
+        return (((void *)(uintptr_t)bdt + (stat->raw << 1)));
 }
 
 void *
@@ -197,11 +155,16 @@ usb_ep_get_transfer_size(int ep, enum usb_ep_dir dir, enum usb_ep_pingpong pingp
 void
 usb_queue_next(struct usbd_ep_pipe_state_t *s, void *addr, size_t len, enum usb_ep_dir dir)
 {
-        struct USB_BD_t *bd = usb_get_bd(0, dir, s->pingpong);
+        volatile struct USB_BD_t *bd = usb_get_bd(0, dir, s->pingpong);
 
         bd->addr = addr;
         /* damn you bitfield problems */
-        bd->bd = (len << 16) | (1 << 3) | (s->data01 << 6) | (1 << 7);
+        bd->raw = ((struct USB_BD_BITS_t){
+                        .dts = 1,
+                                .own = 1,
+                                .data01 = s->data01,
+                                .bc = len,
+                                }).raw;
 }
 
 void
