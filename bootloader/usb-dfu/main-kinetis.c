@@ -19,8 +19,7 @@ finish_write(size_t off, size_t len)
 void
 main(void)
 {
-//        MCG.dmx32 = 1;           /* mcg at 24MHz */
-//        SIM.clkdiv2.usbfrac = 1; /* usb = 2x core */
+#ifdef EXTERNAL_XTAL
         OSC_CR = OSC_CR_SC16P_MASK;
         MCG.c2.raw = ((struct MCG_C2_t){
                         .range0 = MCG_RANGE_VERYHIGH,
@@ -28,7 +27,7 @@ main(void)
                                 }).raw;
         MCG.c1.raw = ((struct MCG_C1_t){
                         .clks = MCG_CLKS_EXTERNAL,
-                                .frdiv = 4,
+                                .frdiv = 4, /* log2(EXTERNAL_XTAL) - 20 */
                                 .irefs = 0
                                 }).raw;
 
@@ -38,7 +37,7 @@ main(void)
                 /* NOTHING */;
 
         MCG.c5.raw = ((struct MCG_C5_t){
-                        .prdiv0 = 7,
+                        .prdiv0 = ((EXTERNAL_XTAL / 2000000L) - 1),
                                 .pllclken0 = 1
                                 }).raw;
         MCG.c6.raw = ((struct MCG_C6_t){
@@ -57,6 +56,14 @@ main(void)
                 /* NOTHING */;
 
         SIM.sopt2.pllfllsel = SIM_PLLFLLSEL_PLL;
+#else
+        /* FLL at 48MHz */
+        MCG.c4.raw = ((struct MCG_C4_t){
+                        .drst_drs = MCG_DRST_DRS_MID,
+                        .dmx32 = 1
+                }).raw;
+        SIM.sopt2.pllfllsel = SIM_PLLFLLSEL_FLL;
+#endif
         SIM.sopt2.usbsrc = 1;    /* usb from mcg */
 
         dfu_start(setup_write, finish_write);
