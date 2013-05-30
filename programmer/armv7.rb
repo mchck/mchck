@@ -185,22 +185,39 @@ class ARMv7
 
   def read_mem(addr, count)
     # we need to deal with unaligned addresses
+    # however, some peripherals require byte accesses
+    size ||= :word
+    align ||= 4
     res = ""
     remaining = count
-    align_start = addr % 4
+    align_start = addr % align
+    aligned_addr = addr
     if align_start > 0
-      data = @dap.read(addr - align_start)
+      data = @dap.read(addr - align_start, :size => size)
       res << [data].pack('L')[align_start..-1]
-      read_size = 4 - align_start
-      addr += read_size
+      read_size = align - align_start
+      aligned_addr += read_size
       remaining -= read_size
     end
-    numwords = (remaining + 3) / 4
+    numwords = (remaining + align - 1) / align
     if numwords >= 1
-      data = @dap.read(addr, :count => numwords)
+      data = @dap.read(aligned_addr, :count => numwords, :size => size)
       res << data.pack('L*')
     end
+    if size == :byte
+      res = res.unpack('L*').pack('C*')
+    end
     res[0...count]
+  rescue
+    # maybe need to read bytes?
+    if size == :word
+      Log(:arm, 3){ "error reading words from %08x, retrying with bytes" % addr }
+      size = :byte
+      align = 1
+      retry
+    else
+      raise
+    end
   end
 
   def write_mem(addr, data)
