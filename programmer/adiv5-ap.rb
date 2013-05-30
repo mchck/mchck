@@ -233,7 +233,7 @@ class Adiv5
 
       Log(:ap, 1){ "initializing memap #@apsel" }
       self.CSW.transact do |csw|
-        csw.Size = :word
+        csw.Size = @last_size = :word
         csw.AddrInc = :single
         csw.Mode = 0
       end
@@ -248,23 +248,39 @@ class Adiv5
       end
     end
 
-    def transfer(dir, addr, val_or_opt)
-      raise UnalignedAccessError if addr & 0x3 != 0
-
-      count = 1
+    def transfer(dir, addr, val_or_opt, opt={})
       if Hash === val_or_opt
-        count = val_or_opt[:count] || 1
-      elsif val_or_opt.respond_to? :count
-        count = val_or_opt.count
+        opt.merge! val_or_opt
       end
+      size = opt[:size]
+      size ||= :word
+
+      align = case size
+              when :word
+                4
+              when :halfword
+                2
+              when :byte
+                1
+              end
+
+      raise UnalignedAccessError if addr % align != 0
+
+      count = opt[:count]
+      count ||= 1
 
       transfer_reg = DRW
-      if count == 1 && @last_TAR && @last_TAR & 0xfffffff0 == addr & 0xfffffff0
+      if size == :word && count == 1 &&
+          @last_TAR && @last_TAR & 0xfffffff0 == addr & 0xfffffff0
         ofs = addr & 0xf
         transfer_reg = BD + ofs
       elsif @last_TAR != addr
-        write_ap(TAR, addr)
-        @last_TAR = addr
+        self.TAR = @last_TAR = addr
+      end
+
+      if @last_size != size
+        Log(:mem, 2){ "switching AP size to #{size}" }
+        self.CSW.Size = @last_size = size
       end
 
       if transfer_reg == DRW
@@ -278,7 +294,7 @@ class Adiv5
             write_ap(transfer_reg, val_or_opt)
           end
       if transfer_reg == DRW
-        @last_TAR = addr + count * 4
+        @last_TAR = addr + count * align
       end
 
       v
