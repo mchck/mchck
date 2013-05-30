@@ -108,7 +108,6 @@ dfu_dnload_complete(void *buf, ssize_t len, void *cbdata)
 
         if (dfu_dev.status != DFU_STATUS_OK)
                 dfu_dev.state = DFU_STATE_dfuERROR;
-        usb_handle_control_status(NULL, 0, NULL);
 }
 
 static int
@@ -157,17 +156,16 @@ dfu_handle_control(struct usb_ctrl_req_t *req)
                 st.bState = dfu_dev.state;
                 st.bStatus = dfu_dev.status;
                 st.bwPollTimeout = 1000; /* XXX */
-                usb_tx_cp(&st, sizeof(st), req->wLength, usb_handle_control_status, NULL);
+                usb_tx_cp(&st, sizeof(st), req->wLength, NULL, NULL);
                 break;
         }
         case USB_CTRL_REQ_DFU_CLRSTATUS:
                 dfu_dev.state = DFU_STATE_dfuIDLE;
                 dfu_dev.status = DFU_STATUS_OK;
-                usb_handle_control_status(NULL, 0, NULL);
                 break;
         case USB_CTRL_REQ_DFU_GETSTATE: {
                 uint8_t st = dfu_dev.state;
-                usb_tx_cp(&st, sizeof(st), req->wLength, usb_handle_control_status, NULL);
+                usb_tx_cp(&st, sizeof(st), req->wLength, NULL, NULL);
                 break;
         }
         case USB_CTRL_REQ_DFU_ABORT:
@@ -180,7 +178,6 @@ dfu_handle_control(struct usb_ctrl_req_t *req)
                 default:
                         goto err;
                 }
-                usb_handle_control_status(NULL, 0, NULL);
                 break;
         case USB_CTRL_REQ_DFU_UPLOAD:
         default:

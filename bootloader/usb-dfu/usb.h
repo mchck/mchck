@@ -6,11 +6,6 @@
 //#include <uchar.h>
 typedef __CHAR16_TYPE__ char16_t;
 
-/**
- * Note: bitfields ahead.
- * GCC fills the fields lsb-to-msb on little endian.
- */
-
 #define __packed __attribute__((__packed__))
 
 /* From FreeBSD: compile-time asserts */
@@ -20,6 +15,12 @@ typedef __CHAR16_TYPE__ char16_t;
 
 #define CTASSERT_SIZE_BYTE(t, s)     CTASSERT(sizeof(t) == (s))
 #define CTASSERT_SIZE_BIT(t, s)     CTASSERT(sizeof(t) * 8 == (s))
+
+
+/**
+ * Note: bitfields ahead.
+ * GCC fills the fields lsb-to-msb on little endian.
+ */
 
 
 /**
@@ -341,7 +342,6 @@ typedef void (*ep_callback_t)(void *buf, ssize_t len, void *data);
 
 
 /* Provided by MD code */
-void usb_enable(void);
 void *usb_get_xfer_data(struct usb_xfer_info *);
 enum usb_tok_pid usb_get_xfer_pid(struct usb_xfer_info *);
 void usb_enable_xfers(void);
@@ -356,7 +356,7 @@ void usb_rx_queue_next(struct usbd_ep_pipe_state_t *, void *, size_t);
 void usb_start(const struct usbd_identity_t *);
 void usb_handle_transaction(struct usb_xfer_info *);
 void usb_setup_control(void);
-void usb_handle_control_status(void *, ssize_t, void *);
+void usb_handle_control_status(void);
 int usb_rx(void *, size_t, ep_callback_t, void *);
 int usb_tx(const void *, size_t, size_t, ep_callback_t, void *);
 int usb_tx_cp(const void *, size_t, size_t, ep_callback_t, void *);

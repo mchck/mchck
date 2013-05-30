@@ -197,7 +197,7 @@ usb_handle_control_done(void *data, ssize_t len, void *cbdata)
 }
 
 void
-usb_handle_control_status(void *data, ssize_t len, void *cbdata)
+usb_handle_control_status(void)
 {
 	usb.ctrl_state = USBD_CTRL_STATE_STATUS;
 
@@ -267,7 +267,7 @@ usb_handle_control(void *data, ssize_t len, void *cbdata)
 		if (usb.identity->class_control == NULL)
 			goto err;
 		if (usb.identity->class_control(req) > 0)
-			goto out;
+			goto status;
 		else
 			goto err;
 		/* NOTREACHED */
@@ -285,7 +285,7 @@ usb_handle_control(void *data, ssize_t len, void *cbdata)
 		 * empty.
 		 */
 		usb_tx_cp(&zero16, sizeof(zero16), req->wLength,
-			  usb_handle_control_status, NULL);
+			  NULL, NULL);
 		break;
 
 	case USB_CTRL_REQ_CLEAR_FEATURE:
@@ -294,7 +294,6 @@ usb_handle_control(void *data, ssize_t len, void *cbdata)
 		 * Nothing to do.  Maybe return STALLs on illegal
 		 * accesses?
 		 */
-		usb_handle_control_status(NULL, 0, NULL);
 		break;
 
 	case USB_CTRL_REQ_SET_ADDRESS:
@@ -306,7 +305,6 @@ usb_handle_control(void *data, ssize_t len, void *cbdata)
 		 */
 		usb.address = req->wValue & 0x7f;
 		usb.state = USBD_STATE_SETTING_ADDRESS;
-		usb_handle_control_status(NULL, 0, NULL);
 		break;
 
 	case USB_CTRL_REQ_GET_DESCRIPTOR: {
@@ -336,27 +334,23 @@ usb_handle_control(void *data, ssize_t len, void *cbdata)
 		default:
 			goto err;
 		}
-		usb_tx(desc, len, req->wLength,
-		       usb_handle_control_status, NULL);
+		usb_tx_cp(desc, len, req->wLength, NULL, NULL);
 		break;
 	}
 
 	case USB_CTRL_REQ_GET_CONFIGURATION:
-		usb_tx_cp(&usb.config, 1, req->wLength,
-			  usb_handle_control_status, NULL); /* XXX implicit LE */
+		usb_tx_cp(&usb.config, 1, req->wLength, NULL, NULL); /* XXX implicit LE */
 		break;
 
 	case USB_CTRL_REQ_SET_CONFIGURATION:
 		/* XXX check config */
 		usb.config = req->wValue;
 		usb.state = USBD_STATE_CONFIGURED;
-		usb_handle_control_status(NULL, 0, NULL);
 		break;
 
 	case USB_CTRL_REQ_GET_INTERFACE:
 		/* We only support iface setting 0 */
-		usb_tx_cp(&zero16, 1, req->wLength,
-			  usb_handle_control_status, NULL);
+		usb_tx_cp(&zero16, 1, req->wLength, NULL, NULL);
 		break;
 
 	case USB_CTRL_REQ_SET_INTERFACE:
@@ -367,11 +361,13 @@ usb_handle_control(void *data, ssize_t len, void *cbdata)
 		goto err;
 	}
 
+status:
+	usb_handle_control_status();
 	goto out;
 
 err:
-	usb_ep_stall(0);
 	usb_setup_control();
+	/* XXX queue stall on control EP to signal error */
 out:
 	usb_enable_xfers();
 }
@@ -383,9 +379,6 @@ usb_setup_control(void)
 
 	usb.ep0_state.rx.data01 = USB_DATA01_DATA0;
 	usb.ep0_state.tx.data01 = USB_DATA01_DATA1;
-	usb.ep0_state.rx.ep_maxsize = EP0_BUFSIZE;
-	usb.ep0_state.tx.ep_maxsize = EP0_BUFSIZE;
-	usb_ep_stall(0);
 	usb_rx(buf, EP0_BUFSIZE, usb_handle_control, NULL);
 }
 
@@ -406,11 +399,22 @@ usb_handle_control_ep(struct usb_xfer_info *stat)
 }
 
 void
+usb_restart(void)
+{
+	const struct usbd_identity_t *identity = usb.identity;
+	memset(&usb, 0, sizeof(usb));
+	usb.identity = identity;
+	usb.ep0_state.rx.ep_maxsize = EP0_BUFSIZE;
+	usb.ep0_state.tx.ep_maxsize = EP0_BUFSIZE;
+	usb_setup_control();
+	usb_enable_xfers();
+}
+
+void
 usb_start(const struct usbd_identity_t *identity)
 {
 	usb.identity = identity;
-	usb_setup_control();
-	usb_enable_xfers();
+	usb_enable();
 }
 
 /**

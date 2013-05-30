@@ -60,3 +60,6 @@ struct usbd_t {
 	} ctrl_state;
 	enum usb_ctrl_req_dir ctrl_dir;
 };
+
+void usb_restart(void);
+void usb_enable(void);

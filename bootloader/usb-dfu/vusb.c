@@ -241,8 +241,8 @@ static int vusb_sock;
 static struct vusb_urb_t *urbs;
 static struct vusb_dev_t vusb_dev;
 
-static void
-vusb_attach(void)
+void
+usb_enable(void)
 {
         /**
          * Interfacing to usbip-host/vhci_hcd:
@@ -807,7 +807,8 @@ vusb_rcv(int block)
 void
 vusb_main_loop()
 {
-        vusb_attach();
+        /* start by resetting the usb stack */
+        usb_restart();
         for (;;) {
                 vusb_rcv(urbs == NULL || vusb_dev.activity == 0);
                 vusb_dev.activity = 0;
