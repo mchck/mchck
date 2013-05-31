@@ -8,7 +8,7 @@
 #include "usb-internal.h"
 
 static uint8_t ep0_buf[EP0_BUFSIZE][2] __attribute__((aligned(4)));
-static struct usbd_t usb;
+struct usbd_t usb;
 
 
 /**
@@ -38,7 +38,7 @@ usb_tx_next(void)
 		s->pos += thislen;
 		s->transfer_size -= thislen;
 
-		usb_tx_queue_next(s, addr, thislen);
+		usb_queue_next(s, addr, thislen);
 		s->pingpong ^= 1;
 
 		return (1);
@@ -50,7 +50,7 @@ usb_tx_next(void)
 	 */
 	if (s->short_transfer) {
 		s->short_transfer = 0;
-		usb_tx_queue_next(s, NULL, 0);
+		usb_queue_next(s, NULL, 0);
 		s->pingpong ^= 1;
 		return (1);
 	}
@@ -123,7 +123,7 @@ usb_rx_next(void)
 	 */
 	s->data01 ^= 1;
 
-	size_t thislen = usb_ep_get_transfer_size(0, USB_EP_RX, s->pingpong);
+	size_t thislen = usb_ep_get_transfer_size(s);
 
 	s->transfer_size -= thislen;
 	s->pos += thislen;
@@ -153,7 +153,7 @@ usb_rx_next(void)
                 nextlen = s->ep_maxsize;
 
         void *addr = s->data_buf + s->pos;
-	usb_rx_queue_next(s, addr, nextlen);
+	usb_queue_next(s, addr, nextlen);
 
 	return (1);
 }
@@ -180,10 +180,9 @@ usb_rx(void *buf, size_t len, ep_callback_t cb, void *cb_data)
 	if (thislen > s->ep_maxsize)
 		thislen = s->ep_maxsize;
 
-	usb_rx_queue_next(s, s->data_buf, thislen);
+	usb_queue_next(s, s->data_buf, thislen);
 	return (len);
 }
-
 
 static void
 usb_handle_control_done(void *data, ssize_t len, void *cbdata)
@@ -366,8 +365,9 @@ status:
 	goto out;
 
 err:
-	usb_setup_control();
-	/* XXX queue stall on control EP to signal error */
+	usb_pipe_stall(&usb.ep0_state.rx);
+	usb_pipe_stall(&usb.ep0_state.tx);
+
 out:
 	usb_enable_xfers();
 }
@@ -379,6 +379,7 @@ usb_setup_control(void)
 
 	usb.ep0_state.rx.data01 = USB_DATA01_DATA0;
 	usb.ep0_state.tx.data01 = USB_DATA01_DATA1;
+	usb_pipe_stall(&usb.ep0_state.tx);
 	usb_rx(buf, EP0_BUFSIZE, usb_handle_control, NULL);
 }
 
@@ -406,6 +407,8 @@ usb_restart(void)
 	usb.identity = identity;
 	usb.ep0_state.rx.ep_maxsize = EP0_BUFSIZE;
 	usb.ep0_state.tx.ep_maxsize = EP0_BUFSIZE;
+	usb.ep0_state.rx.ep_dir = USB_EP_RX;
+	usb.ep0_state.tx.ep_dir = USB_EP_TX;
 	usb_setup_control();
 	usb_enable_xfers();
 }

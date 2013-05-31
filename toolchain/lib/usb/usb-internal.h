@@ -29,6 +29,9 @@ struct usbd_ep_pipe_state_t {
 	ep_callback_t callback;
 	void *callback_data;
 	size_t ep_maxsize;
+	/* constant */
+	int ep_num;
+	enum usb_ep_dir ep_dir;
 };
 
 struct usbd_ep_state_t {
@@ -60,6 +63,8 @@ struct usbd_t {
 	} ctrl_state;
 	enum usb_ctrl_req_dir ctrl_dir;
 };
+
+extern struct usbd_t usb;
 
 void usb_restart(void);
 void usb_enable(void);

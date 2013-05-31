@@ -184,6 +184,7 @@ struct vusb_pipe_state_t {
         char *addr;
         size_t len;
         int ready;
+        int stalled;
         enum usb_data01 data01;
 
         size_t recv_len;
@@ -195,11 +196,15 @@ struct vusb_dev_t {
         int running;
         int activity;
         struct vusb_ep_state_t {
-                int stalled;
                 int pingpong_rx;
                 int pingpong_tx;
-                struct vusb_pipe_state_t rx[2];
-                struct vusb_pipe_state_t tx[2];
+                union {
+                        struct {
+                                struct vusb_pipe_state_t rx[2];
+                                struct vusb_pipe_state_t tx[2];
+                        };
+                        struct vusb_pipe_state_t pipe[2][2];
+                };
         } ep[16];
 };
 
@@ -317,6 +322,15 @@ sockread(void *bufp, size_t buflen)
 }
 
 
+static struct vusb_pipe_state_t *
+vusb_get_pipe(struct usbd_ep_pipe_state_t *s)
+{
+        struct vusb_ep_state_t *es = &vusb_dev.ep[s->ep_num];
+        struct vusb_pipe_state_t *ps = &(s->ep_dir == USB_EP_TX ? es->tx : es->rx)[s->pingpong];
+
+        return (ps);
+}
+
 void *
 usb_get_xfer_data(struct usb_xfer_info *i)
 {
@@ -343,9 +357,21 @@ usb_set_addr(int addr)
 }
 
 void
-usb_ep_stall(int ep)
+usb_pipe_stall(struct usbd_ep_pipe_state_t *s)
 {
-        vusb_dev.ep[ep].stalled = 1;
+        struct vusb_pipe_state_t *ps = vusb_get_pipe(s);
+
+        ps->stalled = 1;
+        ps->ready = 1;
+}
+
+void
+usb_pipe_unstall(struct usbd_ep_pipe_state_t *s)
+{
+        struct vusb_pipe_state_t *ps = vusb_get_pipe(s);
+
+        if (ps->ready && ps->stalled)
+                ps->ready = ps->stalled = 0;
 }
 
 void
@@ -353,36 +379,22 @@ usb_clear_transfers(void)
 {
 }
 
-inline size_t
-usb_ep_get_transfer_size(int ep, enum usb_ep_dir dir, enum usb_ep_pingpong pingpong)
+size_t
+usb_ep_get_transfer_size(struct usbd_ep_pipe_state_t *s)
 {
-        struct vusb_ep_state_t *es = &vusb_dev.ep[ep];
-        struct vusb_pipe_state_t *ps = &(dir == USB_EP_TX ? es->tx : es->rx)[pingpong];
-
-        return (ps->recv_len);
+        return (vusb_get_pipe(s)->recv_len);
 }
 
 void
-usb_tx_queue_next(struct usbd_ep_pipe_state_t *s, void *addr, size_t len)
+usb_queue_next(struct usbd_ep_pipe_state_t *s, void *addr, size_t len)
 {
         /* XXX only ep 0 for now */
-        struct vusb_pipe_state_t *ps = &vusb_dev.ep[0].tx[s->pingpong];
+        struct vusb_pipe_state_t *ps = vusb_get_pipe(s);
 
         ps->addr = addr;
         ps->len = len;
         ps->ready = 1;
-        vusb_dev.activity = 1;
-}
-
-void
-usb_rx_queue_next(struct usbd_ep_pipe_state_t *s, void *addr, size_t len)
-{
-        /* XXX only ep 0 for now */
-        struct vusb_pipe_state_t *ps = &vusb_dev.ep[0].rx[s->pingpong];
-
-        ps->addr = addr;
-        ps->len = len;
-        ps->ready = 1;
+        ps->stalled = 0;
         vusb_dev.activity = 1;
 }
 
@@ -435,21 +447,22 @@ vusb_tx_one(int ep, enum usb_tok_pid tok, void *addr, size_t len)
                 return (USB_PID_TIMEOUT);
         }
 
+        struct vusb_pipe_state_t *ps = &es->rx[es->pingpong_rx];
+
+        if (!ps->ready) {
+                printf("-> NAK\n");
+                return (USB_PID_NAK);
+        }
+
         if (ep == 0 && tok == USB_PID_SETUP) {
-                es->stalled = 0;
+                ps->stalled = 0;
                 vusb_dev.running = 0;
                 vusb_dev.activity = 1;
         }
 
-        if (es->stalled) {
+        if (ps->stalled) {
                 printf("-> STALL\n");
                 return (USB_PID_STALL);
-        }
-
-        struct vusb_pipe_state_t *ps = &es->rx[es->pingpong_rx];
-        if (!ps->ready) {
-                printf("-> NAK\n");
-                return (USB_PID_NAK);
         }
 
         size_t xlen = len;
@@ -490,15 +503,15 @@ vusb_rx_one(int ep, enum usb_tok_pid tok, void *addr, size_t len, size_t *rxlen)
                 return (USB_PID_TIMEOUT);
         }
 
-        if (es->stalled) {
-                printf("-> STALL\n");
-                return (USB_PID_STALL);
-        }
-
         struct vusb_pipe_state_t *ps = &es->tx[es->pingpong_tx];
         if (!ps->ready) {
                 printf("-> NAK\n");
                 return (USB_PID_NAK);
+        }
+
+        if (ps->stalled) {
+                printf("-> STALL\n");
+                return (USB_PID_STALL);
         }
 
         for (size_t i = 0; i < ps->len; ++i)
