@@ -6,94 +6,76 @@
  */
 
 struct USB_ADDINFO_t {
-        union {
-                struct {
-                        uint8_t iehost : 1;
-                        uint8_t _rsvd0 : 2;
-                        uint8_t irqnum : 5;
-                };
-                uint8_t raw;
-        };
+        UNION_STRUCT_START(8);
+        uint8_t iehost : 1;
+        uint8_t _rsvd0 : 2;
+        uint8_t irqnum : 5;
+        UNION_STRUCT_END;
 };
 CTASSERT_SIZE_BIT(struct USB_ADDINFO_t, 8);
 
 struct USB_OTGSTAT_t {
-        union {
-                struct {
-                        uint8_t avbus : 1;
-                        uint8_t _rsvd0 : 1;
-                        uint8_t b_sess : 1;
-                        uint8_t sessvld : 1;
-                        uint8_t _rsvd1 : 1;
-                        uint8_t line_state : 1;
-                        uint8_t onemsec : 1;
-                        uint8_t idchg : 1;
-                };
-                uint8_t raw;
-        };
+        UNION_STRUCT_START(8);
+        uint8_t avbus : 1;
+        uint8_t _rsvd0 : 1;
+        uint8_t b_sess : 1;
+        uint8_t sessvld : 1;
+        uint8_t _rsvd1 : 1;
+        uint8_t line_state : 1;
+        uint8_t onemsec : 1;
+        uint8_t idchg : 1;
+        UNION_STRUCT_END;
 };
 CTASSERT_SIZE_BIT(struct USB_OTGSTAT_t, 8);
 
 struct USB_OTGCTL_t {
-        union {
-                struct {
-                        uint8_t _rsvd0 : 2;
-                        uint8_t otgen : 1;
-                        uint8_t _rsvd1 : 1;
-                        uint8_t dmlow : 1;
-                        uint8_t dplow : 1;
-                        uint8_t _rsvd2 : 1;
-                        uint8_t dphigh : 1;
-                };
-                uint8_t raw;
-        };
+        UNION_STRUCT_START(8);
+        uint8_t _rsvd0 : 2;
+        uint8_t otgen : 1;
+        uint8_t _rsvd1 : 1;
+        uint8_t dmlow : 1;
+        uint8_t dplow : 1;
+        uint8_t _rsvd2 : 1;
+        uint8_t dphigh : 1;
+        UNION_STRUCT_END;
 };
 CTASSERT_SIZE_BIT(struct USB_OTGCTL_t, 8);
 
 struct USB_ISTAT_t {
-        union {
-                struct {
-                        uint8_t usbrst : 1;
-                        uint8_t error : 1;
-                        uint8_t softok : 1;
-                        uint8_t tokdne : 1;
-                        uint8_t sleep : 1;
-                        uint8_t resume : 1;
-                        uint8_t attach : 1;
-                        uint8_t stall : 1;
-                };
-                uint8_t raw;
-        };
+        UNION_STRUCT_START(8);
+        uint8_t usbrst : 1;
+        uint8_t error : 1;
+        uint8_t softok : 1;
+        uint8_t tokdne : 1;
+        uint8_t sleep : 1;
+        uint8_t resume : 1;
+        uint8_t attach : 1;
+        uint8_t stall : 1;
+        UNION_STRUCT_END;
 };
 CTASSERT_SIZE_BIT(struct USB_ISTAT_t, 8);
 
 struct USB_ERRSTAT_t {
-        union {
-                struct {
-                        uint8_t piderr : 1;
-                        uint8_t crc5eof : 1;
-                        uint8_t crc16 : 1;
-                        uint8_t dfn8 : 1;
-                        uint8_t btoerr : 1;
-                        uint8_t dmaerr : 1;
-                        uint8_t _rsvd0 : 1;
-                        uint8_t btserr : 1;
-                };
-                uint8_t raw;
-        };
+        UNION_STRUCT_START(8);
+        uint8_t piderr : 1;
+        uint8_t crc5eof : 1;
+        uint8_t crc16 : 1;
+        uint8_t dfn8 : 1;
+        uint8_t btoerr : 1;
+        uint8_t dmaerr : 1;
+        uint8_t _rsvd0 : 1;
+        uint8_t btserr : 1;
+        UNION_STRUCT_END;
 };
 CTASSERT_SIZE_BIT(struct USB_ERRSTAT_t, 8);
 
 struct USB_STAT_t {
-        union {
-                struct {
-                        uint8_t _rsvd0 : 2;
-                        enum usb_ep_pingpong pingpong : 1;
-                        enum usb_ep_dir dir : 1;
-                        uint8_t ep : 4;
-                };
-                uint8_t raw;
-        };
+        UNION_STRUCT_START(8);
+        uint8_t _rsvd0 : 2;
+        enum usb_ep_pingpong pingpong : 1;
+        enum usb_ep_dir dir : 1;
+        uint8_t ep : 4;
+        UNION_STRUCT_END;
 };
 CTASSERT_SIZE_BIT(struct USB_STAT_t, 8);
 
@@ -127,94 +109,73 @@ struct USB_CTL_t {
 CTASSERT_SIZE_BIT(struct USB_CTL_t, 8);
 
 struct USB_ADDR_t {
-        union {
-                struct {
-                        uint8_t addr : 7;
-                        uint8_t lsen : 1;
-                };
-                uint8_t raw;
-        };
+        UNION_STRUCT_START(8);
+        uint8_t addr : 7;
+        uint8_t lsen : 1;
+        UNION_STRUCT_END;
 };
 CTASSERT_SIZE_BIT(struct USB_ADDR_t, 8);
 
 struct USB_TOKEN_t {
-        union {
-                struct {
-                        uint8_t endpt : 4;
-                        enum usb_tok_pid pid : 4;
-                };
-                uint8_t raw;
-        };
+        UNION_STRUCT_START(8);
+        uint8_t endpt : 4;
+        enum usb_tok_pid pid : 4;
+        UNION_STRUCT_END;
 };
 CTASSERT_SIZE_BIT(struct USB_TOKEN_t, 8);
 
 struct USB_ENDPT_t {
-        union {
-                struct {
-                        uint8_t ephshk : 1;
-                        uint8_t epstall : 1;
-                        uint8_t eptxen : 1;
-                        uint8_t eprxen : 1;
-                        uint8_t epctldis : 1;
-                        uint8_t _rsvd0 : 1;
-                        uint8_t retrydis : 1;
-                        uint8_t hostwohub : 1;
-                };
-                uint8_t raw;
-        };
+        UNION_STRUCT_START(8);
+        uint8_t ephshk : 1;
+        uint8_t epstall : 1;
+        uint8_t eptxen : 1;
+        uint8_t eprxen : 1;
+        uint8_t epctldis : 1;
+        uint8_t _rsvd0 : 1;
+        uint8_t retrydis : 1;
+        uint8_t hostwohub : 1;
+        UNION_STRUCT_END;
 };
 CTASSERT_SIZE_BIT(struct USB_ENDPT_t, 8);
 
 struct USB_USBCTRL_t {
-        union {
-                struct {
-                        uint8_t _rsvd0 : 6;
-                        uint8_t pde : 1;
-                        uint8_t susp : 1;
-                };
-                uint8_t raw;
-        };
+        UNION_STRUCT_START(8);
+        uint8_t _rsvd0 : 6;
+        uint8_t pde : 1;
+        uint8_t susp : 1;
+        UNION_STRUCT_END;
 };
 CTASSERT_SIZE_BIT(struct USB_USBCTRL_t, 8);
 
 struct USB_OBSERVE_t {
-        union {
-                struct {
-                        uint8_t _rsvd0 : 4;
-                        uint8_t dmpd : 1;
-                        uint8_t _rsvd1 : 1;
-                        uint8_t dppd : 1;
-                        uint8_t dppu : 1;
-                };
-                uint8_t raw;
-        };
+        UNION_STRUCT_START(8);
+        uint8_t _rsvd0 : 4;
+        uint8_t dmpd : 1;
+        uint8_t _rsvd1 : 1;
+        uint8_t dppd : 1;
+        uint8_t dppu : 1;
+        UNION_STRUCT_END;
 };
 CTASSERT_SIZE_BIT(struct USB_OBSERVE_t, 8);
 
 struct USB_CONTROL_t {
-        union {
-                struct {
-                        uint8_t _rsvd0 : 4;
-                        uint8_t dppullupnonotg : 1;
-                        uint8_t _rsvd1 : 3;
-                };
-                uint8_t raw;
-        };
+        UNION_STRUCT_START(8);
+        uint8_t _rsvd0 : 4;
+        uint8_t dppullupnonotg : 1;
+        uint8_t _rsvd1 : 3;
+        UNION_STRUCT_END;
 };
 CTASSERT_SIZE_BIT(struct USB_CONTROL_t, 8);
 
 struct USB_USBTRC0_t {
-        union {
-                struct {
-                        uint8_t usb_resume_int : 1;
-                        uint8_t sync_det : 1;
-                        uint8_t _rsvd0 : 3;
-                        uint8_t usbresmen : 1;
-                        uint8_t _rsvd1 : 1;
-                        uint8_t usbreset : 1;
-                };
-                uint8_t raw;
-        };
+        UNION_STRUCT_START(8);
+        uint8_t usb_resume_int : 1;
+        uint8_t sync_det : 1;
+        uint8_t _rsvd0 : 3;
+        uint8_t usbresmen : 1;
+        uint8_t _rsvd1 : 1;
+        uint8_t usbreset : 1;
+        UNION_STRUCT_END;
 };
 CTASSERT_SIZE_BIT(struct USB_USBTRC0_t, 8);
 
