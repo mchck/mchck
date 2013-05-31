@@ -3,6 +3,7 @@
  */
 
 #include <stdint.h>
+#include <mchck-cdefs.h>
 
 #ifndef STACK_SIZE
 #define STACK_SIZE 0x400
@@ -32,8 +33,6 @@ isr_handler_t Default_Handler __attribute__((__weak__, __alias__("__Default_Hand
 isr_handler_t Default_Reset_Handler;
 
 
-#define _CONCAT(a, b) a ## b
-#define _STR(a) #a
 #define VH(handler, default)			\
 	V_handler(handler, _CONCAT(handler, _Handler), default)
 #define V(x)					\

@@ -1,6 +1,14 @@
 #ifndef __MCHCK_H
 #define __MCHCK_H
 
+#include <sys/types.h>
+#include <sys/cdefs.h>
+#include <stdint.h>
+
+#include <mchck-cdefs.h>
+
+#ifndef TARGET_HOST
+
 #ifndef __MCHCK_INTERNAL_H
 #error Build system error: mchck_internal.h not included by compiler
 #endif
@@ -11,36 +19,6 @@
  }
 #endif
 #endif
-
-#include <sys/types.h>
-#include <sys/cdefs.h>
-#include <stdint.h>
-
-
-//#include <uchar.h>
-typedef __CHAR16_TYPE__ char16_t;
-
-#define __packed __attribute__((__packed__))
-
-/* From FreeBSD: compile-time asserts */
-#define CTASSERT(x)             _CTASSERT(x, __COUNTER__)
-#define _CTASSERT(x, y)         __CTASSERT(x, y)
-#define __CTASSERT(x, y)        typedef char __assert ## y[(x) ? 1 : -1]
-
-#define CTASSERT_SIZE_BYTE(t, s)     CTASSERT(sizeof(t) == (s))
-#define CTASSERT_SIZE_BIT(t, s)     CTASSERT(sizeof(t) * 8 == (s))
-
-#define UNION_STRUCT_START(size)                        \
-  union {                                               \
-  __CONCAT(__CONCAT(uint, size), _t) raw;               \
-  struct {                                              \
-  /* just to swallow the following semicolon */         \
-  struct __CONCAT(__CONCAT(__dummy_, __COUNTER__), _t) {}
-
-#define UNION_STRUCT_END \
-  }; /* struct */        \
-  }; /* union */
-
 
 /* From CMSIS: */
 
@@ -186,4 +164,5 @@ void *memcpy(void *, const void *, size_t);
 }
 #endif
 
+#endif
 #endif

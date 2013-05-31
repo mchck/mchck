@@ -1,8 +1,7 @@
 #include <stdio.h>
 
-#include "vusb.h"
-#include "usb.h"
-#include "dfu.h"
+#include <usb/usb.h>
+#include <usb/dfu.h>
 
 
 const static struct usb_desc_dev_t dev_desc = {
@@ -15,7 +14,7 @@ const static struct usb_desc_dev_t dev_desc = {
         .bMaxPacketSize0 = EP0_BUFSIZE,
         .idVendor = 0x2323,
         .idProduct = 1,
-        .bcdDevice = { .bcd = 0 },
+        .bcdDevice = { .raw = 0 },
         .iManufacturer = 1,
         .iProduct = 1,
         .iSerialNumber = 0,

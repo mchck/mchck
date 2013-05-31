@@ -1,5 +1,52 @@
 _libdir:=       $(dir $(lastword ${MAKEFILE_LIST}))
 
+define _include_used_libs =
+_libdir-$(1):=	$$(addprefix $${_libdir}/lib/,$(1))
+include $$(addsuffix /Makefile.part,$${_libdir-$(1)})
+
+_objs-$(1)=	$$(addsuffix .o, $$(basename $$(addprefix $(1)-lib-,$${SRCS-$(1)})))
+OBJS+=	$${_objs-$(1)}
+CLEANFILES+=	$${_objs-$(1)}
+
+$(1)-lib-%.o: $${_libdir-$(1)}/%.c
+	$$(COMPILE.c) $$(OUTPUT_OPTION) $$<
+endef
+
+
+# Common config
+
+CFLAGS+=	-I${_libdir}/include
+CFLAGS+=	-g
+CFLAGS+=	-std=c11 -fplan9-extensions
+ifndef DEBUG
+CFLAGS+=	${COPTFLAGS}
+endif
+CFLAGS+=	${CWARNFLAGS}
+
+SRCS?=	${PROG}.c
+_objs=	$(addsuffix .o, $(basename ${SRCS}))
+CLEANFILES+=	${_objs}
+OBJS+=	${_objs}
+
+
+# Host config (VUSB)
+
+ifeq (${TARGET},host)
+CFLAGS+=	-DTARGET_HOST
+CFLAGS+=	-fshort-enums
+
+all: ${PROG}
+
+$(foreach _uselib,${USE},$(eval $(call _include_used_libs,$(_uselib))))
+
+$(PROG): $(OBJS)
+	$(LINK.c) $^ ${LDLIBS} -o $@
+
+CLEANFILES+=	${PROG}
+else
+
+# MCHCK config
+
 CC=	arm-none-eabi-gcc
 LD=	arm-none-eabi-ld
 AR=	arm-none-eabi-ar
@@ -24,17 +71,12 @@ include ${_libdir}/${TARGET}.mk
 COPTFLAGS?=	-Os
 CWARNFLAGS?=	-Wall -Wno-main
 
-CFLAGS+=	-mcpu=cortex-m4 -msoft-float -mthumb -ffunction-sections -fdata-sections -std=c11 -fplan9-extensions -fno-builtin
+CFLAGS+=	-mcpu=cortex-m4 -msoft-float -mthumb -ffunction-sections -fdata-sections -fno-builtin -fstrict-volatile-bitfields
 ifndef NO_LTO
 CFLAGS+=	-flto
 endif
-CFLAGS+=	-I${_libdir}/include -I${_libdir}/CMSIS/Include -I.
+CFLAGS+=	-I${_libdir}/CMSIS/Include -I.
 CFLAGS+=	-include ${_libdir}/include/mchck_internal.h
-CFLAGS+=	-g
-ifndef DEBUG
-CFLAGS+=	${COPTFLAGS}
-endif
-CFLAGS+=	${CWARNFLAGS}
 
 LDFLAGS+=	-Wl,--gc-sections
 LDFLAGS+=	-fwhole-program
@@ -53,29 +95,13 @@ endif
 LDFLAGS+=	-T ${PROG}.ld
 LDFLAGS+=       -nostartfiles
 
-SRCS?=	${PROG}.c
-_objs=	$(addsuffix .o, $(basename ${SRCS}))
-CLEANFILES+=	${_objs}
-OBJS+=	${_objs}
 
 CLEANFILES+=	${PROG}.hex ${PROG}.elf ${PROG}.bin
 
 all: ${PROG}.hex ${PROG}.bin
 
-
 # This has to go before the rule, because for some reason the updates to OBJS
 # are not incorporated into the target dependencies
-define _include_used_libs =
-_libdir-$(1):=	$$(addprefix $${_libdir}/lib/,$(1))
-include $$(addsuffix /Makefile.part,$${_libdir-$(1)})
-
-_objs-$(1)=	$$(addsuffix .o, $$(basename $$(addprefix $(1)-lib-,$${SRCS-$(1)})))
-OBJS+=	$${_objs-$(1)}
-CLEANFILES+=	$${_objs-$(1)}
-
-$(1)-lib-%.o: $${_libdir-$(1)}/%.c
-	$$(COMPILE.c) $$(OUTPUT_OPTION) $$<
-endef
 $(foreach _uselib,mchck ${USE},$(eval $(call _include_used_libs,$(_uselib))))
 
 
@@ -91,6 +117,7 @@ ${PROG}.elf: ${OBJS} ${LDLIBS} ${PROG}.ld
 ${PROG}.ld: ${_libdir}/ld/link.ld.S ${LDSCRIPTS}
 	cpp -o $@ ${CPPFLAGS.ld} $<
 CLEANFILES+=	${PROG}.ld
+endif
 
 clean:
 	-rm -f ${CLEANFILES}

@@ -6,21 +6,6 @@
 #include <mchck.h>
 #include <usb/usb-common.h>
 
-#ifdef VUSB
-//#include <uchar.h>
-typedef __CHAR16_TYPE__ char16_t;
-
-#define __packed __attribute__((__packed__))
-
-/* From FreeBSD: compile-time asserts */
-#define CTASSERT(x)             _CTASSERT(x, __LINE__)
-#define _CTASSERT(x, y)         __CTASSERT(x, y)
-#define __CTASSERT(x, y)        typedef char __assert ## y[(x) ? 1 : -1]
-
-#define CTASSERT_SIZE_BYTE(t, s)     CTASSERT(sizeof(t) == (s))
-#define CTASSERT_SIZE_BIT(t, s)     CTASSERT(sizeof(t) * 8 == (s))
-#endif
-
 /**
  * Note: bitfields ahead.
  * GCC fills the fields lsb-to-msb on little endian.
@@ -317,7 +302,11 @@ void usb_clear_transfers(void);
 size_t usb_ep_get_transfer_size(int, enum usb_ep_dir, enum usb_ep_pingpong);
 void usb_tx_queue_next(struct usbd_ep_pipe_state_t *, void *, size_t);
 void usb_rx_queue_next(struct usbd_ep_pipe_state_t *, void *, size_t);
+#ifdef VUSB
+void vusb_main_loop(void);
+#else
 void usb_intr(void);
+#endif
 
 /* Provided by MI code */
 void usb_start(const struct usbd_identity_t *);

@@ -5,11 +5,11 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
 #include <errno.h>
 #include <poll.h>
 
-#include "vusb.h"
-#include "usb.h"
+#include <usb/usb.h>
 #include "usb-internal.h"
 
 

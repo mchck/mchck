@@ -1,1 +1,8 @@
-SRCS-usb=	usb.c dfu.c kinetis.c
+SRCS-usb=	usb.c dfu.c
+
+ifeq (${TARGET},host)
+SRCS-usb+=	vusb.c
+CFLAGS+=	-DVUSB
+else
+SRCS-usb+=	kinetis.c
+endif
