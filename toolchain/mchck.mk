@@ -1,5 +1,4 @@
 _libdir:=       $(dir $(lastword ${MAKEFILE_LIST}))
-VPATH:=	${_libdir}/crt0:${_libdir}/lib:${_libdir}/ld:${_libdir}:$(VPATH)
 
 CC=	arm-none-eabi-gcc
 LD=	arm-none-eabi-ld
@@ -41,33 +40,23 @@ LDFLAGS+=	-Wl,--gc-sections
 LDFLAGS+=	-fwhole-program
 CPPFLAGS.ld+=	-P -CC -I${_libdir}/ld -I.
 CPPFLAGS.ld+=	-DTARGET_LDSCRIPT='"${TARGETLD}"'
+TARGETLD?=	${TARGET}.ld
 
 ifdef LOADER
-STARTFILE_SRC+=	flashconfig_k20.c
 CPPFLAGS.ld+=	-DMEMCFG_LDSCRIPT='"loader.ld"'
-LDSCRIPTS+=	loader.ld
+LDSCRIPTS+=	${_libdir}/ld/loader.ld
 else
 CPPFLAGS.ld+=	-DMEMCFG_LDSCRIPT='"app.ld"'
-LDSCRIPTS+=	app.ld
+LDSCRIPTS+=	${_libdir}/ld/app.ld
 endif
 
 LDFLAGS+=	-T ${PROG}.ld
 LDFLAGS+=       -nostartfiles
 
-STARTFILE_SRC+=	startup_k20.c system_k20.c mchck-builtins.c
-STARTFILE_OBJ=	$(addsuffix .o, $(basename ${STARTFILE_SRC}))
-#STARTFILE_LIB=	libcrtnuc1xx.a
-#STARTFILE_LIBSHORT=	-lcrtnuc1xx
-STARTFILES=	${STARTFILE_OBJ}
-
-TARGETLD?=	${TARGET}.ld
-
 SRCS?=	${PROG}.c
 _objs=	$(addsuffix .o, $(basename ${SRCS}))
 CLEANFILES+=	${_objs}
 OBJS+=	${_objs}
-
-CLEANFILES+=	${STARTFILE_OBJ}
 
 CLEANFILES+=	${PROG}.hex ${PROG}.elf ${PROG}.bin
 
@@ -87,11 +76,11 @@ CLEANFILES+=	$${_objs-$(1)}
 $(1)-lib-%.o: $${_libdir-$(1)}/%.c
 	$$(COMPILE.c) $$(OUTPUT_OPTION) $$<
 endef
-$(foreach _uselib,${USE},$(eval $(call _include_used_libs,$(_uselib))))
+$(foreach _uselib,mchck ${USE},$(eval $(call _include_used_libs,$(_uselib))))
 
 
-${PROG}.elf: ${OBJS} ${STARTFILES} ${LDLIBS} ${PROG}.ld
-	${CC} -o $@ ${CFLAGS} ${LDFLAGS} ${STARTFILES} ${OBJS} ${LDLIBS}
+${PROG}.elf: ${OBJS} ${LDLIBS} ${PROG}.ld
+	${CC} -o $@ ${CFLAGS} ${LDFLAGS} ${OBJS} ${LDLIBS}
 
 %.hex: %.elf
 	${OBJCOPY} -O ihex $< $@
@@ -99,10 +88,7 @@ ${PROG}.elf: ${OBJS} ${STARTFILES} ${LDLIBS} ${PROG}.ld
 %.bin: %.elf
 	${OBJCOPY} -O binary $< $@
 
-${STARTFILE_LIB}: ${STARTFILE_OBJ}
-	${AR} r $@ $^
-
-${PROG}.ld: link.ld.S ${LDSCRIPTS}
+${PROG}.ld: ${_libdir}/ld/link.ld.S ${LDSCRIPTS}
 	cpp -o $@ ${CPPFLAGS.ld} $<
 CLEANFILES+=	${PROG}.ld
 
