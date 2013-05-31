@@ -1,5 +1,6 @@
 require 'socket'
 
+$: << File.realpath('..', __FILE__)
 require 'kinetis'
 require 'log'
 
