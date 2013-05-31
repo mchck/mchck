@@ -1,10 +1,7 @@
 #include <mchck.h>
 
-#include "mcg.h"
-#include "sim.h"
-
-#include "usb-kinetis.h"
-#include "dfu.h"
+#include <usb/usb.h>
+#include <usb/dfu.h>
 
 static enum dfu_status
 setup_write(size_t off, size_t len, void **buf)

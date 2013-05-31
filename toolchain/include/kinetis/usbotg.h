@@ -1,4 +1,5 @@
 #include <mchck.h>
+#include <usb/usb-common.h>
 
 /**
  * Hardware structures

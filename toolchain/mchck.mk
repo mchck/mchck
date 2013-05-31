@@ -73,6 +73,23 @@ CLEANFILES+=	${PROG}.hex ${PROG}.elf ${PROG}.bin
 
 all: ${PROG}.hex ${PROG}.bin
 
+
+# This has to go before the rule, because for some reason the updates to OBJS
+# are not incorporated into the target dependencies
+define _include_used_libs =
+_libdir-$(1):=	$$(addprefix $${_libdir}/lib/,$(1))
+include $$(addsuffix /Makefile.part,$${_libdir-$(1)})
+
+_objs-$(1)=	$$(addsuffix .o, $$(basename $$(addprefix $(1)-lib-,$${SRCS-$(1)})))
+OBJS+=	$${_objs-$(1)}
+CLEANFILES+=	$${_objs-$(1)}
+
+$(1)-lib-%.o: $${_libdir-$(1)}/%.c
+	$$(COMPILE.c) $$(OUTPUT_OPTION) $$<
+endef
+$(foreach _uselib,${USE},$(eval $(call _include_used_libs,$(_uselib))))
+
+
 ${PROG}.elf: ${OBJS} ${STARTFILES} ${LDLIBS} ${PROG}.ld
 	${CC} -o $@ ${CFLAGS} ${LDFLAGS} ${STARTFILES} ${OBJS} ${LDLIBS}
 

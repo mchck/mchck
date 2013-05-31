@@ -1,5 +1,5 @@
-#include "usb.h"
-#include "dfu.h"
+#include <usb/usb.h>
+#include <usb/dfu.h>
 
 enum dfu_dev_subclass {
         USB_DEV_SUBCLASS_APP_DFU = 0x01
@@ -22,7 +22,7 @@ enum dfu_ctrl_req_code {
 
 struct dfu_desc_function_t {
         uint8_t bLength;
-        union usb_desc_type_t bDescriptorType; /* = class DFU/0x1 FUNCTIONAL */
+        struct usb_desc_type_t bDescriptorType; /* = class DFU/0x1 FUNCTIONAL */
         union {
                 struct {
                         uint8_t can_download : 1;
@@ -35,7 +35,7 @@ struct dfu_desc_function_t {
         };
         uint16_t wDetachTimeOut;
         uint16_t wTransferSize;
-        union usb_bcd_t bcdDFUVersion;
+        struct usb_bcd_t bcdDFUVersion;
 } __packed;
 CTASSERT_SIZE_BYTE(struct dfu_desc_function_t, 9);
 
@@ -204,7 +204,7 @@ const static struct usb_desc_dev_t dfu_dev_desc = {
         .bMaxPacketSize0 = EP0_BUFSIZE,
         .idVendor = 0x2323,
         .idProduct = 1,
-        .bcdDevice = { .bcd = 0 },
+        .bcdDevice = { .raw = 0 },
         .iManufacturer = 1,
         .iProduct = 2,
         .iSerialNumber = 0,
@@ -215,7 +215,7 @@ const static struct {
         struct usb_desc_config_t config;
         struct usb_desc_iface_t iface;
         struct dfu_desc_function_t dfu;
-} __packed dfu_config_desc = {
+} dfu_config_desc = {
         .config = {
                 .bLength = sizeof(struct usb_desc_config_t),
                 .bDescriptorType = USB_DESC_CONFIG,

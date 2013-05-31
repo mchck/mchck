@@ -1,4 +1,31 @@
+struct FTFL_FSTAT_t {
+        UNION_STRUCT_START(8);
+        uint8_t mgstat0 : 1;
+        uint8_t _rsvd0 : 3;
+        uint8_t fpviol : 1;
+        uint8_t accerr : 1;
+        uint8_t rdcolerr : 1;
+        uint8_t ccif : 1;
+        UNION_STRUCT_END;
+};
+CTASSERT_SIZE_BIT(struct FTFL_FSTAT_t, 8);
+
+struct FTFL_FCNFG_t {
+        UNION_STRUCT_START(8);
+        uint8_t eeerdy : 1;
+        uint8_t ramrdy : 1;
+        uint8_t pflsh : 1;
+        uint8_t _rsvd0 : 1;
+        uint8_t erssusp : 1;
+        uint8_t ersareq : 1;
+        uint8_t rdcollie : 1;
+        uint8_t ccie : 1;
+        UNION_STRUCT_END;
+};
+CTASSERT_SIZE_BIT(struct FTFL_FCNFG_t, 8);
+
 struct FTFL_FSEC_t {
+        UNION_STRUCT_START(8);
         enum {
                 FTFL_FSEC_SEC_UNSECURE = 2,
                 FTFL_FSEC_SEC_SECURE = 3
@@ -15,37 +42,19 @@ struct FTFL_FSEC_t {
                 FTFL_FSEC_KEYEN_DISABLE = 1,
                 FTFL_FSEC_KEYEN_ENABLE = 2
         } keyen : 2;
-} __packed;
+        UNION_STRUCT_END;
+};
+CTASSERT_SIZE_BIT(struct FTFL_FSEC_t, 8);
 
-struct FTFL_FSTAT_t {
-        union {
-                struct {
-                        uint8_t mgstat0 : 1;
-                        uint8_t _rsvd0 : 3;
-                        uint8_t fpviol : 1;
-                        uint8_t accerr : 1;
-                        uint8_t rdcolerr : 1;
-                        uint8_t ccif : 1;
-                } __packed;
-                uint8_t fstat;
-        };
-} __packed;
-
-struct FTFL_FCNFG_t {
-        union {
-                struct {
-                        uint8_t eeerdy : 1;
-                        uint8_t ramrdy : 1;
-                        uint8_t pflsh : 1;
-                        uint8_t _rsvd0 : 1;
-                        uint8_t erssusp : 1;
-                        uint8_t ersareq : 1;
-                        uint8_t rdcollie : 1;
-                        uint8_t ccie : 1;
-                } __packed;
-                uint8_t fcnfg;
-        } __packed;
-} __packed;
+struct FTFL_FOPT_t {
+        UNION_STRUCT_START(8);
+        uint8_t lpboot : 1;
+        uint8_t ezport_dis : 1;
+        uint8_t nmi_dis : 1;
+        uint8_t _rsvd0 : 5;
+        UNION_STRUCT_END;
+};
+CTASSERT_SIZE_BIT(struct FTFL_FOPT_t, 8);
 
 /**
  * The FCOOB is a weird register file, because it is double big endian,
@@ -73,7 +82,7 @@ union FTFL_FCCOB_t {
                         FTFL_FCMD_SET_FLEXRAM = 0x81
                 } fcmd : 8;
                 uint8_t data_be[8];
-        } __packed generic;
+        } generic;
         struct {
                 uint32_t addr : 24;
                 enum FTFL_FCMD fcmd : 8;
@@ -83,21 +92,21 @@ union FTFL_FCCOB_t {
                         FTFL_MARGIN_USER = 0x01,
                         FTFL_MARGIN_FACTORY = 0x02
                 } margin : 8;
-        } __packed read_1s_block;
+        } read_1s_block;
         struct ftfl_data_num_words {
                 uint32_t addr : 24;
                 enum FTFL_FCMD fcmd : 8;
                 uint8_t _rsvd0;
                 enum FTFL_MARGIN_CHOICE margin : 8;
                 uint16_t num_words;
-        } __packed read_1s_section;
+        } read_1s_section;
         struct {
                 uint32_t addr : 24;
                 enum FTFL_FCMD fcmd : 8;
                 uint8_t _rsvd0[3];
                 enum FTFL_MARGIN_CHOICE margin : 8;
                 uint8_t data_be[4];
-        } __packed program_check;
+        } program_check;
         struct {
                 uint32_t addr : 24;
                 enum FTFL_FCMD fcmd : 8;
@@ -107,38 +116,38 @@ union FTFL_FCCOB_t {
                         FTFL_RESOURCE_IFR = 0x00,
                         FTFL_RESOURCE_VERSION = 0x01
                 } resource_select : 8;
-        } __packed read_resource;
+        } read_resource;
         struct {
                 uint32_t addr : 24;
                 enum FTFL_FCMD fcmd : 8;
                 uint8_t data_be[4];
-        } __packed program_longword;
+        } program_longword;
         struct {
                 uint32_t addr : 24;
                 enum FTFL_FCMD fcmd : 8;
-        } __packed erase;
+        } erase;
         struct ftfl_data_num_words program_section;
         struct {
                 uint8_t _rsvd0[2];
                 enum FTFL_MARGIN_CHOICE margin : 8;
                 enum FTFL_FCMD fcmd : 8;
-        } __packed read_1s_all_blocks;
+        } read_1s_all_blocks;
         struct ftfl_cmd_once {
                 uint8_t _rsvd0[2];
                 uint8_t idx;
                 enum FTFL_FCMD fcmd : 8;
                 uint8_t data_be[4];
-        } __packed read_once;
+        } read_once;
         struct ftfl_cmd_once program_once;
         struct {
                 uint8_t _rsvd0[3];
                 enum FTFL_FCMD fcmd : 8;
-        } __packed erase_all;
+        } erase_all;
         struct {
                 uint8_t _rsvd0[3];
                 enum FTFL_FCMD fcmd : 8;
                 uint8_t key_be[8];
-        } __packed verify_key;
+        } verify_key;
         struct {
                 uint8_t _rsvd0[3];
                 enum FTFL_FCMD fcmd : 8;
@@ -160,7 +169,7 @@ union FTFL_FCCOB_t {
                         FTFL_EEPROM_SIZE_1024 = 0x34,
                         FTFL_EEPROM_SIZE_2048 = 0x33
                 } eeprom_size : 8;
-        } __packed program_partition;
+        } program_partition;
         struct {
                 uint8_t _rsvd0[2];
                 enum FTFL_FLEXRAM_FUNCTION {
@@ -168,8 +177,9 @@ union FTFL_FCCOB_t {
                         FTFL_FLEXRAM_RAM = 0xff
                 } flexram_function : 8;
                 enum FTFL_FCMD fcmd : 8;
-        } __packed set_flexram;
-} __packed;
+        } set_flexram;
+};
+CTASSERT_SIZE_BYTE(union FTFL_FCCOB_t, 12);
 
 struct FTFL_t {
         struct FTFL_FSTAT_t fstat;
@@ -180,7 +190,8 @@ struct FTFL_t {
         uint8_t fprot_be[4];
         uint8_t feprot;
         uint8_t fdprot;
-} __packed;
+};
+CTASSERT_SIZE_BYTE(struct FTFL_t, 0x18);
 
 struct FTFL_CONFIG_t {
         uint8_t key[8];

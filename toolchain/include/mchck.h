@@ -7,8 +7,13 @@
 
 #ifdef __cplusplus
  extern "C" {
+#if 0                           /* to make emacs indent properly */
+ }
+#endif
 #endif
 
+#include <sys/types.h>
+#include <sys/cdefs.h>
 #include <stdint.h>
 
 
@@ -18,12 +23,23 @@ typedef __CHAR16_TYPE__ char16_t;
 #define __packed __attribute__((__packed__))
 
 /* From FreeBSD: compile-time asserts */
-#define CTASSERT(x)             _CTASSERT(x, __LINE__)
+#define CTASSERT(x)             _CTASSERT(x, __COUNTER__)
 #define _CTASSERT(x, y)         __CTASSERT(x, y)
 #define __CTASSERT(x, y)        typedef char __assert ## y[(x) ? 1 : -1]
 
 #define CTASSERT_SIZE_BYTE(t, s)     CTASSERT(sizeof(t) == (s))
 #define CTASSERT_SIZE_BIT(t, s)     CTASSERT(sizeof(t) * 8 == (s))
+
+#define UNION_STRUCT_START(size)                        \
+  union {                                               \
+  __CONCAT(__CONCAT(uint, size), _t) raw;               \
+  struct {                                              \
+  /* just to swallow the following semicolon */         \
+  struct __CONCAT(__CONCAT(__dummy_, __COUNTER__), _t) {}
+
+#define UNION_STRUCT_END \
+  }; /* struct */        \
+  }; /* union */
 
 
 /* From CMSIS: */
@@ -157,8 +173,13 @@ extern uint32_t SystemCoreClock;
 extern void SystemInit(void);
 extern void SystemCoreClockUpdate(void);
 
+void *memset(void *, int, size_t);
+void *memcpy(void *, const void *, size_t);
 
-#include <kinetis/flash.h>
+#include <kinetis/ftfl.h>
+#include <kinetis/usbotg.h>
+#include <kinetis/sim.h>
+#include <kinetis/mcg.h>
 
 
 #ifdef __cplusplus

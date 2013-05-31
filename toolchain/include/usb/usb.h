@@ -1,8 +1,12 @@
+#ifndef __USB_H
+#define __USB_H
+
 #include <sys/types.h>
 
-#include <inttypes.h>
-#include <string.h>
+#include <mchck.h>
+#include <usb/usb-common.h>
 
+#ifdef VUSB
 //#include <uchar.h>
 typedef __CHAR16_TYPE__ char16_t;
 
@@ -15,7 +19,7 @@ typedef __CHAR16_TYPE__ char16_t;
 
 #define CTASSERT_SIZE_BYTE(t, s)     CTASSERT(sizeof(t) == (s))
 #define CTASSERT_SIZE_BIT(t, s)     CTASSERT(sizeof(t) * 8 == (s))
-
+#endif
 
 /**
  * Note: bitfields ahead.
@@ -38,19 +42,18 @@ enum usb_desc_type {
 	USB_DESC_POWER = 8
 };
 
-union usb_desc_type_t {
-	struct {
-		uint8_t id : 5;
-		enum usb_desc_type_type {
-			USB_DESC_TYPE_STD = 0,
-			USB_DESC_TYPE_CLASS = 1,
-			USB_DESC_TYPE_VENDOR = 2
-		} type_type : 2;
-		uint8_t _rsvd0 : 1;
-	} __packed;
-	uint8_t type;
-} __packed;
-CTASSERT_SIZE_BYTE(union usb_desc_type_t, 1);
+struct usb_desc_type_t {
+	UNION_STRUCT_START(8);
+	uint8_t id : 5;
+	enum usb_desc_type_type {
+		USB_DESC_TYPE_STD = 0,
+		USB_DESC_TYPE_CLASS = 1,
+		USB_DESC_TYPE_VENDOR = 2
+	} type_type : 2;
+	uint8_t _rsvd0 : 1;
+	UNION_STRUCT_END;
+};
+CTASSERT_SIZE_BYTE(struct usb_desc_type_t, 1);
 
 enum usb_dev_class {
 	USB_DEV_CLASS_SEE_IFACE = 0,
@@ -68,39 +71,40 @@ enum usb_dev_proto {
 	USB_DEV_PROTO_VENDOR = 0xff
 };
 
-union usb_bcd_t {
+struct usb_bcd_t {
+	UNION_STRUCT_START(16);
 	struct {
 		uint8_t sub : 4;
 		uint8_t min : 4;
 		uint16_t maj : 8;
 	};
-	uint16_t bcd;
+	UNION_STRUCT_END;
 };
-CTASSERT_SIZE_BYTE(union usb_bcd_t, 2);
+CTASSERT_SIZE_BYTE(struct usb_bcd_t, 2);
 
 struct usb_desc_generic_t {
 	uint8_t bLength;
-	union usb_desc_type_t bDescriptorType;
+	struct usb_desc_type_t bDescriptorType;
 	uint8_t data[];
-} __packed;
+};
 CTASSERT_SIZE_BYTE(struct usb_desc_generic_t, 2);
 
 struct usb_desc_dev_t {
 	uint8_t bLength;
 	enum usb_desc_type bDescriptorType : 8; /* = USB_DESC_DEV */
-	union usb_bcd_t bcdUSB;	     /* = 0x0200 */
+	struct usb_bcd_t bcdUSB;	     /* = 0x0200 */
 	enum usb_dev_class bDeviceClass : 8;
 	enum usb_dev_subclass bDeviceSubClass : 8;
 	enum usb_dev_proto bDeviceProtocol : 8;
 	uint8_t bMaxPacketSize0;
 	uint16_t idVendor;
 	uint16_t idProduct;
-	union usb_bcd_t bcdDevice;
+	struct usb_bcd_t bcdDevice;
 	uint8_t iManufacturer;
 	uint8_t iProduct;
 	uint8_t iSerialNumber;
 	uint8_t bNumConfigurations;
-} __packed;
+};
 CTASSERT_SIZE_BYTE(struct usb_desc_dev_t, 18);
 
 struct usb_desc_ep_t {
@@ -133,7 +137,7 @@ struct usb_desc_ep_t {
 			USB_EP_ISO_IMPLICIT = 2
 		} usage_type : 2;
 		uint8_t _rsvd1 : 2;
-	} __packed;
+	};
 	struct {
 		uint16_t wMaxPacketSize : 11;
 		uint16_t _rsvd2 : 5;
@@ -152,7 +156,7 @@ struct usb_desc_iface_t {
 	enum usb_dev_subclass bInterfaceSubClass: 8;
 	enum usb_dev_proto bInterfaceProtocol : 8;
 	uint8_t iInterface;
-} __packed;
+};
 CTASSERT_SIZE_BYTE(struct usb_desc_iface_t, 9);
 
 struct usb_desc_config_t {
@@ -176,14 +180,14 @@ struct usb_desc_string_t {
 	uint8_t bLength;
 	enum usb_desc_type bDescriptorType : 8; /* = USB_DESC_STRING */
 	const char16_t bString[];
-} __packed;
+};
 CTASSERT_SIZE_BYTE(struct usb_desc_string_t, 2);
 
 #define USB_DESC_STRING(s)					\
         (const void *)&(const struct {				\
 			struct usb_desc_string_t dsc;		\
 			char16_t str[sizeof(s) / 2 - 1];	\
-        } __packed) {{						\
+        }) {{						\
 			.bLength = sizeof(struct usb_desc_string_t) +	\
 				sizeof(s) - 2,			\
 			.bDescriptorType = USB_DESC_STRING,	\
@@ -192,22 +196,6 @@ CTASSERT_SIZE_BYTE(struct usb_desc_string_t, 2);
 	}
 #define USB_DESC_STRING_LANG_ENUS USB_DESC_STRING(u"\x0409")
 
-/**
- * USB request data structures.
- */
-
-enum usb_tok_pid {
-	USB_PID_TIMEOUT = 0,
-	USB_PID_OUT = 1,
-	USB_PID_ACK = 2,
-	USB_PID_DATA0 = 3,
-	USB_PID_IN = 9,
-	USB_PID_NAK = 10,
-	USB_PID_DATA1 = 11,
-	USB_PID_SETUP = 13,
-	USB_PID_STALL = 14,
-	USB_PID_DATAERR = 15
-};
 
 struct usb_ctrl_req_t {
 	union /* reqtype and request & u16 */ {
@@ -229,7 +217,7 @@ struct usb_ctrl_req_t {
 						USB_CTRL_REQ_OUT = 0,
 						USB_CTRL_REQ_IN = 1
 					} in : 1;
-				} __packed;
+				};
 				uint8_t bmRequestType;
 			}; /* union */
 			enum usb_ctrl_req_code {
@@ -245,13 +233,13 @@ struct usb_ctrl_req_t {
 				USB_CTRL_REQ_SET_INTERFACE = 11,
 				USB_CTRL_REQ_SYNC_FRAME = 12
 			} bRequest : 8;
-		} __packed; /* struct */
+		}; /* struct */
 		uint16_t type_and_req;
 	}; /* union */
 	uint16_t wValue;
 	uint16_t wIndex;
 	uint16_t wLength;
-} __packed;
+};
 CTASSERT_SIZE_BYTE(struct usb_ctrl_req_t, 8);
 
 #define USB_CTRL_REQ_DIR_SHIFT 0
@@ -292,7 +280,7 @@ CTASSERT_SIZE_BIT(struct usb_ctrl_req_status_ep_t, 16);
 struct usb_ctrl_req_desc_t {
 	uint8_t idx;
 	enum usb_desc_type type : 8;
-} __packed;
+};
 CTASSERT_SIZE_BIT(struct usb_ctrl_req_desc_t, 16);
 
 /**
@@ -304,28 +292,6 @@ enum usb_ctrl_req_feature {
 	USB_CTRL_REQ_FEAT_TEST_MODE = 2
 };
 
-
-/**
- * Internal types
- */
-enum usb_ep_pingpong {
-	USB_EP_PINGPONG_EVEN = 0,
-	USB_EP_PINGPONG_ODD = 1
-};
-
-enum usb_ep_dir {
-	USB_EP_RX = 0,
-	USB_EP_TX = 1
-};
-
-enum usb_data01 {
-	USB_DATA01_DATA0 = 0,
-	USB_DATA01_DATA1 = 1
-};
-
-enum {
-	EP0_BUFSIZE = 64
-};
 
 struct usbd_identity_t {
 	const struct usb_desc_dev_t *dev_desc;
@@ -351,6 +317,7 @@ void usb_clear_transfers(void);
 size_t usb_ep_get_transfer_size(int, enum usb_ep_dir, enum usb_ep_pingpong);
 void usb_tx_queue_next(struct usbd_ep_pipe_state_t *, void *, size_t);
 void usb_rx_queue_next(struct usbd_ep_pipe_state_t *, void *, size_t);
+void usb_intr(void);
 
 /* Provided by MI code */
 void usb_start(const struct usbd_identity_t *);
@@ -360,3 +327,5 @@ void usb_handle_control_status(void);
 int usb_rx(void *, size_t, ep_callback_t, void *);
 int usb_tx(const void *, size_t, size_t, ep_callback_t, void *);
 int usb_tx_cp(const void *, size_t, size_t, ep_callback_t, void *);
+
+#endif

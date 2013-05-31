@@ -4,7 +4,7 @@
 #include <string.h>
 #include <wchar.h>
 
-#include "usb.h"
+#include <usb/usb.h>
 #include "usb-internal.h"
 
 static uint8_t ep0_buf[EP0_BUFSIZE][2] __attribute__((aligned(4)));

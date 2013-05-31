@@ -1,12 +1,9 @@
+#include <mchck.h>
+
 #define usb_xfer_info USB_STAT_t
 
-#include "usb.h"
+#include <usb/usb.h>
 #include "usb-internal.h"
-
-#include "usbotg.h"
-#include "sim.h"
-#include "mcg.h"
-
 
 /**
  * Kinetis USB driver notes:
