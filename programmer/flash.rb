@@ -20,5 +20,6 @@ if $0 == __FILE__
   $stderr.puts "resetting..."
   k.reset_system!
   k.disable_debug!
+  k.continue!
   $stderr.puts "done."
 end
