@@ -52,7 +52,7 @@ SECTIONS
         _ebss = . ;
     } > ram
 
-    _sidata = .;
+    _sidata = LOADADDR(.data);
 
     .data : AT (_etext)
     {
