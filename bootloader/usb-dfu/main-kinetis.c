@@ -46,3 +46,28 @@ main(void)
                 usb_intr();
         }
 }
+
+__attribute__((noreturn))
+inline void
+jump_to_app(uintptr_t addr)
+{
+        /* addr is in r0 */
+        __asm__("ldr sp, [%[addr], #0]\n"
+                "ldr pc, [%[addr], #4]"
+                :: [addr] "r" (addr));
+        /* NOTREACHED */
+        __builtin_unreachable();
+}
+
+void
+Reset_Handler(void)
+{
+        if (RCM.srs0.pin) {
+                extern void Default_Reset_Handler(void);
+                Default_Reset_Handler();
+        } else {
+                uint32_t addr = (uintptr_t)&_app_rom;
+                SCB_VTOR = addr;
+                jump_to_app(addr);
+        }
+}
