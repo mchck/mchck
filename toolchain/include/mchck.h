@@ -145,11 +145,8 @@ typedef enum IRQn
 #include <core_cm4.h>
 #include <MK20DZ10.h>
 
+extern uint32_t _sidata, _sdata, _edata, _sbss, _ebss, _app_rom;
 
-extern uint32_t SystemCoreClock;
-
-extern void SystemInit(void);
-extern void SystemCoreClockUpdate(void);
 
 void *memset(void *, int, size_t);
 void *memcpy(void *, const void *, size_t);

@@ -1,7 +1,7 @@
 SRCS-mchck=	builtins.c
 
 ifeq (${TARGET},MK20DX32VLF5)
-SRCS-mchck+=	startup_k20.c system_k20.c
+SRCS-mchck+=	startup_k20.c
 
 ifdef LOADER
 SRCS-mchck+=	flashconfig_k20.c

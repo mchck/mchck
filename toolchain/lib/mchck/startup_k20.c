@@ -86,11 +86,8 @@ __Default_Handler(void)
  * _sbss and _ebss delimit the RAM BSS section in the same way.
  */
 
-extern uint32_t _sidata, _sdata, _edata, _sbss, _ebss;
-
 #include <mchck.h>
 
-void SystemInit(void);
 void main(void);
 
 void
@@ -101,9 +98,54 @@ Default_Reset_Handler(void)
 	WDOG_UNLOCK = 0xd928;
 	WDOG_STCTRLH &= ~WDOG_STCTRLH_WDOGEN_MASK;
 
+#ifdef EXTERNAL_XTAL
+        OSC_CR = OSC_CR_SC16P_MASK;
+        MCG.c2.raw = ((struct MCG_C2_t){
+                        .range0 = MCG_RANGE_VERYHIGH,
+                                .erefs0 = MCG_EREF_OSC
+                                }).raw;
+        MCG.c1.raw = ((struct MCG_C1_t){
+                        .clks = MCG_CLKS_EXTERNAL,
+                                .frdiv = 4, /* log2(EXTERNAL_XTAL) - 20 */
+                                .irefs = 0
+                                }).raw;
+
+        while (!MCG.s.oscinit0)
+                /* NOTHING */;
+        while (MCG.s.clkst != MCG_CLKST_EXTERNAL)
+                /* NOTHING */;
+
+        MCG.c5.raw = ((struct MCG_C5_t){
+                        .prdiv0 = ((EXTERNAL_XTAL / 2000000L) - 1),
+                                .pllclken0 = 1
+                                }).raw;
+        MCG.c6.raw = ((struct MCG_C6_t){
+                        .vdiv0 = 0,
+                        .plls = 1
+                                }).raw;
+
+        while (!MCG.s.pllst)
+                /* NOTHING */;
+        while (!MCG.s.lock0)
+                /* NOTHING */;
+
+        MCG.c1.clks = MCG_CLKS_FLLPLL;
+
+        while (MCG.s.clkst != MCG_CLKST_PLL)
+                /* NOTHING */;
+
+        SIM.sopt2.pllfllsel = SIM_PLLFLLSEL_PLL;
+#else
+        /* FLL at 48MHz */
+        MCG.c4.raw = ((struct MCG_C4_t){
+                        .drst_drs = MCG_DRST_DRS_MID,
+                        .dmx32 = 1
+                }).raw;
+        SIM.sopt2.pllfllsel = SIM_PLLFLLSEL_FLL;
+#endif
+
 	memcpy(&_sdata, &_sidata, (uintptr_t)&_edata - (uintptr_t)&_sdata);
 	memset(&_sbss, 0, (uintptr_t)&_ebss - (uintptr_t)&_sbss);
 
-	SystemInit();
 	main();
 }
