@@ -155,6 +155,7 @@ void *memcpy(void *, const void *, size_t);
 #include <kinetis/usbotg.h>
 #include <kinetis/sim.h>
 #include <kinetis/mcg.h>
+#include <kinetis/rcm.h>
 
 
 #ifdef __cplusplus
