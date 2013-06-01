@@ -7,7 +7,7 @@
 #include <usb/usb.h>
 #include "usb-internal.h"
 
-static uint8_t ep0_buf[EP0_BUFSIZE][2] __attribute__((aligned(4)));
+static uint8_t ep0_buf[2][EP0_BUFSIZE] __attribute__((aligned(4)));
 struct usbd_t usb;
 
 
@@ -17,9 +17,8 @@ struct usbd_t usb;
  */
 /* Defaults to EP0 for now */
 static int
-usb_tx_next(void)
+usb_tx_next(struct usbd_ep_pipe_state_t *s)
 {
-	struct usbd_ep_pipe_state_t *s = &usb.ep0_state.tx;
 
 	/**
 	 * Us being here means the previous transfer just completed
@@ -87,7 +86,7 @@ usb_tx(const void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_da
 
 	/* usb_tx_next() flips the data toggle, so invert this here. */
 	s->data01 ^= 1;
-	usb_tx_next();
+	usb_tx_next(s);
 	return (s->transfer_size);
 }
 
@@ -112,10 +111,8 @@ usb_tx_cp(const void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb
 /* Defaults to EP0 for now */
 /* XXX pass usb_stat to validate pingpong */
 static int
-usb_rx_next(void)
+usb_rx_next(struct usbd_ep_pipe_state_t *s)
 {
-	struct usbd_ep_pipe_state_t *s = &usb.ep0_state.rx;
-
 	/**
 	 * Us being here means the previous transfer just completed
 	 * successfully.  That means the host just toggled its data
@@ -187,7 +184,6 @@ usb_rx(void *buf, size_t len, ep_callback_t cb, void *cb_data)
 static void
 usb_handle_control_done(void *data, ssize_t len, void *cbdata)
 {
-	usb.ctrl_state = USBD_CTRL_STATE_IDLE;
 	if (usb.state == USBD_STATE_SETTING_ADDRESS) {
 		usb.state = USBD_STATE_ADDRESS;
 		usb_set_addr(usb.address);
@@ -196,9 +192,13 @@ usb_handle_control_done(void *data, ssize_t len, void *cbdata)
 }
 
 void
-usb_handle_control_status(void)
+usb_handle_control_status(int fail)
 {
-	usb.ctrl_state = USBD_CTRL_STATE_STATUS;
+	if (fail) {
+		usb_pipe_stall(&usb.ep0_state.rx);
+		usb_pipe_stall(&usb.ep0_state.tx);
+		return;
+	}
 
 	/* empty status transfer */
 	switch (usb.ctrl_dir) {
@@ -254,9 +254,9 @@ usb_handle_control(void *data, ssize_t len, void *cbdata)
 {
 	struct usb_ctrl_req_t *req = data;
 	uint16_t zero16 = 0;
+	int fail = 1;
 
 	usb_clear_transfers();
-	usb.ctrl_state = USBD_CTRL_STATE_DATA;
 	usb.ctrl_dir = req->in;
 
 	switch (req->type) {
@@ -265,10 +265,8 @@ usb_handle_control(void *data, ssize_t len, void *cbdata)
 	case USB_CTRL_REQ_CLASS:
 		if (usb.identity->class_control == NULL)
 			goto err;
-		if (usb.identity->class_control(req) > 0)
-			goto status;
-		else
-			goto err;
+		usb.identity->class_control(req);
+		return;
 		/* NOTREACHED */
 	default:
 		goto err;
@@ -283,8 +281,7 @@ usb_handle_control(void *data, ssize_t len, void *cbdata)
 		 * only EP 0 so far, all GET_STATUS replies are just
 		 * empty.
 		 */
-		usb_tx_cp(&zero16, sizeof(zero16), req->wLength,
-			  NULL, NULL);
+		usb_tx_cp(&zero16, sizeof(zero16), req->wLength, NULL, NULL);
 		break;
 
 	case USB_CTRL_REQ_CLEAR_FEATURE:
@@ -353,23 +350,16 @@ usb_handle_control(void *data, ssize_t len, void *cbdata)
 		break;
 
 	case USB_CTRL_REQ_SET_INTERFACE:
-		/* We don't support alternate iface settings */
-		goto err;
+		break;
 
 	default:
 		goto err;
 	}
 
-status:
-	usb_handle_control_status();
-	goto out;
+	fail = 0;
 
 err:
-	usb_pipe_stall(&usb.ep0_state.rx);
-	usb_pipe_stall(&usb.ep0_state.tx);
-
-out:
-	usb_enable_xfers();
+	usb_handle_control_status(fail);
 }
 
 void
@@ -386,13 +376,25 @@ usb_setup_control(void)
 void
 usb_handle_control_ep(struct usb_xfer_info *stat)
 {
-	switch (usb_get_xfer_pid(stat)) {
+	enum usb_tok_pid pid = usb_get_xfer_pid(stat);
+	struct usbd_ep_pipe_state_t *s = &usb.ep0_state.pipe[usb_get_xfer_dir(stat)];
+
+	switch (pid) {
 	case USB_PID_SETUP:
 	case USB_PID_OUT:
-		usb_rx_next();
+		/**
+		 * If we receive a SETUP transaction, but don't expect
+		 * it (callback set to somewhere else), stall the EP.
+		 */
+		if (pid == USB_PID_SETUP && s->callback != usb_handle_control)
+			usb_handle_control_status(1);
+		else
+			usb_rx_next(s);
+		if (pid == USB_PID_SETUP)
+			usb_enable_xfers();
 		break;
 	case USB_PID_IN:
-		usb_tx_next();
+		usb_tx_next(s);
 		break;
 	default:
 		break;
@@ -410,7 +412,6 @@ usb_restart(void)
 	usb.ep0_state.rx.ep_dir = USB_EP_RX;
 	usb.ep0_state.tx.ep_dir = USB_EP_TX;
 	usb_setup_control();
-	usb_enable_xfers();
 }
 
 void

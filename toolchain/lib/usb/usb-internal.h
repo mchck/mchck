@@ -56,11 +56,6 @@ struct usbd_t {
 		USBD_STATE_ADDRESS,
 		USBD_STATE_CONFIGURED
 	} state;
-	enum usbd_ctrl_state {
-		USBD_CTRL_STATE_IDLE,
-		USBD_CTRL_STATE_DATA,
-		USBD_CTRL_STATE_STATUS
-	} ctrl_state;
 	enum usb_ctrl_req_dir ctrl_dir;
 };
 

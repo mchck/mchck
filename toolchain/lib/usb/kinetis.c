@@ -55,16 +55,31 @@ usb_get_xfer_pid(struct usb_xfer_info *i)
         return (usb_get_bd_stat(i)->tok_pid);
 }
 
+int
+usb_get_xfer_ep(struct usb_xfer_info *i)
+{
+        return (i->ep);
+}
+
+enum usb_ep_dir
+usb_get_xfer_dir(struct usb_xfer_info *i)
+{
+        return (i->dir);
+}
+
 void
 usb_enable_xfers(void)
 {
-        USB0.ctl.txd_suspend = 0;
+        USB0.ctl.raw = ((struct USB_CTL_t){
+                        .txd_suspend = 0,
+                                .usben = 1
+                                }).raw;
 }
 
 void
 usb_set_addr(int addr)
 {
-        USB0.addr.addr = addr;
+        USB0.addr.raw = addr;
 }
 
 
@@ -119,66 +134,86 @@ usb_queue_next(struct usbd_ep_pipe_state_t *s, void *addr, size_t len)
                                 }).raw;
 }
 
+static void
+usb_reset(void)
+{
+        /* reset pingpong state */
+        /* For some obscure reason, we need to use or here. */
+        USB0.ctl.raw |= ((struct USB_CTL_t){
+                        .txd_suspend = 1,
+                                .oddrst = 1,
+                                }).raw;
+
+        /* clear all interrupt bits - not sure if needed */
+        USB0.istat.raw = 0xff;
+        USB0.errstat.raw = 0xff;
+        USB0.otgistat.raw = 0xff;
+
+        /* zap also BDT pingpong & queued transactions */
+        memset(bdt, 0, sizeof(bdt));
+        USB0.endpt[0].raw = ((struct USB_ENDPT_t){
+                        .eptxen = 1,
+                                .eprxen = 1,
+                                .ephshk = 1
+                                }).raw;
+        USB0.addr.raw = 0;
+
+        usb_restart();
+
+        USB0.ctl.raw = ((struct USB_CTL_t){
+                        .txd_suspend = 0,
+                                .usben = 1
+                                }).raw;
+}
+
 void
 usb_enable(void)
 {
         SIM.scgc4.usbotg = 1;   /* enable usb clock */
 
         /* reset module - not sure if needed */
-        USB0.usbtrc0.usbreset = 1;
-        while (USB0.usbtrc0.usbreset == 1)
+        USB0.usbtrc0.raw = ((struct USB_USBTRC0_t){
+                        .usbreset = 1
+                                }).raw;
+        while (USB0.usbtrc0.usbreset)
                 /* NOTHING */;
 
         USB0.bdtpage1 = (uintptr_t)bdt >> 8;
         USB0.bdtpage2 = (uintptr_t)bdt >> 16;
         USB0.bdtpage3 = (uintptr_t)bdt >> 24;
 
-        USB0.control.dppullupnonotg = 1; /* enable pullup */
-        USB0.ctl.usben = 1;              /* enable SIE */
-        USB0.usbctrl.raw = 0; /* resume peripheral & disable pulldowns */
+        USB0.control.raw = ((struct USB_CONTROL_t){
+                        .dppullupnonotg = 1 /* enable pullup */
+                                }).raw;
 
-        /* clear all interrupt bits - not sure if needed */
-	USB0.istat.raw = 0xff;
-	USB0.errstat.raw = 0xff;
-	USB0.otgistat.raw = 0xff;
+        USB0.usbctrl.raw = 0; /* resume peripheral & disable pulldowns */
+        usb_reset();          /* this will start usb processing */
 
         /* we're only interested in reset and transfers */
-        USB0.inten.tokdne = 1;
-        USB0.inten.usbrst = 1;
-        USB0.inten.stall = 1;
+        USB0.inten.raw = ((struct USB_ISTAT_t){
+                        .tokdne = 1,
+                                .usbrst = 1,
+                                .stall = 1
+                                }).raw;
 }
 
 void
 usb_intr(void)
 {
-        while (USB0.istat.usbrst) {
-                USB0.ctl.txd_suspend = 1;
-                /* clear interrupts */
-                USB0.errstat.raw = 0xff;
-                USB0.istat.raw = 0xff;
-                USB0.otgistat.raw = 0xff;
-                /* reset pingpong state */
-                USB0.ctl.oddrst = 1;
-                /* zap also BDT pingpong & queued transactions */
-                memset(bdt, 0, sizeof(bdt));
-                USB0.endpt[0].eptxen = 1;
-                USB0.endpt[0].eprxen = 1;
-                USB0.endpt[0].ephshk = 1;
-                /* stop resetting pingpong state - not sure if needed */
-                USB0.ctl.oddrst = 0;
-                USB0.addr.addr = 0;
-                usb_restart();
+        struct USB_ISTAT_t stat = USB0.istat;
+        if (stat.usbrst) {
+                usb_reset();
+                return;
         }
-        while (USB0.istat.stall) {
+        if (stat.stall) {
                 /* XXX need more work for non-0 ep */
                 volatile struct USB_BD_t *bd = usb_get_bd(&usb.ep0_state.rx);
                 if (bd->stall)
                         usb_setup_control();
-                USB0.istat.raw = ((struct USB_ISTAT_t){ .stall = 1 }).raw;
         }
-        while (USB0.istat.tokdne) {
+        if (stat.tokdne) {
                 struct usb_xfer_info stat = USB0.stat;
-                USB0.istat.raw = ((struct USB_ISTAT_t){ .tokdne = 1 }).raw;
                 usb_handle_transaction(&stat);
         }
+        USB0.istat.raw = stat.raw;
 }

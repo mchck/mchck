@@ -110,9 +110,11 @@ dfu_dnload_complete(void *buf, ssize_t len, void *cbdata)
                 dfu_dev.state = DFU_STATE_dfuERROR;
 }
 
-static int
+static void
 dfu_handle_control(struct usb_ctrl_req_t *req)
 {
+        int fail = 1;
+
         switch ((enum dfu_ctrl_req_code)req->bRequest) {
         case USB_CTRL_REQ_DFU_DNLOAD: {
                 void *buf;
@@ -184,13 +186,15 @@ dfu_handle_control(struct usb_ctrl_req_t *req)
                 goto err;
         }
 
-        return (1);
+        fail = 0;
+        goto out;
 
 err:
         dfu_dev.status = DFU_STATUS_errSTALLEDPKT;
 err_have_status:
         dfu_dev.state = DFU_STATE_dfuERROR;
-        return (-1);
+out:
+        usb_handle_control_status(fail);
 }
 
 

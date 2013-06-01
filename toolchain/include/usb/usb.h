@@ -282,7 +282,7 @@ struct usbd_identity_t {
 	const struct usb_desc_dev_t *dev_desc;
 	const struct usb_desc_config_t *config_desc;
 	const struct usb_desc_string_t * const *string_descs;
-	int (*class_control)(struct usb_ctrl_req_t *);
+	void (*class_control)(struct usb_ctrl_req_t *);
 };
 
 struct usb_xfer_info;
@@ -295,6 +295,8 @@ typedef void (*ep_callback_t)(void *buf, ssize_t len, void *data);
 /* Provided by MD code */
 void *usb_get_xfer_data(struct usb_xfer_info *);
 enum usb_tok_pid usb_get_xfer_pid(struct usb_xfer_info *);
+int usb_get_xfer_ep(struct usb_xfer_info *);
+enum usb_ep_dir usb_get_xfer_dir(struct usb_xfer_info *);
 void usb_enable_xfers(void);
 void usb_set_addr(int);
 void usb_ep_stall(int);
@@ -313,7 +315,7 @@ void usb_intr(void);
 void usb_start(const struct usbd_identity_t *);
 void usb_handle_transaction(struct usb_xfer_info *);
 void usb_setup_control(void);
-void usb_handle_control_status(void);
+void usb_handle_control_status(int);
 int usb_rx(void *, size_t, ep_callback_t, void *);
 int usb_tx(const void *, size_t, size_t, ep_callback_t, void *);
 int usb_tx_cp(const void *, size_t, size_t, ep_callback_t, void *);

@@ -176,11 +176,16 @@ struct usbip_iso_packet_descriptor {
 
 
 struct usb_xfer_info {
+        int ep;
+        enum usb_ep_dir dir;
         enum usb_tok_pid pid;
         void *data;
 };
 
 struct vusb_pipe_state_t {
+        int ep;
+        enum usb_ep_dir dir;
+
         char *addr;
         size_t len;
         int ready;
@@ -343,6 +348,18 @@ usb_get_xfer_pid(struct usb_xfer_info *i)
         return (i->pid);
 }
 
+int
+usb_get_xfer_ep(struct usb_xfer_info *i)
+{
+        return (i->ep);
+}
+
+enum usb_ep_dir
+usb_get_xfer_dir(struct usb_xfer_info *i)
+{
+        return (i->dir);
+}
+
 void
 usb_enable_xfers(void)
 {
@@ -400,12 +417,14 @@ usb_queue_next(struct usbd_ep_pipe_state_t *s, void *addr, size_t len)
 
 
 static void
-vusb_deliver_packet(struct vusb_pipe_state_t *ps)
+vusb_deliver_packet(int ep, enum usb_ep_dir dir, struct vusb_pipe_state_t *ps)
 {
         struct usb_xfer_info stat;
 
         stat.pid = ps->tok;
         stat.data = ps->addr;
+        stat.ep = ep;
+        stat.dir = dir;
         usb_handle_transaction(&stat);
 }
 
@@ -455,13 +474,14 @@ vusb_tx_one(int ep, enum usb_tok_pid tok, void *addr, size_t len)
         }
 
         if (ep == 0 && tok == USB_PID_SETUP) {
-                ps->stalled = 0;
                 vusb_dev.running = 0;
                 vusb_dev.activity = 1;
         }
 
         if (ps->stalled) {
                 printf("-> STALL\n");
+                if (ep == 0)
+                        usb_setup_control();
                 return (USB_PID_STALL);
         }
 
@@ -478,7 +498,7 @@ vusb_tx_one(int ep, enum usb_tok_pid tok, void *addr, size_t len)
         printf("-> ACK%s\n",
                xlen < len ? " (short)" : "");
 
-        vusb_deliver_packet(ps);
+        vusb_deliver_packet(ep, USB_EP_RX, ps);
         vusb_dev.activity = 1;
 
         return (USB_PID_ACK);
@@ -511,6 +531,8 @@ vusb_rx_one(int ep, enum usb_tok_pid tok, void *addr, size_t len, size_t *rxlen)
 
         if (ps->stalled) {
                 printf("-> STALL\n");
+                if (ep == 0)
+                        usb_setup_control();
                 return (USB_PID_STALL);
         }
 
@@ -535,7 +557,7 @@ vusb_rx_one(int ep, enum usb_tok_pid tok, void *addr, size_t len, size_t *rxlen)
         es->pingpong_tx ^= 1;
         *rxlen = ps->len;
 
-        vusb_deliver_packet(ps);
+        vusb_deliver_packet(ep, USB_EP_TX, ps);
         vusb_dev.activity = 1;
 
         return (USB_PID_ACK);
@@ -822,6 +844,7 @@ vusb_main_loop()
 {
         /* start by resetting the usb stack */
         usb_restart();
+        vusb_dev.running = 1;
         for (;;) {
                 vusb_rcv(urbs == NULL || vusb_dev.activity == 0);
                 vusb_dev.activity = 0;
