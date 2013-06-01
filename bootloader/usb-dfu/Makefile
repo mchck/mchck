@@ -6,7 +6,7 @@ NO_LTO= 1
 LOADER=	1
 
 ifndef VUSB
-SRCS+=	main-kinetis.c
+SRCS+=	main-kinetis.c flash.c
 else
 TARGET=	host
 SRCS+=	vdfu.c

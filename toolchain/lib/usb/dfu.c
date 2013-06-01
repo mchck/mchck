@@ -82,7 +82,7 @@ dfu_write_done(enum dfu_status err)
         if (dfu_dev.status == DFU_STATUS_OK) {
                 switch (dfu_dev.state) {
                 case DFU_STATE_dfuDNBUSY:
-                        dfu_dev.state = DFU_STATE_dfuDNLOAD_SYNC;
+                        dfu_dev.state = DFU_STATE_dfuDNLOAD_IDLE;
                         break;
                 case DFU_STATE_dfuMANIFEST:
                         dfu_dev.state = DFU_STATE_dfuIDLE;
@@ -102,12 +102,14 @@ dfu_dnload_complete(void *buf, ssize_t len, void *cbdata)
                 dfu_dev.state = DFU_STATE_dfuDNBUSY;
         else
                 dfu_dev.state = DFU_STATE_dfuMANIFEST;
-        dfu_dev.status = dfu_dev.finish_write(dfu_dev.off, len);
+        dfu_dev.status = dfu_dev.finish_write(buf, dfu_dev.off, len);
         dfu_dev.off += len;
         dfu_dev.len = len;
 
-        if (dfu_dev.status != DFU_STATUS_OK)
-                dfu_dev.state = DFU_STATE_dfuERROR;
+        if (dfu_dev.status != DFU_STATUS_async)
+                dfu_write_done(dfu_dev.status);
+
+        usb_handle_control_status(dfu_dev.state == DFU_STATE_dfuERROR);
 }
 
 static void
@@ -143,18 +145,11 @@ dfu_handle_control(struct usb_ctrl_req_t *req)
                         usb_rx(buf, req->wLength, dfu_dnload_complete, NULL);
                 else
                         dfu_dnload_complete(NULL, 0, NULL);
-                break;
+                return;     /* We handle the status stage later */
         }
         case USB_CTRL_REQ_DFU_GETSTATUS: {
                 struct dfu_status_t st;
 
-                switch (dfu_dev.state) {
-                case DFU_STATE_dfuDNLOAD_SYNC:
-                        dfu_dev.state = DFU_STATE_dfuDNLOAD_IDLE;
-                        break;
-                default:
-                        break;
-                }
                 st.bState = dfu_dev.state;
                 st.bStatus = dfu_dev.status;
                 st.bwPollTimeout = 1000; /* XXX */
@@ -174,14 +169,14 @@ dfu_handle_control(struct usb_ctrl_req_t *req)
                 switch (dfu_dev.state) {
                 case DFU_STATE_dfuIDLE:
                 case DFU_STATE_dfuDNLOAD_IDLE:
-                case DFU_STATE_dfuUPLOAD_IDLE:
+                /* case DFU_STATE_dfuUPLOAD_IDLE: */
                         dfu_dev.state = DFU_STATE_dfuIDLE;
                         break;
                 default:
                         goto err;
                 }
                 break;
-        case USB_CTRL_REQ_DFU_UPLOAD:
+        /* case USB_CTRL_REQ_DFU_UPLOAD: */
         default:
                 goto err;
         }

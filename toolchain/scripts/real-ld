@@ -48,6 +48,9 @@ if linker_in
     fixed_sects << s
   end
   all_sect = Objdump.new object_files
+  ln.grep(/PACK SECTIONS IGNORE\s+([^\s]+)/) do |m|
+    all_sect.delete_if{|s| File.fnmatch($1, s.name)}
+  end
   l = Linker.new(all_sect, fixed_sects)
 
   if save_temps

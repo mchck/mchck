@@ -3,6 +3,8 @@
 #include TARGET_LDSCRIPT
 #include MEMCFG_LDSCRIPT
 
+/* PACK SECTIONS IGNORE .ramtext.* */
+
 OUTPUT_FORMAT ("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 
 /* Section Definitions */
@@ -57,7 +59,7 @@ SECTIONS
     .data : AT (_etext)
     {
         _sdata = .;
-        *(SORT_BY_ALIGNMENT(.data*))
+        *(SORT_BY_ALIGNMENT(.ramtext.*) SORT_BY_ALIGNMENT(.data*))
         . = ALIGN(4);
         _edata = . ;
     } > ram

@@ -62,20 +62,17 @@ static char fw_buf[4096];
 static enum dfu_status
 setup_write(size_t off, size_t len, void **buf)
 {
-        if (len == 0 && off != 65536)
-                return (DFU_STATUS_errNOTDONE);
         printf("setup_write: off %zd, len %zd\n", off, len);
         *buf = fw_buf;
         return (DFU_STATUS_OK);
 };
 
 static enum dfu_status
-finish_write(size_t off, size_t len)
+finish_write(void *buf, size_t off, size_t len)
 {
         if (off + len > 65536)
                 return (DFU_STATUS_errADDRESS);
         printf("finish_write: off %zd, len %zd\n", off, len);
-        dfu_write_done(DFU_STATUS_OK);
         return (DFU_STATUS_OK);
 }
 

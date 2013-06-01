@@ -1,6 +1,7 @@
 #include <sys/types.h>
 
 enum dfu_status {
+        DFU_STATUS_async = 0xff,
         DFU_STATUS_OK = 0x00,
         DFU_STATUS_errTARGET = 0x01,
         DFU_STATUS_errFILE = 0x02,
@@ -20,7 +21,7 @@ enum dfu_status {
 };
 
 typedef enum dfu_status (*dfu_setup_write_t)(size_t off, size_t len, void **buf);
-typedef enum dfu_status (*dfu_finish_write_t)(size_t off, size_t len);
+typedef enum dfu_status (*dfu_finish_write_t)(void *, size_t off, size_t len);
 
 void dfu_start(dfu_setup_write_t, dfu_finish_write_t);
 void dfu_write_done(enum dfu_status);

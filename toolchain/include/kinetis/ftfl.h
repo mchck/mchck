@@ -203,3 +203,5 @@ struct FTFL_CONFIG_t {
 };
 
 extern volatile struct FTFL_t FTFL;
+extern char FlexRAM[];
+extern struct FTFL_CONFIG_t FTFL_CONFIG;
