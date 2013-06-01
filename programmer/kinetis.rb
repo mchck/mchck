@@ -237,7 +237,7 @@ class Kinetis < ARMv7
       end
     end
 
-    if true || !@ftfl.FSTAT.RAMRDY
+    if !@ftfl.FSTAT.RAMRDY
       # set FlexRAM to RAM
       @ftfl.cmd(FTFL::FCCOB_Set_FlexRAM.new(:ram))
     end
