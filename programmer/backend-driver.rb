@@ -1,7 +1,7 @@
 require 'swd-buspirate'
 begin
   require 'swd-ftdi'
-rescue
+rescue LoadError
   # Not required, we'll just lack support for FTDI
 end
 
