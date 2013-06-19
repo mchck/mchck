@@ -273,7 +273,7 @@ class Kinetis < ARMv7
 end
 
 if $0 == __FILE__
-  adiv5 = Adiv5.new(FtdiSwd, :vid => Integer(ARGV[0]), :pid => Integer(ARGV[1]), :debug => true)
+  adiv5 = Adiv5.new(BackendDriver.from_string(ARGV[0]))
   k = Kinetis.new(adiv5)
   # r = k.program_sector(0x800, "\xa5"*1024)
   # puts Log.hexary(adiv5.dap.read(0x800, :count => 1024/4))

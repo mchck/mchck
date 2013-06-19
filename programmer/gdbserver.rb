@@ -260,7 +260,7 @@ class GDBServer
 end
 
 if $0 == __FILE__
-  adiv5 = Adiv5.new(FtdiSwd, :vid => Integer(ARGV[0]), :pid => Integer(ARGV[1]), :debug => true)
+  adiv5 = Adiv5.new(BackendDriver.from_string(ARGV[0]))
   k = Kinetis.new(adiv5, false)
   g = GDBServer.new(k, 1234)
   g.run_loop

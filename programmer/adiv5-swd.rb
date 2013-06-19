@@ -1,5 +1,5 @@
-require 'swd-ftdi'
 require 'log'
+require 'backend-driver'
 
 class Adiv5Swd
   ABORT = 0
@@ -20,8 +20,8 @@ class Adiv5Swd
   end
 
 
-  def initialize(drv, opt)
-    @drv = drv.new opt
+  def initialize(drv)
+    @drv = drv
 
     switch_to_swd
     write(:dp, ABORT, 0x1e)           # clear all errors
@@ -135,5 +135,5 @@ end
 
 
 if $0 == __FILE__
-  s = Adiv5Swd.new(FtdiSwd, :vid => Integer(ARGV[0]), :pid => Integer(ARGV[1]))
+  s = Adiv5Swd.new(BackendDriver.from_string(ARGV[0]))
 end

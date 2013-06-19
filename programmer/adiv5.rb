@@ -4,8 +4,8 @@ require 'adiv5-dp'
 require 'adiv5-ap'
 
 class Adiv5
-  def initialize(drv, opt)
-    @dp = DP.new(Adiv5Swd.new(drv, opt))
+  def initialize(drv)
+    @dp = DP.new(Adiv5Swd.new(drv))
 
     # power up syste + debug
     @dp.CTRLSTAT.transact do |dp|
@@ -63,7 +63,7 @@ end
 
 
 if $0 == __FILE__
-  p = Adiv5.new(FtdiSwd, :vid => Integer(ARGV[0]), :pid => Integer(ARGV[1]), :debug => true)
+  p = Adiv5.new(BackendDriver.from_string(ARGV[0]))
   require 'pp'
   pp p.dap.devs
 end

@@ -4,12 +4,12 @@ require 'kinetis'
 
 if $0 == __FILE__
   $stderr.puts "Attaching debugger..."
-  adiv5 = Adiv5.new(FtdiSwd, :vid => Integer(ARGV[0]), :pid => Integer(ARGV[1]), :debug => true)
+  adiv5 = Adiv5.new(BackendDriver.from_string(ARGV[0]))
   k = Kinetis.new(adiv5)
   $stderr.puts "done."
 
-  firmware = File.read(ARGV[2], :mode => 'rb')
-  address = Integer(ARGV[3])
+  firmware = File.read(ARGV[1], :mode => 'rb')
+  address = Integer(ARGV[2])
 
   $stderr.puts "Programming %d bytes of firmware to address %#x..." % [firmware.bytesize, address]
   k.halt_core!

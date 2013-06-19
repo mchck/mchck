@@ -454,8 +454,7 @@ __end__
 end
 
 if $0 == __FILE__
-  adiv5 = Adiv5.new(FtdiSwd, :vid => Integer(ARGV[0]), :pid => Integer(ARGV[1]), :debug => true)
-  armv7 = ARMv7.new(adiv5)
+  armv7 = ARMv7.new(Adiv5.new(BackendDriver.from_string(ARGV[0])))
   armv7.enable_debug!
   armv7.catch_vector!(:CORERESET)
   armv7.halt_core!
