@@ -1,5 +1,9 @@
 require 'ftdi'
 require 'log'
+require 'swd-bitbang'
+
+# Documentation:
+# <http://www.ftdichip.com/Support/Documents/AppNotes/AN_108_Command_Processor_for_MPSSE_and_MCU_Host_Bus_Emulation_Modes.pdf>
 
 module Ftdi
   # This data comes from ftdi.h
@@ -91,8 +95,7 @@ module Ftdi
   attach_function :ftdi_usb_purge_buffers, [ :pointer ], :int
 end
 
-
-class FtdiSwd
+class FtdiSwd < BitbangSwd
   XFER_MODE = Ftdi::MPSSE_LSB | Ftdi::MPSSE_WRITE_NEG
 
   ACK_OK = 1
@@ -100,7 +103,7 @@ class FtdiSwd
   ACK_FAULT = 4
 
   def initialize(opt = {})
-    @opt = opt
+    super
     @outbuf = ""
     @inbuf = ""
 
@@ -115,21 +118,9 @@ class FtdiSwd
     @dev.usb_reset
     @dev.set_bitmode(0, 0)      # reset
     @dev.set_bitmode(0, 2)      # mpsse
-    set_line_mode(:out)
-    @cur_dir = :out
-  end
 
-  def raw_out(seq, seqlen=nil)
-    seqlen ||= seq.length * 8
-    Log(:phys, 1){ "swd raw: #{seq.unpack("B#{seqlen}").first}" }
-    @cur_dir = :out
     set_line_mode(:out)
-    if seqlen >= 8
-      write_bytes(seq[0..(seqlen / 8)])
-    end
-    if seqlen % 8 > 0
-      write_bits(seq[-1], seqlen % 8)
-    end
+    @cur_dir = :out
   end
 
   def flush!
@@ -137,89 +128,6 @@ class FtdiSwd
     Log(:phys, 2){ ['flush', hexify(@outbuf)] }
     @dev.write_data(@outbuf)
     @outbuf = ""
-  end
-
-  def transact(cmd, data=nil)
-    Log(:phys, 1){ 'transact %08b' % cmd }
-    case cmd & 0x4
-    when 0
-      dir = :out
-    else
-      dir = :in
-    end
-
-    turn :out
-    write_bytes cmd.chr
-    turn :in
-    ack = read_bits 3
-
-    case ack
-    when ACK_OK
-      # empty
-    when ACK_WAIT
-      raise Adiv5Swd::Wait
-    when ACK_FAULT
-      raise Adiv5Swd::Fault
-    else
-      # we read data right now, just to make sure that we will never
-      # work against the protocol
-      if dir == :in
-        data, par = read_word_and_parity
-      end
-
-      raise Adiv5Swd::ProtocolError
-    end
-
-    case dir
-    when :out
-      turn :out
-      write_bytes [data].pack('V')
-      write_bits calc_parity(data), 1
-      nil
-    when :in
-      data, par = read_word_and_parity
-      cal_par = calc_parity data
-      if par != cal_par
-        raise Adiv5Swd::ParityError
-      end
-      data
-    end
-  end
-
-  def calc_parity(data)
-    data ^= data >> 16
-    data ^= data >> 8
-    data ^= data >> 4
-    data ^= data >> 2
-    data ^= data >> 1
-    data & 1
-  end
-
-  def turn(dir)
-    return if @cur_dir == dir
-
-    if dir == :in
-      set_line_mode(dir)
-    end
-    write_bits(0, 1)
-    if dir == :out
-      set_line_mode(dir)
-    end
-
-    @cur_dir = dir
-  end
-
-  def speed=(hz)
-    opspeed = 12000000
-    div = opspeed / hz - 2
-    div = 0 if div < 0
-    div = 65535 if div > 65535
-    @speed = opspeed / (div + 2)
-
-    @outbuf << Ftdi::EN_DIV_5
-    @outbuf << Ftdi::TCK_DIVISOR
-    @outbuf << (div & 0xff)
-    @outbuf << (div >> 8)
   end
 
   def set_line_mode(dir)
@@ -238,8 +146,24 @@ class FtdiSwd
     @outbuf << (@dirs >> 8)
   end
 
+  def turn(dir)
+    return if @cur_dir == dir
+
+    if dir == :in
+      set_line_mode(dir)
+      @cur_dir = dir
+    end
+    write_bits(0, 1)
+    if dir == :out
+      set_line_mode(dir)
+      @cur_dir = dir
+    end
+  end
+
   def write_bytes(bytes)
     return if bytes.empty?
+    turn(:out)
+
     len = bytes.length - 1
 
     @outbuf << (XFER_MODE | Ftdi::MPSSE_DO_WRITE)
@@ -256,7 +180,20 @@ class FtdiSwd
     @outbuf << byte
   end
 
+  def write_cmd(cmd)
+    write_bytes(cmd)
+    turn(:in)
+    ack = read_bits(3)
+  end
+
+  def write_word_and_parity(word, parity)
+    write_bytes([word].pack('V'))
+    write_bits(parity, 1)
+  end
+
   def read_word_and_parity
+    raise RuntimeError, "wrong line direction" if @cur_dir != :in
+
     len = 4
     @outbuf << (XFER_MODE | Ftdi::MPSSE_DO_READ)
     @outbuf << (len - 1) % 256
@@ -285,6 +222,19 @@ class FtdiSwd
     ret
   end
 
+  def speed=(hz)
+    opspeed = 12000000
+    div = opspeed / hz - 2
+    div = 0 if div < 0
+    div = 65535 if div > 65535
+    @speed = opspeed / (div + 2)
+
+    @outbuf << Ftdi::EN_DIV_5
+    @outbuf << Ftdi::TCK_DIVISOR
+    @outbuf << (div & 0xff)
+    @outbuf << (div >> 8)
+  end
+
   def expect_bytes(num)
     while @inbuf.length < num
       @inbuf << @dev.read_data
@@ -294,10 +244,6 @@ class FtdiSwd
     @inbuf = @inbuf.byteslice(num..-1)
     Log(:phys, 3){ ['read:', hexify(ret)] }
     ret
-  end
-
-  def hexify(str)
-    str.unpack('C*').map{|e| "%02x" % e}.join(' ')
   end
 end
 
