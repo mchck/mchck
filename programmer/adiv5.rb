@@ -63,6 +63,7 @@ end
 
 
 if $0 == __FILE__
+  require 'backend-driver'
   p = Adiv5.new(BackendDriver.from_string(ARGV[0]))
   require 'pp'
   pp p.dap.devs

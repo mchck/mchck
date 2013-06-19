@@ -1,5 +1,4 @@
 require 'log'
-require 'backend-driver'
 
 class Adiv5Swd
   ABORT = 0
@@ -133,6 +132,9 @@ class Adiv5Swd
   end
 end
 
+# We require this here so that all our consumers can directly use
+# BackendDriver.  However, we cannot require this before the
+# declaration of the class, or dependency loops get in our way.
 
 if $0 == __FILE__
   s = Adiv5Swd.new(BackendDriver.from_string(ARGV[0]))

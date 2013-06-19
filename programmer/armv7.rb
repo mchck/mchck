@@ -454,6 +454,7 @@ __end__
 end
 
 if $0 == __FILE__
+  require 'backend-driver'
   armv7 = ARMv7.new(Adiv5.new(BackendDriver.from_string(ARGV[0])))
   armv7.enable_debug!
   armv7.catch_vector!(:CORERESET)

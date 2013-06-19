@@ -260,6 +260,7 @@ class GDBServer
 end
 
 if $0 == __FILE__
+  require 'backend-driver'
   adiv5 = Adiv5.new(BackendDriver.from_string(ARGV[0]))
   k = Kinetis.new(adiv5, false)
   g = GDBServer.new(k, 1234)

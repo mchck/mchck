@@ -1,6 +1,7 @@
 $: << File.realpath('..', __FILE__)
 
 require 'kinetis'
+require 'backend-driver'
 
 if $0 == __FILE__
   $stderr.puts "Attaching debugger..."
