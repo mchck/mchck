@@ -1,6 +1,6 @@
 _libdir:=       $(dir $(lastword ${MAKEFILE_LIST}))
 
-define _include_used_libs =
+define _include_used_libs
 _libdir-$(1):=	$$(addprefix $${_libdir}/lib/,$(1))
 include $$(addsuffix /Makefile.part,$${_libdir-$(1)})
 
