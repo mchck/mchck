@@ -1,5 +1,9 @@
 require 'swd-buspirate'
-require 'swd-ftdi'
+begin
+  require 'swd-ftdi'
+rescue
+  # Not required, we'll just lack support for FTDI
+end
 
 module BackendDriver
   class << self
