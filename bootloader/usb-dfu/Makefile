@@ -2,7 +2,7 @@ PROG=	dfu
 
 CFLAGS+= -DSHORT_ISR
 USE=	usb
-NO_LTO= 1
+#NO_LTO= 1
 LOADER=	1
 
 ifndef VUSB
