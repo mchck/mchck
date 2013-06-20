@@ -256,7 +256,7 @@ const static struct {
 const struct usb_desc_string_t * const dfu_string_descs[] = {
         USB_DESC_STRING_LANG_ENUS,
         USB_DESC_STRING(u"mchck.org"),
-        USB_DESC_STRING(u"MCHCK bootloader"),
+        USB_DESC_STRING(u"MC HCK bootloader"),
         NULL
 };
 
