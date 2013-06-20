@@ -62,7 +62,12 @@ jump_to_app(uintptr_t addr)
 void
 Reset_Handler(void)
 {
-        if (RCM.srs0.pin) {
+        /**
+         * We treat _app_rom as pointer to directly read the stack
+         * pointer and check for valid app code.  This is no fool
+         * proof method, but it should help for the first flash.
+         */
+        if (RCM.srs0.pin || _app_rom == 0xffffffff) {
                 extern void Default_Reset_Handler(void);
                 Default_Reset_Handler();
         } else {
