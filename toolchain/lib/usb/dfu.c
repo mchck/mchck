@@ -220,7 +220,7 @@ const static struct {
                 .bDescriptorType = USB_DESC_CONFIG,
                 .wTotalLength = sizeof(dfu_config_desc),
                 .bNumInterfaces = 1,
-                .bConfigurationValue = 0,
+                .bConfigurationValue = 1,
                 .iConfiguration = 0,
                 .remote_wakeup = 0,
                 .self_powered = 0,
