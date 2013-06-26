@@ -113,6 +113,12 @@ dfu_dnload_complete(void *buf, ssize_t len, void *cbdata)
 }
 
 static void
+dfu_reset_system(void *buf, ssize_t len, void *cbdata)
+{
+        sys_reset();
+}
+
+static void
 dfu_handle_control(struct usb_ctrl_req_t *req)
 {
         int fail = 1;
@@ -153,7 +159,16 @@ dfu_handle_control(struct usb_ctrl_req_t *req)
                 st.bState = dfu_dev.state;
                 st.bStatus = dfu_dev.status;
                 st.bwPollTimeout = 1000; /* XXX */
-                usb_tx_cp(&st, sizeof(st), req->wLength, NULL, NULL);
+                /**
+                 * If we're in DFU_STATE_dfuMANIFEST, we just finished
+                 * the download, and we're just about to send our last
+                 * status report.  Once the report has been sent, go
+                 * and reset the system to put the new firmware into
+                 * effect.
+                 */
+                usb_tx_cp(&st, sizeof(st), req->wLength,
+                          dfu_dev.state == DFU_STATE_dfuMANIFEST ? dfu_reset_system : NULL,
+                          NULL);
                 break;
         }
         case USB_CTRL_REQ_DFU_CLRSTATUS:
@@ -244,7 +259,8 @@ const static struct {
                         .id = 0x1,
                         .type_type = USB_DESC_TYPE_CLASS
                 },
-                .manifestation_tolerant = 1,
+                .will_detach = 1,
+                .manifestation_tolerant = 0,
                 .can_upload = 1,
                 .can_download = 1,
                 .wDetachTimeOut = 0,
