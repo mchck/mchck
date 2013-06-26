@@ -162,6 +162,7 @@ void *memcpy(void *, const void *, size_t);
 
 #include <mchck/builtins.h>
 #include <mchck/system.h>
+#include <mchck/flash.h>
 
 
 #ifdef __cplusplus

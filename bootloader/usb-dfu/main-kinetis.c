@@ -2,7 +2,7 @@
 
 #include <usb/usb.h>
 #include <usb/dfu.h>
-#include "flash.h"
+
 
 /**
  * Unfortunately we can't DMA directly to FlexRAM, so we'll have to stage here.

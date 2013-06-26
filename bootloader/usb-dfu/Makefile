@@ -6,7 +6,7 @@ USE=	usb
 LOADER=	1
 
 ifndef VUSB
-SRCS+=	main-kinetis.c flash.c
+SRCS+=	main-kinetis.c
 else
 TARGET=	host
 SRCS+=	vdfu.c

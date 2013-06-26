@@ -1,5 +1,4 @@
 #include <mchck.h>
-#include "flash.h"
 
 /* This will have to live in SRAM. */
 __attribute__((section(".ramtext.ftfl_submit_cmd"), long_call))
