@@ -4,7 +4,7 @@ int
 main(void)
 {
 	/* Enable PORTC clock */
-	SIM_SCGC5 = 1 << SIM_SCGC5_PORTC_SHIFT;
+	SIM.scgc5.portc = 1;
 
 	/* Configure pin as GPIO */
         PORTC.pcr[0].mux = PCR_MUX_GPIO;
