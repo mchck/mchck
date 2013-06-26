@@ -115,7 +115,7 @@ ${PROG}.elf: ${OBJS} ${LDLIBS} ${PROG}.ld
 	${OBJCOPY} -O binary $< $@
 
 ${PROG}.ld: ${_libdir}/ld/link.ld.S ${LDSCRIPTS}
-	cpp -o $@ ${CPPFLAGS.ld} $<
+	${CPP} -o $@ ${CPPFLAGS.ld} $<
 CLEANFILES+=	${PROG}.ld
 endif
 
