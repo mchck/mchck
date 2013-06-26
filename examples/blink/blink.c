@@ -11,10 +11,10 @@ main(void)
         PORTC.pcr[0].dse = 1;
 
 	/* Configure pin as output */
-	GPIOC_PDDR = 1 << 0;
+	GPIOC.pddr = 1 << 0;
 
 	for (;;) {
 		for (volatile int i = 1000000; i > 0; --i);
-		GPIOC_PTOR = 1 << 0;
+		GPIOC.ptor = 1 << 0;
 	}
 }
