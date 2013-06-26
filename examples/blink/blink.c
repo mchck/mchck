@@ -7,7 +7,8 @@ main(void)
 	SIM_SCGC5 = 1 << SIM_SCGC5_PORTC_SHIFT;
 
 	/* Configure pin as GPIO */
-	PORTC_PCR0 = PORT_PCR_MUX(1) | (1 << PORT_PCR_DSE_SHIFT);
+        PORTC.pcr[0].mux = PCR_MUX_GPIO;
+        PORTC.pcr[0].dse = 1;
 
 	/* Configure pin as output */
 	GPIOC_PDDR = 1 << 0;
