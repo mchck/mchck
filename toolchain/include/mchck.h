@@ -142,7 +142,6 @@ typedef enum IRQn
   Reserved119_IRQn
 } IRQn_Type;
 
-#include <core_cm4.h>
 #include <MK20DZ10.h>
 
 extern uint32_t _sidata, _sdata, _edata, _sbss, _ebss, _app_rom;
