@@ -158,6 +158,8 @@ void *memcpy(void *, const void *, size_t);
 
 #include <arm/scb.h>
 
+#include <mchck/system.h>
+
 
 #ifdef __cplusplus
 }

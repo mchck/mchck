@@ -1,4 +1,4 @@
-SRCS-mchck=	builtins.c
+SRCS-mchck=	builtins.c system.c
 
 ifeq (${TARGET},MK20DX32VLF5)
 SRCS-mchck+=	startup_k20.c
