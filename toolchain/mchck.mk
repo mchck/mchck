@@ -15,7 +15,7 @@ endef
 
 # Common config
 
-CFLAGS+=	-I${_libdir}/include
+CFLAGS+=	-I${_libdir}/include -I${_libdir}/lib
 CFLAGS+=	-g
 CFLAGS+=	-std=c11 -fplan9-extensions
 ifndef DEBUG
