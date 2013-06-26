@@ -155,6 +155,8 @@ void *memcpy(void *, const void *, size_t);
 #include <kinetis/sim.h>
 #include <kinetis/mcg.h>
 #include <kinetis/rcm.h>
+#include <kinetis/port.h>
+#include <kinetis/gpio.h>
 
 #include <arm/scb.h>
 
