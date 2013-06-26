@@ -82,6 +82,7 @@ LDFLAGS+=	-Wl,--gc-sections
 LDFLAGS+=	-fwhole-program
 CPPFLAGS.ld+=	-P -CC -I${_libdir}/ld -I.
 CPPFLAGS.ld+=	-DTARGET_LDSCRIPT='"${TARGETLD}"'
+LDSCRIPTS+=	${_libdir}/ld/${TARGETLD}
 TARGETLD?=	${TARGET}.ld
 
 ifdef LOADER
