@@ -152,12 +152,18 @@ union FTFL_FCCOB_t {
                 uint8_t _rsvd0[3];
                 enum FTFL_FCMD fcmd : 8;
                 uint8_t _rsvd1[2];
+
+                /* the following enum is analogous to enum
+                 * SIM_FLEXNVM_PARTITION in sim.h, but this one is padded
+                 * with four 1-bits to make an 8-bit value.
+                 */
+
                 enum FTFL_FLEXNVM_PARTITION {
-                        FTFL_FLEXNVM_DATA_32_EEPROM_0 = 0x00,
-                        FTFL_FLEXNVM_DATA_24_EEPROM_8 = 0x01,
-                        FTFL_FLEXNVM_DATA_16_EEPROM_16 = 0x02,
-                        FTFL_FLEXNVM_DATA_8_EEPROM_24 = 0x05,
-                        FTFL_FLEXNVM_DATA_0_EEPROM_32 = 0x03
+                        FTFL_FLEXNVM_DATA_32_EEPROM_0 = 0xF0,
+                        FTFL_FLEXNVM_DATA_24_EEPROM_8 = 0xF1,
+                        FTFL_FLEXNVM_DATA_16_EEPROM_16 = 0xF2,
+                        FTFL_FLEXNVM_DATA_8_EEPROM_24 = 0xF9,
+                        FTFL_FLEXNVM_DATA_0_EEPROM_32 = 0xF3
                 } flexnvm_partition : 8;
                 enum FTFL_EEPROM_SIZE {
                         FTFL_EEPROM_SIZE_0 = 0x3f,
@@ -185,7 +191,7 @@ struct FTFL_t {
         struct FTFL_FSTAT_t fstat;
         struct FTFL_FCNFG_t fcnfg;
         struct FTFL_FSEC_t fsec;
-        uint8_t fopt;
+        struct FTFL_FOPT_t fopt;
         union FTFL_FCCOB_t fccob;
         uint8_t fprot_be[4];
         uint8_t feprot;
@@ -193,6 +199,7 @@ struct FTFL_t {
 };
 CTASSERT_SIZE_BYTE(struct FTFL_t, 0x18);
 
+/* Flash Configuration Field, see Sub-Family Reference Manual, section 28.3.1 */
 struct FTFL_CONFIG_t {
         uint8_t key[8];
         uint8_t fprot[4];
@@ -201,6 +208,7 @@ struct FTFL_CONFIG_t {
         uint8_t feprot;
         uint8_t fdprot;
 };
+CTASSERT_SIZE_BYTE(struct FTFL_CONFIG_t, 16);
 
 extern volatile struct FTFL_t FTFL;
 extern char FlexRAM[];
