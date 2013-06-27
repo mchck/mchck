@@ -264,7 +264,7 @@ const static struct {
                 .can_upload = 1,
                 .can_download = 1,
                 .wDetachTimeOut = 0,
-                .wTransferSize = 4096,
+                .wTransferSize = FLASH_SECTOR_SIZE,
                 .bcdDFUVersion = { .maj = 1, .min = 1 }
         }
 };
