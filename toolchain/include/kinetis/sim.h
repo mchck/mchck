@@ -245,7 +245,19 @@ struct SIM_t {
                 uint32_t flashdis : 1;
                 uint32_t flashdoze : 1;
                 uint32_t _rsvd0 : 6;
-                uint32_t depart : 4; /* XXX use FTFL enum */
+
+                /* the following enum is analogous to enum
+                 * FTFL_FLEXNVM_PARTITION in ftfl.h, but that one is padded
+                 * with four 1-bits to make an 8-bit value.
+                 */
+                enum SIM_FLEXNVM_PARTITION {
+                        SIM_FLEXNVM_DATA_32_EEPROM_0  = 0x0,
+                        SIM_FLEXNVM_DATA_24_EEPROM_8  = 0x1,
+                        SIM_FLEXNVM_DATA_16_EEPROM_16 = 0x2,
+                        SIM_FLEXNVM_DATA_8_EEPROM_24  = 0x9,
+                        SIM_FLEXNVM_DATA_0_EEPROM_32  = 0x3
+                } depart : 4;
+
                 uint32_t _rsvd1 : 4;
                 enum {
                         SIM_EESIZE_2KB = 3,
