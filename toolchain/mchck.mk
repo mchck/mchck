@@ -52,6 +52,9 @@ LD=	arm-none-eabi-ld
 AR=	arm-none-eabi-ar
 AS=	arm-none-eabi-as
 OBJCOPY=	arm-none-eabi-objcopy
+GDB=	arm-none-eabi-gdb
+DFUUTIL?=	dfu-util
+RUBY?=	ruby
 
 ifeq ($(shell which $(CC) 2>/dev/null),)
 SATDIR?=	$(HOME)/sat
@@ -122,3 +125,12 @@ endif
 
 clean:
 	-rm -f ${CLEANFILES}
+
+gdbserver:
+	${RUBY} ${_libdir}/../programmer/gdbserver.rb ${MCHCKADAPTER}
+
+gdb: ${PROG}.elf
+	${GDB} ${PROG}.elf
+
+flash: ${PROG}.bin
+	${DFUUTIL} -D ${PROG}.bin
