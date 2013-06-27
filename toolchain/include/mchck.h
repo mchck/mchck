@@ -160,10 +160,7 @@ void *memcpy(void *, const void *, size_t);
 
 #include <arm/scb.h>
 
-#include <mchck/builtins.h>
-#include <mchck/system.h>
-#include <mchck/flash.h>
-
+#include <mchck/mchck.h>
 
 #ifdef __cplusplus
 }
