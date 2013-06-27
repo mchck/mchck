@@ -84,9 +84,6 @@ dfu_write_done(enum dfu_status err)
                 case DFU_STATE_dfuDNBUSY:
                         dfu_dev.state = DFU_STATE_dfuDNLOAD_IDLE;
                         break;
-                case DFU_STATE_dfuMANIFEST:
-                        dfu_dev.state = DFU_STATE_dfuIDLE;
-                        break;
                 default:
                         break;
                 }
