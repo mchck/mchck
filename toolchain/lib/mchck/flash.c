@@ -1,5 +1,7 @@
 #include <mchck.h>
 
+uint32_t flash_ALLOW_BRICKABLE_ADDRESSES;
+
 /* This will have to live in SRAM. */
 __attribute__((section(".ramtext.ftfl_submit_cmd"), long_call))
 int
@@ -32,7 +34,8 @@ flash_prepare_flashing(void)
 int
 flash_erase_sector(uintptr_t addr)
 {
-        if (addr == (uintptr_t)&FTFL_CONFIG)
+        if (addr < (uintptr_t)&_app_rom &&
+                flash_ALLOW_BRICKABLE_ADDRESSES != 0x00023420)
                 return (-1);
         FTFL.fccob.erase.fcmd = FTFL_FCMD_ERASE_SECTOR;
         FTFL.fccob.erase.addr = addr;
