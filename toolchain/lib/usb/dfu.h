@@ -1,5 +1,9 @@
 #include <sys/types.h>
 
+#ifndef USB_DFU_TRANSFER_SIZE
+#define USB_DFU_TRANSFER_SIZE	FLASH_SECTOR_SIZE
+#endif
+
 enum dfu_status {
         DFU_STATUS_async = 0xff,
         DFU_STATUS_OK = 0x00,
