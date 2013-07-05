@@ -7,7 +7,11 @@
 
 #include <mchck-cdefs.h>
 
-#ifndef TARGET_HOST
+#ifdef TARGET_HOST
+
+#include <host/host.h>
+
+#else
 
 #ifndef __MCHCK_INTERNAL_H
 #error Build system error: mchck_internal.h not included by compiler
