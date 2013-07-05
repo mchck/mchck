@@ -68,10 +68,8 @@ usb_tx_next(struct usbd_ep_pipe_state_t *s)
  * Returns: size to be transfered, or -1 on error.
  */
 int
-usb_tx(const void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_data)
+usb_tx(struct usbd_ep_pipe_state_t *s, const void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_data)
 {
-	struct usbd_ep_pipe_state_t *s = &usb.ep0_state.tx;
-
 	s->data_buf = (void *)buf;
 	s->transfer_size = len;
 	s->pos = 0;
@@ -88,19 +86,6 @@ usb_tx(const void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_da
 	s->data01 ^= 1;
 	usb_tx_next(s);
 	return (s->transfer_size);
-}
-
-int
-usb_tx_cp(const void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_data)
-{
-	enum usb_ep_pingpong pp = usb.ep0_state.tx.pingpong;
-	void *destbuf = ep0_buf[pp];
-
-	if (len > EP0_BUFSIZE)
-		return (-1);
-	memcpy(destbuf, buf, len);
-
-	return (usb_tx(destbuf, len, reqlen, cb, cb_data));
 }
 
 
@@ -158,15 +143,11 @@ usb_rx_next(struct usbd_ep_pipe_state_t *s)
 /**
  * Receive USB data (OUT device transaction)
  *
- * So far this function is specialized for EP 0 only.
- *
  * Returns: size to be received, or -1 on error.
  */
 int
-usb_rx(void *buf, size_t len, ep_callback_t cb, void *cb_data)
+usb_rx(struct usbd_ep_pipe_state_t *s, void *buf, size_t len, ep_callback_t cb, void *cb_data)
 {
-	struct usbd_ep_pipe_state_t *s = &usb.ep0_state.rx;
-
 	s->data_buf = buf;
 	s->transfer_size = len;
 	s->pos = 0;
@@ -180,6 +161,26 @@ usb_rx(void *buf, size_t len, ep_callback_t cb, void *cb_data)
 	usb_queue_next(s, s->data_buf, thislen);
 	return (len);
 }
+
+int
+usb_ep0_tx_cp(const void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_data)
+{
+	enum usb_ep_pingpong pp = usb.ep0_state.tx.pingpong;
+	void *destbuf = ep0_buf[pp];
+
+	if (len > EP0_BUFSIZE)
+		return (-1);
+	memcpy(destbuf, buf, len);
+
+	return (usb_tx(&usb.ep0_state.tx, destbuf, len, reqlen, cb, cb_data));
+}
+
+int
+usb_ep0_rx(void *buf, size_t len, ep_callback_t cb, void *cb_data)
+{
+	return (usb_rx(&usb.ep0_state.rx, buf, len, cb, cb_data));
+}
+
 
 static void
 usb_handle_control_done(void *data, ssize_t len, void *cbdata)
@@ -204,12 +205,12 @@ usb_handle_control_status(int fail)
 	switch (usb.ctrl_dir) {
 	case USB_CTRL_REQ_IN:
 		usb.ep0_state.rx.data01 = USB_DATA01_DATA1;
-		usb_rx(NULL, 0, usb_handle_control_done, NULL);
+		usb_rx(&usb.ep0_state.rx, NULL, 0, usb_handle_control_done, NULL);
 		break;
 
 	default:
 		usb.ep0_state.tx.data01 = USB_DATA01_DATA1;
-		usb_tx(NULL, 0, 1 /* short packet */, usb_handle_control_done, NULL);
+		usb_ep0_tx_cp(NULL, 0, 1 /* short packet */, usb_handle_control_done, NULL);
 		break;
 	}
 }
@@ -281,7 +282,7 @@ usb_handle_control(void *data, ssize_t len, void *cbdata)
 		 * only EP 0 so far, all GET_STATUS replies are just
 		 * empty.
 		 */
-		usb_tx_cp(&zero16, sizeof(zero16), req->wLength, NULL, NULL);
+		usb_ep0_tx_cp(&zero16, sizeof(zero16), req->wLength, NULL, NULL);
 		break;
 
 	case USB_CTRL_REQ_CLEAR_FEATURE:
@@ -330,12 +331,12 @@ usb_handle_control(void *data, ssize_t len, void *cbdata)
 		default:
 			goto err;
 		}
-		usb_tx_cp(desc, len, req->wLength, NULL, NULL);
+		usb_ep0_tx_cp(desc, len, req->wLength, NULL, NULL);
 		break;
 	}
 
 	case USB_CTRL_REQ_GET_CONFIGURATION:
-		usb_tx_cp(&usb.config, 1, req->wLength, NULL, NULL); /* XXX implicit LE */
+		usb_ep0_tx_cp(&usb.config, 1, req->wLength, NULL, NULL); /* XXX implicit LE */
 		break;
 
 	case USB_CTRL_REQ_SET_CONFIGURATION:
@@ -346,7 +347,7 @@ usb_handle_control(void *data, ssize_t len, void *cbdata)
 
 	case USB_CTRL_REQ_GET_INTERFACE:
 		/* We only support iface setting 0 */
-		usb_tx_cp(&zero16, 1, req->wLength, NULL, NULL);
+		usb_ep0_tx_cp(&zero16, 1, req->wLength, NULL, NULL);
 		break;
 
 	case USB_CTRL_REQ_SET_INTERFACE:
@@ -370,7 +371,7 @@ usb_setup_control(void)
 	usb.ep0_state.rx.data01 = USB_DATA01_DATA0;
 	usb.ep0_state.tx.data01 = USB_DATA01_DATA1;
 	usb_pipe_stall(&usb.ep0_state.tx);
-	usb_rx(buf, EP0_BUFSIZE, usb_handle_control, NULL);
+	usb_rx(&usb.ep0_state.rx, buf, EP0_BUFSIZE, usb_handle_control, NULL);
 }
 
 void

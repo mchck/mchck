@@ -145,7 +145,7 @@ dfu_handle_control(struct usb_ctrl_req_t *req)
                 }
 
                 if (req->wLength > 0)
-                        usb_rx(buf, req->wLength, dfu_dnload_complete, NULL);
+                        usb_ep0_rx(buf, req->wLength, dfu_dnload_complete, NULL);
                 else
                         dfu_dnload_complete(NULL, 0, NULL);
                 return;     /* We handle the status stage later */
@@ -163,9 +163,9 @@ dfu_handle_control(struct usb_ctrl_req_t *req)
                  * and reset the system to put the new firmware into
                  * effect.
                  */
-                usb_tx_cp(&st, sizeof(st), req->wLength,
-                          dfu_dev.state == DFU_STATE_dfuMANIFEST ? dfu_reset_system : NULL,
-                          NULL);
+                usb_ep0_tx_cp(&st, sizeof(st), req->wLength,
+                              dfu_dev.state == DFU_STATE_dfuMANIFEST ? dfu_reset_system : NULL,
+                              NULL);
                 break;
         }
         case USB_CTRL_REQ_DFU_CLRSTATUS:
@@ -174,7 +174,7 @@ dfu_handle_control(struct usb_ctrl_req_t *req)
                 break;
         case USB_CTRL_REQ_DFU_GETSTATE: {
                 uint8_t st = dfu_dev.state;
-                usb_tx_cp(&st, sizeof(st), req->wLength, NULL, NULL);
+                usb_ep0_tx_cp(&st, sizeof(st), req->wLength, NULL, NULL);
                 break;
         }
         case USB_CTRL_REQ_DFU_ABORT:

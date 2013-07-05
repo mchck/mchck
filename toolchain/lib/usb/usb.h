@@ -316,8 +316,10 @@ void usb_start(const struct usbd_identity_t *);
 void usb_handle_transaction(struct usb_xfer_info *);
 void usb_setup_control(void);
 void usb_handle_control_status(int);
-int usb_rx(void *, size_t, ep_callback_t, void *);
-int usb_tx(const void *, size_t, size_t, ep_callback_t, void *);
-int usb_tx_cp(const void *, size_t, size_t, ep_callback_t, void *);
+int usb_rx(struct usbd_ep_pipe_state_t *, void *, size_t, ep_callback_t, void *);
+int usb_tx(struct usbd_ep_pipe_state_t *, const void *, size_t, size_t, ep_callback_t, void *);
+
+int usb_ep0_rx(void *, size_t, ep_callback_t, void *);
+int usb_ep0_tx_cp(const void *, size_t, size_t, ep_callback_t, void *);
 
 #endif
