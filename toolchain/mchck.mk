@@ -121,10 +121,6 @@ ${PROG}.elf: ${OBJS} ${LDLIBS} ${PROG}.ld
 ${PROG}.ld: ${_libdir}/ld/link.ld.S ${LDSCRIPTS}
 	${CPP} -o $@ ${CPPFLAGS.ld} $<
 CLEANFILES+=	${PROG}.ld
-endif
-
-clean:
-	-rm -f ${CLEANFILES}
 
 gdbserver:
 	${RUBY} ${_libdir}/../programmer/gdbserver.rb ${MCHCKADAPTER}
@@ -134,3 +130,7 @@ gdb: ${PROG}.elf
 
 flash: ${PROG}.bin
 	${DFUUTIL} -D ${PROG}.bin
+endif
+
+clean:
+	-rm -f ${CLEANFILES}
