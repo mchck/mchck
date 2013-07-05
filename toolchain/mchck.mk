@@ -37,7 +37,7 @@ CFLAGS+=	-fshort-enums
 
 all: ${PROG}
 
-$(foreach _uselib,${USE},$(eval $(call _include_used_libs,$(_uselib))))
+$(foreach _uselib,host ${USE},$(eval $(call _include_used_libs,$(_uselib))))
 
 $(PROG): $(OBJS)
 	$(LINK.c) $^ ${LDLIBS} -o $@
