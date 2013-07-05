@@ -403,15 +403,22 @@ usb_handle_control_ep(struct usb_xfer_info *stat)
 }
 
 void
+usb_init_ep(struct usbd_ep_pipe_state_t *s, int ep, enum usb_ep_dir dir, size_t size)
+{
+	memset(s, 0, sizeof(*s));
+	s->ep_maxsize = size;
+	s->ep_num = ep;
+	s->ep_dir = dir;
+}
+
+void
 usb_restart(void)
 {
 	const struct usbd_identity_t *identity = usb.identity;
 	memset(&usb, 0, sizeof(usb));
 	usb.identity = identity;
-	usb.ep0_state.rx.ep_maxsize = EP0_BUFSIZE;
-	usb.ep0_state.tx.ep_maxsize = EP0_BUFSIZE;
-	usb.ep0_state.rx.ep_dir = USB_EP_RX;
-	usb.ep0_state.tx.ep_dir = USB_EP_TX;
+	usb_init_ep(&usb.ep0_state.rx, 0, USB_EP_RX, EP0_BUFSIZE);
+	usb_init_ep(&usb.ep0_state.tx, 0, USB_EP_TX, EP0_BUFSIZE);
 	usb_setup_control();
 }
 
