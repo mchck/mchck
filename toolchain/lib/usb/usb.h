@@ -301,6 +301,7 @@ void usb_enable_xfers(void);
 void usb_set_addr(int);
 void usb_ep_stall(int);
 void usb_clear_transfers(void);
+	void (*reset)(void);
 size_t usb_ep_get_transfer_size(struct usbd_ep_pipe_state_t *);
 void usb_queue_next(struct usbd_ep_pipe_state_t *, void *, size_t);
 void usb_pipe_stall(struct usbd_ep_pipe_state_t *);

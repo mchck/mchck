@@ -419,6 +419,8 @@ usb_restart(void)
 	usb.identity = identity;
 	usb_init_ep(&usb.ep0_state.rx, 0, USB_EP_RX, EP0_BUFSIZE);
 	usb_init_ep(&usb.ep0_state.tx, 0, USB_EP_TX, EP0_BUFSIZE);
+	if (usb.identity->reset != NULL)
+		usb.identity->reset();
 	usb_setup_control();
 }
 
