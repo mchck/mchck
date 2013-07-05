@@ -405,7 +405,6 @@ usb_ep_get_transfer_size(struct usbd_ep_pipe_state_t *s)
 void
 usb_queue_next(struct usbd_ep_pipe_state_t *s, void *addr, size_t len)
 {
-        /* XXX only ep 0 for now */
         struct vusb_pipe_state_t *ps = vusb_get_pipe(s);
 
         ps->addr = addr;
@@ -682,6 +681,7 @@ vusb_process_urb(struct vusb_urb_t *urb)
         int direction = urb->direction;
         int status = 0;
 
+again:
         switch (urb->setup_state) {
         case VUSB_SETUP_SETUP:
                 if (vusb_tx_one(urb->ep, USB_PID_SETUP, urb->setup, sizeof(urb->setup)) != USB_PID_ACK)
@@ -690,7 +690,8 @@ vusb_process_urb(struct vusb_urb_t *urb)
                         urb->setup_state = VUSB_SETUP_DATA;
                 else
                         urb->setup_state = VUSB_SETUP_STATUS;
-                return (0);
+                /* we run this SETUP transaction to completion */
+                goto again;
 
         case VUSB_SETUP_STATUS:
                 return (vusb_setup_status(urb));
@@ -706,6 +707,8 @@ vusb_process_urb(struct vusb_urb_t *urb)
                 if (status > 0 && urb->setup_state == VUSB_SETUP_DATA) {
                         urb->setup_state = VUSB_SETUP_STATUS;
                         status = 0;
+                        /* we run this SETUP transaction to completion */
+                        goto again;
                 }
 
                 return (status);
