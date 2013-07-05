@@ -151,9 +151,6 @@ typedef enum IRQn
 extern uint32_t _sidata, _sdata, _edata, _sbss, _ebss, _app_rom;
 
 
-void *memset(void *, int, size_t);
-void *memcpy(void *, const void *, size_t);
-
 #include <kinetis/ftfl.h>
 #include <kinetis/usbotg.h>
 #include <kinetis/sim.h>
