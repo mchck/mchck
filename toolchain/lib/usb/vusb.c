@@ -248,7 +248,7 @@ struct vusb_urb_t {
 
 
 static int vusb_sock;
-static struct vusb_urb_t *urbs;
+static struct vusb_urb_t *urbs, **urbs_tail = &urbs;
 static struct vusb_dev_t vusb_dev;
 
 void
@@ -751,8 +751,8 @@ handle_cmd_submit(struct usbip_header *requn)
                 sockread(urb->data, urb->transfer_length);
         }
 
-        urb->next = urbs;
-        urbs = urb;
+        *urbs_tail = urb;
+        urbs_tail = &urb->next;
         vusb_dev.activity = 1;
 }
 
@@ -796,6 +796,8 @@ vusb_process_urbs(void)
                 if (vusb_process_urb(urb)) {
                         vusb_ret_submit(urb);
                         *p = urb->next;
+                        if (urbs_tail == &urb->next)
+                                urbs_tail = p;
                         free(urb);
                 }
         }
