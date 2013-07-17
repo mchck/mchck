@@ -98,9 +98,10 @@ endif
 
 LDFLAGS+=	-T ${PROG}.ld
 LDFLAGS+=       -nostartfiles
+LDFLAGS+=	-Wl,-Map=${PROG}.map
 
 
-CLEANFILES+=	${PROG}.hex ${PROG}.elf ${PROG}.bin
+CLEANFILES+=	${PROG}.hex ${PROG}.elf ${PROG}.bin ${PROG}.map
 
 all: ${PROG}.hex ${PROG}.bin
 
