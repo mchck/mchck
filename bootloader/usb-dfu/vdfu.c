@@ -3,58 +3,7 @@
 #include <usb/usb.h>
 #include <usb/dfu.h>
 
-
-const static struct usb_desc_dev_t dev_desc = {
-        .bLength = sizeof(struct usb_desc_dev_t),
-        .bDescriptorType = USB_DESC_DEV,
-        .bcdUSB = { .maj = 2 },
-        .bDeviceClass = USB_DEV_CLASS_SEE_IFACE,
-        .bDeviceSubClass = USB_DEV_SUBCLASS_SEE_IFACE,
-        .bDeviceProtocol = USB_DEV_PROTO_SEE_IFACE,
-        .bMaxPacketSize0 = EP0_BUFSIZE,
-        .idVendor = 0x2323,
-        .idProduct = 1,
-        .bcdDevice = { .raw = 0 },
-        .iManufacturer = 1,
-        .iProduct = 1,
-        .iSerialNumber = 0,
-        .bNumConfigurations = 1,
-};
-
-const static struct {
-        struct usb_desc_config_t config;
-        struct usb_desc_iface_t iface;
-} __packed config_desc = {
-        .config = {
-                .bLength = sizeof(struct usb_desc_config_t),
-                .bDescriptorType = USB_DESC_CONFIG,
-                .wTotalLength = sizeof(config_desc),
-                .bNumInterfaces = 1,
-                .bConfigurationValue = 0,
-                .iConfiguration = 0,
-                .remote_wakeup = 0,
-                .self_powered = 0,
-                .one = 1,
-                .bMaxPower = 50
-        },
-        .iface = {
-                .bLength = sizeof(struct usb_desc_iface_t),
-                .bDescriptorType = USB_DESC_IFACE,
-                .bInterfaceNumber = 0,
-                .bAlternateSetting = 0,
-                .bNumEndpoints = 0,
-                .bInterfaceClass = USB_DEV_CLASS_VENDOR,
-                .bInterfaceSubClass = 0,
-                .bInterfaceProtocol = 0,
-                .iInterface = 0,
-        }
-};
-
-const static struct usb_desc_string_t * const string_descs[] = {
-        USB_DESC_STRING_LANG_ENUS,
-        USB_DESC_STRING(u"MCHCK test"),
-        NULL
-};
+#include "desc.h"
 
 
 static char fw_buf[4096];
@@ -76,9 +25,53 @@ finish_write(void *buf, size_t off, size_t len)
         return (DFU_STATUS_OK);
 }
 
+static struct dfu_ctx dfu_ctx;
+
+static void
+init_usb_bootloader(int config)
+{
+        dfu_init(setup_write, finish_write, &dfu_ctx);
+}
+
+const static struct usb_desc_dev_t dfu_dev_desc = {
+        .bLength = sizeof(struct usb_desc_dev_t),
+        .bDescriptorType = USB_DESC_DEV,
+        .bcdUSB = { .maj = 2 },
+        .bDeviceClass = USB_DEV_CLASS_SEE_IFACE,
+        .bDeviceSubClass = USB_DEV_SUBCLASS_SEE_IFACE,
+        .bDeviceProtocol = USB_DEV_PROTO_SEE_IFACE,
+        .bMaxPacketSize0 = EP0_BUFSIZE,
+        .idVendor = 0x2323,
+        .idProduct = 1,
+        .bcdDevice = { .raw = 0 },
+        .iManufacturer = 1,
+        .iProduct = 2,
+        .iSerialNumber = 0,
+        .bNumConfigurations = 1,
+};
+
+const struct usb_desc_string_t * const dfu_string_descs[] = {
+        USB_DESC_STRING_LANG_ENUS,
+        USB_DESC_STRING(u"mchck.org"),
+        USB_DESC_STRING(u"vdfu test"),
+        NULL
+};
+
+const static struct usbd_config dfu_config = {
+        .init = init_usb_bootloader,
+        .desc = &usb_desc_config1.config, /* from desc.c */
+        .function = { &dfu_function, NULL },
+};
+
+const struct usbd_device dfu_device = {
+        .dev_desc = &dfu_dev_desc,
+        .string_descs = dfu_string_descs,
+        .configs = { &dfu_config, NULL }
+};
+
 int
 main(void)
 {
-        dfu_start(setup_write, finish_write);
+        usb_init(&dfu_device);
         vusb_main_loop();
 }

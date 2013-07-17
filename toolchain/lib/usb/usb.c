@@ -165,20 +165,78 @@ usb_rx(struct usbd_ep_pipe_state_t *s, void *buf, size_t len, ep_callback_t cb, 
 int
 usb_ep0_tx_cp(const void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_data)
 {
-	enum usb_ep_pingpong pp = usb.ep0_state.tx.pingpong;
+	enum usb_ep_pingpong pp = usb.ep_state[0].tx.pingpong;
 	void *destbuf = ep0_buf[pp];
 
 	if (len > EP0_BUFSIZE)
 		return (-1);
 	memcpy(destbuf, buf, len);
 
-	return (usb_tx(&usb.ep0_state.tx, destbuf, len, reqlen, cb, cb_data));
+	return (usb_tx(&usb.ep_state[0].tx, destbuf, len, reqlen, cb, cb_data));
 }
 
 int
 usb_ep0_rx(void *buf, size_t len, ep_callback_t cb, void *cb_data)
 {
-	return (usb_rx(&usb.ep0_state.rx, buf, len, cb, cb_data));
+	return (usb_rx(&usb.ep_state[0].rx, buf, len, cb, cb_data));
+}
+
+static int
+usb_set_config(int config)
+{
+	const struct usbd_config *config_data = usb.identity->configs[config - 1];
+
+	if (config_data->init != NULL)
+		config_data->init(1);
+	return (0);
+}
+
+static int
+usb_set_interface(int iface, int altsetting)
+{
+	int iface_count = 0;
+
+	for (struct usbd_function_ctx_header *fh = usb.functions;
+	     fh != NULL;
+	     fh = fh->next, iface_count += fh->function->ninterface) {
+		if (iface - iface_count < fh->function->ninterface) {
+			if (fh->function->configure != NULL)
+				return (fh->function->configure(iface,
+								iface - iface_count,
+								altsetting,
+								fh));
+
+			/* Default to a single altsetting */
+			if (altsetting != 0)
+				return (-1);
+			else
+				return (0);
+		}
+	}
+
+	return (-1);
+}
+
+static int
+usb_tx_config_desc(int idx, int reqlen)
+{
+	const struct usb_desc_config_t *d = usb.identity->configs[idx]->desc;
+
+	usb_ep0_tx_cp(d, d->wTotalLength, reqlen, NULL, NULL);
+	return (0);
+}
+
+static int
+usb_tx_string_desc(int idx, int reqlen)
+{
+	const struct usb_desc_string_t * const *d;
+
+	for (d = usb.identity->string_descs; idx != 0 && *d != NULL; ++d)
+		--idx;
+	if (*d == NULL)
+		return (-1);
+	usb_ep0_tx_cp(*d, (*d)->bLength, reqlen, NULL, NULL);
+	return (0);
 }
 
 
@@ -196,24 +254,42 @@ void
 usb_handle_control_status(int fail)
 {
 	if (fail) {
-		usb_pipe_stall(&usb.ep0_state.rx);
-		usb_pipe_stall(&usb.ep0_state.tx);
+		usb_pipe_stall(&usb.ep_state[0].rx);
+		usb_pipe_stall(&usb.ep_state[0].tx);
 		return;
 	}
 
 	/* empty status transfer */
 	switch (usb.ctrl_dir) {
 	case USB_CTRL_REQ_IN:
-		usb.ep0_state.rx.data01 = USB_DATA01_DATA1;
-		usb_rx(&usb.ep0_state.rx, NULL, 0, usb_handle_control_done, NULL);
+		usb.ep_state[0].rx.data01 = USB_DATA01_DATA1;
+		usb_rx(&usb.ep_state[0].rx, NULL, 0, usb_handle_control_done, NULL);
 		break;
 
 	default:
-		usb.ep0_state.tx.data01 = USB_DATA01_DATA1;
+		usb.ep_state[0].tx.data01 = USB_DATA01_DATA1;
 		usb_ep0_tx_cp(NULL, 0, 1 /* short packet */, usb_handle_control_done, NULL);
 		break;
 	}
 }
+
+/**
+ * Dispatch non-standard request to registered USB functions.
+ */
+static void
+usb_handle_control_nonstd(struct usb_ctrl_req_t *req)
+{
+	/* XXX filter by interface/endpoint? */
+	for (struct usbd_function_ctx_header *fh = usb.functions; fh != NULL; fh = fh->next) {
+		/* ->control() returns != 0 if it handled the request */
+		if (fh->function->control != NULL &&
+		    fh->function->control(req, fh))
+			return;
+	}
+
+	usb_handle_control_status(-1);
+}
+
 
 /**
  *
@@ -260,17 +336,9 @@ usb_handle_control(void *data, ssize_t len, void *cbdata)
 	usb_clear_transfers();
 	usb.ctrl_dir = req->in;
 
-	switch (req->type) {
-	case USB_CTRL_REQ_STD:
-		break;
-	case USB_CTRL_REQ_CLASS:
-		if (usb.identity->class_control == NULL)
-			goto err;
-		usb.identity->class_control(req);
+	if (req->type != USB_CTRL_REQ_STD) {
+		usb_handle_control_nonstd(req);
 		return;
-		/* NOTREACHED */
-	default:
-		goto err;
 	}
 
 	/* Only STD requests here */
@@ -304,45 +372,33 @@ usb_handle_control(void *data, ssize_t len, void *cbdata)
 		usb.state = USBD_STATE_SETTING_ADDRESS;
 		break;
 
-	case USB_CTRL_REQ_GET_DESCRIPTOR: {
-		const struct usb_desc_generic_t *desc;
-		size_t len;
-
+	case USB_CTRL_REQ_GET_DESCRIPTOR:
 		switch (req->wValue >> 8) {
 		case USB_DESC_DEV:
-			desc = (const void *)usb.identity->dev_desc;
-			len = desc->bLength;
+			usb_ep0_tx_cp(usb.identity->dev_desc, usb.identity->dev_desc->bLength,
+				      req->wLength, NULL, NULL);
+			fail = 0;
 			break;
 		case USB_DESC_CONFIG:
-			desc = (const void *)usb.identity->config_desc;
-			len = usb.identity->config_desc->wTotalLength;
+			fail = usb_tx_config_desc(req->wValue & 0xff, req->wLength);
 			break;
-		case USB_DESC_STRING: {
-			int idx = req->wValue & 0xff;
-			const struct usb_desc_string_t * const *d;
-			for (d = usb.identity->string_descs; idx != 0 && *d != NULL; ++d)
-				--idx;
-			if (*d == NULL)
-				goto err;
-			desc = (const void *)*d;
-			len = desc->bLength;
+		case USB_DESC_STRING:
+			fail = usb_tx_string_desc(req->wValue & 0xff, req->wLength);
 			break;
-		}
 		default:
-			goto err;
+			fail = -1;
+			break;
 		}
-		usb_ep0_tx_cp(desc, len, req->wLength, NULL, NULL);
-		break;
-	}
+		/* we set fail already, so we can go directly to `err' */
+		goto err;
 
 	case USB_CTRL_REQ_GET_CONFIGURATION:
 		usb_ep0_tx_cp(&usb.config, 1, req->wLength, NULL, NULL); /* XXX implicit LE */
 		break;
 
 	case USB_CTRL_REQ_SET_CONFIGURATION:
-		/* XXX check config */
-		usb.config = req->wValue;
-		usb.state = USBD_STATE_CONFIGURED;
+		if (usb_set_config(req->wValue) < 0)
+			goto err;
 		break;
 
 	case USB_CTRL_REQ_GET_INTERFACE:
@@ -351,6 +407,8 @@ usb_handle_control(void *data, ssize_t len, void *cbdata)
 		break;
 
 	case USB_CTRL_REQ_SET_INTERFACE:
+		if (usb_set_interface(req->wIndex, req->wValue) < 0)
+			goto err;
 		break;
 
 	default:
@@ -366,19 +424,24 @@ err:
 void
 usb_setup_control(void)
 {
-	void *buf = ep0_buf[usb.ep0_state.rx.pingpong];
+	void *buf = ep0_buf[usb.ep_state[0].rx.pingpong];
 
-	usb.ep0_state.rx.data01 = USB_DATA01_DATA0;
-	usb.ep0_state.tx.data01 = USB_DATA01_DATA1;
-	usb_pipe_stall(&usb.ep0_state.tx);
-	usb_rx(&usb.ep0_state.rx, buf, EP0_BUFSIZE, usb_handle_control, NULL);
+	usb.ep_state[0].rx.data01 = USB_DATA01_DATA0;
+	usb.ep_state[0].tx.data01 = USB_DATA01_DATA1;
+	usb_pipe_stall(&usb.ep_state[0].tx);
+	usb_rx(&usb.ep_state[0].rx, buf, EP0_BUFSIZE, usb_handle_control, NULL);
 }
 
+
+/**
+ * This is called by the interrupt handler
+ */
 void
-usb_handle_control_ep(struct usb_xfer_info *stat)
+usb_handle_transaction(struct usb_xfer_info *info)
 {
-	enum usb_tok_pid pid = usb_get_xfer_pid(stat);
-	struct usbd_ep_pipe_state_t *s = &usb.ep0_state.pipe[usb_get_xfer_dir(stat)];
+	enum usb_tok_pid pid = usb_get_xfer_pid(info);
+	struct usbd_ep_state_t *eps = &usb.ep_state[usb_get_xfer_ep(info)];
+	struct usbd_ep_pipe_state_t *s = &eps->pipe[usb_get_xfer_dir(info)];
 
 	switch (pid) {
 	case USB_PID_SETUP:
@@ -414,29 +477,31 @@ usb_init_ep(struct usbd_ep_pipe_state_t *s, int ep, enum usb_ep_dir dir, size_t 
 void
 usb_restart(void)
 {
-	const struct usbd_identity_t *identity = usb.identity;
+	const struct usbd_device *identity = usb.identity;
 	memset(&usb, 0, sizeof(usb));
 	usb.identity = identity;
-	usb_init_ep(&usb.ep0_state.rx, 0, USB_EP_RX, EP0_BUFSIZE);
-	usb_init_ep(&usb.ep0_state.tx, 0, USB_EP_TX, EP0_BUFSIZE);
-	if (usb.identity->reset != NULL)
-		usb.identity->reset();
+	/* XXX reset existing functions? */
+	usb_init_ep(&usb.ep_state[0].rx, 0, USB_EP_RX, EP0_BUFSIZE);
+	usb_init_ep(&usb.ep_state[0].tx, 0, USB_EP_TX, EP0_BUFSIZE);
 	usb_setup_control();
 }
 
 void
-usb_start(const struct usbd_identity_t *identity)
+usb_attach_function(const struct usbd_function *function, struct usbd_function_ctx_header *ctx)
+{
+	/* XXX right now this requires a sequential initialization */
+	struct usbd_function_ctx_header **fhp = &usb.functions;
+
+	while (*fhp != NULL)
+		fhp = &(*fhp)->next;
+	*fhp = ctx;
+	ctx->next = NULL;
+	ctx->function = function;
+}
+
+void
+usb_init(const struct usbd_device *identity)
 {
 	usb.identity = identity;
 	usb_enable();
-}
-
-/**
- * This is called by the interrupt handler
- */
-void
-usb_handle_transaction(struct usb_xfer_info *info)
-{
-	/* XXX for now only control EP */
-	usb_handle_control_ep(info);
 }

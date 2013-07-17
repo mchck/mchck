@@ -1,4 +1,5 @@
 PROG=	dfu
+SRCS=	desc.c
 
 CFLAGS+= -DSHORT_ISR
 USE=	usb

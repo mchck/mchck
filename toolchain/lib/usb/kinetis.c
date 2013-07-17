@@ -207,7 +207,7 @@ usb_intr(void)
         }
         if (stat.stall) {
                 /* XXX need more work for non-0 ep */
-                volatile struct USB_BD_t *bd = usb_get_bd(&usb.ep0_state.rx);
+                volatile struct USB_BD_t *bd = usb_get_bd(&usb.ep_state[0].rx);
                 if (bd->stall)
                         usb_setup_control();
         }

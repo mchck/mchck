@@ -29,7 +29,7 @@ enum usb_desc_type {
 
 struct usb_desc_type_t {
 	UNION_STRUCT_START(8);
-	uint8_t id : 5;
+	enum usb_desc_type id : 5;
 	enum usb_desc_type_type {
 		USB_DESC_TYPE_STD = 0,
 		USB_DESC_TYPE_CLASS = 1,
@@ -278,21 +278,53 @@ enum usb_ctrl_req_feature {
 };
 
 
-struct usbd_identity_t {
-	const struct usb_desc_dev_t *dev_desc;
-	const struct usb_desc_config_t *config_desc;
-	const struct usb_desc_string_t * const *string_descs;
-	void (*class_control)(struct usb_ctrl_req_t *);
+struct usb_xfer_info;
+typedef void (*ep_callback_t)(void *buf, ssize_t len, void *data);
+
+/**
+ * (Artificial) function.  Aggregates one or more interfaces.
+ */
+struct usbd_function {
+	int (*configure)(int orig_iface, int iface, int altsetting, void *data);
+	int (*control)(struct usb_ctrl_req_t *, void *);
+	int ninterface;
 };
 
-struct usb_xfer_info;
-enum usb_ep_dir;
-enum usb_ep_pingpong;
-struct usbd_ep_pipe_state_t;
-typedef void (*ep_callback_t)(void *buf, ssize_t len, void *data);
+/**
+ * Configuration.  Contains one or more functions which all will be
+ * active concurrently.
+ */
+struct usbd_config {
+	void (*init)(int);
+	/**
+	 * We will not set a config for now, because there is not much to
+	 * configure, except for power
+	 *
+	 * const struct usb_desc_config_t *config_desc;
+	 */
+	const struct usb_desc_config_t *desc;
+	const struct usbd_function *function[];
+};
+
+/**
+ * Device.  Contains one or more configurations, out of which only one
+ * is active at a time.
+ */
+struct usbd_device {
+	const struct usb_desc_dev_t *dev_desc;
+	const struct usb_desc_string_t * const *string_descs;
+	const struct usbd_config *configs[];
+};
+
+struct usbd_function_ctx_header {
+	struct usbd_function_ctx_header *next;
+	const struct usbd_function *function;
+};
 
 
 /* Provided by MD code */
+struct usbd_ep_pipe_state_t;
+
 void *usb_get_xfer_data(struct usb_xfer_info *);
 enum usb_tok_pid usb_get_xfer_pid(struct usb_xfer_info *);
 int usb_get_xfer_ep(struct usb_xfer_info *);
@@ -301,7 +333,6 @@ void usb_enable_xfers(void);
 void usb_set_addr(int);
 void usb_ep_stall(int);
 void usb_clear_transfers(void);
-	void (*reset)(void);
 size_t usb_ep_get_transfer_size(struct usbd_ep_pipe_state_t *);
 void usb_queue_next(struct usbd_ep_pipe_state_t *, void *, size_t);
 void usb_pipe_stall(struct usbd_ep_pipe_state_t *);
@@ -313,7 +344,8 @@ void usb_intr(void);
 #endif
 
 /* Provided by MI code */
-void usb_start(const struct usbd_identity_t *);
+void usb_init(const struct usbd_device *);
+void usb_attach_function(const struct usbd_function *function, struct usbd_function_ctx_header *ctx);
 void usb_handle_transaction(struct usb_xfer_info *);
 void usb_setup_control(void);
 void usb_handle_control_status(int);

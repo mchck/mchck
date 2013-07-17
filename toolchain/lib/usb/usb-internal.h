@@ -19,6 +19,10 @@
  */
 
 
+#ifndef USB_MAX_EP
+#define USB_MAX_EP 16
+#endif
+
 struct usbd_ep_pipe_state_t {
 	enum usb_ep_pingpong pingpong; /* next desc to use */
 	enum usb_data01 data01;
@@ -45,8 +49,8 @@ struct usbd_ep_state_t {
 };
 
 struct usbd_t {
-	struct usbd_ep_state_t ep0_state;
-	const struct usbd_identity_t *identity;
+	const struct usbd_device *identity;
+	struct usbd_function_ctx_header *functions;
 	int address;
 	int config;
 	enum usbd_dev_state {
@@ -57,6 +61,7 @@ struct usbd_t {
 		USBD_STATE_CONFIGURED
 	} state;
 	enum usb_ctrl_req_dir ctrl_dir;
+	struct usbd_ep_state_t ep_state[USB_MAX_EP];
 };
 
 extern struct usbd_t usb;
