@@ -7,3 +7,4 @@ e.g. USE=usb/cdc, does not compile/link usb/dfu?
 
 * electrical
 ** TODO verify: can we disable charging from software?
+** TODO verify: resonator stability
