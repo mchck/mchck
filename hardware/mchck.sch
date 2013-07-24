@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Tue Sep 11 21:36:26 2012
+EESchema Schematic File Version 2
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -45,8 +45,10 @@ LIBS:inductor_select
 LIBS:logo
 LIBS:MK20LF
 LIBS:mounthole
+LIBS:vssa
+LIBS:vdda
 LIBS:mchck-cache
-EELAYER 25  0
+EELAYER 24 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
@@ -54,7 +56,7 @@ Sheet 1 4
 Title "MC HCK micro controller board"
 Date "11 sep 2012"
 Rev "4"
-Comp "(c) 2011,2012 Simon Schubert"
+Comp "(c) 2011,2012,2013 Simon Schubert"
 Comment1 "CERN OHL v.1.1 or later"
 Comment2 ""
 Comment3 ""
@@ -67,6 +69,8 @@ P 7650 4650
 F 0 "P2" V 7600 4650 50  0000 C CNN
 F 1 "DEBUG" V 7700 4650 50  0000 C CNN
 F 2 "SparkFun-1X05_LOCK" V 7650 4650 60  0001 C CNN
+F 3 "" H 7650 4650 60  0001 C CNN
+F 4 "never" V 7650 4650 60  0001 C CNN "populate"
 	1    7650 4650
 	1    0    0    -1  
 $EndComp
@@ -77,6 +81,8 @@ P 7650 5300
 F 0 "P1" V 7600 5300 50  0000 C CNN
 F 1 "RIGHT_PINS" V 7700 5300 50  0000 C CNN
 F 2 "SparkFun-1X05_LOCK" V 7650 5300 60  0001 C CNN
+F 3 "" H 7650 5300 60  0001 C CNN
+F 4 "never" V 7650 5300 60  0001 C CNN "populate"
 	1    7650 5300
 	1    0    0    -1  
 $EndComp
@@ -87,6 +93,8 @@ P 3450 5050
 F 0 "P4" V 3400 5050 60  0000 C CNN
 F 1 "LOWER_PINS" V 3500 5050 60  0000 C CNN
 F 2 "SparkFun-1X14_LOCK" V 3450 5050 60  0001 C CNN
+F 3 "" H 3450 5050 60  0001 C CNN
+F 4 "never" V 3450 5050 60  0001 C CNN "populate"
 	1    3450 5050
 	-1   0    0    -1  
 $EndComp
@@ -97,6 +105,8 @@ P 3450 3550
 F 0 "P3" V 3400 3550 60  0000 C CNN
 F 1 "UPPER_PINS" V 3500 3550 60  0000 C CNN
 F 2 "SparkFun-1X14_LOCK" V 3450 3550 60  0001 C CNN
+F 3 "" H 3450 3550 60  0001 C CNN
+F 4 "never" V 3450 3550 60  0001 C CNN "populate"
 	1    3450 3550
 	-1   0    0    -1  
 $EndComp
@@ -109,33 +119,41 @@ P 10300 800
 F 0 "G1" H 10300 800 60  0000 C CNN
 F 1 "OHW LOGO" H 10300 550 60  0000 C CNN
 F 2 "OHW-LOGO-6mm" H 10300 650 60  0001 C CNN
+F 3 "" H 10300 800 60  0001 C CNN
+F 4 "never" H 10300 800 60  0001 C CNN "populate"
 	1    10300 800 
 	1    0    0    -1  
 $EndComp
 $Comp
-L VSS #PWR3
+L VSS #PWR01
 U 1 1 5046C971
 P 7100 4550
-F 0 "#PWR3" H 7100 4550 30  0001 C CNN
+F 0 "#PWR01" H 7100 4550 30  0001 C CNN
 F 1 "VSS" H 7100 4480 30  0000 C CNN
+F 2 "" H 7100 4550 60  0001 C CNN
+F 3 "" H 7100 4550 60  0001 C CNN
 	1    7100 4550
 	-1   0    0    -1  
 $EndComp
 $Comp
-L VSS #PWR2
+L VSS #PWR02
 U 1 1 5047C978
 P 4200 5600
-F 0 "#PWR2" H 4200 5600 30  0001 C CNN
+F 0 "#PWR02" H 4200 5600 30  0001 C CNN
 F 1 "VSS" H 4200 5530 30  0000 C CNN
+F 2 "" H 4200 5600 60  0001 C CNN
+F 3 "" H 4200 5600 60  0001 C CNN
 	1    4200 5600
 	1    0    0    -1  
 $EndComp
 $Comp
-L +3.3V #PWR1
+L +3.3V #PWR03
 U 1 1 5047C987
 P 3700 5950
-F 0 "#PWR1" H 3700 5910 30  0001 C CNN
+F 0 "#PWR03" H 3700 5910 30  0001 C CNN
 F 1 "+3.3V" H 3700 6060 30  0000 C CNN
+F 2 "" H 3700 5950 60  0001 C CNN
+F 3 "" H 3700 5950 60  0001 C CNN
 	1    3700 5950
 	1    0    0    -1  
 $EndComp
@@ -203,15 +221,19 @@ P 9650 900
 F 0 "H1" H 9650 1000 60  0000 C CNN
 F 1 "MOUNTHOLE" H 9650 1100 60  0000 C CNN
 F 2 "mounthole_3mm" H 9650 1200 60  0001 C CNN
+F 3 "" H 9650 900 60  0001 C CNN
+F 4 "never" H 9650 900 60  0001 C CNN "populate"
 	1    9650 900 
 	1    0    0    -1  
 $EndComp
 $Comp
-L VSS #PWR4
+L VSS #PWR04
 U 1 1 5049D46F
 P 9650 1050
-F 0 "#PWR4" H 9650 1050 30  0001 C CNN
+F 0 "#PWR04" H 9650 1050 30  0001 C CNN
 F 1 "VSS" H 9650 980 30  0000 C CNN
+F 2 "" H 9650 1050 60  0001 C CNN
+F 3 "" H 9650 1050 60  0001 C CNN
 	1    9650 1050
 	1    0    0    -1  
 $EndComp

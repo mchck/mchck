@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by CvPcb (2012-03-22 BZR 3475)-stable date = Fri Sep  7 13:28:01 2012
+Cmp-Mod V01 Created by CvPcb (2013-07-14 BZR 4242)-stable date = Wed 24 Jul 2013 06:52:50 PM CEST
 
 BeginCmp
 TimeStamp = /50474F32/5048FC9E;
@@ -106,14 +106,21 @@ IdModule  = SOD-523F-NC;
 EndCmp
 
 BeginCmp
-TimeStamp = /4F22DD51/5046681B;
+TimeStamp = /4F22DD51/504F92BA;
+Reference = D4;
+ValeurCmp = CDBU0530;
+IdModule  = SOD-523F-NC;
+EndCmp
+
+BeginCmp
+TimeStamp = /4F22DD51/51F00979;
 Reference = FB1;
 ValeurCmp = FILTER;
 IdModule  = SM0603_NC;
 EndCmp
 
 BeginCmp
-TimeStamp = /4F22DD51/504667D4;
+TimeStamp = /4F22DD51/51F00986;
 Reference = FB2;
 ValeurCmp = FILTER;
 IdModule  = SM0603_NC;
@@ -122,7 +129,7 @@ EndCmp
 BeginCmp
 TimeStamp = /503C1464;
 Reference = G1;
-ValeurCmp = OHW_LOGO;
+ValeurCmp = OHW LOGO;
 IdModule  = OHW-LOGO-6mm;
 EndCmp
 
@@ -192,7 +199,7 @@ EndCmp
 BeginCmp
 TimeStamp = /4F22DD51/4F22E691;
 Reference = P5;
-ValeurCmp = CHRG;
+ValeurCmp = CHG;
 IdModule  = SparkFun-PAD.03X.03;
 EndCmp
 
@@ -271,13 +278,6 @@ TimeStamp = /4F22DD51/503BFB94;
 Reference = SJ5;
 ValeurCmp = SOLDERJUMPERNO;
 IdModule  = SparkFun-SJ_2VerySmall-NO;
-EndCmp
-
-BeginCmp
-TimeStamp = /4F22DD51/50478372;
-Reference = SJ6;
-ValeurCmp = SOLDERJUMPERNC;
-IdModule  = SM0603_NC;
 EndCmp
 
 BeginCmp

@@ -1,609 +1,871 @@
-# EESchema Netlist Version 1.1 created  Tue Sep 11 21:37:59 2012
-(
- ( /4F3D2CED SparkFun-1X05_LOCK  P2 DEBUG {Lib=CONN_5}
-  (    1 +BATT )
-  (    2 VSS )
-  (    3 /MCU/SWD_DIO )
-  (    4 /MCU/SWD_CLK )
-  (    5 /MCU/TRACE_SWO )
- )
- ( /4F2EFBC8 SparkFun-1X05_LOCK  P1 RIGHT_PINS {Lib=CONN_5}
-  (    1 /power/VRAW )
-  (    2 /MCU/~RESET )
-  (    3 /MCU/PR3 )
-  (    4 /MCU/PR4 )
-  (    5 /MCU/PR5 )
- )
- ( /4E446864 SparkFun-1X14_LOCK  P4 LOWER_PINS {Lib=CONN_14}
-  (    1 /MCU/PL1 )
-  (    2 /MCU/PL2 )
-  (    3 /MCU/PL3 )
-  (    4 /MCU/PL4 )
-  (    5 /MCU/PL5 )
-  (    6 /MCU/PL6 )
-  (    7 /MCU/PL7 )
-  (    8 /MCU/PL8 )
-  (    9 /MCU/PL9 )
-  (   10 /MCU/PL10 )
-  (   11 /MCU/PL11 )
-  (   12 /MCU/PL12 )
-  (   13 VSS )
-  (   14 +3.3V )
- )
- ( /4E446858 SparkFun-1X14_LOCK  P3 UPPER_PINS {Lib=CONN_14}
-  (    1 /MCU/PU1 )
-  (    2 /MCU/PU2 )
-  (    3 /MCU/PU3 )
-  (    4 /MCU/PU4/FLASH_CS )
-  (    5 /MCU/PU5/FLASH_MISO )
-  (    6 /MCU/PU6/FLASH_MOSI )
-  (    7 /MCU/PU7/FLASH_SCK )
-  (    8 /MCU/PU8 )
-  (    9 /MCU/PU9 )
-  (   10 /MCU/PU10 )
-  (   11 /MCU/PU11 )
-  (   12 /MCU/PU12 )
-  (   13 /MCU/PU13 )
-  (   14 /MCU/PU14 )
- )
- ( /503C1464 OHW-LOGO-6mm  G1 OHW_LOGO {Lib=LOGO}
- )
- ( /5049CF35 mounthole_3mm  H1 MOUNTHOLE {Lib=MOUNTHOLE}
-  (    1 VSS )
- )
- ( /504995A0/4FEDD8B1 SparkFun-SJ_2VerySmall-NO  SJ3 SOLDERJUMPERNO {Lib=SOLDERJUMPERNO}
-  (    1 N-000053 )
-  (    2 /MCU/+5V )
- )
- ( /504995A0/4FEDCFCF SparkFun-SJ_2VerySmall-NO  SJ1 SOLDERJUMPERNO {Lib=SOLDERJUMPERNO}
-  (    1 N-000055 )
-  (    2 /USB/USB_D+ )
- )
- ( /504995A0/4FEDCF32 SparkFun-SJ_2VerySmall-NO  SJ2 SOLDERJUMPERNO {Lib=SOLDERJUMPERNO}
-  (    1 N-000054 )
-  (    2 /USB/USB_D- )
- )
- ( /504995A0/4F27475E SparkFun-1X05_LOCK  J2 INT_USB {Lib=CONN_5}
-  (    1 /MCU/+5V )
-  (    2 /USB/USB_D- )
-  (    3 /USB/USB_D+ )
-  (    4 GNDPWR )
-  (    5 /USB/VLIPO )
- )
- ( /504995A0/4F274705 SparkFun-USB-MICROB  J3 MICRO_USB {Lib=CONN_5}
-  (    1 N-000053 )
-  (    2 N-000054 )
-  (    3 N-000055 )
-  (    4 N-000056 )
-  (    5 GNDPWR )
- )
- ( /504995A0/4F22C569 SM0603  R1 33 {Lib=R}
-  (    1 /USB/USB_D+ )
-  (    2 /MCU/USB_DP )
- )
- ( /504995A0/4F22C560 SM0603  R2 33 {Lib=R}
-  (    1 /USB/USB_D- )
-  (    2 /MCU/USB_DM )
- )
- ( /504995A0/4E3D8AFF SparkFun-USB-A-PCB  J1 USB_2 {Lib=USB_2}
-  (    1 /MCU/+5V )
-  (    2 /USB/USB_D- )
-  (    3 /USB/USB_D+ )
-  (    4 GNDPWR )
- )
- ( /504995A0/5047107A SparkFun-PAD.03X.03  P6 ID {Lib=CONN_1}
-  (    1 N-000056 )
- )
- ( /50474F32/4F475346 SM0603_Capa  C10 100n {Lib=C}
-  (    1 +3.3V )
-  (    2 VSS )
- )
- ( /50474F32/4F22F29F SM0603_Capa  C4 100n {Lib=C}
-  (    1 +3.3V )
-  (    2 VSS )
- )
- ( /50474F32/4F22E1F9 SparkFun-SO08  U3 SPI_FLASH-X25XXSMD {Lib=SPI_FLASH-X25XXSMD}
-  (    1 /MCU/PU4/FLASH_CS )
-  (    2 /MCU/PU5/FLASH_MISO )
-  (    3 +3.3V )
-  (    4 VSS )
-  (    5 /MCU/PU6/FLASH_MOSI )
-  (    6 /MCU/PU7/FLASH_SCK )
-  (    7 +3.3V )
-  (    8 +3.3V )
- )
- ( /50474F32/4F22C606 SM0603_Capa  C5 100n {Lib=C}
-  (    1 +3.3V )
-  (    2 VSS )
- )
- ( /50474F32/4E4186C6 SM0603  R3 1k {Lib=R}
-  (    1 N-000049 )
-  (    2 VSS )
- )
- ( /50474F32/4E418482 LED-0603  D1 LED {Lib=LED}
-  (    1 /MCU/PR4 )
-  (    2 N-000049 )
- )
- ( /50474F32/4E4181C7 SM0603_Capa  C6 100n {Lib=C}
-  (    1 /MCU/~RESET )
-  (    2 VSS )
- )
- ( /50474F32/4F22C5A2 SM0603_Capa  C3 100n {Lib=C}
-  (    1 +3.3V )
-  (    2 VSS )
- )
- ( /50474F32/5044CEB6 LQFP48  U1 MK20LF {Lib=MK20LF}
-  (    1 +3.3V )
-  (    2 VSS )
-  (    3 /MCU/USB_DP )
-  (    4 /MCU/USB_DM )
-  (    5 /MCU/VREGOUT )
-  (    6 /MCU/+5V )
-  (    7 /MCU/PL1 )
-  (    8 /MCU/PL2 )
-  (    9 +3.3V )
-  (   10 N-000052 )
-  (   11 VSS )
-  (   12 VSS )
-  (   13 /MCU/PL3 )
-  (   14 N-000048 )
-  (   15 N-000050 )
-  (   16 +BATT )
-  (   17 /MCU/SWD_CLK )
-  (   18 /MCU/PL4 )
-  (   19 /MCU/TRACE_SWO )
-  (   20 /MCU/SWD_DIO )
-  (   21 /MCU/PL5 )
-  (   22 +3.3V )
-  (   23 VSS )
-  (   24 /MCU/PL6 )
-  (   25 /MCU/PL7 )
-  (   26 /MCU/~RESET )
-  (   27 /MCU/PL8 )
-  (   28 /MCU/PL9 )
-  (   29 /MCU/PL10 )
-  (   30 /MCU/PL11 )
-  (   31 /MCU/PL12 )
-  (   32 /MCU/PR5 )
-  (   33 /MCU/PR4 )
-  (   34 /MCU/PR3 )
-  (   35 /MCU/PU14 )
-  (   36 /MCU/PU13 )
-  (   37 /MCU/PU12 )
-  (   38 /MCU/PU11 )
-  (   39 /MCU/PU10 )
-  (   40 /MCU/PU9 )
-  (   41 /MCU/PU8 )
-  (   42 /MCU/PU7/FLASH_SCK )
-  (   43 /MCU/PU6/FLASH_MOSI )
-  (   44 /MCU/PU5/FLASH_MISO )
-  (   45 /MCU/PU4/FLASH_CS )
-  (   46 /MCU/PU3 )
-  (   47 /MCU/PU2 )
-  (   48 /MCU/PU1 )
- )
- ( /50474F32/5045BE79 SparkFun-CRYSTAL-32KHZ-SMD  Y1 CRYSTAL32-SMD {Lib=CRYSTAL32-SMD}
-  (   X1 N-000048 )
-  (   X2 N-000050 )
- )
- ( /50474F32/50466EFD EVQP2  S1 TAC_SWITCHSMD_EVQP2 {Lib=TAC_SWITCHSMD_EVQP2}
-  (    1 /MCU/~RESET )
-  (    2 VSS )
-  (    3 ? )
-  (    4 VSS )
- )
- ( /50474F32/50477093 SM0603_Capa  C8 100n {Lib=C}
-  (    1 /MCU/PL3 )
-  (    2 VSS )
- )
- ( /50474F32/5048FC9E SM0603_Capa  C1 2.2u {Lib=C}
-  (    1 /MCU/VREGOUT )
-  (    2 VSS )
- )
- ( /50474F32/504B05C7 SM0603_Capa  C9 100n {Lib=C}
-  (    1 N-000052 )
-  (    2 VSS )
- )
- ( /50474F32/50478946 SM0603_NC  SJ4 SOLDERJUMPERNC {Lib=SOLDERJUMPERNC}
-  (    1 +3.3V )
-  (    2 N-000052 )
- )
- ( /4F22DD51/4F22EB14 SOD-523F-NC  D3 CDBU0530 {Lib=DIODE-SCHOTTKY_}
-  (    A /MCU/+5V )
-  (    C /power/VRAW )
- )
- ( /4F22DD51/4F22E9AF SM0805  C7 4.7u {Lib=CAP0805}
-  (    1 /USB/VLIPO )
-  (    2 GNDPWR )
- )
- ( /4F22DD51/4F22E7C7 SM0603  R4 20k {Lib=R}
-  (    1 N-000044 )
-  (    2 GNDPWR )
- )
- ( /4F22DD51/4F22E691 SparkFun-PAD.03X.03  P5 CHG {Lib=CONN_1}
-  (    1 N-000045 )
- )
- ( /4F22DD51/4F22DEC3 SOT23-5  U2 MCP73831-SOT {Lib=MCP73831-SOT}
-  (    1 N-000045 )
-  (    2 GNDPWR )
-  (    3 /USB/VLIPO )
-  (    4 /MCU/+5V )
-  (    5 N-000044 )
- )
- ( /4F22DD51/4F22DDA9 SM0805  C12 10u {Lib=CAP0805}
-  (    1 /power/VRAW )
-  (    2 GNDPWR )
- )
- ( /4F22DD51/5030034E SOD-523F  D2 CDBU0530 {Lib=DIODE-SCHOTTKY_}
-  (    A /USB/VLIPO )
-  (    C /MCU/+5V )
- )
- ( /4F22DD51/503156DF SM0805  C11 10u {Lib=CAP0805}
-  (    1 /MCU/VREGOUT )
-  (    2 GNDPWR )
- )
- ( /4F22DD51/503BF088 SOT23-5  U4 MULTIREG {Lib=MULTIREG}
-  (    1 /power/VRAW )
-  (    2 GNDPWR )
-  (    3 /power/VRAW )
-  (    4 N-000047 )
-  (    5 N-000046 )
- )
- ( /4F22DD51/503BFB94 SparkFun-SJ_2VerySmall-NO  SJ5 SOLDERJUMPERNO {Lib=SOLDERJUMPERNO}
-  (    1 N-000047 )
-  (    2 /MCU/VREGOUT )
- )
- ( /4F22DD51/503C00A7 SM0805-3WAY  L1 INDUCTOR_SELECT {Lib=INDUCTOR_SELECT}
-  (    1 /power/VRAW )
-  (    2 N-000046 )
-  (    3 /MCU/VREGOUT )
- )
- ( /4F22DD51/504667D4 SM0603_NC  FB2 FILTER {Lib=FILTER}
-  (    1 /MCU/VREGOUT )
-  (    2 +3.3V )
- )
- ( /4F22DD51/5046681B SM0603_NC  FB1 FILTER {Lib=FILTER}
-  (    1 GNDPWR )
-  (    2 VSS )
- )
- ( /4F22DD51/50477AE0 SM0603_Capa  C2 2.2u {Lib=C}
-  (    1 /MCU/+5V )
-  (    2 VSS )
- )
- ( /4F22DD51/504F92BA SOD-523F-NC  D4 CDBU0530 {Lib=DIODE-SCHOTTKY_}
-  (    A +BATT )
-  (    C +3.3V )
- )
-)
-*
-{ Allowed footprints by component:
-$component R1
- R?
- SM0603
- SM0805
- R?-*
- SM1206
-$endlist
-$component R2
- R?
- SM0603
- SM0805
- R?-*
- SM1206
-$endlist
-$component C10
- SM*
- C?
- C1-1
-$endlist
-$component C4
- SM*
- C?
- C1-1
-$endlist
-$component C5
- SM*
- C?
- C1-1
-$endlist
-$component R3
- R?
- SM0603
- SM0805
- R?-*
- SM1206
-$endlist
-$component D1
- LED-3MM
- LED-5MM
- LED-10MM
- LED-0603
- LED-0805
- LED-1206
- LEDV
-$endlist
-$component C6
- SM*
- C?
- C1-1
-$endlist
-$component C3
- SM*
- C?
- C1-1
-$endlist
-$component C8
- SM*
- C?
- C1-1
-$endlist
-$component C1
- SM*
- C?
- C1-1
-$endlist
-$component C9
- SM*
- C?
- C1-1
-$endlist
-$component R4
- R?
- SM0603
- SM0805
- R?-*
- SM1206
-$endlist
-$component U4
- SOT-23-5
-$endlist
-$component C2
- SM*
- C?
- C1-1
-$endlist
-$endfootprintlist
-}
-{ Pin List by Nets
-Net 1 "/MCU/PL3" "PL3"
- U1 13
- C8 1
- P4 3
-Net 2 "/MCU/PL4" "PL4"
- U1 18
- P4 4
-Net 3 "/MCU/PL5" "PL5"
- P4 5
- U1 21
-Net 4 "/MCU/PL7" "PL7"
- P4 7
- U1 25
-Net 5 "/MCU/PL9" "PL9"
- U1 28
- P4 9
-Net 6 "/MCU/PL11" "PL11"
- U1 30
- P4 11
-Net 7 "/MCU/PU6/FLASH_MOSI" "PU6/FLASH_MOSI"
- U3 5
- U1 43
- P3 6
-Net 8 "/MCU/PU4/FLASH_CS" "PU4/FLASH_CS"
- P3 4
- U3 1
- U1 45
-Net 9 "/MCU/PU12" "PU12"
- U1 37
- P3 12
-Net 10 "/MCU/PU3" "PU3"
- U1 46
- P3 3
-Net 11 "/MCU/PL6" "PL6"
- P4 6
- U1 24
-Net 12 "/MCU/PU1" "PU1"
- P3 1
- U1 48
-Net 13 "/MCU/PU8" "PU8"
- U1 41
- P3 8
-Net 14 "/MCU/PU10" "PU10"
- U1 39
- P3 10
-Net 15 "/MCU/PL2" "PL2"
- U1 8
- P4 2
-Net 16 "/MCU/PL1" "PL1"
- P4 1
- U1 7
-Net 17 "/MCU/PU14" "PU14"
- U1 35
- P3 14
-Net 18 "/MCU/PU13" "PU13"
- U1 36
- P3 13
-Net 19 "+3.3V" "+3.3V"
- U3 3
- C4 1
- U3 7
- C10 1
- D4 C
- C3 1
- U1 1
- FB2 2
- U1 9
- P4 14
- U3 8
- C5 1
- SJ4 1
- U1 22
-Net 20 "/MCU/PR3" "PR3"
- P1 3
- U1 34
-Net 21 "/MCU/PR4" "PR4"
- D1 1
- U1 33
- P1 4
-Net 22 "/MCU/PR5" "PR5"
- U1 32
- P1 5
-Net 23 "/MCU/~RESET" "~RESET"
- S1 1
- C6 1
- U1 26
- P1 2
-Net 24 "/MCU/USB_DP" "USB_DP"
- R1 2
- U1 3
-Net 25 "/MCU/USB_DM" "USB_DM"
- U1 4
- R2 2
-Net 26 "VSS" "VSS"
- U1 2
- C2 2
- U1 12
- U1 23
- P2 2
- U1 11
- C8 2
- C3 2
- S1 2
- S1 4
- FB1 2
- P4 13
- C10 2
- C6 2
- C4 2
- U3 4
- C5 2
- R3 2
- H1 1
- C1 2
- C9 2
-Net 27 "/MCU/PU9" "PU9"
- P3 9
- U1 40
-Net 28 "/MCU/PU7/FLASH_SCK" "PU7/FLASH_SCK"
- U1 42
- P3 7
- U3 6
-Net 29 "/MCU/PU2" "PU2"
- U1 47
- P3 2
-Net 30 "/MCU/PU11" "PU11"
- P3 11
- U1 38
-Net 31 "/MCU/PU5/FLASH_MISO" "PU5/FLASH_MISO"
- U1 44
- P3 5
- U3 2
-Net 32 "/MCU/PL12" "PL12"
- P4 12
- U1 31
-Net 33 "/MCU/PL10" "PL10"
- P4 10
- U1 29
-Net 34 "/MCU/PL8" "PL8"
- U1 27
- P4 8
-Net 35 "/MCU/+5V" "+5V"
- J2 1
- SJ3 2
- D3 A
- J1 1
- D2 C
- U2 4
- C2 1
- U1 6
-Net 36 "/MCU/VREGOUT" "VREGOUT"
- C1 1
- SJ5 2
- L1 3
- FB2 1
- U1 5
- C11 1
-Net 37 "/USB/VLIPO" "VLIPO"
- J2 5
- C7 1
- U2 3
- D2 A
-Net 38 "/MCU/TRACE_SWO" "TRACE_SWO"
- P2 5
- U1 19
-Net 39 "/MCU/SWD_CLK" "SWD_CLK"
- P2 4
- U1 17
-Net 40 "/MCU/SWD_DIO" "SWD_DIO"
- P2 3
- U1 20
-Net 41 "+BATT" "+BATT"
- P2 1
- D4 A
- U1 16
-Net 42 "/power/VRAW" "VRAW"
- C12 1
- D3 C
- U4 1
- U4 3
- L1 1
- P1 1
-Net 43 "GNDPWR" "GNDPWR"
- FB1 1
- J2 4
- J3 5
- J1 4
- R4 2
- U2 2
- C12 2
- C7 2
- U4 2
- C11 2
-Net 44 "" ""
- R4 1
- U2 5
-Net 45 "" ""
- U2 1
- P5 1
-Net 46 "" ""
- L1 2
- U4 5
-Net 47 "" ""
- SJ5 1
- U4 4
-Net 48 "" ""
- U1 14
- Y1 X1
-Net 49 "" ""
- R3 1
- D1 2
-Net 50 "" ""
- U1 15
- Y1 X2
-Net 52 "" ""
- SJ4 2
- U1 10
- C9 1
-Net 53 "" ""
- J3 1
- SJ3 1
-Net 54 "" ""
- J3 2
- SJ2 1
-Net 55 "" ""
- J3 3
- SJ1 1
-Net 56 "" ""
- J3 4
- P6 1
-Net 57 "/USB/USB_D-" "USB_D-"
- SJ2 2
- J2 2
- J1 2
- R2 1
-Net 58 "/USB/USB_D+" "USB_D+"
- J1 3
- R1 1
- SJ1 2
- J2 3
-}
-#End
+(export (version D)
+  (design
+    (source /home/corecode/devel/electronics/mchck/hardware/mchck.sch)
+    (date "Wed 24 Jul 2013 07:38:30 PM CEST")
+    (tool "eeschema (2013-07-14 BZR 4242)-stable"))
+  (components
+    (comp (ref P2)
+      (value DEBUG)
+      (footprint SparkFun-1X05_LOCK)
+      (fields
+        (field (name populate) never))
+      (libsource (lib conn) (part CONN_5))
+      (sheetpath (names /) (tstamps /))
+      (tstamp 4F3D2CED))
+    (comp (ref P1)
+      (value RIGHT_PINS)
+      (footprint SparkFun-1X05_LOCK)
+      (fields
+        (field (name populate) never))
+      (libsource (lib conn) (part CONN_5))
+      (sheetpath (names /) (tstamps /))
+      (tstamp 4F2EFBC8))
+    (comp (ref P4)
+      (value LOWER_PINS)
+      (footprint SparkFun-1X14_LOCK)
+      (fields
+        (field (name populate) never))
+      (libsource (lib conn) (part CONN_14))
+      (sheetpath (names /) (tstamps /))
+      (tstamp 4E446864))
+    (comp (ref P3)
+      (value UPPER_PINS)
+      (footprint SparkFun-1X14_LOCK)
+      (fields
+        (field (name populate) never))
+      (libsource (lib conn) (part CONN_14))
+      (sheetpath (names /) (tstamps /))
+      (tstamp 4E446858))
+    (comp (ref G1)
+      (value "OHW LOGO")
+      (footprint OHW-LOGO-6mm)
+      (fields
+        (field (name populate) never))
+      (libsource (lib logo) (part LOGO))
+      (sheetpath (names /) (tstamps /))
+      (tstamp 503C1464))
+    (comp (ref H1)
+      (value MOUNTHOLE)
+      (footprint mounthole_3mm)
+      (fields
+        (field (name populate) never))
+      (libsource (lib mounthole) (part MOUNTHOLE))
+      (sheetpath (names /) (tstamps /))
+      (tstamp 5049CF35))
+    (comp (ref SJ3)
+      (value SOLDERJUMPERNO)
+      (footprint SparkFun-SJ_2VerySmall-NO)
+      (fields
+        (field (name populate) never))
+      (libsource (lib SparkFun) (part SOLDERJUMPERNO))
+      (sheetpath (names /USB/) (tstamps /504995A0/))
+      (tstamp 4FEDD8B1))
+    (comp (ref SJ1)
+      (value SOLDERJUMPERNO)
+      (footprint SparkFun-SJ_2VerySmall-NO)
+      (fields
+        (field (name populate) never))
+      (libsource (lib SparkFun) (part SOLDERJUMPERNO))
+      (sheetpath (names /USB/) (tstamps /504995A0/))
+      (tstamp 4FEDCFCF))
+    (comp (ref SJ2)
+      (value SOLDERJUMPERNO)
+      (footprint SparkFun-SJ_2VerySmall-NO)
+      (fields
+        (field (name populate) never))
+      (libsource (lib SparkFun) (part SOLDERJUMPERNO))
+      (sheetpath (names /USB/) (tstamps /504995A0/))
+      (tstamp 4FEDCF32))
+    (comp (ref J2)
+      (value INT_USB)
+      (footprint SparkFun-1X05_LOCK)
+      (fields
+        (field (name populate) never))
+      (libsource (lib conn) (part CONN_5))
+      (sheetpath (names /USB/) (tstamps /504995A0/))
+      (tstamp 4F27475E))
+    (comp (ref J3)
+      (value MICRO_USB)
+      (footprint SparkFun-USB-MICROB)
+      (fields
+        (field (name populate) optional))
+      (libsource (lib conn) (part CONN_5))
+      (sheetpath (names /USB/) (tstamps /504995A0/))
+      (tstamp 4F274705))
+    (comp (ref R1)
+      (value 33)
+      (footprint SM0603)
+      (libsource (lib device) (part R))
+      (sheetpath (names /USB/) (tstamps /504995A0/))
+      (tstamp 4F22C569))
+    (comp (ref R2)
+      (value 33)
+      (footprint SM0603)
+      (libsource (lib device) (part R))
+      (sheetpath (names /USB/) (tstamps /504995A0/))
+      (tstamp 4F22C560))
+    (comp (ref J1)
+      (value USB_2)
+      (footprint SparkFun-USB-A-PCB)
+      (fields
+        (field (name populate) never)
+        (field (name VCC) VCC)
+        (field (name Data+) D+)
+        (field (name Data-) D-)
+        (field (name Ground) GND))
+      (libsource (lib mchck-cache) (part USB_2))
+      (sheetpath (names /USB/) (tstamps /504995A0/))
+      (tstamp 4E3D8AFF))
+    (comp (ref P6)
+      (value ID)
+      (footprint SparkFun-PAD.03X.03)
+      (fields
+        (field (name populate) never))
+      (libsource (lib conn) (part CONN_1))
+      (sheetpath (names /USB/) (tstamps /504995A0/))
+      (tstamp 5047107A))
+    (comp (ref C10)
+      (value 100n)
+      (footprint SM0603_Capa)
+      (fields
+        (field (name populate) optional))
+      (libsource (lib device) (part C))
+      (sheetpath (names /MCU/) (tstamps /50474F32/))
+      (tstamp 4F475346))
+    (comp (ref C4)
+      (value 100n)
+      (footprint SM0603_Capa)
+      (libsource (lib device) (part C))
+      (sheetpath (names /MCU/) (tstamps /50474F32/))
+      (tstamp 4F22F29F))
+    (comp (ref U3)
+      (value SPI_FLASH-X25XXSMD)
+      (footprint SparkFun-SO08)
+      (fields
+        (field (name populate) optional))
+      (libsource (lib SparkFun) (part SPI_FLASH-X25XXSMD))
+      (sheetpath (names /MCU/) (tstamps /50474F32/))
+      (tstamp 4F22E1F9))
+    (comp (ref C5)
+      (value 100n)
+      (footprint SM0603_Capa)
+      (libsource (lib device) (part C))
+      (sheetpath (names /MCU/) (tstamps /50474F32/))
+      (tstamp 4F22C606))
+    (comp (ref R3)
+      (value 1k)
+      (footprint SM0603)
+      (libsource (lib device) (part R))
+      (sheetpath (names /MCU/) (tstamps /50474F32/))
+      (tstamp 4E4186C6))
+    (comp (ref D1)
+      (value LED)
+      (footprint LED-0603)
+      (libsource (lib device) (part LED))
+      (sheetpath (names /MCU/) (tstamps /50474F32/))
+      (tstamp 4E418482))
+    (comp (ref C6)
+      (value 100n)
+      (footprint SM0603_Capa)
+      (libsource (lib device) (part C))
+      (sheetpath (names /MCU/) (tstamps /50474F32/))
+      (tstamp 4E4181C7))
+    (comp (ref C3)
+      (value 100n)
+      (footprint SM0603_Capa)
+      (libsource (lib device) (part C))
+      (sheetpath (names /MCU/) (tstamps /50474F32/))
+      (tstamp 4F22C5A2))
+    (comp (ref U1)
+      (value MK20LF)
+      (footprint LQFP48)
+      (libsource (lib MK20LF) (part MK20LF))
+      (sheetpath (names /MCU/) (tstamps /50474F32/))
+      (tstamp 5044CEB6))
+    (comp (ref Y1)
+      (value CRYSTAL32-SMD)
+      (footprint SparkFun-CRYSTAL-32KHZ-SMD)
+      (fields
+        (field (name populate) optional))
+      (libsource (lib SparkFun) (part CRYSTAL32-SMD))
+      (sheetpath (names /MCU/) (tstamps /50474F32/))
+      (tstamp 5045BE79))
+    (comp (ref S1)
+      (value TAC_SWITCHSMD_EVQP2)
+      (footprint EVQP2)
+      (libsource (lib tac_switchsmd_evqp2) (part TAC_SWITCHSMD_EVQP2))
+      (sheetpath (names /MCU/) (tstamps /50474F32/))
+      (tstamp 50466EFD))
+    (comp (ref C8)
+      (value 100n)
+      (footprint SM0603_Capa)
+      (fields
+        (field (name populate) optional))
+      (libsource (lib device) (part C))
+      (sheetpath (names /MCU/) (tstamps /50474F32/))
+      (tstamp 50477093))
+    (comp (ref C1)
+      (value 2.2u)
+      (footprint SM0603_Capa)
+      (libsource (lib device) (part C))
+      (sheetpath (names /MCU/) (tstamps /50474F32/))
+      (tstamp 5048FC9E))
+    (comp (ref C9)
+      (value 100n)
+      (footprint SM0603_Capa)
+      (fields
+        (field (name populate) optional))
+      (libsource (lib device) (part C))
+      (sheetpath (names /MCU/) (tstamps /50474F32/))
+      (tstamp 504B05C7))
+    (comp (ref SJ4)
+      (value SOLDERJUMPERNC)
+      (footprint SM0603_NC)
+      (fields
+        (field (name populate) never))
+      (libsource (lib SparkFun) (part SOLDERJUMPERNC))
+      (sheetpath (names /MCU/) (tstamps /50474F32/))
+      (tstamp 50478946))
+    (comp (ref D3)
+      (value CDBU0530)
+      (footprint SOD-523F-NC)
+      (fields
+        (field (name populate) optional))
+      (libsource (lib SparkFun) (part DIODE-SCHOTTKY_))
+      (sheetpath (names /power/) (tstamps /4F22DD51/))
+      (tstamp 4F22EB14))
+    (comp (ref C7)
+      (value 4.7u)
+      (footprint SM0805)
+      (fields
+        (field (name populate) optional))
+      (libsource (lib SparkFun) (part CAP0805))
+      (sheetpath (names /power/) (tstamps /4F22DD51/))
+      (tstamp 4F22E9AF))
+    (comp (ref R4)
+      (value 20k)
+      (footprint SM0603)
+      (fields
+        (field (name populate) optional))
+      (libsource (lib device) (part R))
+      (sheetpath (names /power/) (tstamps /4F22DD51/))
+      (tstamp 4F22E7C7))
+    (comp (ref P5)
+      (value CHG)
+      (footprint SparkFun-PAD.03X.03)
+      (fields
+        (field (name populate) never))
+      (libsource (lib conn) (part CONN_1))
+      (sheetpath (names /power/) (tstamps /4F22DD51/))
+      (tstamp 4F22E691))
+    (comp (ref U2)
+      (value MCP73831-SOT)
+      (footprint SOT23-5)
+      (fields
+        (field (name populate) optional))
+      (libsource (lib mcp73831) (part MCP73831-SOT))
+      (sheetpath (names /power/) (tstamps /4F22DD51/))
+      (tstamp 4F22DEC3))
+    (comp (ref C12)
+      (value 10u)
+      (footprint SM0805)
+      (fields
+        (field (name populate) optional))
+      (libsource (lib SparkFun) (part CAP0805))
+      (sheetpath (names /power/) (tstamps /4F22DD51/))
+      (tstamp 4F22DDA9))
+    (comp (ref D2)
+      (value CDBU0530)
+      (footprint SOD-523F)
+      (fields
+        (field (name populate) optional))
+      (libsource (lib SparkFun) (part DIODE-SCHOTTKY_))
+      (sheetpath (names /power/) (tstamps /4F22DD51/))
+      (tstamp 5030034E))
+    (comp (ref C11)
+      (value 10u)
+      (footprint SM0805)
+      (fields
+        (field (name populate) optional))
+      (libsource (lib SparkFun) (part CAP0805))
+      (sheetpath (names /power/) (tstamps /4F22DD51/))
+      (tstamp 503156DF))
+    (comp (ref U4)
+      (value MULTIREG)
+      (footprint SOT23-5)
+      (fields
+        (field (name populate) optional))
+      (libsource (lib multireg) (part MULTIREG))
+      (sheetpath (names /power/) (tstamps /4F22DD51/))
+      (tstamp 503BF088))
+    (comp (ref L1)
+      (value INDUCTOR_SELECT)
+      (footprint SM0805-3WAY)
+      (fields
+        (field (name optional) true))
+      (libsource (lib inductor_select) (part INDUCTOR_SELECT))
+      (sheetpath (names /power/) (tstamps /4F22DD51/))
+      (tstamp 503C00A7))
+    (comp (ref C2)
+      (value 2.2u)
+      (footprint SM0603_Capa)
+      (libsource (lib device) (part C))
+      (sheetpath (names /power/) (tstamps /4F22DD51/))
+      (tstamp 50477AE0))
+    (comp (ref D4)
+      (value CDBU0530)
+      (footprint SOD-523F-NC)
+      (fields
+        (field (name populate) optional))
+      (libsource (lib SparkFun) (part DIODE-SCHOTTKY_))
+      (sheetpath (names /power/) (tstamps /4F22DD51/))
+      (tstamp 504F92BA))
+    (comp (ref FB1)
+      (value FILTER)
+      (footprint SM0603_NC)
+      (fields
+        (field (name populate) optional))
+      (libsource (lib device) (part FILTER))
+      (sheetpath (names /power/) (tstamps /4F22DD51/))
+      (tstamp 51F00979))
+    (comp (ref FB2)
+      (value FILTER)
+      (footprint SM0603_NC)
+      (fields
+        (field (name populate) optional))
+      (libsource (lib device) (part FILTER))
+      (sheetpath (names /power/) (tstamps /4F22DD51/))
+      (tstamp 51F00986))
+    (comp (ref SJ5)
+      (value SOLDERJUMPERNO)
+      (footprint SparkFun-SJ_2VerySmall-NO)
+      (fields
+        (field (name populate) never))
+      (libsource (lib SparkFun) (part SOLDERJUMPERNO))
+      (sheetpath (names /power/) (tstamps /4F22DD51/))
+      (tstamp 503BFB94)))
+  (libparts
+    (libpart (lib device) (part C)
+      (description "Condensateur non polarise")
+      (footprints
+        (fp SM*)
+        (fp C?)
+        (fp C1-1))
+      (fields
+        (field (name Reference) C)
+        (field (name Value) C))
+      (pins
+        (pin (num 1) (name ~) (type passive))
+        (pin (num 2) (name ~) (type passive))))
+    (libpart (lib device) (part FILTER)
+      (description "Filtre EMI")
+      (fields
+        (field (name Reference) FB)
+        (field (name Value) FILTER))
+      (pins
+        (pin (num 1) (name 1) (type passive))
+        (pin (num 2) (name 2) (type passive))))
+    (libpart (lib device) (part LED)
+      (footprints
+        (fp LED-3MM)
+        (fp LED-5MM)
+        (fp LED-10MM)
+        (fp LED-0603)
+        (fp LED-0805)
+        (fp LED-1206)
+        (fp LEDV))
+      (fields
+        (field (name Reference) D)
+        (field (name Value) LED))
+      (pins
+        (pin (num 1) (name A) (type passive))
+        (pin (num 2) (name K) (type passive))))
+    (libpart (lib device) (part R)
+      (description Resistance)
+      (footprints
+        (fp R?)
+        (fp SM0603)
+        (fp SM0805)
+        (fp R?-*)
+        (fp SM1206))
+      (fields
+        (field (name Reference) R)
+        (field (name Value) R))
+      (pins
+        (pin (num 1) (name ~) (type passive))
+        (pin (num 2) (name ~) (type passive))))
+    (libpart (lib conn) (part CONN_1)
+      (description "1 pin")
+      (fields
+        (field (name Reference) P)
+        (field (name Value) CONN_1))
+      (pins
+        (pin (num 1) (name 1) (type passive))))
+    (libpart (lib conn) (part CONN_14)
+      (description "Symbole general de connexion")
+      (fields
+        (field (name Reference) P)
+        (field (name Value) CONN_14))
+      (pins
+        (pin (num 1) (name P1) (type passive))
+        (pin (num 2) (name P2) (type passive))
+        (pin (num 3) (name P3) (type passive))
+        (pin (num 4) (name P4) (type passive))
+        (pin (num 5) (name P5) (type passive))
+        (pin (num 6) (name P6) (type passive))
+        (pin (num 7) (name P7) (type passive))
+        (pin (num 8) (name P8) (type passive))
+        (pin (num 9) (name P9) (type passive))
+        (pin (num 10) (name P10) (type passive))
+        (pin (num 11) (name P11) (type passive))
+        (pin (num 12) (name P12) (type passive))
+        (pin (num 13) (name P13) (type passive))
+        (pin (num 14) (name P14) (type passive))))
+    (libpart (lib conn) (part CONN_5)
+      (description "Symbole general de connecteur")
+      (fields
+        (field (name Reference) P)
+        (field (name Value) CONN_5))
+      (pins
+        (pin (num 1) (name ~) (type passive))
+        (pin (num 2) (name ~) (type passive))
+        (pin (num 3) (name ~) (type passive))
+        (pin (num 4) (name ~) (type passive))
+        (pin (num 5) (name ~) (type passive))))
+    (libpart (lib mcp73831) (part MCP73831-SOT)
+      (fields
+        (field (name Reference) U)
+        (field (name Value) MCP73831-SOT))
+      (pins
+        (pin (num 1) (name STAT) (type 3state))
+        (pin (num 2) (name VSS) (type power_in))
+        (pin (num 3) (name VBAT) (type power_out))
+        (pin (num 4) (name VDD) (type power_in))
+        (pin (num 5) (name PROG) (type passive))))
+    (libpart (lib tac_switchsmd_evqp2) (part TAC_SWITCHSMD_EVQP2)
+      (fields
+        (field (name Reference) S)
+        (field (name Value) TAC_SWITCHSMD_EVQP2)
+        (field (name Footprint) EVQP2))
+      (pins
+        (pin (num 1) (name 1) (type passive))
+        (pin (num 2) (name 2) (type passive))
+        (pin (num 3) (name 3) (type passive))
+        (pin (num 4) (name 4) (type passive))))
+    (libpart (lib SparkFun) (part CAP0805)
+      (fields
+        (field (name Reference) C)
+        (field (name Value) CAP0805)
+        (field (name Footprint) SparkFun-0805))
+      (pins
+        (pin (num 1) (name 1) (type passive))
+        (pin (num 2) (name 2) (type passive))))
+    (libpart (lib SparkFun) (part CRYSTAL32-SMD)
+      (fields
+        (field (name Reference) Y)
+        (field (name Value) CRYSTAL32-SMD)
+        (field (name Footprint) SparkFun-CRYSTAL-32KHZ-SMD))
+      (pins
+        (pin (num X1) (name 1) (type passive))
+        (pin (num X2) (name 2) (type passive))))
+    (libpart (lib SparkFun) (part DIODE-SCHOTTKY_)
+      (fields
+        (field (name Reference) D)
+        (field (name Value) DIODE-SCHOTTKY_)
+        (field (name Footprint) SparkFun-SMA-DIODE))
+      (pins
+        (pin (num A) (name A) (type passive))
+        (pin (num C) (name C) (type passive))))
+    (libpart (lib SparkFun) (part SOLDERJUMPERNC)
+      (fields
+        (field (name Reference) SJ)
+        (field (name Value) SOLDERJUMPERNC)
+        (field (name Footprint) SparkFun-SJ_2S)
+        (field (name populate) never))
+      (pins
+        (pin (num 1) (name 1) (type passive))
+        (pin (num 2) (name 2) (type passive))))
+    (libpart (lib SparkFun) (part SPI_FLASH-X25XXSMD)
+      (fields
+        (field (name Reference) U)
+        (field (name Value) SPI_FLASH-X25XXSMD))
+      (pins
+        (pin (num 1) (name CS) (type input))
+        (pin (num 2) (name MISO) (type output))
+        (pin (num 3) (name WP) (type input))
+        (pin (num 4) (name GND) (type power_in))
+        (pin (num 5) (name MOSI) (type input))
+        (pin (num 6) (name SCK) (type input))
+        (pin (num 7) (name HOLD) (type input))
+        (pin (num 8) (name VCC) (type power_in))))
+    (libpart (lib multireg) (part MULTIREG)
+      (footprints
+        (fp SOT-23-5))
+      (fields
+        (field (name Reference) U)
+        (field (name Value) MULTIREG))
+      (pins
+        (pin (num 1) (name VIN) (type power_in))
+        (pin (num 2) (name GND) (type power_in))
+        (pin (num 3) (name EN) (type input))
+        (pin (num 4) (name OUT/FB) (type passive))
+        (pin (num 5) (name L/OUT) (type power_out))))
+    (libpart (lib inductor_select) (part INDUCTOR_SELECT)
+      (fields
+        (field (name Reference) L)
+        (field (name Value) INDUCTOR_SELECT))
+      (pins
+        (pin (num 1) (name 1) (type input))
+        (pin (num 2) (name 2) (type input))
+        (pin (num 3) (name 3) (type input))))
+    (libpart (lib logo) (part LOGO)
+      (fields
+        (field (name Reference) G)
+        (field (name Value) LOGO)))
+    (libpart (lib mounthole) (part MOUNTHOLE)
+      (fields
+        (field (name Reference) H)
+        (field (name Value) MOUNTHOLE))
+      (pins
+        (pin (num 1) (name ~) (type passive))))
+    (libpart (lib MK20LF) (part MK20LF)
+      (fields
+        (field (name Reference) U)
+        (field (name Value) MK20LF))
+      (pins
+        (pin (num 1) (name VDD) (type power_in))
+        (pin (num 2) (name VSS) (type power_in))
+        (pin (num 3) (name USB0_DP) (type 3state))
+        (pin (num 4) (name USB0_DM) (type 3state))
+        (pin (num 5) (name VOUT33) (type power_out))
+        (pin (num 6) (name VREGIN) (type power_in))
+        (pin (num 7) (name ADC0_DP0) (type input))
+        (pin (num 8) (name ADC0_DM0) (type input))
+        (pin (num 9) (name VDDA) (type power_in))
+        (pin (num 10) (name VREFH) (type input))
+        (pin (num 11) (name VREFL) (type input))
+        (pin (num 12) (name VSSA) (type power_in))
+        (pin (num 13) (name VREF_OUT/CMP0_IN5) (type passive))
+        (pin (num 14) (name XTAL32) (type output))
+        (pin (num 15) (name EXTAL32) (type input))
+        (pin (num 16) (name VBAT) (type power_in))
+        (pin (num 17) (name PTA0/SWD_CLK) (type passive))
+        (pin (num 18) (name PTA1) (type passive))
+        (pin (num 19) (name PTA2/TRACE_SWO) (type passive))
+        (pin (num 20) (name PTA3/SWD_DIO) (type passive))
+        (pin (num 21) (name PTA4/nNMI) (type passive))
+        (pin (num 22) (name VDD) (type power_in))
+        (pin (num 23) (name VSS) (type power_in))
+        (pin (num 24) (name EXTAL0/PTA18) (type passive))
+        (pin (num 25) (name XTAL0/PTA19) (type passive))
+        (pin (num 26) (name nRESET) (type BiDi))
+        (pin (num 27) (name PTB0) (type passive))
+        (pin (num 28) (name PTB1) (type passive))
+        (pin (num 29) (name PTB2) (type passive))
+        (pin (num 30) (name PTB3) (type passive))
+        (pin (num 31) (name PTB16) (type passive))
+        (pin (num 32) (name PTB17) (type passive))
+        (pin (num 33) (name PTC0) (type passive))
+        (pin (num 34) (name PTC1) (type passive))
+        (pin (num 35) (name PTC2) (type passive))
+        (pin (num 36) (name PTC3) (type passive))
+        (pin (num 37) (name PTC4) (type passive))
+        (pin (num 38) (name PTC5) (type passive))
+        (pin (num 39) (name PTC6) (type passive))
+        (pin (num 40) (name PTC7) (type passive))
+        (pin (num 41) (name PTD0) (type passive))
+        (pin (num 42) (name PTD1) (type passive))
+        (pin (num 43) (name PTD2) (type passive))
+        (pin (num 44) (name PTD3) (type passive))
+        (pin (num 45) (name PTD4) (type passive))
+        (pin (num 46) (name PTD5) (type passive))
+        (pin (num 47) (name PTD6) (type passive))
+        (pin (num 48) (name PTD7) (type passive))))
+    (libpart (lib mchck-cache) (part USB_2)
+      (fields
+        (field (name Reference) J)
+        (field (name Value) USB_2)
+        (field (name VCC) VCC)
+        (field (name Data+) D+)
+        (field (name Data-) D-)
+        (field (name Ground) GND))
+      (pins
+        (pin (num 1) (name ~) (type input))
+        (pin (num 2) (name ~) (type input))
+        (pin (num 3) (name ~) (type input))
+        (pin (num 4) (name ~) (type input))))
+    (libpart (lib SparkFun) (part SOLDERJUMPERNO)
+      (fields
+        (field (name Reference) SJ)
+        (field (name Value) SOLDERJUMPERNO)
+        (field (name Footprint) SparkFun-SJ_2S-NO)
+        (field (name populate) never))
+      (pins
+        (pin (num 1) (name 1) (type passive))
+        (pin (num 2) (name 2) (type passive)))))
+  (libraries
+    (library (logical mounthole)
+      (uri mounthole.lib))
+    (library (logical device)
+      (uri /usr/share/kicad/library/device.lib))
+    (library (logical conn)
+      (uri /usr/share/kicad/library/conn.lib))
+    (library (logical mcp73831)
+      (uri mcp73831.lib))
+    (library (logical SparkFun)
+      (uri SparkFun.lib))
+    (library (logical tac_switchsmd_evqp2)
+      (uri tac_switchsmd_evqp2.lib))
+    (library (logical multireg)
+      (uri multireg.lib))
+    (library (logical inductor_select)
+      (uri inductor_select.lib))
+    (library (logical MK20LF)
+      (uri MK20LF.lib))
+    (library (logical logo)
+      (uri logo.lib))
+    (library (logical mchck-cache)
+      (uri /home/corecode/devel/electronics/mchck/hardware/mchck-cache.lib)))
+  (nets
+    (net (code 1) (name /MCU/PL3)
+      (node (ref U1) (pin 13))
+      (node (ref C8) (pin 1))
+      (node (ref P4) (pin 3)))
+    (net (code 2) (name /MCU/PL4)
+      (node (ref U1) (pin 18))
+      (node (ref P4) (pin 4)))
+    (net (code 3) (name /MCU/PL5)
+      (node (ref P4) (pin 5))
+      (node (ref U1) (pin 21)))
+    (net (code 4) (name /MCU/PL7)
+      (node (ref P4) (pin 7))
+      (node (ref U1) (pin 25)))
+    (net (code 5) (name /MCU/PL9)
+      (node (ref P4) (pin 9))
+      (node (ref U1) (pin 28)))
+    (net (code 6) (name /MCU/PL11)
+      (node (ref U1) (pin 30))
+      (node (ref P4) (pin 11)))
+    (net (code 7) (name /MCU/PU6/FLASH_MOSI)
+      (node (ref U1) (pin 43))
+      (node (ref U3) (pin 5))
+      (node (ref P3) (pin 6)))
+    (net (code 8) (name /MCU/PU4/FLASH_CS)
+      (node (ref U3) (pin 1))
+      (node (ref U1) (pin 45))
+      (node (ref P3) (pin 4)))
+    (net (code 9) (name /MCU/PU12)
+      (node (ref U1) (pin 37))
+      (node (ref P3) (pin 12)))
+    (net (code 10) (name /MCU/PU3)
+      (node (ref P3) (pin 3))
+      (node (ref U1) (pin 46)))
+    (net (code 11) (name /MCU/PL6)
+      (node (ref P4) (pin 6))
+      (node (ref U1) (pin 24)))
+    (net (code 12) (name /MCU/PU1)
+      (node (ref P3) (pin 1))
+      (node (ref U1) (pin 48)))
+    (net (code 13) (name /MCU/PU8)
+      (node (ref P3) (pin 8))
+      (node (ref U1) (pin 41)))
+    (net (code 14) (name /MCU/PU10)
+      (node (ref P3) (pin 10))
+      (node (ref U1) (pin 39)))
+    (net (code 15) (name /MCU/PL2)
+      (node (ref P4) (pin 2))
+      (node (ref U1) (pin 8)))
+    (net (code 16) (name /MCU/PL1)
+      (node (ref U1) (pin 7))
+      (node (ref P4) (pin 1)))
+    (net (code 17) (name /MCU/PU14)
+      (node (ref P3) (pin 14))
+      (node (ref U1) (pin 35)))
+    (net (code 18) (name /MCU/PU13)
+      (node (ref P3) (pin 13))
+      (node (ref U1) (pin 36)))
+    (net (code 19) (name /MCU/PR3)
+      (node (ref P1) (pin 3))
+      (node (ref U1) (pin 34)))
+    (net (code 20) (name /MCU/PR4)
+      (node (ref U1) (pin 33))
+      (node (ref P1) (pin 4))
+      (node (ref D1) (pin 1)))
+    (net (code 21) (name /MCU/PR5)
+      (node (ref U1) (pin 32))
+      (node (ref P1) (pin 5)))
+    (net (code 22) (name /MCU/~RESET)
+      (node (ref P1) (pin 2))
+      (node (ref S1) (pin 1))
+      (node (ref U1) (pin 26))
+      (node (ref C6) (pin 1)))
+    (net (code 23) (name /MCU/USB_DP)
+      (node (ref U1) (pin 3))
+      (node (ref R1) (pin 2)))
+    (net (code 24) (name /MCU/USB_DM)
+      (node (ref U1) (pin 4))
+      (node (ref R2) (pin 2)))
+    (net (code 25) (name /MCU/PU9)
+      (node (ref P3) (pin 9))
+      (node (ref U1) (pin 40)))
+    (net (code 26) (name /MCU/PU7/FLASH_SCK)
+      (node (ref P3) (pin 7))
+      (node (ref U3) (pin 6))
+      (node (ref U1) (pin 42)))
+    (net (code 27) (name /MCU/PU2)
+      (node (ref P3) (pin 2))
+      (node (ref U1) (pin 47)))
+    (net (code 28) (name /MCU/PU11)
+      (node (ref U1) (pin 38))
+      (node (ref P3) (pin 11)))
+    (net (code 29) (name /MCU/PU5/FLASH_MISO)
+      (node (ref U1) (pin 44))
+      (node (ref U3) (pin 2))
+      (node (ref P3) (pin 5)))
+    (net (code 30) (name /MCU/PL12)
+      (node (ref P4) (pin 12))
+      (node (ref U1) (pin 31)))
+    (net (code 31) (name /MCU/PL10)
+      (node (ref P4) (pin 10))
+      (node (ref U1) (pin 29)))
+    (net (code 32) (name /MCU/PL8)
+      (node (ref U1) (pin 27))
+      (node (ref P4) (pin 8)))
+    (net (code 33) (name /MCU/+5V)
+      (node (ref J2) (pin 1))
+      (node (ref SJ3) (pin 2))
+      (node (ref U1) (pin 6))
+      (node (ref U2) (pin 4))
+      (node (ref D3) (pin A))
+      (node (ref C2) (pin 1))
+      (node (ref J1) (pin 1)))
+    (net (code 34) (name +3.3V)
+      (node (ref L1) (pin 3))
+      (node (ref SJ5) (pin 2))
+      (node (ref C3) (pin 1))
+      (node (ref U1) (pin 1))
+      (node (ref U1) (pin 5))
+      (node (ref D4) (pin C))
+      (node (ref P4) (pin 14))
+      (node (ref C1) (pin 1))
+      (node (ref C11) (pin 1))
+      (node (ref U1) (pin 22))
+      (node (ref C10) (pin 1))
+      (node (ref U3) (pin 3))
+      (node (ref FB1) (pin 1))
+      (node (ref U3) (pin 7))
+      (node (ref U3) (pin 8))
+      (node (ref C5) (pin 1)))
+    (net (code 35) (name /USB/VLIPO)
+      (node (ref J2) (pin 5))
+      (node (ref C7) (pin 1))
+      (node (ref U2) (pin 3))
+      (node (ref D2) (pin A)))
+    (net (code 36) (name /MCU/TRACE_SWO)
+      (node (ref P2) (pin 5))
+      (node (ref U1) (pin 19)))
+    (net (code 37) (name /MCU/SWD_CLK)
+      (node (ref P2) (pin 4))
+      (node (ref U1) (pin 17)))
+    (net (code 38) (name /MCU/SWD_DIO)
+      (node (ref U1) (pin 20))
+      (node (ref P2) (pin 3)))
+    (net (code 39) (name +BATT)
+      (node (ref U1) (pin 16))
+      (node (ref P2) (pin 1))
+      (node (ref D4) (pin A)))
+    (net (code 40) (name /power/VRAW)
+      (node (ref D2) (pin C))
+      (node (ref C12) (pin 1))
+      (node (ref D3) (pin C))
+      (node (ref L1) (pin 1))
+      (node (ref U4) (pin 3))
+      (node (ref U4) (pin 1))
+      (node (ref P1) (pin 1)))
+    (net (code 41) (name GNDPWR)
+      (node (ref H1) (pin 1))
+      (node (ref C7) (pin 2))
+      (node (ref R4) (pin 2))
+      (node (ref C11) (pin 2))
+      (node (ref U2) (pin 2))
+      (node (ref P4) (pin 13))
+      (node (ref J1) (pin 4))
+      (node (ref J2) (pin 4))
+      (node (ref J3) (pin 5))
+      (node (ref P2) (pin 2))
+      (node (ref C1) (pin 2))
+      (node (ref C12) (pin 2))
+      (node (ref C2) (pin 2))
+      (node (ref U1) (pin 2))
+      (node (ref S1) (pin 4))
+      (node (ref C10) (pin 2))
+      (node (ref S1) (pin 2))
+      (node (ref C3) (pin 2))
+      (node (ref U1) (pin 23))
+      (node (ref U3) (pin 4))
+      (node (ref FB2) (pin 1))
+      (node (ref C5) (pin 2))
+      (node (ref C6) (pin 2))
+      (node (ref R3) (pin 2))
+      (node (ref U4) (pin 2))
+      (node (ref C8) (pin 2)))
+    (net (code 42) (name "")
+      (node (ref P5) (pin 1))
+      (node (ref U2) (pin 1)))
+    (net (code 43) (name "")
+      (node (ref R4) (pin 1))
+      (node (ref U2) (pin 5)))
+    (net (code 44) (name "")
+      (node (ref U4) (pin 5))
+      (node (ref L1) (pin 2)))
+    (net (code 45) (name "")
+      (node (ref SJ5) (pin 1))
+      (node (ref U4) (pin 4)))
+    (net (code 46) (name VSSA)
+      (node (ref C4) (pin 2))
+      (node (ref C9) (pin 2))
+      (node (ref U1) (pin 12))
+      (node (ref FB2) (pin 2))
+      (node (ref U1) (pin 11)))
+    (net (code 47) (name VDDA)
+      (node (ref SJ4) (pin 1))
+      (node (ref FB1) (pin 2))
+      (node (ref C4) (pin 1))
+      (node (ref U1) (pin 9)))
+    (net (code 48) (name "")
+      (node (ref S1) (pin 3)))
+    (net (code 49) (name "")
+      (node (ref R3) (pin 1))
+      (node (ref D1) (pin 2)))
+    (net (code 50) (name "")
+      (node (ref U1) (pin 15))
+      (node (ref Y1) (pin X2)))
+    (net (code 51) (name "")
+      (node (ref Y1) (pin X1))
+      (node (ref U1) (pin 14)))
+    (net (code 52) (name "")
+      (node (ref SJ4) (pin 2))
+      (node (ref U1) (pin 10))
+      (node (ref C9) (pin 1)))
+    (net (code 53) (name "")
+      (node (ref SJ3) (pin 1))
+      (node (ref J3) (pin 1)))
+    (net (code 54) (name "")
+      (node (ref J3) (pin 2))
+      (node (ref SJ2) (pin 1)))
+    (net (code 55) (name "")
+      (node (ref J3) (pin 3))
+      (node (ref SJ1) (pin 1)))
+    (net (code 56) (name "")
+      (node (ref J3) (pin 4))
+      (node (ref P6) (pin 1)))
+    (net (code 57) (name /USB/USB_D-)
+      (node (ref SJ2) (pin 2))
+      (node (ref R2) (pin 1))
+      (node (ref J1) (pin 2))
+      (node (ref J2) (pin 2)))
+    (net (code 58) (name /USB/USB_D+)
+      (node (ref J2) (pin 3))
+      (node (ref J1) (pin 3))
+      (node (ref SJ1) (pin 2))
+      (node (ref R1) (pin 1)))))
