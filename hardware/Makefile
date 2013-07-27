@@ -7,7 +7,7 @@ PNG_PREVIEWS=	${PNGS:.png=-small.png}
 BOARD=		$P.brd
 GERBERS=	$(wildcard $P-*.g[bt][lso] $P-*.gbr $P*.drl)
 LICENSE_FILES=	LICENSE LICENSE.HOWTO README.md
-COMPOSITE_PNGS=	$P-Composite_Front.png $P-Composite_Back.png
+COMPOSITE_PNGS=	$P-F_Composite.png $P-B_Composite.png
 
 all: clean png png_preview
 
@@ -40,7 +40,7 @@ png_preview: ${PNG_PREVIEWS}
 $P-Composite_%-small.png: $P-Composite_%.png
 	convert -type TrueColorMatte -resize '300x300' -quality 95 -type optimize $^ $@
 
-$P-Composite_%.png: $P-%.png $P-Mask_%.png $P-SilkS_%.png $P-PCB_Edges.png
+$P-%_Composite.png: $P-%_Cu.png $P-%_Mask.png $P-%_SilkS.png $P-Edge_Cuts.png
 	sh composite-board.sh $^ $$(case "$@" in *Back*) printf -- "-flop";;esac) -type optimize -quality 95 $@
 
 
