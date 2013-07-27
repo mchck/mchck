@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by CvPcb (2013-07-14 BZR 4242)-stable date = Wed 24 Jul 2013 06:52:50 PM CEST
+Cmp-Mod V01 Created by CvPcb (2013-07-14 BZR 4242)-stable date = Thu 25 Jul 2013 02:55:30 AM CEST
 
 BeginCmp
 TimeStamp = /50474F32/5048FC9E;
@@ -172,14 +172,14 @@ BeginCmp
 TimeStamp = /4F2EFBC8;
 Reference = P1;
 ValeurCmp = RIGHT_PINS;
-IdModule  = SparkFun-1X05_LOCK;
+IdModule  = SparkFun-1X06_LOCK;
 EndCmp
 
 BeginCmp
 TimeStamp = /4F3D2CED;
 Reference = P2;
 ValeurCmp = DEBUG;
-IdModule  = SparkFun-1X05_LOCK;
+IdModule  = SparkFun-1X03_LOCK;
 EndCmp
 
 BeginCmp
@@ -242,7 +242,7 @@ BeginCmp
 TimeStamp = /50474F32/50466EFD;
 Reference = S1;
 ValeurCmp = TAC_SWITCHSMD_EVQP2;
-IdModule  = EVQP2;
+IdModule  = TACT_4x3;
 EndCmp
 
 BeginCmp
