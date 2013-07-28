@@ -41,7 +41,7 @@ $P-Composite_%-small.png: $P-Composite_%.png
 	convert -type TrueColorMatte -resize '300x300' -quality 95 -type optimize $^ $@
 
 $P-%_Composite.png: $P-%_Cu.png $P-%_Mask.png $P-%_SilkS.png $P-Edge_Cuts.png
-	sh composite-board.sh $^ $$(case "$@" in *Back*) printf -- "-flop";;esac) -type optimize -quality 95 $@
+	sh composite-board.sh $^ $$(case "$@" in *B_*) printf -- "-flop";;esac) -type optimize -quality 95 $@
 
 
 ${GERBERS}: ${BOARD}
