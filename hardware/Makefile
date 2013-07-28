@@ -54,7 +54,7 @@ FAB_INDEX=	$(shell git rev-parse --git-dir || echo ".git")/fab-index
 e=	GIT_INDEX_FILE=${FAB_INDEX}
 
 ci-fab: ${GERBERS} ${PDFS} ${PNGS} ${PNG_PREVIEWS} ${LICENSE_FILES}
-	@if ! git diff --quiet HEAD; then \
+	@if ! git diff --quiet HEAD -- . ${LICENSE_FILES}; then \
 		echo "tree is dirty.  please commit first." >&2; \
 		exit 1; \
 	fi
