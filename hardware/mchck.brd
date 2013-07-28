@@ -1,4 +1,4 @@
-PCBNEW-BOARD Version 2 date Sun 28 Jul 2013 02:13:05 PM CEST
+PCBNEW-BOARD Version 2 date Sun 28 Jul 2013 02:19:28 PM CEST
 
 # Created by Pcbnew(2013-07-14 BZR 4242)-stable
 
@@ -11,7 +11,7 @@ VisibleLayers 1C208001
 Links 129
 NoConn 0
 Di 12.877799 32.639 86.715602 66.268601
-Ndraw 129
+Ndraw 130
 Ntrack 510
 Nzone 0
 BoardThickness 1.6002
@@ -65,7 +65,7 @@ PadDrill 1.016
 Pad2MaskClearance 0.09906
 SolderMaskMinWidth 0
 AuxiliaryAxisOrg 0 0
-VisibleElements FFFFFF3F
+VisibleElements FFFFFF7F
 PcbPlotParams (pcbplotparams (layerselection 284196865) (usegerberextensions true) (excludeedgelayer false) (linewidth 0.150000) (plotframeref false) (viasonmask false) (mode 1) (useauxorigin false) (hpglpennumber 1) (hpglpenspeed 20) (hpglpendiameter 15) (hpglpenoverlay 0) (psnegative false) (psa4output false) (plotreference true) (plotvalue true) (plotothertext true) (plotinvisibletext false) (padsonsilk false) (subtractmaskfromsilk true) (outputformat 1) (mirror false) (drillshape 0) (scaleselection 1) (outputdirectory ""))
 $EndSETUP
 
@@ -3303,6 +3303,18 @@ Ro 0 0 0
 $EndSHAPE3D
 $EndMODULE SM0603_Capa
 $DRAWSEGMENT
+Po 0 69.9008 49.9364 69.9008 54.3052 0.14986
+De 21 0 900 0 0
+$EndDRAWSEGMENT
+$DRAWSEGMENT
+Po 0 66.0908 49.9364 69.9008 49.9364 0.14986
+De 21 0 900 0 0
+$EndDRAWSEGMENT
+$DRAWSEGMENT
+Po 0 66.0908 54.2544 66.0908 49.9364 0.14986
+De 21 0 900 0 0
+$EndDRAWSEGMENT
+$DRAWSEGMENT
 Po 0 38.862 44.2722 38.862 41.91 0.09906
 De 28 0 900 51F5065F 0
 $EndDRAWSEGMENT
@@ -3389,10 +3401,6 @@ $EndDRAWSEGMENT
 $DRAWSEGMENT
 Po 0 44.6532 58.166 42.9768 56.4896 0.14986
 De 20 0 900 0 0
-$EndDRAWSEGMENT
-$DRAWSEGMENT
-Po 0 69.9008 54.3052 69.9008 52.1208 0.14986
-De 21 0 900 0 0
 $EndDRAWSEGMENT
 $DRAWSEGMENT
 Po 0 69.9008 54.3052 70.3072 54.7116 0.14986
@@ -3549,10 +3557,6 @@ De 21 0 900 0 0
 $EndDRAWSEGMENT
 $DRAWSEGMENT
 Po 0 61.0616 48.4632 61.0616 47.4472 0.14986
-De 21 0 900 0 0
-$EndDRAWSEGMENT
-$DRAWSEGMENT
-Po 0 66.0908 53.5432 66.0908 54.2544 0.14986
 De 21 0 900 0 0
 $EndDRAWSEGMENT
 $DRAWSEGMENT
