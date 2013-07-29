@@ -198,8 +198,8 @@ usb_set_interface(int iface, int altsetting)
 
 	for (struct usbd_function_ctx_header *fh = usb.functions;
 	     fh != NULL;
-	     fh = fh->next, iface_count += fh->function->ninterface) {
-		if (iface - iface_count < fh->function->ninterface) {
+	     fh = fh->next, iface_count += fh->function->interface_count) {
+		if (iface - iface_count < fh->function->interface_count) {
 			if (fh->function->configure != NULL)
 				return (fh->function->configure(iface,
 								iface - iface_count,
@@ -465,13 +465,27 @@ usb_handle_transaction(struct usb_xfer_info *info)
 	}
 }
 
-void
-usb_init_ep(struct usbd_ep_pipe_state_t *s, int ep, enum usb_ep_dir dir, size_t size)
+static void
+usb_init_ep_pipe(struct usbd_ep_pipe_state_t *s, int ep, enum usb_ep_dir dir, size_t size)
 {
 	memset(s, 0, sizeof(*s));
 	s->ep_maxsize = size;
 	s->ep_num = ep;
 	s->ep_dir = dir;
+}
+
+struct usbd_ep_pipe_state_t *
+usb_init_ep(struct usbd_function_ctx_header *ctx, int ep, enum usb_ep_dir dir, size_t size)
+{
+	struct usbd_ep_pipe_state_t *s;
+
+	if (dir == USB_EP_RX)
+		s = &usb.ep_state[ctx->ep_rx_offset + ep].rx;
+	else
+		s = &usb.ep_state[ctx->ep_tx_offset + ep].tx;
+
+	usb_init_ep_pipe(s, ep, dir, size);
+	return (s);
 }
 
 void
@@ -481,8 +495,8 @@ usb_restart(void)
 	memset(&usb, 0, sizeof(usb));
 	usb.identity = identity;
 	/* XXX reset existing functions? */
-	usb_init_ep(&usb.ep_state[0].rx, 0, USB_EP_RX, EP0_BUFSIZE);
-	usb_init_ep(&usb.ep_state[0].tx, 0, USB_EP_TX, EP0_BUFSIZE);
+	usb_init_ep_pipe(&usb.ep_state[0].rx, 0, USB_EP_RX, EP0_BUFSIZE);
+	usb_init_ep_pipe(&usb.ep_state[0].tx, 0, USB_EP_TX, EP0_BUFSIZE);
 	usb_setup_control();
 }
 

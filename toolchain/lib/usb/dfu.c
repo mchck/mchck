@@ -165,5 +165,5 @@ dfu_init(dfu_setup_write_t setup_write, dfu_finish_write_t finish_write, struct 
 
 const struct usbd_function dfu_function = {
         .control = dfu_handle_control,
-        .ninterface = USB_FUNCTION_DFU_IFACE_COUNT,
+        .interface_count = USB_FUNCTION_DFU_IFACE_COUNT,
 };

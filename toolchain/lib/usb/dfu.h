@@ -68,6 +68,67 @@ struct dfu_ctx {
 };
 
 
+struct dfu_desc_functional {
+        uint8_t bLength;
+        struct usb_desc_type_t bDescriptorType; /* = class DFU/0x1 FUNCTIONAL */
+        union {
+                struct {
+                        uint8_t can_download : 1;
+                        uint8_t can_upload : 1;
+                        uint8_t manifestation_tolerant : 1;
+                        uint8_t will_detach : 1;
+                        uint8_t _rsvd0 : 4;
+                };
+                uint8_t bmAttributes;
+        };
+        uint16_t wDetachTimeOut;
+        uint16_t wTransferSize;
+        struct usb_bcd_t bcdDFUVersion;
+} __packed;
+CTASSERT_SIZE_BYTE(struct dfu_desc_functional, 9);
+
+struct dfu_function_desc {
+        struct usb_desc_iface_t iface;
+        struct dfu_desc_functional dfu;
+};
+
+#define USB_FUNCTION_DESC_DFU_DECL                         \
+        struct dfu_function_desc
+
+#define USB_FUNCTION_DESC_DFU_NIFACE	1
+#define USB_FUNCTION_DESC_DFU_NRXEP	0
+#define USB_FUNCTION_DESC_DFU_NTXEP	0
+
+#define USB_FUNCTION_DESC_DFU(state...)                                 \
+        {                                                               \
+                .iface = {                                              \
+                        .bLength = sizeof(struct usb_desc_iface_t),     \
+                        .bDescriptorType = USB_DESC_IFACE,              \
+                        .bInterfaceNumber = USB_FUNCTION_IFACE(0, state), \
+                        .bAlternateSetting = 0,                         \
+                        .bNumEndpoints = 0,                             \
+                        .bInterfaceClass = USB_DEV_CLASS_APP,           \
+                        .bInterfaceSubClass = USB_DEV_SUBCLASS_APP_DFU, \
+                        .bInterfaceProtocol = USB_DEV_PROTO_DFU_DFU,    \
+                        .iInterface = 0,                                \
+                },                                                      \
+                        .dfu = {                                        \
+                        .bLength = sizeof(struct dfu_desc_functional),  \
+                        .bDescriptorType = {                            \
+                                .id = 0x1,                              \
+                                .type_type = USB_DESC_TYPE_CLASS        \
+                        },                                              \
+                        .will_detach = 1,                               \
+                        .manifestation_tolerant = 0,                    \
+                        .can_upload = 0,                                \
+                        .can_download = 1,                              \
+                        .wDetachTimeOut = 0,                            \
+                        .wTransferSize = USB_DFU_TRANSFER_SIZE,         \
+                        .bcdDFUVersion = { .maj = 1, .min = 1 }         \
+                }                                                       \
+        }
+
+
 extern const struct usbd_function dfu_function;
 
 void dfu_write_done(enum dfu_status, struct dfu_ctx *ctx);

@@ -287,7 +287,17 @@ typedef void (*ep_callback_t)(void *buf, ssize_t len, void *data);
 struct usbd_function {
 	int (*configure)(int orig_iface, int iface, int altsetting, void *data);
 	int (*control)(struct usb_ctrl_req_t *, void *);
-	int ninterface;
+	int interface_count;
+	int ep_rx_count;
+	int ep_tx_count;
+};
+
+struct usbd_function_ctx_header {
+	struct usbd_function_ctx_header *next;
+	const struct usbd_function *function;
+	int iface_offset;
+	int ep_rx_offset;
+	int ep_tx_offset;
 };
 
 /**
@@ -316,10 +326,8 @@ struct usbd_device {
 	const struct usbd_config *configs[];
 };
 
-struct usbd_function_ctx_header {
-	struct usbd_function_ctx_header *next;
-	const struct usbd_function *function;
-};
+#define USB_FUNCTION_IFACE(iface, iface_off, tx_ep_off, rx_ep_off)	\
+	((iface_off) + (iface))
 
 
 /* Provided by MD code */
@@ -349,7 +357,7 @@ void usb_attach_function(const struct usbd_function *function, struct usbd_funct
 void usb_handle_transaction(struct usb_xfer_info *);
 void usb_setup_control(void);
 void usb_handle_control_status(int);
-void usb_init_ep(struct usbd_ep_pipe_state_t *s, int ep, enum usb_ep_dir dir, size_t size);
+struct usbd_ep_pipe_state_t *usb_init_ep(struct usbd_function_ctx_header *ctx, int ep, enum usb_ep_dir dir, size_t size);
 int usb_rx(struct usbd_ep_pipe_state_t *, void *, size_t, ep_callback_t, void *);
 int usb_tx(struct usbd_ep_pipe_state_t *, const void *, size_t, size_t, ep_callback_t, void *);
 
