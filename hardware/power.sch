@@ -202,7 +202,7 @@ F 4 "true" H 5650 2100 60  0001 C CNN "optional"
 	1    0    0    -1  
 $EndComp
 Text Notes 4600 1550 0    40   ~ 0
-LDO, e.g. MIC5205 (16V, 150mA, 1uA Iq): bridge L2/out\n\nany DC/DC regulator: bridge SJ5\nstep-down, e.g. LM3671 (5.5V, 600mA, 16uA Iq): place L across L2/out \nstep-up, e.g. TPS61097 (5.5V, 350mA, 5uA Iq): place L across L2/in
+LDO, e.g. MIC5205 (16V, 150mA, 1uA Iq): bridge L/out\n\nany DC/DC regulator: bridge SJ\nstep-down, e.g. LM3671 (5.5V, 600mA, 16uA Iq): place L across L/out \nstep-up, e.g. TPS61097 (5.5V, 350mA, 5uA Iq): place L across L/in
 Text Notes 5450 2050 0    40   ~ 0
 in
 Text Notes 5750 2050 0    40   ~ 0
