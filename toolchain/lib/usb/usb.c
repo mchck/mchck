@@ -55,7 +55,7 @@ usb_tx_next(struct usbd_ep_pipe_state_t *s)
 	}
 
 	if (s->callback)
-		s->callback(s->data_buf, 0, s->callback_data);
+		s->callback(s->data_buf, s->pos, s->callback_data);
 
 	return (0);
 }
