@@ -447,7 +447,7 @@ vusb_tx_one(int ep, enum usb_tok_pid tok, void *addr, size_t len)
                 printf("SETUP\n");
                 break;
         case USB_PID_OUT:
-                printf("OUT\n");
+                printf("OUT, ep %d, len %zd\n", ep, len);
                 break;
         default:
                 printf("weh\n");
@@ -510,7 +510,7 @@ vusb_rx_one(int ep, enum usb_tok_pid tok, void *addr, size_t len, size_t *rxlen)
 
         switch (tok) {
         case USB_PID_IN:
-                printf("IN\n");
+                printf("IN, ep %d, len %zd\n", ep, len);
                 break;
         default:
                 printf("weh\n");
