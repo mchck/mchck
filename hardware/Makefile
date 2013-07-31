@@ -1,9 +1,10 @@
 P=	mchck
 
-SOURCES=	$(wildcard $P*.ps)
+SOURCES=	$(wildcard $P*.ps) $(wildcard $(SCHEMATIC:.sch=*.ps))
 PDFS=		${SOURCES:.ps=-crop.pdf}
 PNGS=            ${COMPOSITE_PNGS} ${SOURCES:.ps=.png}
 PNG_PREVIEWS=	${PNGS:.png=-small.png}
+SCHEMATIC=	$(wildcard *.sch)
 BOARD=		$P.brd
 GERBERS=	$(wildcard $P-*.g[bt][lso] $P-*.gbr $P*.drl)
 LICENSE_FILES=	LICENSE LICENSE.HOWTO README.md
