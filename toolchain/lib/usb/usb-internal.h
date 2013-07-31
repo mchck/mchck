@@ -49,8 +49,9 @@ struct usbd_ep_state_t {
 };
 
 struct usbd_t {
+	struct usbd_function_ctx_header functions;
+	struct usbd_function control_function;
 	const struct usbd_device *identity;
-	struct usbd_function_ctx_header *functions;
 	int address;
 	int config;
 	enum usbd_dev_state {

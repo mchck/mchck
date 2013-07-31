@@ -295,7 +295,7 @@ struct usbd_function {
 struct usbd_function_ctx_header {
 	struct usbd_function_ctx_header *next;
 	const struct usbd_function *function;
-	int iface_offset;
+	int interface_offset;
 	int ep_rx_offset;
 	int ep_tx_offset;
 };
@@ -328,6 +328,10 @@ struct usbd_device {
 
 #define USB_FUNCTION_IFACE(iface, iface_off, tx_ep_off, rx_ep_off)	\
 	((iface_off) + (iface))
+#define USB_FUNCTION_TX_EP(ep, iface_off, tx_ep_off, rx_ep_off)	\
+	((tx_ep_off) + (ep))
+#define USB_FUNCTION_RX_EP(ep, iface_off, tx_ep_off, rx_ep_off)	\
+	((rx_ep_off) + (ep))
 
 
 /* Provided by MD code */

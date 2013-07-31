@@ -196,7 +196,7 @@ usb_set_interface(int iface, int altsetting)
 {
 	int iface_count = 0;
 
-	for (struct usbd_function_ctx_header *fh = usb.functions;
+	for (struct usbd_function_ctx_header *fh = &usb.functions;
 	     fh != NULL;
 	     fh = fh->next, iface_count += fh->function->interface_count) {
 		if (iface - iface_count < fh->function->interface_count) {
@@ -280,7 +280,7 @@ static void
 usb_handle_control_nonstd(struct usb_ctrl_req_t *req)
 {
 	/* XXX filter by interface/endpoint? */
-	for (struct usbd_function_ctx_header *fh = usb.functions; fh != NULL; fh = fh->next) {
+	for (struct usbd_function_ctx_header *fh = &usb.functions; fh != NULL; fh = fh->next) {
 		/* ->control() returns != 0 if it handled the request */
 		if (fh->function->control != NULL &&
 		    fh->function->control(req, fh))
@@ -465,15 +465,6 @@ usb_handle_transaction(struct usb_xfer_info *info)
 	}
 }
 
-static void
-usb_init_ep_pipe(struct usbd_ep_pipe_state_t *s, int ep, enum usb_ep_dir dir, size_t size)
-{
-	memset(s, 0, sizeof(*s));
-	s->ep_maxsize = size;
-	s->ep_num = ep;
-	s->ep_dir = dir;
-}
-
 struct usbd_ep_pipe_state_t *
 usb_init_ep(struct usbd_function_ctx_header *ctx, int ep, enum usb_ep_dir dir, size_t size)
 {
@@ -484,7 +475,10 @@ usb_init_ep(struct usbd_function_ctx_header *ctx, int ep, enum usb_ep_dir dir, s
 	else
 		s = &usb.ep_state[ctx->ep_tx_offset + ep].tx;
 
-	usb_init_ep_pipe(s, ep, dir, size);
+	memset(s, 0, sizeof(*s));
+	s->ep_maxsize = size;
+	s->ep_num = ep;
+	s->ep_dir = dir;
 	return (s);
 }
 
@@ -492,11 +486,12 @@ void
 usb_restart(void)
 {
 	const struct usbd_device *identity = usb.identity;
-	memset(&usb, 0, sizeof(usb));
-	usb.identity = identity;
 	/* XXX reset existing functions? */
-	usb_init_ep_pipe(&usb.ep_state[0].rx, 0, USB_EP_RX, EP0_BUFSIZE);
-	usb_init_ep_pipe(&usb.ep_state[0].tx, 0, USB_EP_TX, EP0_BUFSIZE);
+	memset(&usb, 0, sizeof(usb));
+	usb.functions.function = &usb.control_function;
+	usb.identity = identity;
+	usb_init_ep(&usb.functions, 0, USB_EP_RX, EP0_BUFSIZE);
+	usb_init_ep(&usb.functions, 0, USB_EP_TX, EP0_BUFSIZE);
 	usb_setup_control();
 }
 
@@ -504,13 +499,16 @@ void
 usb_attach_function(const struct usbd_function *function, struct usbd_function_ctx_header *ctx)
 {
 	/* XXX right now this requires a sequential initialization */
-	struct usbd_function_ctx_header **fhp = &usb.functions;
+	struct usbd_function_ctx_header *prev = &usb.functions;
 
-	while (*fhp != NULL)
-		fhp = &(*fhp)->next;
-	*fhp = ctx;
+	while (prev->next != NULL)
+		prev = prev->next;
 	ctx->next = NULL;
 	ctx->function = function;
+	ctx->interface_offset = prev->interface_offset + prev->function->interface_count;
+	ctx->ep_rx_offset = prev->ep_rx_offset + prev->function->ep_rx_count;
+	ctx->ep_tx_offset = prev->ep_tx_offset + prev->function->ep_tx_count;
+	prev->next = ctx;
 }
 
 void
