@@ -428,9 +428,9 @@ vusb_deliver_packet(int ep, enum usb_ep_dir dir, struct vusb_pipe_state_t *ps)
 }
 
 static void
-vusb_urb_to_req(struct vusb_urb_t *urb, struct usbip_header_basic *h)
+vusb_urb_to_req(struct vusb_urb_t *urb, struct usbip_header_basic *h, int command)
 {
-        h->command = htonl(USBIP_RET_SUBMIT);
+        h->command = htonl(command);
         h->seqnum = htonl(urb->seqnum);
         h->devid = htonl(urb->devid);
         h->direction = htonl(urb->direction);
@@ -582,6 +582,7 @@ vusb_tx(struct vusb_urb_t *urb)
                 urb->status = -EPIPE;
                 return (-1);
         case USB_PID_ACK:
+                urb->status = 0;
                 urb->actual_length += thislen;
                 /* Are we done? */
                 if (urb->actual_length == urb->transfer_length &&
@@ -619,6 +620,7 @@ vusb_rx(struct vusb_urb_t *urb)
                 urb->status = -EPIPE;
                 return (-1);
         case USB_PID_ACK:
+                urb->status = 0;
                  if (rxlen < thislen &&
                      (urb->transfer_flags & URB_SHORT_NOT_OK)) {
                          urb->status = -EREMOTEIO;
@@ -646,6 +648,7 @@ vusb_setup_status(struct vusb_urb_t *urb)
         if (direction == USBIP_DIR_OUT) {
                 switch (vusb_tx_one(urb->ep, USB_PID_OUT, NULL, 0)) {
                 case USB_PID_ACK:
+                        urb->status = 0;
                         urb->setup_state = VUSB_SETUP_DONE;
                         return (1);
                 case USB_PID_STALL:
@@ -662,6 +665,7 @@ vusb_setup_status(struct vusb_urb_t *urb)
                         urb->status = -EPIPE;
                         return (-1);
                 case USB_PID_ACK:
+                        urb->status = 0;
                         if (rxlen > 0)
                                 urb->status = -EOVERFLOW;
                         urb->setup_state = VUSB_SETUP_DONE;
@@ -736,6 +740,7 @@ handle_cmd_submit(struct usbip_header *requn)
         urb->direction = h->direction;
         urb->ep = h->ep;
 
+        urb->status = -EINPROGRESS;
         urb->transfer_flags = ntohl(req->transfer_flags);
         urb->transfer_length = ntohl(req->transfer_buffer_length);
         urb->start_frame = ntohl(req->start_frame);
@@ -760,6 +765,36 @@ handle_cmd_submit(struct usbip_header *requn)
 }
 
 static void
+handle_cmd_unlink(struct usbip_header *reqin)
+{
+        struct vusb_urb_t **p;
+        struct vusb_urb_t *urb;
+
+        uint32_t seqnum = ntohl(reqin->u.cmd_unlink.seqnum);
+
+        for (p = &urbs; (urb = *p) != NULL; p = *p ? &(*p)->next : p) {
+                if (urb->seqnum == seqnum) {
+                        *p = urb->next;
+                        if (urbs_tail == &urb->next)
+                                urbs_tail = p;
+
+                        struct usbip_header requn;
+                        struct usbip_header_ret_unlink *r = &requn.u.ret_unlink;
+
+                        printf("unlinking URB %d\n", urb->seqnum);
+
+                        vusb_urb_to_req(urb, &requn.base, USBIP_RET_UNLINK);
+                        requn.base.seqnum = htonl(reqin->base.seqnum);
+                        r->status = htonl(urb->status);
+
+                        if (write(vusb_sock, &requn, sizeof(requn)) < 0)
+                                err(1, "send urb return");
+                        free(urb);
+                }
+        }
+}
+
+static void
 vusb_ret_submit(struct vusb_urb_t *urb)
 {
         struct usbip_header requn;
@@ -767,7 +802,7 @@ vusb_ret_submit(struct vusb_urb_t *urb)
         int iovcnt = 0;
         struct usbip_header_ret_submit *r = &requn.u.ret_submit;
 
-        vusb_urb_to_req(urb, &requn.base);
+        vusb_urb_to_req(urb, &requn.base, USBIP_RET_SUBMIT);
         r->status = htonl(urb->status);
         r->actual_length = htonl(urb->actual_length);
         r->start_frame = htonl(urb->start_frame);
@@ -841,6 +876,8 @@ vusb_rcv(int block)
         case USBIP_CMD_SUBMIT:
                 handle_cmd_submit(&requn);
                 break;
+        case USBIP_CMD_UNLINK:
+                handle_cmd_unlink(&requn);
         }
 }
 
