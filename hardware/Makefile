@@ -49,6 +49,8 @@ ${GERBERS}: ${BOARD}
 	@echo "Fabrication outputs older than board file!" >&2
 	@exit 1
 
+bom: $P.xml
+	xmlstarlet sel -t -m '//comp[not(descendant::field[@name="populate"]) or descendant::field[@name="populate" and not(text()="never" or text()="optional")]]' -v '@ref' -o "        " -v value -n mchck.xml
 
 FAB_BRANCH=	fab
 FAB_INDEX=	$(shell git rev-parse --git-dir || echo ".git")/fab-index
