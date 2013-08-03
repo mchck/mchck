@@ -19,7 +19,7 @@ class BusPirateSwd < BitbangSwd
 
   def initialize(opt = {})
     super
-    @outbuf = ""
+    @outbuf = []
     @acks = 0
 
     @dev = SerialPort.new(opt[:dev], 115200)
@@ -75,12 +75,15 @@ class BusPirateSwd < BitbangSwd
 
   def flush!
     return if @outbuf.empty?
-    Log(:phys, 2){ ['flush', hexify(@outbuf)] }
-    @dev.write(@outbuf)
-    @outbuf = ""
+    data = @outbuf.pack('C*')
+    Log(:phys, 2){ ['flush', hexify(data)] }
+    @dev.write(data)
+    @outbuf = []
   end
 
   def write_bytes(bytes)
+    bytes = bytes.bytes
+
     while !bytes.empty?
       if @cur_dir == :in
         Log(:phys, 2){ 'turning out' }
@@ -93,7 +96,7 @@ class BusPirateSwd < BitbangSwd
 
       this_bytes = bytes.slice!(0..15)
       @outbuf << (CMD_WRITE_BYTES | (this_bytes.length - 1))
-      @outbuf << this_bytes
+      @outbuf += this_bytes
       @acks += this_bytes.length + 1
     end
   end
@@ -105,7 +108,7 @@ class BusPirateSwd < BitbangSwd
     byte = ("" << byte).unpack('b*').pack('B*')
 
     @outbuf << (CMD_WRITE_BITS | (len - 1))
-    @outbuf << byte
+    @outbuf << byte.ord
     @acks += 2                  # yes, two acks.
   end
 
@@ -159,6 +162,11 @@ class BusPirateSwd < BitbangSwd
     data.slice!(0...@acks)
     @acks = 0
     Log(:phys, 3){ ['read:', hexify(data)] }
+    # begin
+    #   d = @dev.read_nonblock(10)
+    #   Log(:phys, 1){ ['found unexpected byte:', hexify(d)] }
+    # rescue
+    # end
     data
   end
 end
