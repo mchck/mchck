@@ -27,7 +27,7 @@ class GDBServer
     @data = ""
     @sock.setsockopt(:TCP, :NODELAY, true)
     attach
-    while true
+    while @state != :detached
       cmd = read_packet
       repl = nil
       begin
@@ -148,6 +148,7 @@ class GDBServer
     @target.disable_breakpoints!
     @target.disable_debug!
     @target.continue!
+    @state = :detached
     'OK'
   end
 
