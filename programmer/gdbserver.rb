@@ -106,8 +106,13 @@ class GDBServer
       single_step($1)
     when /^vAttach;.*$/
       attach
+    when /^vKill;/
+      ret = reset_system(:ok)
+      @state = :killed
+      ret
     when /^vRun;$/
-      reset_system(true)
+      @state = :resetting
+      reset_system(:stop)
     when /^([zZ])([01234]),([[:xdigit:]]+),([[:xdigit:]]*).*/
       # remove/insert breakpoint
       breakpoint($1, $2, $3, $4)
@@ -135,6 +140,7 @@ class GDBServer
     @target.catch_vector!(true)
     @target.halt_core!
     @target.enable_breakpoints!
+    @state = :running
     wait_stop
   end
 
@@ -173,11 +179,13 @@ class GDBServer
 
   def reset_system(send_reply)
     @target.reset_system!
-    if send_reply
-      wait_stop
-    else
+    ret = wait_stop(send_reply)
+
+    if not send_reply
       # this packet has no reply
       throw :gdbreply, nil
+    else
+      ret
     end
   end
 
@@ -189,7 +197,7 @@ class GDBServer
     wait_stop
   end
 
-  def wait_stop
+  def wait_stop(send_reply=:stop)
     while !@target.core_halted?
       begin
         @data += @sock.read_nonblock(1024)
@@ -202,6 +210,8 @@ class GDBServer
       end
       sleep 0.1
     end
+
+    return 'X01' if @state == :killed
 
     aux = ""
     halt_reason = @target.halt_reason
@@ -218,10 +228,19 @@ class GDBServer
       aux = "%s:%x;" % [typestr, addr]
     end
     Log(:gdb, 2){ "halt reason #{halt_reason}#{aux}" }
-    sig_num = Signal.list[halt_reason.to_s] || Signal.list["INT"]
-    pc_num = @target.reg_desc.index{|r| r[:name] == :pc}
-    cur_pc = @target.get_register(:pc, true)
-    'T%02x%02x:%s;%s' % [sig_num, pc_num, code_binary(cur_pc), aux]
+    case send_reply
+    when :stop
+      sig_num = Signal.list[halt_reason.to_s] || Signal.list["INT"]
+      pc_num = @target.reg_desc.index{|r| r[:name] == :pc}
+      cur_pc = @target.get_register(:pc, true)
+      'T%02x%02x:%s;thread:1;%s' % [sig_num, pc_num, code_binary(cur_pc), aux]
+    when :ok
+      'OK'
+    when false
+      nil
+    else
+      raise RuntimeError, "invalid reply mode"
+    end
   end
 
   def breakpoint(insertstr, typestr, addrstr, kindstr)
