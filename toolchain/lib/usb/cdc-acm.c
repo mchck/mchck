@@ -45,7 +45,7 @@ queue:
 }
 
 ssize_t
-cdc_write(const char *buf, size_t len, struct cdc_ctx *ctx)
+cdc_write(const uint8_t *buf, size_t len, struct cdc_ctx *ctx)
 {
         size_t max_len;
 

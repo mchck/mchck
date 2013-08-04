@@ -144,5 +144,5 @@ struct cdc_ctx;
 
 const struct usbd_function cdc_function;
 
-ssize_t cdc_write(const char *buf, size_t len, struct cdc_ctx *ctx);
+ssize_t cdc_write(const uint8_t *buf, size_t len, struct cdc_ctx *ctx);
 void cdc_init(void (*data_ready_cb)(uint8_t *, size_t), void (*data_sent_cb)(size_t), struct cdc_ctx *ctx);
