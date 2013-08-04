@@ -121,13 +121,10 @@ usb_pipe_disable(struct usbd_ep_pipe_state_t *s)
                                 }).raw;
 }
 
-/* Only EP0 for now; clears all pending transfers. XXX invoke callbacks? */
+/* XXX what is this supposed to do? */
 void
 usb_clear_transfers(void)
 {
-        struct USB_BD_t *bd = bdt;
-
-        memset(bd, 0, USB_NUM_EP * sizeof(*bd) * 4);
 }
 
 size_t
