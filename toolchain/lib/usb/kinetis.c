@@ -25,11 +25,7 @@
  */
 
 
-#ifndef USB_NUM_EP
-#define USB_NUM_EP 1
-#endif
-
-static struct USB_BD_t bdt[USB_NUM_EP * 2 *2] __attribute__((section(".usb_bdt")));
+static struct USB_BD_t bdt[USB_MAX_EP * 2 *2] __attribute__((section(".usb_bdt")));
 
 static struct USB_BD_t *
 usb_get_bd(struct usbd_ep_pipe_state_t *s)
