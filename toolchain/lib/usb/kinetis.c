@@ -169,6 +169,7 @@ usb_reset(void)
 void
 usb_enable(void)
 {
+        SIM.sopt2.usbsrc = 1;   /* usb from mcg */
         SIM.scgc4.usbotg = 1;   /* enable usb clock */
 
         /* reset module - not sure if needed */

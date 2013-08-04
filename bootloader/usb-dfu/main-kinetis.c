@@ -63,7 +63,6 @@ init_usb_bootloader(int config)
 void
 main(void)
 {
-        SIM.sopt2.usbsrc = 1;    /* usb from mcg */
         flash_prepare_flashing();
 
         usb_init(&dfu_device);

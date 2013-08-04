@@ -109,7 +109,6 @@ main(void)
 
         onboard_led(1);
 
-        SIM.sopt2.usbsrc = 1;    /* usb from mcg */
         flash_prepare_flashing();
 
         usb_init(&dfu_device);
