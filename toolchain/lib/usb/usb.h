@@ -349,6 +349,8 @@ size_t usb_ep_get_transfer_size(struct usbd_ep_pipe_state_t *);
 void usb_queue_next(struct usbd_ep_pipe_state_t *, void *, size_t);
 void usb_pipe_stall(struct usbd_ep_pipe_state_t *);
 void usb_pipe_unstall(struct usbd_ep_pipe_state_t *);
+void usb_pipe_enable(struct usbd_ep_pipe_state_t *s);
+void usb_pipe_disable(struct usbd_ep_pipe_state_t *s);
 #ifdef VUSB
 void vusb_main_loop(void);
 #else

@@ -190,6 +190,7 @@ struct vusb_pipe_state_t {
         size_t len;
         int ready;
         int stalled;
+        int enabled;
         enum usb_data01 data01;
 
         size_t recv_len;
@@ -392,6 +393,22 @@ usb_pipe_unstall(struct usbd_ep_pipe_state_t *s)
 }
 
 void
+usb_pipe_enable(struct usbd_ep_pipe_state_t *s)
+{
+        struct vusb_pipe_state_t *ps = vusb_get_pipe(s);
+
+        ps->enabled = 1;
+}
+
+void
+usb_pipe_disable(struct usbd_ep_pipe_state_t *s)
+{
+        struct vusb_pipe_state_t *ps = vusb_get_pipe(s);
+
+        ps->enabled = 0;
+}
+
+void
 usb_clear_transfers(void)
 {
 }
@@ -460,12 +477,12 @@ vusb_tx_one(int ep, enum usb_tok_pid tok, void *addr, size_t len)
         if (len % 8 != 0)
                 printf("\n");
 
-        if (!vusb_dev.running) {
+        struct vusb_pipe_state_t *ps = &es->rx[es->pingpong_rx];
+
+        if (!vusb_dev.running || !ps->enabled) {
                 printf("-> TIMEOUT\n");
                 return (USB_PID_TIMEOUT);
         }
-
-        struct vusb_pipe_state_t *ps = &es->rx[es->pingpong_rx];
 
         if (!ps->ready) {
                 printf("-> NAK\n");
@@ -517,12 +534,13 @@ vusb_rx_one(int ep, enum usb_tok_pid tok, void *addr, size_t len, size_t *rxlen)
                 break;
         }
 
-        if (!vusb_dev.running) {
+        struct vusb_pipe_state_t *ps = &es->tx[es->pingpong_tx];
+
+        if (!vusb_dev.running || !ps->enabled) {
                 printf("-> TIMEOUT\n");
                 return (USB_PID_TIMEOUT);
         }
 
-        struct vusb_pipe_state_t *ps = &es->tx[es->pingpong_tx];
         if (!ps->ready) {
                 printf("-> NAK\n");
                 return (USB_PID_NAK);

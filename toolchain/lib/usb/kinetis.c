@@ -103,6 +103,28 @@ usb_pipe_unstall(struct usbd_ep_pipe_state_t *s)
                 bd->raw = 0;
 }
 
+void
+usb_pipe_enable(struct usbd_ep_pipe_state_t *s)
+{
+        USB0.endpt[s->ep_num].raw |= ((struct USB_ENDPT_t){
+                        .eptxen = s->ep_dir == USB_EP_TX,
+                                .eprxen = s->ep_dir == USB_EP_RX,
+                                .ephshk = 1, /* XXX ISO */
+                                .epctldis = s->ep_num != 0
+                                }).raw;
+}
+
+void
+usb_pipe_disable(struct usbd_ep_pipe_state_t *s)
+{
+        USB0.endpt[s->ep_num].raw &= ~((struct USB_ENDPT_t){
+                        .eptxen = s->ep_dir == USB_EP_TX,
+                                .eprxen = s->ep_dir == USB_EP_RX,
+                                .ephshk = 1,
+                                .epctldis = 1
+                                }).raw;
+}
+
 /* Only EP0 for now; clears all pending transfers. XXX invoke callbacks? */
 void
 usb_clear_transfers(void)
@@ -151,11 +173,6 @@ usb_reset(void)
 
         /* zap also BDT pingpong & queued transactions */
         memset(bdt, 0, sizeof(bdt));
-        USB0.endpt[0].raw = ((struct USB_ENDPT_t){
-                        .eptxen = 1,
-                                .eprxen = 1,
-                                .ephshk = 1
-                                }).raw;
         USB0.addr.raw = 0;
 
         usb_restart();

@@ -479,6 +479,7 @@ usb_init_ep(struct usbd_function_ctx_header *ctx, int ep, enum usb_ep_dir dir, s
 	s->ep_maxsize = size;
 	s->ep_num = ep;
 	s->ep_dir = dir;
+	usb_pipe_enable(s);
 	return (s);
 }
 
