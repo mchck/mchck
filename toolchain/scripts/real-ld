@@ -19,7 +19,7 @@ save_temps = false
 while arg = ARGV.shift
   call_args << arg
   case arg
-  when /^-o/
+  when /^-o/, /^-plugin$/
     arg = ARGV.shift
     call_args << arg
   when /^-T/
