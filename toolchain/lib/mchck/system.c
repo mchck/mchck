@@ -10,6 +10,14 @@ sys_reset(void)
         for (;;);
 }
 
+void __attribute__((noreturn))
+sys_yield_for_frogs(void)
+{
+        SCB.scr.sleeponexit = 1;
+        for (;;)
+                __asm__("wfi");
+}
+
 static int crit_nest;
 
 void

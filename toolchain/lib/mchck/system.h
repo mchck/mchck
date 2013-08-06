@@ -2,6 +2,7 @@ void *memset(void *, int, size_t);
 void *memcpy(void *, const void *, size_t);
 
 void sys_reset(void);
+void __attribute__((noreturn)) sys_yield_for_frogs(void);
 
 void crit_enter(void);
 void crit_exit(void);
