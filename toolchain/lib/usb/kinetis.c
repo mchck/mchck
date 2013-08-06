@@ -206,10 +206,12 @@ usb_enable(void)
                                 .usbrst = 1,
                                 .stall = 1
                                 }).raw;
+
+        int_enable(IRQ_USB0);
 }
 
 void
-usb_intr(void)
+USB0_Handler(void)
 {
         struct USB_ISTAT_t stat = USB0.istat;
         if (stat.usbrst) {
