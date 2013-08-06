@@ -36,7 +36,5 @@ void
 main(void)
 {
         usb_init(&cdc_device);
-        for (;;) {
-                usb_intr();
-        }
+        sys_yield_for_frogs();
 }
