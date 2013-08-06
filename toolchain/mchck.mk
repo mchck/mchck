@@ -16,7 +16,7 @@ endef
 # Common config
 
 CFLAGS+=	-I${_libdir}/include -I${_libdir}/lib
-CFLAGS+=	-g
+CFLAGS+=	-ggdb3
 CFLAGS+=	-std=c11 -fplan9-extensions
 ifndef DEBUG
 CFLAGS+=	${COPTFLAGS}
