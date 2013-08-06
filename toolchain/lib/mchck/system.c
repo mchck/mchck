@@ -25,3 +25,15 @@ crit_exit(void)
         if (--crit_nest == 0)
                 __asm__("cpsie i");
 }
+
+void
+int_enable(size_t intno)
+{
+        NVIC.iser[intno / 32] = 1 << (intno % 32);
+}
+
+void
+int_disable(size_t intno)
+{
+        NVIC.icer[intno / 32] = 1 << (intno % 32);
+}

@@ -5,3 +5,6 @@ void sys_reset(void);
 
 void crit_enter(void);
 void crit_exit(void);
+
+void int_enable(size_t intno);
+void int_disable(size_t intno);

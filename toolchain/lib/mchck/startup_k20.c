@@ -33,10 +33,10 @@ isr_handler_t Default_Handler __attribute__((__weak__, __alias__("__Default_Hand
 isr_handler_t Default_Reset_Handler;
 
 
-#define VH(handler, default)			\
-	V_handler(handler, _CONCAT(handler, _Handler), default)
-#define V(x)					\
-	VH(x, Default_Handler)
+#define VH(num, handler, default)                               \
+	V_handler(num, handler, _CONCAT(handler, _Handler), default)
+#define V(num, x)                               \
+	VH(num, x, Default_Handler)
 
 /**
  * Declare the weak symbols.  By default they will be aliased
@@ -44,13 +44,11 @@ isr_handler_t Default_Reset_Handler;
  * by using VH() instead of V().
  */
 
-#define V_handler(n, h, d)						\
-	isr_handler_t h __attribute__((__weak__, __alias__(#d)));	\
-	isr_handler_t _CONCAT(n, _IRQHandler) __attribute__((__weak__, __alias__(_STR(h))));
-#define V_reserved()
+#define V_handler(num, name, handler, default)                          \
+	isr_handler_t handler __attribute__((__weak__, __alias__(#default)));	\
+	isr_handler_t _CONCAT(name, _IRQHandler) __attribute__((__weak__, __alias__(_STR(handler))));
 #include "vecs_k20.h"
 #undef V_handler
-#undef V_reserved
 
 /**
  * Define the vector table.  We simply fill in all (weak) vector symbols
@@ -61,12 +59,13 @@ __attribute__ ((__section__(".isr_vector"), __used__))
 isr_handler_t * const isr_vectors[] =
 {
 	(isr_handler_t *)&sys_stack[sizeof(sys_stack)/sizeof(*sys_stack)],
-#define V_handler(n, h, d)	h,
-#define V_reserved()	0,
+#define V_handler(num, name, handler, default)	[num] = handler,
 #include "vecs_k20.h"
-#undef V
-#undef V_Reserved
+#undef V_handler
 };
+
+#undef V
+#undef VH
 
 
 static void

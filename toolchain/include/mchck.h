@@ -150,6 +150,7 @@ typedef enum IRQn
 
 extern uint32_t _sidata, _sdata, _edata, _sbss, _ebss, _app_rom;
 
+#include <intnums.h>
 
 #include <kinetis/ftfl.h>
 #include <kinetis/usbotg.h>
@@ -160,6 +161,7 @@ extern uint32_t _sidata, _sdata, _edata, _sbss, _ebss, _app_rom;
 #include <kinetis/gpio.h>
 
 #include <arm/scb.h>
+#include <arm/nvic.h>
 
 #include <mchck/mchck.h>
 
