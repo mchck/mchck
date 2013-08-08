@@ -1,5 +1,3 @@
-
-
 #include <mchck.h>
 
 void
