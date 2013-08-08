@@ -9,3 +9,11 @@ void crit_exit(void);
 
 void int_enable(size_t intno);
 void int_disable(size_t intno);
+
+static inline volatile uint32_t *
+bitband_bitp(volatile void *addr, size_t bit)
+{
+        return ((volatile void *)(0x42000000 + ((uintptr_t)addr - 0x40000000) * 32 + 4 * bit));
+}
+
+#define BITBAND_BIT(var, bit)	(*bitband_bitp(&(var), (bit)))
