@@ -2,7 +2,7 @@
 
 struct SIM_t {
         struct SIM_SOPT1_t {
-                UNION_STRUCT_START(8);
+                UNION_STRUCT_START(32);
                 uint32_t _rsvd0 : 12;
                 enum {
                         SIM_RAMSIZE_8KB = 1,
@@ -21,7 +21,7 @@ struct SIM_t {
                 UNION_STRUCT_END;
         } sopt1;
         struct SIM_SOPT1CFG_t {
-                UNION_STRUCT_START(8);
+                UNION_STRUCT_START(32);
                 uint32_t _rsvd0 : 24;
                 uint32_t urwe : 1;
                 uint32_t uvswe : 1;
@@ -31,7 +31,7 @@ struct SIM_t {
         } sopt1cfg;
         uint32_t _pad0[(0x1004 - 0x8) / 4];
         struct SIM_SOPT2_t {
-                UNION_STRUCT_START(8);
+                UNION_STRUCT_START(32);
                 uint32_t _rsvd0 : 4;
                 enum {
                         SIM_RTCCLKOUTSEL_1HZ = 0,
@@ -68,7 +68,7 @@ struct SIM_t {
         } sopt2;
         uint32_t _pad1;
         struct SIM_SOPT4_t {
-                UNION_STRUCT_START(8);
+                UNION_STRUCT_START(32);
                 enum sim_ftmflt {
                         SIM_FTMFLT_FTM = 0,
                         SIM_FTMFLT_CMP = 1
@@ -98,7 +98,7 @@ struct SIM_t {
                 UNION_STRUCT_END;
         } sopt4;
         struct SIM_SOPT5_t {
-                UNION_STRUCT_START(8);
+                UNION_STRUCT_START(32);
                 enum sim_uarttxsrc {
                         SIM_UARTTXSRC_UART = 0,
                         SIM_UARTTXSRC_FTM = 1
@@ -117,7 +117,7 @@ struct SIM_t {
         } sopt5;
         uint32_t _pad2;
         struct SIM_SOPT7_t {
-                UNION_STRUCT_START(8);
+                UNION_STRUCT_START(32);
                 enum {
                         SIM_ADCTRGSEL_PDB = 0,
                         SIM_ADCTRGSEL_HSCMP0 = 1,
@@ -146,7 +146,7 @@ struct SIM_t {
         } sopt7;
         uint32_t _pad3[(0x1024 - 0x101c) / 4];
         struct SIM_SDID_t {
-                UNION_STRUCT_START(8);
+                UNION_STRUCT_START(32);
                 enum {
                         SIM_PINID_32 = 2,
                         SIM_PINID_48 = 4,
@@ -163,7 +163,7 @@ struct SIM_t {
         } sdid;
         uint32_t _pad4[(0x1034 - 0x1028) / 4];
         struct SIM_SCGC4_t {
-                UNION_STRUCT_START(8);
+                UNION_STRUCT_START(32);
                 uint32_t _rsvd0 : 1;
                 uint32_t ewm : 1;
                 uint32_t cmt : 1;
@@ -181,7 +181,7 @@ struct SIM_t {
                 UNION_STRUCT_END;
         } scgc4;
         struct SIM_SCGC5_t {
-                UNION_STRUCT_START(8);
+                UNION_STRUCT_START(32);
                 uint32_t lptimer : 1;
                 uint32_t _rsvd0 : 4;
                 uint32_t tsi : 1;
@@ -195,7 +195,7 @@ struct SIM_t {
                 UNION_STRUCT_END;
         } scgc5;
         struct SIM_SCGC6_t {
-                UNION_STRUCT_START(8);
+                UNION_STRUCT_START(32);
                 uint32_t ftfl : 1;
                 uint32_t dmamux : 1;
                 uint32_t _rsvd0 : 10;
@@ -218,14 +218,14 @@ struct SIM_t {
                 UNION_STRUCT_END;
         } scgc6;
         struct SIM_SCGC7_t {
-                UNION_STRUCT_START(8);
+                UNION_STRUCT_START(32);
                 uint32_t _rsvd0 : 1;
                 uint32_t dma : 1;
                 uint32_t _rsvd1 : 30;
                 UNION_STRUCT_END;
         } scgc7;
         struct SIM_CLKDIV1_t {
-                UNION_STRUCT_START(8);
+                UNION_STRUCT_START(32);
                 uint32_t _rsvd0 : 16;
                 uint32_t outdiv4 : 4;
                 uint32_t _rsvd1 : 4;
@@ -234,14 +234,14 @@ struct SIM_t {
                 UNION_STRUCT_END;
         } clkdiv1;
         struct SIM_CLKDIV2_t {
-                UNION_STRUCT_START(8);
+                UNION_STRUCT_START(32);
                 uint32_t usbfrac : 1;
                 uint32_t usbdiv : 3;
                 uint32_t _rsvd0 : 28;
                 UNION_STRUCT_END;
         } clkdiv2;
         struct SIM_FCFG1_t {
-                UNION_STRUCT_START(8);
+                UNION_STRUCT_START(32);
                 uint32_t flashdis : 1;
                 uint32_t flashdoze : 1;
                 uint32_t _rsvd0 : 6;
@@ -282,7 +282,7 @@ struct SIM_t {
                 UNION_STRUCT_END;
         } fcfg1;
         struct SIM_FCFG2_t {
-                UNION_STRUCT_START(8);
+                UNION_STRUCT_START(32);
                 uint32_t _rsvd0 : 16;
                 uint32_t maxaddr1 : 7;
                 enum {
