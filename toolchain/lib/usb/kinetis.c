@@ -121,12 +121,6 @@ usb_pipe_disable(struct usbd_ep_pipe_state_t *s)
                                 }).raw;
 }
 
-/* XXX what is this supposed to do? */
-void
-usb_clear_transfers(void)
-{
-}
-
 size_t
 usb_ep_get_transfer_size(struct usbd_ep_pipe_state_t *s)
 {

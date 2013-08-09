@@ -333,7 +333,6 @@ usb_handle_control(void *data, ssize_t len, void *cbdata)
 	uint16_t zero16 = 0;
 	int fail = 1;
 
-	usb_clear_transfers();
 	usb.ctrl_dir = req->in;
 
 	if (req->type != USB_CTRL_REQ_STD) {
