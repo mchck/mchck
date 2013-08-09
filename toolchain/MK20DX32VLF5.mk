@@ -1,2 +1,5 @@
 FIXED_SECTIONS+=	-s 0:.isr_vector
 FIXED_SECTIONS+=	-s 0x400:.flash_config
+
+LOADER_SIZE=	3072
+APP_SIZE=	29696

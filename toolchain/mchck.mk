@@ -91,9 +91,11 @@ TARGETLD?=	${TARGET}.ld
 ifdef LOADER
 CPPFLAGS.ld+=	-DMEMCFG_LDSCRIPT='"loader.ld"'
 LDSCRIPTS+=	${_libdir}/ld/loader.ld
+BINSIZE=	${LOADER_SIZE}
 else
 CPPFLAGS.ld+=	-DMEMCFG_LDSCRIPT='"app.ld"'
 LDSCRIPTS+=	${_libdir}/ld/app.ld
+BINSIZE=	${APP_SIZE}
 endif
 
 LDFLAGS+=	-T ${PROG}.ld
@@ -103,7 +105,7 @@ LDFLAGS+=	-Wl,-Map=${PROG}.map
 
 CLEANFILES+=	${PROG}.hex ${PROG}.elf ${PROG}.bin ${PROG}.map
 
-all: ${PROG}.hex ${PROG}.bin
+all: ${PROG}.bin
 
 # This has to go before the rule, because for some reason the updates to OBJS
 # are not incorporated into the target dependencies
@@ -113,11 +115,11 @@ $(foreach _uselib,mchck ${USE},$(eval $(call _include_used_libs,$(_uselib))))
 ${PROG}.elf: ${OBJS} ${LDLIBS} ${PROG}.ld
 	${CC} -o $@ ${CFLAGS} ${LDFLAGS} ${OBJS} ${LDLIBS}
 
-%.hex: %.elf
-	${OBJCOPY} -O ihex $< $@
-
 %.bin: %.elf
-	${OBJCOPY} -O binary $< $@
+	${OBJCOPY} -O binary $< $@.tmp
+	ls -l $@.tmp | awk '{ s=$$5; as=${BINSIZE}; printf "%d bytes available\n", (as - s); if (s > as) { exit 1; }}'
+	mv $@.tmp $@
+CLEANFILES+=	${PROG}.bin.tmp
 
 ${PROG}.ld: ${_libdir}/ld/link.ld.S ${LDSCRIPTS}
 	${CPP} -o $@ ${CPPFLAGS.ld} $<
