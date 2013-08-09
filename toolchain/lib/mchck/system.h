@@ -1,5 +1,6 @@
 void *memset(void *, int, size_t);
 void *memcpy(void *, const void *, size_t);
+int memcmp(const void *, const void *, size_t);
 
 void sys_reset(void);
 void __attribute__((noreturn)) sys_yield_for_frogs(void);

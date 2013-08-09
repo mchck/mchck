@@ -20,3 +20,14 @@ memcpy(void *dst, const void *src, size_t len)
 		*dstbuf = *srcbuf;
 	return (dst);
 }
+
+int
+memcmp(const void *a, const void *b, size_t len)
+{
+	const uint8_t *ap = a, *bp = b;
+	int val = 0;
+
+	for (; len > 0 && (val = *ap - *bp) == 0; --len, ++ap, ++bp)
+		/* NOTHING */;
+	return (val);
+}
