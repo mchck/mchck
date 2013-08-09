@@ -10,11 +10,12 @@ cdc_rx_done(void *buf, ssize_t len, void *data)
 {
         struct cdc_ctx *ctx = data;
 
-        if (len <= 0)
-                goto queue;
-
         ctx->data_ready_cb(buf, len);
-queue:
+}
+
+void
+cdc_read_more(struct cdc_ctx *ctx)
+{
         usb_rx(ctx->rx_pipe, ctx->inbuf, sizeof(ctx->inbuf), cdc_rx_done, ctx);
 }
 
@@ -44,13 +45,19 @@ queue:
         crit_exit();
 }
 
+size_t
+cdc_write_space(struct cdc_ctx *ctx)
+{
+        return (sizeof(ctx->outbuf) - ctx->out_pos);
+}
+
 ssize_t
 cdc_write(const uint8_t *buf, size_t len, struct cdc_ctx *ctx)
 {
         size_t max_len;
 
         crit_enter();
-        max_len = sizeof(ctx->outbuf) - ctx->out_pos;
+        max_len = cdc_write_space(ctx);
         if (len > max_len)
                 len = max_len;
 
@@ -85,6 +92,6 @@ cdc_init(void (*data_ready_cb)(uint8_t *, size_t), void (*data_sent_cb)(size_t),
         ctx->notice_pipe = usb_init_ep(&ctx->header, CDC_NOTICE_EP, USB_EP_TX, CDC_NOTICE_SIZE);
 	ctx->tx_pipe = usb_init_ep(&ctx->header, CDC_TX_EP, USB_EP_TX, CDC_TX_SIZE);
 	ctx->rx_pipe = usb_init_ep(&ctx->header, CDC_RX_EP, USB_EP_RX, CDC_RX_SIZE);
-        cdc_rx_done(ctx->inbuf, -1, ctx);
+        cdc_read_more(ctx);
         cdc_tx_done(ctx->outbuf, -1, ctx);
 }
