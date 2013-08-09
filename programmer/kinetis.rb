@@ -258,7 +258,7 @@ class Kinetis < ARMv7
 
     # pad data
     if data.bytesize % @sector_size != 0
-      data += "\xff" * (@sector_size - data.bytesize % @sector_size)
+      data += ([0xff] * (@sector_size - data.bytesize % @sector_size)).pack('c*')
     end
 
     datapos = 0
