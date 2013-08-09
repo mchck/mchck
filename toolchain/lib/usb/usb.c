@@ -427,7 +427,6 @@ usb_setup_control(void)
 
 	usb.ep_state[0].rx.data01 = USB_DATA01_DATA0;
 	usb.ep_state[0].tx.data01 = USB_DATA01_DATA1;
-	usb_pipe_stall(&usb.ep_state[0].tx);
 	usb_rx(&usb.ep_state[0].rx, buf, EP0_BUFSIZE, usb_handle_control, NULL);
 }
 
