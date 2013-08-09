@@ -67,7 +67,7 @@ main(void)
 
         usb_init(&dfu_device);
         for (;;) {
-                usb_intr();
+                usb_poll();
         }
 }
 

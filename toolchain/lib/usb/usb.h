@@ -354,7 +354,7 @@ void usb_pipe_disable(struct usbd_ep_pipe_state_t *s);
 #ifdef VUSB
 void vusb_main_loop(void);
 #else
-void usb_intr(void);
+void usb_poll(void);
 #endif
 
 /* Provided by MI code */

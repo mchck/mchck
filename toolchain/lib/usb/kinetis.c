@@ -207,7 +207,9 @@ usb_enable(void)
                                 .stall = 1
                                 }).raw;
 
+#ifndef SHORT_ISR
         int_enable(IRQ_USB0);
+#endif
 }
 
 void
@@ -229,4 +231,10 @@ USB0_Handler(void)
                 usb_handle_transaction(&stat);
         }
         USB0.istat.raw = stat.raw;
+}
+
+void
+usb_poll(void)
+{
+        USB0_Handler();
 }
