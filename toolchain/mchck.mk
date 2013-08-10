@@ -98,9 +98,11 @@ LDSCRIPTS+=	${_libdir}/ld/app.ld
 BINSIZE=	${APP_SIZE}
 endif
 
-LDFLAGS+=	-T ${PROG}.ld
+LDTEMPLATE=	${PROG}.ld-template
+LDFLAGS+=	-T ${LDTEMPLATE}
 LDFLAGS+=       -nostartfiles
 LDFLAGS+=	-Wl,-Map=${PROG}.map
+LDFLAGS+=	-Wl,-output-linker-script=${PROG}.ld
 
 
 CLEANFILES+=	${PROG}.hex ${PROG}.elf ${PROG}.bin ${PROG}.map
@@ -112,7 +114,7 @@ all: ${PROG}.bin
 $(foreach _uselib,mchck ${USE},$(eval $(call _include_used_libs,$(_uselib))))
 
 
-${PROG}.elf: ${OBJS} ${LDLIBS} ${PROG}.ld
+${PROG}.elf: ${OBJS} ${LDLIBS} ${LDTEMPLATE}
 	${CC} -o $@ ${CFLAGS} ${LDFLAGS} ${OBJS} ${LDLIBS}
 
 %.bin: %.elf
@@ -121,9 +123,9 @@ ${PROG}.elf: ${OBJS} ${LDLIBS} ${PROG}.ld
 	mv $@.tmp $@
 CLEANFILES+=	${PROG}.bin.tmp
 
-${PROG}.ld: ${_libdir}/ld/link.ld.S ${LDSCRIPTS}
+${LDTEMPLATE}: ${_libdir}/ld/link.ld.S ${LDSCRIPTS}
 	${CPP} -o $@ ${CPPFLAGS.ld} $<
-CLEANFILES+=	${PROG}.ld
+CLEANFILES+=	${LDTEMPLATE} ${PROG}.ld
 
 gdbserver:
 	${RUBY} ${_libdir}/../programmer/gdbserver.rb ${MCHCKADAPTER}

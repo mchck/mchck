@@ -12,26 +12,30 @@ require 'pack-sections'
 
 call_args = []
 object_files = []
+output_file = nil
 linker_out = nil
 linker_in = nil
 save_temps = false
+output_linker_script = nil
+
+$stderr.puts ARGV.join " "
 
 while arg = ARGV.shift
-  call_args << arg
   case arg
-  when /^-o/, /^-plugin$/
-    arg = ARGV.shift
+  when /^-o$/
+    output_file = ARGV.shift
+  when /^-plugin$/
     call_args << arg
-  when /^-T/
+    call_args << ARGV.shift
+  when /^-T$/
     linker_in = ARGV.shift
     linker_out = Tempfile.new(['mchck-real-ld-', '.ld'])
-    call_args << linker_out.path
-  when /^-save-temps/
+  when /^-save-temps$/
     save_temps = true
-    # actually unknown to ld
-    call_args.pop
+  when /^-output-linker-script=(.*)$/
+    output_linker_script = $1
   when /^-/
-    # nothing
+    call_args << arg
   else
     object_files << arg
   end
@@ -39,6 +43,31 @@ end
 
 if linker_in
   fixed_sects = []
+
+  # do one plain pass so that --gc-sections do its job
+  tmp_obj = Tempfile.new(['mchck-real-ld-', '.o'])
+  tmp_obj.close
+
+  tmp_map = Tempfile.new(['mchck-real-ld-', '.map'])
+  tmp_map.close
+
+  if save_temps
+    path = linker_out.path
+    linker_out.close(true)
+    linker_out = File.open(path, "w+")
+    $stdout.puts "keeping temporary linker file #{path}"
+
+    path = tmp_obj.path
+    $stdout.puts "keeping intermediary object file #{path}"
+
+    path = tmp_map.path
+    $stdout.puts "keeping intermediary map file #{path}"
+  end
+
+  args = ["arm-none-eabi-ld", "-o", tmp_obj.path, "-T", linker_in, *object_files, *call_args, "-Map=#{tmp_map.path}"]
+  if !system(*args)
+    exit $?.exitstatus
+  end
 
   ln = File.readlines(linker_in)
   ln.grep(/PACK SECTIONS FIX\s+([^\s]+)\s*=\s*(0x[[:xdigit:]]+|[[:digit:]]+)[^\w]/) do |m|
@@ -51,14 +80,33 @@ if linker_in
   ln.grep(/PACK SECTIONS IGNORE\s+([^\s]+)/) do |m|
     all_sect.delete_if{|s| File.fnmatch($1, s.name)}
   end
-  l = Linker.new(all_sect, fixed_sects)
 
-  if save_temps
-    path = linker_out.path
-    $stdout.puts "keeping temporary linker file #{path}"
-    linker_out.close(true)
-    linker_out = File.open(path, "w")
+  # XXX getting ugly, move to separate functions
+  skipping = true
+  carryover = []
+  File.readlines(tmp_map.path).each do |line|
+    line.chomp!
+    case line
+    when /^Discarded input sections/
+      skipping = false
+      next
+    when /^[^ ]/
+      if !skipping
+        break
+      end
+    end
+    next if skipping
+    line = carryover + line.split
+    if line.count < 4
+      carryover = line
+      next
+    end
+    carryover = []
+    sect, _, _, file = line
+    all_sect.delete_if{|s| s.name == sect && s.file == file}
   end
+
+  l = Linker.new(all_sect, fixed_sects)
 
   skipping = false
   ln.each do |line|
@@ -74,14 +122,25 @@ if linker_in
     linker_out.write line
   end
 
+  if output_linker_script
+    File.open(output_linker_script, 'w') do |of|
+      linker_out.seek(0)
+      of.write(linker_out.read)
+    end
+  end
   linker_out.close
 end
 
 err = 1
 begin
-  system("arm-none-eabi-ld", *call_args)
+  args = ["arm-none-eabi-ld", "-o", output_file, "-T", linker_out.path, *object_files, *call_args]
+  system(*args)
   err = $?.exitstatus
 ensure
-  linker_out.unlink if linker_out && !save_temps
+  if !save_temps
+    linker_out.unlink if linker_out
+    tmp_obj.unlink if tmp_obj
+    tmp_map.unlink if tmp_map
+  end
 end
 exit(err)
