@@ -82,7 +82,7 @@ class BusPirateSwd < BitbangSwd
   end
 
   def write_bytes(bytes)
-    bytes = bytes.bytes
+    bytes = bytes.bytes.to_a
 
     while !bytes.empty?
       if @cur_dir == :in
