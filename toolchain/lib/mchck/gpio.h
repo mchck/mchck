@@ -47,19 +47,19 @@ enum gpio_pin_value {
         GPIO_HIGH = 1
 };
 
-inline enum gpio_port_id
+static inline enum gpio_port_id
 gpio_port_from_pin(enum gpio_pin_id pin)
 {
         return (pin & 0xf0000);
 }
 
-inline int
+static inline int
 gpio_portnum_from_pin(enum gpio_pin_id pin)
 {
         return (gpio_port_from_pin(pin) >> 16);
 }
 
-inline volatile struct PORT_t *
+static inline volatile struct PORT_t *
 gpio_physport_from_pin(enum gpio_pin_id pin)
 {
         switch (gpio_port_from_pin(pin)) {
@@ -76,7 +76,7 @@ gpio_physport_from_pin(enum gpio_pin_id pin)
         }
 }
 
-inline volatile struct GPIO_t *
+static inline volatile struct GPIO_t *
 gpio_physgpio_from_pin(enum gpio_pin_id pin)
 {
         switch (gpio_port_from_pin(pin)) {
@@ -93,7 +93,7 @@ gpio_physgpio_from_pin(enum gpio_pin_id pin)
         }
 }
 
-inline int
+static inline int
 gpio_physpin_from_pin(enum gpio_pin_id pin)
 {
         return (pin & 0xffff);
