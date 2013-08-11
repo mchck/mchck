@@ -16,6 +16,8 @@
  * 0x10 => 4 bytes
  * - read_bits
  * 0x20 + (bitcount - 1) => 1 byte
+ * - cycle clock (silent read)
+ * 0x28 + (bitcount - 1)
  */
 
 #include <mchck.h>
@@ -43,7 +45,7 @@ write_bits(uint8_t buf, size_t bits)
 }
 
 static void
-read_bits(size_t bits)
+read_bits(size_t bits, int silent)
 {
         uint8_t val = 0;
 
@@ -51,8 +53,11 @@ read_bits(size_t bits)
         for (; bits > 0; --bits) {
                 uint8_t bitval = pin_read(SWD_DIO_PIN);
                 val |= bitval << (bits - 1);
+                pin_write(SWD_CLK_PIN, 1);
+                pin_write(SWD_CLK_PIN, 0);
         }
-        reply_write(&val, 1);
+        if (!silent)
+                reply_write(&val, 1);
 }
 
 static void
@@ -77,20 +82,20 @@ process_buf(const uint8_t *buf, size_t len)
 
                 switch (cmd) {
                 case 0x10:       /* read word */
-                        if (reply_space() < 4) {
-                                --buf;
+                        if (reply_space() < 4)
                                 goto need_more_data;
-                        }
                         for (int i = 4; i > 0; --i)
-                                read_bits(8);
+                                read_bits(8, 0);
                         break;
 
-                case 0x20 ... 0x28: /* read bits */
-                        if (reply_space() < 1) {
-                                --buf;
+                case 0x20 ... 0x27: /* read bits */
+                        if (reply_space() < 1)
                                 goto need_more_data;
-                        }
-                        read_bits((cmd & 7) + 1);
+                        read_bits((cmd & 7) + 1, 0);
+                        break;
+
+                case 0x28 ... 0x2f: /* cycle clock */
+                        read_bits((cmd & 7) + 1, 1);
                         break;
 
                 case 0x90:       /* write word */
@@ -100,32 +105,33 @@ process_buf(const uint8_t *buf, size_t len)
                                 write_bits(*buf, 8);
                         break;
 
-                case 0xa0 ... 0xa8: /* write bits */
+                case 0xa0 ... 0xa7: /* write bits */
                         if (len < 1)
                                 goto need_more_data;
-                        write_bits(*buf++, (cmd & 7) + 1);
+                        write_bits(*buf, (cmd & 7) + 1);
+                        ++buf; --len;
                         break;
 
                 default:
                 case '?':        /* handshake? */
 test_magic:
-                        /* rewind what we consumed */
-                        --buf; ++len;
                         configure_pins(0);
-                        if (len < sizeof(magic) - 1) {
+                        if (len < sizeof(magic) - 1 /* NUL byte */ - 1 /* we already skipped one */)
                                 goto need_more_data;
-                        }
-                        if (memcmp(buf, magic, sizeof(magic) - 1) != 0)
+                        if (memcmp(buf - 1, magic, sizeof(magic) - 1) != 0)
                                 continue;
                         /* We found a handshake! */
-                        buf += sizeof(magic) - 1;
-                        len -= sizeof(magic) - 1;
+                        buf += sizeof(magic) - 1 /* NUL byte */ - 1 /* we already skipped one */;
+                        len -= sizeof(magic) - 1 - 1;
                         configure_pins(1);
                         reply_write(version, sizeof(version) - 1);
                         break;
                 }
         }
 
-need_more_data:
         return (buf);
+
+need_more_data:
+        /* we skipped one, now go back */
+        return (buf - 1);
 }
