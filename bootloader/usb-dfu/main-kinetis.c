@@ -72,7 +72,7 @@ main(void)
 }
 
 __attribute__((noreturn))
-inline void
+static inline void
 jump_to_app(uintptr_t addr)
 {
         /* addr is in r0 */
