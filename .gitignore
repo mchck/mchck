@@ -4,3 +4,4 @@
 *.hex
 *.map
 *.ld
+*.ld-template
