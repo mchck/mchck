@@ -16,7 +16,7 @@ struct cdc_ctx {
         void (*data_ready_cb)(uint8_t *, size_t);
         size_t out_pos;
         size_t out_sent;
-        _Bool out_queued;
+        int out_queued;
         uint8_t outbuf[CDC_TX_SIZE];
         uint8_t inbuf[CDC_RX_SIZE];
 };
