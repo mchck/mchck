@@ -1,3 +1,4 @@
+require 'swd-mchck-bitbang'
 require 'swd-buspirate'
 begin
   require 'swd-ftdi'
@@ -13,6 +14,8 @@ module BackendDriver
         FtdiSwd.new(opts)
       when 'buspirate'
         BusPirateSwd.new(opts)
+      when 'mchck'
+        MchckBitbangSwd.new(opts)
       end
     end
 
