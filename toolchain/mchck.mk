@@ -21,7 +21,7 @@ CFLAGS+=	-std=c11 -fplan9-extensions
 ifndef DEBUG
 CFLAGS+=	${COPTFLAGS}
 else
-NO_LTO=		# no lto
+NO_LTO=		no-lto
 endif
 CFLAGS+=	${CWARNFLAGS}
 
