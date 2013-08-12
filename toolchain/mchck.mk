@@ -133,7 +133,7 @@ gdbserver:
 	${RUBY} ${_libdir}/../programmer/gdbserver.rb ${MCHCKADAPTER}
 
 gdb: ${PROG}.elf
-	${GDB} ${PROG}.elf
+	${GDB} -readnow -ex 'target extended-remote :1234' ${PROG}.elf
 
 flash: ${PROG}.bin
 	${DFUUTIL} -D ${PROG}.bin
