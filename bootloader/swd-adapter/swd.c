@@ -50,9 +50,9 @@ read_bits(size_t bits, int silent)
         uint8_t val = 0;
 
         pin_configure(SWD_DIO_PIN, SWD_MODE_INPUT);
-        for (; bits > 0; --bits) {
+        for (size_t bit = 0; bit < bits; ++bit) {
                 uint8_t bitval = pin_read(SWD_DIO_PIN);
-                val |= bitval << (bits - 1);
+                val |= bitval << bit;
                 pin_write(SWD_CLK_PIN, 1);
                 pin_write(SWD_CLK_PIN, 0);
         }
