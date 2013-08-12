@@ -52,7 +52,7 @@ class Adiv5Swd
     readcount = opt[:count] || 1
     ret = []
 
-    Log(:swd, 2){ 'read  %s %x ...' % [port, addr] }
+    Log(:swd, 2){ 'read  %s %x (%d words)...' % [port, addr, readcount] }
     readcount.times do |i|
       ret << transact(port, :in, addr)
     end
@@ -81,6 +81,8 @@ class Adiv5Swd
   def transact(port, dir, addr, data=nil)
     try ||= 0
     try += 1
+
+    Log(:swd, 2){ "SWD transaction #{port} #{dir} #{addr}, try #{try}" }
 
     cmd = 0x81
     case port
@@ -126,6 +128,7 @@ class Adiv5Swd
       retry
     end
   rescue Fault
+    Log(:swd, 2){ 'SWD fault, clearing sticky error' }
     # clear sticky error
     transact(:dp, :out, ABORT, 1 << 2)
     raise
