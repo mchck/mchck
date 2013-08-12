@@ -1,8 +1,8 @@
 #include <mchck.h>
 
 enum swd_pin {
-        SWD_DIO_PIN = GPIO_PB16,
-        SWD_CLK_PIN = GPIO_PB3
+        SWD_DIO_PIN = GPIO_PTB16,
+        SWD_CLK_PIN = GPIO_PTB3
 };
 
 enum swd_pin_mode {
