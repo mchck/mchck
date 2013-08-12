@@ -34,16 +34,18 @@ class MchckBitbangSwd < BitbangSwd
     @outbuf = []
   end
 
+  def turn(dir)
+    if @cur_dir != dir
+      Log(:phys, 2){ 'turning %s' % dir }
+      @outbuf << CMD_CYCLE_CLOCK
+      @cur_dir = dir
+    end
+  end
+
   def write_bytes(bytes)
     bytes = bytes.bytes
 
     while bytes.count >= 4
-      if @cur_dir == :in
-        Log(:phys, 2){ 'turning out' }
-        @outbuf << CMD_CYCLE_CLOCK
-        @cur_dir = :out
-      end
-
       this_word = bytes.slice!(0..3)
       @outbuf << CMD_WRITE_WORD
       @outbuf += this_word
@@ -63,21 +65,20 @@ class MchckBitbangSwd < BitbangSwd
   end
 
   def write_word_and_parity(word, parity)
+    turn(:out)
     write_bytes([word].pack('V'))
     write_bits(parity, 1)
   end
 
   def write_cmd(cmd)
+    turn(:out)
     write_bytes(cmd)
-
-    # turn in
-    @outbuf << CMD_READ_BITS
-    @cur_dir = :in
+    turn(:in)
 
     # read ack
     @outbuf << (CMD_READ_BITS | (3 - 1))
 
-    _, ack = expect_bytes(2).unpack('CC')
+    ack, = expect_bytes(1).unpack('C')
     Log(:phys, 2){ 'read ack: %d' % ack }
     ack
   end
@@ -85,10 +86,13 @@ class MchckBitbangSwd < BitbangSwd
   def read_word_and_parity
     raise RuntimeError, "invalid line direction" if @cur_dir != :in
 
+    turn(:in)
     @outbuf << CMD_READ_WORD
     @outbuf << CMD_READ_BITS
+    turn(:out)
 
     data = expect_bytes(5)
+
     ret, par = data.unpack('VC')
     Log(:phys, 2){ 'read word: %08x, parity %d' % [ret, par] }
     [ret, par]
