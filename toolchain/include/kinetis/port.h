@@ -3,7 +3,10 @@
 /* Pin Control Register n */
 struct PCR_t {
         UNION_STRUCT_START(32);
-        uint8_t ps : 1;
+        enum {
+                PCR_PULLDOWN = 0,
+                PCR_PULLUP = 1
+        } ps : 1;
         uint8_t pe : 1;
         uint8_t sre : 1;
         uint8_t _rsvd0 : 1;

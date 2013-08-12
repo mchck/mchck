@@ -37,9 +37,39 @@ enum gpio_pin_id {
 };
 
 enum gpio_pin_mode {
-        GPIO_MODE_UNKNOWN = 0,
-        GPIO_MODE_OUTPUT,
-        GPIO_MODE_INPUT
+        GPIO_MODE__DIRECTION = 2 << 0,
+        GPIO_MODE_INPUT = GPIO_MODE__DIRECTION | (0 << 0),
+        GPIO_MODE_OUTPUT = GPIO_MODE__DIRECTION | (1 << 0),
+        GPIO_MODE__DIRECTION_MASK = GPIO_MODE__DIRECTION | (1 << 0),
+
+        /* XXX this is not specific to GPIO */
+        GPIO_MODE__SLEW = 2 << 2,
+        GPIO_MODE_SLEW_FAST = GPIO_MODE__SLEW | (0 << 2),
+        GPIO_MODE_SLEW_SLOW = GPIO_MODE__SLEW | (1 << 2),
+        GPIO_MODE__SLEW_MASK = GPIO_MODE__SLEW | (1 << 2),
+
+        GPIO_MODE__PULL = 4 << 4,
+        GPIO_MODE_PULL_OFF = GPIO_MODE__PULL | (0 << 4),
+        GPIO_MODE_PULLUP = GPIO_MODE__PULL | (1 << 4),
+        GPIO_MODE_PULLDOWN = GPIO_MODE__PULL | (2 << 4),
+        GPIO_MODE__PULL_MASK = GPIO_MODE__PULL | (3 << 4),
+
+        GPIO_MODE__DRIVE = 2 << 7,
+        GPIO_MODE_DRIVE_LOW = GPIO_MODE__DRIVE | (0 << 7),
+        GPIO_MODE_DRIVE_HIGH = GPIO_MODE__DRIVE | (1 << 7),
+        GPIO_MODE__DRIVE_MASK = GPIO_MODE__DRIVE | (1 << 7),
+
+        GPIO_MODE__FILTER = 2 << 9,
+        GPIO_MODE_FILTER_OFF = GPIO_MODE__FILTER | (0 << 9),
+        GPIO_MODE_FILTER_ON = GPIO_MODE__FILTER | (1 << 9),
+        GPIO_MODE__FILTER_MASK = GPIO_MODE__FILTER | (1 << 9),
+
+        GPIO_MODE__OPEN_DRAIN = 2 << 11,
+        GPIO_MODE_OPEN_DRAIN_OFF = GPIO_MODE__OPEN_DRAIN | (0 << 11),
+        GPIO_MODE_OPEN_DRAIN_ON = GPIO_MODE__OPEN_DRAIN | (1 << 11),
+        GPIO_MODE__OPEN_DRAIN_MASK = GPIO_MODE__OPEN_DRAIN | (1 << 11),
+
+        GPIO_MODE_RESET = 1 << 31
 };
 
 enum gpio_pin_value {

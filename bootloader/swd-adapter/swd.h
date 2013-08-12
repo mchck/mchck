@@ -6,8 +6,8 @@ enum swd_pin {
 };
 
 enum swd_pin_mode {
-        SWD_MODE_OUTPUT = GPIO_MODE_OUTPUT,
-        SWD_MODE_INPUT = GPIO_MODE_INPUT
+        SWD_MODE_OUTPUT = GPIO_MODE_OUTPUT | GPIO_MODE_SLEW_SLOW,
+        SWD_MODE_INPUT = GPIO_MODE_INPUT | GPIO_MODE_FILTER_ON
 };
 
 const uint8_t *process_buf(const uint8_t *buf, size_t len);
