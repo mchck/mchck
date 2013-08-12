@@ -38,9 +38,9 @@ write_bits(uint8_t buf, size_t bits)
 {
         pin_configure(SWD_DIO_PIN, SWD_MODE_OUTPUT);
         for (; bits > 0; --bits, buf >>= 1) {
+                pin_write(SWD_CLK_PIN, 0);
                 pin_write(SWD_DIO_PIN, buf & 1);
                 pin_write(SWD_CLK_PIN, 1);
-                pin_write(SWD_CLK_PIN, 0);
         }
 }
 
@@ -51,10 +51,9 @@ read_bits(size_t bits, int silent)
 
         pin_configure(SWD_DIO_PIN, SWD_MODE_INPUT);
         for (size_t bit = 0; bit < bits; ++bit) {
-                uint8_t bitval = pin_read(SWD_DIO_PIN);
-                val |= bitval << bit;
-                pin_write(SWD_CLK_PIN, 1);
                 pin_write(SWD_CLK_PIN, 0);
+                val |= pin_read(SWD_DIO_PIN) << bit;
+                pin_write(SWD_CLK_PIN, 1);
         }
         if (!silent)
                 reply_write(&val, 1);
