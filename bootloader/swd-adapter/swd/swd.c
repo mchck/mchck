@@ -20,8 +20,6 @@
  * 0x28 + (bitcount - 1)
  */
 
-#include <mchck.h>
-
 #include "swd.h"
 
 static enum {
@@ -50,7 +48,8 @@ read_bits(size_t bits, int silent)
         uint8_t val = 0;
 
         pin_configure(SWD_DIO_PIN, SWD_MODE_INPUT);
-        for (size_t bit = 0; bit < bits; ++bit) {
+        size_t bit;
+        for (bit = 0; bit < bits; ++bit) {
                 pin_write(SWD_CLK_PIN, 0);
                 val |= pin_read(SWD_DIO_PIN) << bit;
                 pin_write(SWD_CLK_PIN, 1);
@@ -71,6 +70,7 @@ configure_pins(int on)
 const uint8_t *
 process_buf(const uint8_t *buf, size_t len)
 {
+        int i;
         for (; len > 0;) {
                 uint8_t cmd = *buf;
 
@@ -83,7 +83,7 @@ process_buf(const uint8_t *buf, size_t len)
                 case 0x10:       /* read word */
                         if (reply_space() < 4)
                                 goto need_more_data;
-                        for (int i = 4; i > 0; --i)
+                        for (i = 4; i > 0; --i)
                                 read_bits(8, 0);
                         break;
 
@@ -100,7 +100,7 @@ process_buf(const uint8_t *buf, size_t len)
                 case 0x90:       /* write word */
                         if (len < 4)
                                 goto need_more_data;
-                        for (int i = 4; i > 0; --i, ++buf, --len)
+                        for (i = 4; i > 0; --i, ++buf, --len)
                                 write_bits(*buf, 8);
                         break;
 
