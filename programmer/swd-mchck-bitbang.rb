@@ -15,6 +15,7 @@ class MchckBitbangSwd < BitbangSwd
     super
     @outbuf = []
 
+    Log(:phys, 1){ 'connecting to device %s' % opt[:dev] }
     @dev = SerialPort.new(opt[:dev], 115200)
     @dev.flow_control = SerialPort::NONE
 
