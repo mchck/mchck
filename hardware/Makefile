@@ -16,7 +16,7 @@ clean:
 	-rm -f *.pdf *.png
 
 realclean:
-	-rm -f *.pdf *.png *.ps *.gbr *.gbl *.gto *.gts *.gbs *.gtl *.dsn *.ses *.svg *.svgz *.drl *.csv *.lst
+	-rm -f *.pdf *.png *.ps *.gbr *.gbl *.gto *.gts *.gbs *.gtl *.dsn *.ses *.svg *.svgz *.drl *.csv *.lst *.gbo
 
 pdf: ${PDFS}
 png: ${PNGS}
