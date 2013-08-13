@@ -54,8 +54,8 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 2 4
 Title "MC HCK microcontroller board"
-Date "25 Jul 2013"
-Rev "5-dev"
+Date "13 Aug 2013"
+Rev "R5-rc2"
 Comp "(c) 2011,2012,2013 Simon Schubert"
 Comment1 "CERN OHL v.1.1 or later"
 Comment2 ""
