@@ -12,6 +12,7 @@ new_data(uint8_t *data, size_t len)
 {
         onboard_led(-1);
         cdc_write(data, len, &cdc);
+        cdc_read_more(&cdc);
 }
 
 static void
