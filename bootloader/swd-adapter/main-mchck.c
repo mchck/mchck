@@ -3,7 +3,7 @@
 #include <usb/usb.h>
 #include <usb/cdc-acm.h>
 
-#include "swd.h"
+#include "swd/swd.h"
 
 #include "desc.c"
 
