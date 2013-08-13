@@ -43,7 +43,7 @@ class MchckBitbangSwd < BitbangSwd
   end
 
   def write_bytes(bytes)
-    bytes = bytes.bytes
+    bytes = bytes.bytes.to_a
 
     while bytes.count >= 4
       this_word = bytes.slice!(0..3)
