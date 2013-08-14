@@ -8,7 +8,7 @@ struct GPIO_t {
         uint32_t pdir;
         uint32_t pddr;
 } ;
-CTASSERT_SIZE_BYTE(struct GPIO_t, 24);
+_Static_assert(sizeof(struct GPIO_t) == 24, "Size assertion failed");
 
 extern volatile struct GPIO_t GPIOA;
 extern volatile struct GPIO_t GPIOB;

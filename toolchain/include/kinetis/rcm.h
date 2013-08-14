@@ -49,6 +49,6 @@ struct RCM_t {
                 uint8_t _rsvd1 : 6;
         } mr;
 };
-CTASSERT_SIZE_BYTE(struct RCM_t, 8);
+_Static_assert(sizeof(struct RCM_t) == 8, "Size assertion failed");
 
 extern volatile struct RCM_t RCM;

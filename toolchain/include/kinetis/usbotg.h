@@ -12,7 +12,7 @@ struct USB_ADDINFO_t {
         uint8_t irqnum : 5;
         UNION_STRUCT_END;
 };
-CTASSERT_SIZE_BIT(struct USB_ADDINFO_t, 8);
+_Static_assert(sizeof(struct USB_ADDINFO_t) == 1, "Size assertion failed");
 
 struct USB_OTGSTAT_t {
         UNION_STRUCT_START(8);
@@ -26,7 +26,7 @@ struct USB_OTGSTAT_t {
         uint8_t idchg : 1;
         UNION_STRUCT_END;
 };
-CTASSERT_SIZE_BIT(struct USB_OTGSTAT_t, 8);
+_Static_assert(sizeof(struct USB_OTGSTAT_t) == 1, "Size assertion failed");
 
 struct USB_OTGCTL_t {
         UNION_STRUCT_START(8);
@@ -39,7 +39,7 @@ struct USB_OTGCTL_t {
         uint8_t dphigh : 1;
         UNION_STRUCT_END;
 };
-CTASSERT_SIZE_BIT(struct USB_OTGCTL_t, 8);
+_Static_assert(sizeof(struct USB_OTGCTL_t) == 1, "Size assertion failed");
 
 struct USB_ISTAT_t {
         UNION_STRUCT_START(8);
@@ -53,7 +53,7 @@ struct USB_ISTAT_t {
         uint8_t stall : 1;
         UNION_STRUCT_END;
 };
-CTASSERT_SIZE_BIT(struct USB_ISTAT_t, 8);
+_Static_assert(sizeof(struct USB_ISTAT_t) == 1, "Size assertion failed");
 
 struct USB_ERRSTAT_t {
         UNION_STRUCT_START(8);
@@ -67,7 +67,7 @@ struct USB_ERRSTAT_t {
         uint8_t btserr : 1;
         UNION_STRUCT_END;
 };
-CTASSERT_SIZE_BIT(struct USB_ERRSTAT_t, 8);
+_Static_assert(sizeof(struct USB_ERRSTAT_t) == 1, "Size assertion failed");
 
 struct USB_STAT_t {
         UNION_STRUCT_START(8);
@@ -77,7 +77,7 @@ struct USB_STAT_t {
         uint8_t ep : 4;
         UNION_STRUCT_END;
 };
-CTASSERT_SIZE_BIT(struct USB_STAT_t, 8);
+_Static_assert(sizeof(struct USB_STAT_t) == 1, "Size assertion failed");
 
 struct USB_CTL_t {
         union {
@@ -106,7 +106,7 @@ struct USB_CTL_t {
                 uint8_t raw;
         };
 };
-CTASSERT_SIZE_BIT(struct USB_CTL_t, 8);
+_Static_assert(sizeof(struct USB_CTL_t) == 1, "Size assertion failed");
 
 struct USB_ADDR_t {
         UNION_STRUCT_START(8);
@@ -114,7 +114,7 @@ struct USB_ADDR_t {
         uint8_t lsen : 1;
         UNION_STRUCT_END;
 };
-CTASSERT_SIZE_BIT(struct USB_ADDR_t, 8);
+_Static_assert(sizeof(struct USB_ADDR_t) == 1, "Size assertion failed");
 
 struct USB_TOKEN_t {
         UNION_STRUCT_START(8);
@@ -122,7 +122,7 @@ struct USB_TOKEN_t {
         enum usb_tok_pid pid : 4;
         UNION_STRUCT_END;
 };
-CTASSERT_SIZE_BIT(struct USB_TOKEN_t, 8);
+_Static_assert(sizeof(struct USB_TOKEN_t) == 1, "Size assertion failed");
 
 struct USB_ENDPT_t {
         UNION_STRUCT_START(8);
@@ -136,7 +136,7 @@ struct USB_ENDPT_t {
         uint8_t hostwohub : 1;
         UNION_STRUCT_END;
 };
-CTASSERT_SIZE_BIT(struct USB_ENDPT_t, 8);
+_Static_assert(sizeof(struct USB_ENDPT_t) == 1, "Size assertion failed");
 
 struct USB_USBCTRL_t {
         UNION_STRUCT_START(8);
@@ -145,7 +145,7 @@ struct USB_USBCTRL_t {
         uint8_t susp : 1;
         UNION_STRUCT_END;
 };
-CTASSERT_SIZE_BIT(struct USB_USBCTRL_t, 8);
+_Static_assert(sizeof(struct USB_USBCTRL_t) == 1, "Size assertion failed");
 
 struct USB_OBSERVE_t {
         UNION_STRUCT_START(8);
@@ -156,7 +156,7 @@ struct USB_OBSERVE_t {
         uint8_t dppu : 1;
         UNION_STRUCT_END;
 };
-CTASSERT_SIZE_BIT(struct USB_OBSERVE_t, 8);
+_Static_assert(sizeof(struct USB_OBSERVE_t) == 1, "Size assertion failed");
 
 struct USB_CONTROL_t {
         UNION_STRUCT_START(8);
@@ -165,7 +165,7 @@ struct USB_CONTROL_t {
         uint8_t _rsvd1 : 3;
         UNION_STRUCT_END;
 };
-CTASSERT_SIZE_BIT(struct USB_CONTROL_t, 8);
+_Static_assert(sizeof(struct USB_CONTROL_t) == 1, "Size assertion failed");
 
 struct USB_USBTRC0_t {
         UNION_STRUCT_START(8);
@@ -177,7 +177,7 @@ struct USB_USBTRC0_t {
         uint8_t usbreset : 1;
         UNION_STRUCT_END;
 };
-CTASSERT_SIZE_BIT(struct USB_USBTRC0_t, 8);
+_Static_assert(sizeof(struct USB_USBTRC0_t) == 1, "Size assertion failed");
 
 struct USB_t {
         uint8_t perid;
@@ -245,7 +245,7 @@ struct USB_t {
         uint8_t usbfrmadjust;
         uint8_t _pad30[3];
 };
-CTASSERT_SIZE_BYTE(struct USB_t, 0x118);
+_Static_assert(sizeof(struct USB_t) == 280, "Size assertion failed");
 
 struct USB_BD_t {
         struct USB_BD_BITS_t {
@@ -272,6 +272,6 @@ struct USB_BD_t {
         };
         void *addr;
 };
-CTASSERT_SIZE_BYTE(struct USB_BD_t, 8);
+_Static_assert(sizeof(struct USB_BD_t) == 8, "Size assertion failed");
 
 extern volatile struct USB_t USB0;

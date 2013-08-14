@@ -8,7 +8,7 @@ struct FTFL_FSTAT_t {
         uint8_t ccif : 1;
         UNION_STRUCT_END;
 };
-CTASSERT_SIZE_BIT(struct FTFL_FSTAT_t, 8);
+_Static_assert(sizeof(struct FTFL_FSTAT_t) == 1, "Size assertion failed");
 
 struct FTFL_FCNFG_t {
         UNION_STRUCT_START(8);
@@ -22,7 +22,7 @@ struct FTFL_FCNFG_t {
         uint8_t ccie : 1;
         UNION_STRUCT_END;
 };
-CTASSERT_SIZE_BIT(struct FTFL_FCNFG_t, 8);
+_Static_assert(sizeof(struct FTFL_FCNFG_t) == 1, "Size assertion failed");
 
 struct FTFL_FSEC_t {
         UNION_STRUCT_START(8);
@@ -44,7 +44,7 @@ struct FTFL_FSEC_t {
         } keyen : 2;
         UNION_STRUCT_END;
 };
-CTASSERT_SIZE_BIT(struct FTFL_FSEC_t, 8);
+_Static_assert(sizeof(struct FTFL_FSEC_t) == 1, "Size assertion failed");
 
 struct FTFL_FOPT_t {
         UNION_STRUCT_START(8);
@@ -54,7 +54,7 @@ struct FTFL_FOPT_t {
         uint8_t _rsvd0 : 5;
         UNION_STRUCT_END;
 };
-CTASSERT_SIZE_BIT(struct FTFL_FOPT_t, 8);
+_Static_assert(sizeof(struct FTFL_FOPT_t) == 1, "Size assertion failed");
 
 /**
  * The FCOOB is a weird register file, because it is double big endian,
@@ -185,7 +185,7 @@ union FTFL_FCCOB_t {
                 enum FTFL_FCMD fcmd : 8;
         } set_flexram;
 };
-CTASSERT_SIZE_BYTE(union FTFL_FCCOB_t, 12);
+_Static_assert(sizeof(union FTFL_FCCOB_t) == 12, "Size assertion failed");
 
 struct FTFL_t {
         struct FTFL_FSTAT_t fstat;
@@ -197,7 +197,7 @@ struct FTFL_t {
         uint8_t feprot;
         uint8_t fdprot;
 };
-CTASSERT_SIZE_BYTE(struct FTFL_t, 0x18);
+_Static_assert(sizeof(struct FTFL_t) == 24, "Size assertion failed");
 
 /* Flash Configuration Field, see Sub-Family Reference Manual, section 28.3.1 */
 struct FTFL_CONFIG_t {
@@ -208,7 +208,7 @@ struct FTFL_CONFIG_t {
         uint8_t feprot;
         uint8_t fdprot;
 };
-CTASSERT_SIZE_BYTE(struct FTFL_CONFIG_t, 16);
+_Static_assert(sizeof(struct FTFL_CONFIG_t) == 16, "Size assertion failed");
 
 extern volatile struct FTFL_t FTFL;
 extern char FlexRAM[];

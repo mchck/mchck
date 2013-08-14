@@ -38,7 +38,7 @@ struct usb_desc_type_t {
 	uint8_t _rsvd0 : 1;
 	UNION_STRUCT_END;
 };
-CTASSERT_SIZE_BYTE(struct usb_desc_type_t, 1);
+_Static_assert(sizeof(struct usb_desc_type_t) == 1);
 
 enum usb_dev_class {
 	USB_DEV_CLASS_SEE_IFACE = 0,
@@ -65,14 +65,14 @@ struct usb_bcd_t {
 	};
 	UNION_STRUCT_END;
 };
-CTASSERT_SIZE_BYTE(struct usb_bcd_t, 2);
+_Static_assert(sizeof(struct usb_bcd_t) == 2);
 
 struct usb_desc_generic_t {
 	uint8_t bLength;
 	struct usb_desc_type_t bDescriptorType;
 	uint8_t data[];
 };
-CTASSERT_SIZE_BYTE(struct usb_desc_generic_t, 2);
+_Static_assert(sizeof(struct usb_desc_generic_t) == 2);
 
 struct usb_desc_dev_t {
 	uint8_t bLength;
@@ -90,7 +90,7 @@ struct usb_desc_dev_t {
 	uint8_t iSerialNumber;
 	uint8_t bNumConfigurations;
 };
-CTASSERT_SIZE_BYTE(struct usb_desc_dev_t, 18);
+_Static_assert(sizeof(struct usb_desc_dev_t) == 18);
 
 struct usb_desc_ep_t {
 	uint8_t bLength;
@@ -129,7 +129,7 @@ struct usb_desc_ep_t {
 	};
 	uint8_t bInterval;
 } __packed;
-CTASSERT_SIZE_BYTE(struct usb_desc_ep_t, 7);
+_Static_assert(sizeof(struct usb_desc_ep_t) == 7);
 
 struct usb_desc_iface_t {
 	uint8_t bLength;
@@ -142,7 +142,7 @@ struct usb_desc_iface_t {
 	enum usb_dev_proto bInterfaceProtocol : 8;
 	uint8_t iInterface;
 };
-CTASSERT_SIZE_BYTE(struct usb_desc_iface_t, 9);
+_Static_assert(sizeof(struct usb_desc_iface_t) == 9);
 
 struct usb_desc_config_t {
 	uint8_t bLength;
@@ -159,14 +159,14 @@ struct usb_desc_config_t {
 	};
 	uint8_t bMaxPower;	/* units of 2mA */
 } __packed;
-CTASSERT_SIZE_BYTE(struct usb_desc_config_t, 9);
+_Static_assert(sizeof(struct usb_desc_config_t) == 9);
 
 struct usb_desc_string_t {
 	uint8_t bLength;
 	enum usb_desc_type bDescriptorType : 8; /* = USB_DESC_STRING */
 	const char16_t bString[];
 };
-CTASSERT_SIZE_BYTE(struct usb_desc_string_t, 2);
+_Static_assert(sizeof(struct usb_desc_string_t) == 2);
 
 #define USB_DESC_STRING(s)					\
         (const void *)&(const struct {				\
@@ -225,7 +225,7 @@ struct usb_ctrl_req_t {
 	uint16_t wIndex;
 	uint16_t wLength;
 };
-CTASSERT_SIZE_BYTE(struct usb_ctrl_req_t, 8);
+_Static_assert(sizeof(struct usb_ctrl_req_t) == 8);
 
 #define USB_CTRL_REQ_DIR_SHIFT 0
 #define USB_CTRL_REQ_TYPE_SHIFT 1
@@ -246,18 +246,18 @@ struct usb_ctrl_req_status_dev_t {
 	uint16_t remote_wakeup : 1;
 	uint16_t _rsvd : 14;
 };
-CTASSERT_SIZE_BIT(struct usb_ctrl_req_status_dev_t, 16);
+_Static_assert(sizeof(struct usb_ctrl_req_status_dev_t) == 2);
 
 struct usb_ctrl_req_status_iface_t {
 	uint16_t _rsvd;
 };
-CTASSERT_SIZE_BIT(struct usb_ctrl_req_status_iface_t, 16);
+_Static_assert(sizeof(struct usb_ctrl_req_status_iface_t) == 2);
 
 struct usb_ctrl_req_status_ep_t {
 	uint16_t halt : 1;
 	uint16_t _rsvd : 15;
 };
-CTASSERT_SIZE_BIT(struct usb_ctrl_req_status_ep_t, 16);
+_Static_assert(sizeof(struct usb_ctrl_req_status_ep_t) == 2);
 
 /**
  * Descriptor type (in req->value) for GET_DESCRIPTOR.
@@ -266,7 +266,7 @@ struct usb_ctrl_req_desc_t {
 	uint8_t idx;
 	enum usb_desc_type type : 8;
 };
-CTASSERT_SIZE_BIT(struct usb_ctrl_req_desc_t, 16);
+_Static_assert(sizeof(struct usb_ctrl_req_desc_t) == 2);
 
 /**
  * Feature selector (in req->value) for CLEAR_FEATURE.

@@ -42,7 +42,7 @@ struct PCR_t {
         uint8_t _rsvd4 : 7;
         UNION_STRUCT_END;
 };
-CTASSERT_SIZE_BIT(struct PCR_t, 32);
+_Static_assert(sizeof(struct PCR_t) == 4, "Size assertion failed");
 
 /* Global Pin Control register */
 struct GPCR_t {
@@ -51,7 +51,7 @@ struct GPCR_t {
         uint16_t gpwd;
         UNION_STRUCT_END;
 };
-CTASSERT_SIZE_BIT(struct GPCR_t, 32);
+_Static_assert(sizeof(struct GPCR_t) == 4, "Size assertion failed");
 
 /* a single complete port register structure */
 struct PORT_t {
@@ -60,7 +60,7 @@ struct PORT_t {
         struct GPCR_t gpchr;
         uint32_t isfr;
 };
-CTASSERT_SIZE_BYTE(struct PORT_t, 140);
+_Static_assert(sizeof(struct PORT_t) == 140, "Size assertion failed");
 
 /* port structures are not contiguous in memory, can't allocate them as an array */
 extern volatile struct PORT_t PORTA;

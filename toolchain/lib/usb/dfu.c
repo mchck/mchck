@@ -17,7 +17,7 @@ struct dfu_status_t {
         enum dfu_state bState : 8;
         uint8_t iString;
 } __packed;
-CTASSERT_SIZE_BYTE(struct dfu_status_t, 6);
+_Static_assert(sizeof(struct dfu_status_t) == 6);
 
 
 void
