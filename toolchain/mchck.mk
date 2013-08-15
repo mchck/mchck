@@ -97,10 +97,12 @@ ifdef LOADER
 CPPFLAGS.ld+=	-DMEMCFG_LDSCRIPT='"loader.ld"'
 LDSCRIPTS+=	${_libdir}/ld/loader.ld
 BINSIZE=	${LOADER_SIZE}
+LOADADDR=	${LOADER_ADDR}
 else
 CPPFLAGS.ld+=	-DMEMCFG_LDSCRIPT='"app.ld"'
 LDSCRIPTS+=	${_libdir}/ld/app.ld
 BINSIZE=	${APP_SIZE}
+LOADADDR=	${APP_ADDR}
 endif
 
 LDTEMPLATE=	${PROG}.ld-template
@@ -140,6 +142,9 @@ gdb: ${PROG}.elf
 
 flash: ${PROG}.bin
 	${DFUUTIL} -D ${PROG}.bin
+
+swd-flash: ${PROG}.bin
+	${RUBY} ${_libdir}/../programmer/flash.rb ${MCHCKADAPTER} $< ${LOADADDR}
 endif
 
 clean:
