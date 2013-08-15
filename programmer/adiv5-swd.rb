@@ -1,4 +1,3 @@
-require 'swd-ftdi'
 require 'log'
 
 class Adiv5Swd
@@ -20,8 +19,8 @@ class Adiv5Swd
   end
 
 
-  def initialize(drv, opt)
-    @drv = drv.new opt
+  def initialize(drv)
+    @drv = drv
 
     switch_to_swd
     write(:dp, ABORT, 0x1e)           # clear all errors
@@ -53,7 +52,7 @@ class Adiv5Swd
     readcount = opt[:count] || 1
     ret = []
 
-    Log :swd, 2, 'read  %s %x ...' % [port, addr]
+    Log(:swd, 2){ 'read  %s %x (%d words)...' % [port, addr, readcount] }
     readcount.times do |i|
       ret << transact(port, :in, addr)
     end
@@ -65,7 +64,7 @@ class Adiv5Swd
       # add last posted result
       ret << transact(:dp, :in, RDBUFF)
     end
-    Log :swd, 1, 'read  %s %x <' % [port, addr], *ret.map{|e| "%08x" % e}
+    Log(:swd, 1){ ['read  %s %x <' % [port, addr], *ret.map{|e| "%08x" % e}] }
 
     ret = ret.first if not opt[:count]
     ret
@@ -73,7 +72,7 @@ class Adiv5Swd
 
   def write(port, addr, val)
     val = [val] unless val.respond_to? :each
-    Log :swd, 1, 'write %s %x =' % [port, addr], *val.map{|e| "%08x" % e}
+    Log(:swd, 1){ ['write %s %x =' % [port, addr], *val.map{|e| "%08x" % e}] }
     val.each do |v|
       transact(port, :out, addr, v)
     end
@@ -82,6 +81,8 @@ class Adiv5Swd
   def transact(port, dir, addr, data=nil)
     try ||= 0
     try += 1
+
+    Log(:swd, 2){ "SWD transaction #{port} #{dir} #{addr}, try #{try}" }
 
     cmd = 0x81
     case port
@@ -102,22 +103,22 @@ class Adiv5Swd
     end
     @drv.transact(cmd, data)
   rescue Wait
-    Log :swd, 2, 'SWD WAIT, retrying'
+    Log(:swd, 2){ 'SWD WAIT, retrying' }
     retry
 
   # XXX we might have to repeat the previous write instead of this transaction
   # the fault/protocolerror might actually refer to the preceeding transaction.
   rescue ProtocolError
     if try <= 3
-      Log :swd, 2, 'SWD protocol error, retrying'
+      Log(:swd, 2){ 'SWD protocol error, retrying' }
       reset
       retry
     else
-      Log :swd, 2, 'SWD protocol error unrecoverable, aborting'
+      Log(:swd, 2){ 'SWD protocol error unrecoverable, aborting' }
       raise
     end
   rescue ParityError
-    Log :swd, 2, 'SWD parity error, restarting'
+    Log(:swd, 2){ 'SWD parity error, restarting' }
     if port == :ap || addr == RDBUFF
       # If this transfer read from the AP, we have to read from RESEND
       # instead.
@@ -126,11 +127,18 @@ class Adiv5Swd
       # We can repeat simple DP reads
       retry
     end
+  rescue Fault
+    Log(:swd, 2){ 'SWD fault, clearing sticky error' }
+    # clear sticky error
+    transact(:dp, :out, ABORT, 1 << 2)
+    raise
   end
 end
 
+# We require this here so that all our consumers can directly use
+# BackendDriver.  However, we cannot require this before the
+# declaration of the class, or dependency loops get in our way.
 
 if $0 == __FILE__
-  s = Adiv5Swd.new(FtdiSwd, :vid => Integer(ARGV[0]), :pid => Integer(ARGV[1]))
-  
+  s = Adiv5Swd.new(BackendDriver.from_string(ARGV[0]))
 end
