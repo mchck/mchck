@@ -281,8 +281,29 @@ end
 
 if $0 == __FILE__
   require 'backend-driver'
+  driver = ARGV[0]
+  if ARGV[1] == '--'
+    cmd = ARGV[2..-1]
+  end
+
   adiv5 = Adiv5.new(BackendDriver.from_string(ARGV[0]))
   k = Kinetis.new(adiv5, false)
-  g = GDBServer.new(k, 1234)
-  g.run_loop
+
+  if cmd
+    case pid = Process.fork
+    when nil
+      # child
+      g = GDBServer.new(k, 1234)
+      g.run_loop
+      $stderr.puts "GDB server exiting"
+      exit!
+    else
+      # parent
+      system(*cmd)
+      Process.kill("TERM", pid)
+    end
+  else
+    g = GDBServer.new(k, 1234)
+    g.run_loop
+  end
 end

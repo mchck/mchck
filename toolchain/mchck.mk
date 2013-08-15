@@ -134,11 +134,8 @@ ${LDTEMPLATE}: ${_libdir}/ld/link.ld.S ${LDSCRIPTS}
 	${CPP} -o $@ ${CPPFLAGS.ld} $<
 CLEANFILES+=	${LDTEMPLATE} ${PROG}.ld
 
-gdbserver:
-	${RUBY} ${_libdir}/../programmer/gdbserver.rb ${MCHCKADAPTER}
-
 gdb: ${PROG}.elf
-	${GDB} -readnow -ex 'target extended-remote :1234' ${PROG}.elf
+	${RUBY} ${_libdir}/../programmer/gdbserver.rb ${MCHCKADAPTER} -- ${GDB} -readnow -ex 'target extended-remote :1234' ${PROG}.elf
 
 flash: ${PROG}.bin
 	${DFUUTIL} -D ${PROG}.bin
