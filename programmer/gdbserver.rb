@@ -290,6 +290,7 @@ if $0 == __FILE__
   k = Kinetis.new(adiv5, false)
 
   if cmd
+    trap("INT", "IGNORE")
     case pid = Process.fork
     when nil
       # child
