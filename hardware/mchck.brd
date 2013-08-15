@@ -1,4 +1,4 @@
-PCBNEW-BOARD Version 2 date Tue 13 Aug 2013 06:47:20 PM CEST
+PCBNEW-BOARD Version 2 date Thu 15 Aug 2013 04:11:55 PM CEST
 
 # Created by Pcbnew(2013-07-14 BZR 4242)-stable
 
@@ -62,8 +62,8 @@ TextModSize 0.89916 0.89916
 TextModWidth 0.14986
 PadSize 1.8796 1.8796
 PadDrill 1.016
-Pad2MaskClearance 0.09906
-SolderMaskMinWidth 0
+Pad2MaskClearance 0.1
+SolderMaskMinWidth 0.1
 AuxiliaryAxisOrg 0 0
 VisibleElements FFFFFF5F
 PcbPlotParams (pcbplotparams (layerselection 284196865) (usegerberextensions true) (excludeedgelayer false) (linewidth 0.150000) (plotframeref false) (viasonmask false) (mode 1) (useauxorigin false) (hpglpennumber 1) (hpglpenspeed 20) (hpglpendiameter 15) (hpglpenoverlay 0) (psnegative false) (psa4output false) (plotreference true) (plotvalue true) (plotothertext true) (plotinvisibletext false) (padsonsilk false) (subtractmaskfromsilk true) (outputformat 1) (mirror false) (drillshape 0) (scaleselection 1) (outputdirectory ""))
