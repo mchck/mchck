@@ -1,19 +1,21 @@
 P=	mchck
 
+REPOVER=	$(shell git describe)
 SOURCES=	$(wildcard $P*.ps) $(wildcard $(SCHEMATIC:.sch=*.ps))
 PDFS=		${SOURCES:.ps=-crop.pdf}
-PNGS=            ${COMPOSITE_PNGS} ${SOURCES:.ps=.png}
+PNGS=		${COMPOSITE_PNGS} ${SOURCES:.ps=.png}
 PNG_PREVIEWS=	${PNGS:.png=-small.png}
 SCHEMATIC=	$(wildcard *.sch)
 BOARD=		$P.brd
 GERBERS=	$(wildcard $P-*.g[bt][lso] $P-*.gbr $P*.drl)
+ZIPNAME=	${P}-${REPOVER}.zip
 LICENSE_FILES=	LICENSE LICENSE.HOWTO README.md
 COMPOSITE_PNGS=	$P-F_Composite.png $P-B_Composite.png
 
-all: clean png png_preview
+all: clean png png_preview zip
 
 clean:
-	-rm -f *.pdf *.png
+	-rm -f *.pdf *.png *.zip
 
 realclean:
 	-rm -f *.pdf *.png *.ps *.gbr *.gbl *.gto *.gts *.gbs *.gtl *.dsn *.ses *.svg *.svgz *.drl *.csv *.lst *.gbo
@@ -56,7 +58,7 @@ FAB_BRANCH=	fab
 FAB_INDEX=	$(shell git rev-parse --git-dir || echo ".git")/fab-index
 e=	GIT_INDEX_FILE=${FAB_INDEX}
 
-ci-fab: ${GERBERS} ${PDFS} ${PNGS} ${PNG_PREVIEWS} ${LICENSE_FILES}
+ci-fab: ${GERBERS} ${PDFS} ${PNGS} ${PNG_PREVIEWS} ${LICENSE_FILES} ${ZIPNAME}
 	@if ! git diff --quiet HEAD -- . ${LICENSE_FILES}; then \
 		echo "tree is dirty.  please commit first." >&2; \
 		exit 1; \
@@ -83,10 +85,10 @@ update-wiki:
 
 .PHONY: update-wiki
 
-zip: ${P}.zip
+zip: ${ZIPNAME}
 
 .PHONY: zip
 
-${P}.zip: ${GERBERS}
+${ZIPNAME}: ${GERBERS}
 	-rm $@
 	zip $@ $^
