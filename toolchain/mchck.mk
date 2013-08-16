@@ -1,66 +1,148 @@
 _libdir:=       $(dir $(lastword ${MAKEFILE_LIST}))
-VPATH=	${_libdir}/crt0:${_libdir}/lib
 
-CC=	arm-none-eabi-gcc
-LD=	arm-none-eabi-ld
-AR=	arm-none-eabi-ar
-AS=	arm-none-eabi-as
-OBJCOPY=	arm-none-eabi-objcopy
+-include .mchckrc
+-include ${_libdir}/../.mchckrc
 
-TARGET?=	MK20DX32VLF5
+define _include_used_libs
+_libdir-$(1):=	$$(addprefix $${_libdir}/lib/,$(1))
+include $$(addsuffix /Makefile.part,$${_libdir-$(1)})
 
-COPTFLAGS?=	-Os
-CWARNFLAGS?=	-Wall
+_objs-$(1)=	$$(addsuffix .o, $$(basename $$(addprefix $(1)-lib-,$${SRCS-$(1)})))
+OBJS+=	$${_objs-$(1)}
+CLEANFILES+=	$${_objs-$(1)}
 
-CFLAGS+=	-mcpu=cortex-m4 -msoft-float -mthumb -ffunction-sections -std=gnu99
-CFLAGS+=	-I${_libdir}/include -I${_libdir}/CMSIS/Include -I.
-CFLAGS+=	-include ${_libdir}/include/mchck_internal.h
-CFLAGS+=	-g
+$(1)-lib-%.o: $${_libdir-$(1)}/%.c
+	$$(COMPILE.c) $$(OUTPUT_OPTION) $$<
+endef
+
+
+# Common config
+
+CFLAGS+=	-I${_libdir}/include -I${_libdir}/lib
+CFLAGS+=	-ggdb3
+CFLAGS+=	-std=c11 -fplan9-extensions
 ifndef DEBUG
 CFLAGS+=	${COPTFLAGS}
+else
+NO_LTO=		no-lto
 endif
 CFLAGS+=	${CWARNFLAGS}
-
-LDFLAGS+=	-Wl,--gc-sections -L${_libdir} -L${_libdir}/ld
-LDFLAGS+=	-T ${TARGETLD}
-ifdef LOADER
-LDFLAGS+=	-T loader.ld
-else
-LDFLAGS+=	-T app.ld
-endif
-LDFLAGS+=	-T link.ld
-LDFLAGS+=       -nostartfiles
-
-STARTFILE_SRC=	startup_k20.c system_k20.c
-STARTFILE_OBJ=	$(addsuffix .o, $(basename ${STARTFILE_SRC}))
-#STARTFILE_LIB=	libcrtnuc1xx.a
-#STARTFILE_LIBSHORT=	-lcrtnuc1xx
-STARTFILES=	${STARTFILE_OBJ}
-
-TARGETLD?=	${TARGET}.ld
 
 SRCS?=	${PROG}.c
 _objs=	$(addsuffix .o, $(basename ${SRCS}))
 CLEANFILES+=	${_objs}
 OBJS+=	${_objs}
 
-CLEANFILES+=	${STARTFILE_OBJ}
 
-CLEANFILES+=	${PROG}.hex ${PROG}.elf ${PROG}.bin
+# Host config (VUSB)
 
-all: ${PROG}.hex ${PROG}.bin
+ifeq (${TARGET},host)
+CFLAGS+=	-DTARGET_HOST
+CFLAGS+=	-fshort-enums
 
-${PROG}.elf: ${OBJS} ${STARTFILES}
-	${CC} -o $@ ${CFLAGS} ${LDFLAGS} ${STARTFILES} ${OBJS} ${LDLIBS}
+all: ${PROG}
 
-%.hex: %.elf
-	${OBJCOPY} -O ihex $< $@
+$(foreach _uselib,host ${USE},$(eval $(call _include_used_libs,$(_uselib))))
+
+$(PROG): $(OBJS)
+	$(LINK.c) $^ ${LDLIBS} -o $@
+
+CLEANFILES+=	${PROG}
+else
+
+# MCHCK config
+
+CC=	arm-none-eabi-gcc
+LD=	arm-none-eabi-ld
+AR=	arm-none-eabi-ar
+AS=	arm-none-eabi-as
+OBJCOPY=	arm-none-eabi-objcopy
+GDB=	arm-none-eabi-gdb
+DFUUTIL?=	dfu-util
+RUBY?=	ruby
+
+ifeq ($(shell which $(CC) 2>/dev/null),)
+SATDIR?=	$(HOME)/sat
+endif
+ifdef SATDIR
+PATH:=	${SATDIR}/bin:${PATH}
+export PATH
+endif
+
+COMPILER_PATH=	${_libdir}/scripts
+export COMPILER_PATH
+
+TARGET?=	MK20DX32VLF5
+
+include ${_libdir}/${TARGET}.mk
+
+COPTFLAGS?=	-Os
+CWARNFLAGS?=	-Wall -Wno-main
+
+CFLAGS+=	-mcpu=cortex-m4 -msoft-float -mthumb -ffunction-sections -fdata-sections -fno-builtin -fstrict-volatile-bitfields
+ifndef NO_LTO
+CFLAGS+=	-flto
+endif
+CFLAGS+=	-I${_libdir}/CMSIS/Include -I.
+CFLAGS+=	-include ${_libdir}/include/mchck_internal.h
+
+LDFLAGS+=	-Wl,--gc-sections
+LDFLAGS+=	-fwhole-program
+CPPFLAGS.ld+=	-P -CC -I${_libdir}/ld -I.
+CPPFLAGS.ld+=	-DTARGET_LDSCRIPT='"${TARGETLD}"'
+LDSCRIPTS+=	${_libdir}/ld/${TARGETLD}
+TARGETLD?=	${TARGET}.ld
+
+ifdef LOADER
+CPPFLAGS.ld+=	-DMEMCFG_LDSCRIPT='"loader.ld"'
+LDSCRIPTS+=	${_libdir}/ld/loader.ld
+BINSIZE=	${LOADER_SIZE}
+LOADADDR=	${LOADER_ADDR}
+else
+CPPFLAGS.ld+=	-DMEMCFG_LDSCRIPT='"app.ld"'
+LDSCRIPTS+=	${_libdir}/ld/app.ld
+BINSIZE=	${APP_SIZE}
+LOADADDR=	${APP_ADDR}
+endif
+
+LDTEMPLATE=	${PROG}.ld-template
+LDFLAGS+=	-T ${LDTEMPLATE}
+LDFLAGS+=       -nostartfiles
+LDFLAGS+=	-Wl,-Map=${PROG}.map
+LDFLAGS+=	-Wl,-output-linker-script=${PROG}.ld
+
+
+CLEANFILES+=	${PROG}.hex ${PROG}.elf ${PROG}.bin ${PROG}.map
+
+all: ${PROG}.bin
+
+# This has to go before the rule, because for some reason the updates to OBJS
+# are not incorporated into the target dependencies
+$(foreach _uselib,mchck ${USE},$(eval $(call _include_used_libs,$(_uselib))))
+
+
+${PROG}.elf: ${OBJS} ${LDLIBS} ${LDTEMPLATE}
+	${CC} -o $@ ${CFLAGS} ${LDFLAGS} ${OBJS} ${LDLIBS}
 
 %.bin: %.elf
-	${OBJCOPY} -O binary $< $@
+	${OBJCOPY} -O binary $< $@.tmp
+	ls -l $@.tmp | awk '{ s=$$5; as=${BINSIZE}; printf "%d bytes available\n", (as - s); if (s > as) { exit 1; }}'
+	mv $@.tmp $@
+CLEANFILES+=	${PROG}.bin.tmp
 
-${STARTFILE_LIB}: ${STARTFILE_OBJ}
-	${AR} r $@ $^
+${LDTEMPLATE}: ${_libdir}/ld/link.ld.S ${LDSCRIPTS}
+	${CPP} -o $@ ${CPPFLAGS.ld} $<
+CLEANFILES+=	${LDTEMPLATE} ${PROG}.ld
+
+gdb: ${PROG}.elf
+	${RUBY} ${_libdir}/../programmer/gdbserver.rb ${MCHCKADAPTER} -- ${GDB} -readnow -ex 'target extended-remote :1234' ${PROG}.elf
+
+flash: ${PROG}.bin
+	${DFUUTIL} -D ${PROG}.bin
+
+swd-flash: ${PROG}.bin
+	${RUBY} ${_libdir}/../programmer/flash.rb ${MCHCKADAPTER} $< ${LOADADDR}
+endif
 
 clean:
 	-rm -f ${CLEANFILES}
