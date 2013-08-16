@@ -58,8 +58,8 @@ new_data(uint8_t *data, size_t len)
 }
 
 void serialEvent() {
-  uint8_t buff[BUFF_SIZE];
-  int n = 0;
+  static uint8_t buff[BUFF_SIZE];
+  static int n = 0;
   while (Serial.available()) {
     buff[n++] = (uint8_t)Serial.read();
     if (n >= BUFF_SIZE) {
