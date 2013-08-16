@@ -1,4 +1,5 @@
 * toolchain
+** TODO add header dependencies
 ** TODO build everything framework to avoid breaking code
 ** TODO only link subset of library?
 e.g. USE=usb/cdc, does not compile/link usb/dfu?
