@@ -3,7 +3,7 @@
 #include <usb/usb.h>
 #include <usb/cdc-acm.h>
 
-#include "swd/swd.h"
+#include "swduino/swd.h"
 
 #include "desc.c"
 

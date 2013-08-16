@@ -1,5 +1,4 @@
-/* Import the library from the swd/ folder first */
-#include <swd.h>
+#include "swd.h"
 
 const int BUFF_SIZE = 10;
 const int LED = 13;
