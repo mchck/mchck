@@ -35,11 +35,13 @@
 extern "C" {
 #endif
 
-const uint8_t *process_buf(const uint8_t *buf, size_t len);
+int process_data(const uint8_t *buf, size_t len);
+const uint8_t *process_command(const uint8_t *buf, size_t len, int *outpipe_full);
+void signal_led(void);
 void pin_configure(enum swd_pin pin, enum swd_pin_mode mode);
 void pin_write(enum swd_pin pin, int val);
 int pin_read(enum swd_pin pin);
-size_t reply_space(void);
+int outpipe_space(size_t len);
 void reply_write(const uint8_t *buf, size_t len);
 
 #ifdef __cplusplus

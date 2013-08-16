@@ -68,10 +68,12 @@ configure_pins(int on)
 
 
 const uint8_t *
-process_buf(const uint8_t *buf, size_t len)
+process_command(const uint8_t *buf, size_t len, int *outpipe_full)
 {
-        int i;
+        signal_led();
+
         for (; len > 0;) {
+                size_t i;
                 uint8_t cmd = *buf;
 
                 ++buf; --len;
@@ -81,15 +83,15 @@ process_buf(const uint8_t *buf, size_t len)
 
                 switch (cmd) {
                 case 0x10:       /* read word */
-                        if (reply_space() < 4)
-                                goto need_more_data;
+                        if (!outpipe_space(4))
+                                goto outpipe_full;
                         for (i = 4; i > 0; --i)
                                 read_bits(8, 0);
                         break;
 
                 case 0x20 ... 0x27: /* read bits */
-                        if (reply_space() < 1)
-                                goto need_more_data;
+                        if (!outpipe_space(1))
+                                goto outpipe_full;
                         read_bits((cmd & 7) + 1, 0);
                         break;
 
@@ -130,7 +132,40 @@ test_magic:
 
         return (buf);
 
+outpipe_full:
+        if (outpipe_full != NULL)
+                *outpipe_full = 1;
+
 need_more_data:
         /* we skipped one, now go back */
         return (buf - 1);
+}
+
+int
+process_data(const uint8_t *data, size_t len)
+{
+        static uint8_t buf[10];
+        static size_t buflen;
+
+        int outpipe_full = 0;
+
+        while (buflen + len > 0) {
+                size_t copylen = sizeof(buf) - buflen;
+
+                if (len < copylen)
+                        copylen = len;
+                memcpy(buf + buflen, data, copylen);
+                len -= copylen;
+                buflen += copylen;
+                data += copylen;
+
+                outpipe_full = 0;
+                const uint8_t *p = process_command(buf, buflen, &outpipe_full);
+                if (p == buf)
+                        break;
+                buflen -= p - buf;
+                memcpy(buf, p, buflen);
+        }
+
+        return (outpipe_full);
 }

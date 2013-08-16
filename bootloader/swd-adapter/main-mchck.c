@@ -12,6 +12,12 @@ static struct cdc_ctx cdc;
 /* Glue for SWD */
 
 void
+signal_led(void)
+{
+        onboard_led(ONBOARD_LED_TOGGLE);
+}
+
+void
 pin_configure(enum swd_pin pin, enum swd_pin_mode mode)
 {
         gpio_mode(pin, mode);
@@ -29,10 +35,10 @@ pin_read(enum swd_pin pin)
         return (gpio_read(pin));
 }
 
-size_t
-reply_space(void)
+int
+outpipe_space(size_t len)
 {
-        return (cdc_write_space(&cdc));
+        return (cdc_write_space(&cdc) >= len);
 }
 
 void
@@ -41,37 +47,31 @@ reply_write(const uint8_t *buf, size_t len)
         cdc_write(buf, len, &cdc);
 }
 
+/* end glue */
+
+
+static int draining = 0;
+
 static void
 new_data(uint8_t *data, size_t len)
 {
-        static uint8_t buf[10];
-        static size_t buflen;
+        draining = process_data(data, len);
 
-        onboard_led(-1);
-        while (buflen + len > 0) {
-                size_t copylen = sizeof(buf) - buflen;
-
-                if (len < copylen)
-                        copylen = len;
-                memcpy(buf + buflen, data, copylen);
-                len -= copylen;
-                buflen += copylen;
-                data += copylen;
-
-                const uint8_t *p = process_buf(buf, buflen);
-                if (p == buf)
-                        break;
-                buflen -= p - buf;
-                memcpy(buf, p, buflen);
-        }
-        cdc_read_more(&cdc);
+        if (!draining)
+                cdc_read_more(&cdc);
 }
 
+static void
+space_available(size_t len)
+{
+        if (draining)
+                new_data(NULL, 0);
+}
 
 static void
 init_cdc(int config)
 {
-        cdc_init(new_data, NULL, &cdc);
+        cdc_init(new_data, space_available, &cdc);
 }
 
 const static struct usbd_config cdc_config = {

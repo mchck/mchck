@@ -11,6 +11,10 @@ void setup() {
 void loop() {
 }
 
+void signal_led(void) {
+  digitalWrite(LED, !digitalRead(LED));
+}
+
 void pin_configure(enum swd_pin pin, enum swd_pin_mode mode) {
   pinMode(pin, mode);
 }
@@ -23,49 +27,17 @@ int pin_read(enum swd_pin pin) {
   return digitalRead(pin);
 }
 
-size_t reply_space(void) {
-  return BUFF_SIZE; // XXX can always write (I hope)
+int outpipe_space(size_t len) {
+  return 1; // XXX can always write (I hope)
 }
 
 void reply_write(const uint8_t *buf, size_t len) {
   Serial.write(buf, len);
 }
 
-static void
-new_data(uint8_t *data, size_t len)
-{
-  static uint8_t buf[BUFF_SIZE];
-  static size_t buflen;
-  digitalWrite(LED, 1);
-  while (buflen + len > 0) {
-    size_t copylen = sizeof(buf) - buflen;
-
-    if (len < copylen)
-      copylen = len;
-    memcpy(buf + buflen, data, copylen);
-    len -= copylen;
-    buflen += copylen;
-    data += copylen;
-
-    const uint8_t *p = process_buf(buf, buflen);
-    if (p == buf)
-      break;
-    buflen -= p - buf;
-    memcpy(buf, p, buflen);
-  }
-  digitalWrite(LED, 0);
-}
-
 void serialEvent() {
-  static uint8_t buff[BUFF_SIZE];
-  static int n = 0;
   while (Serial.available()) {
-    buff[n++] = (uint8_t)Serial.read();
-    if (n >= BUFF_SIZE) {
-      new_data(buff, n);
-      n = 0;
-    }
+    uint8_t data = Serial.read();
+    process_data(&data, 1);
   }
-  if (n > 0)
-    new_data(buff, n);
 }
