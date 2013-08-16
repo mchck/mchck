@@ -85,7 +85,7 @@ struct dfu_desc_functional {
         uint16_t wTransferSize;
         struct usb_bcd_t bcdDFUVersion;
 } __packed;
-_Static_assert(sizeof(struct dfu_desc_functional) == 9);
+CTASSERT_SIZE_BYTE(struct dfu_desc_functional, 9);
 
 struct dfu_function_desc {
         struct usb_desc_iface_t iface;

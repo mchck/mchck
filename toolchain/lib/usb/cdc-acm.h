@@ -44,14 +44,14 @@ struct cdc_desc_function_header_t {
         struct cdc_desc_function_common_t;
         struct usb_bcd_t bcdCDC; /* 1.2 */
 } __packed;
-_Static_assert(sizeof(struct cdc_desc_function_header_t) == 5);
+CTASSERT_SIZE_BYTE(struct cdc_desc_function_header_t, 5);
 
 struct cdc_desc_function_union_t {
         struct cdc_desc_function_common_t;
         uint8_t bControlInterface;
         uint8_t bSubordinateInterface0;
 };
-_Static_assert(sizeof(struct cdc_desc_function_union_t) == 5);
+CTASSERT_SIZE_BYTE(struct cdc_desc_function_header_t, 5);
 
 struct cdc_function_desc {
         struct usb_desc_iface_t ctrl_iface;

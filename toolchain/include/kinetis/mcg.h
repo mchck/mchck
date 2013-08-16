@@ -129,6 +129,6 @@ struct MCG_t {
                 UNION_STRUCT_END;
         } c8;
 };
-_Static_assert(sizeof(struct MCG_t) == 14, "Size assertion failed");
+CTASSERT_SIZE_BYTE(struct MCG_t, 0xe);
 
 extern volatile struct MCG_t MCG;

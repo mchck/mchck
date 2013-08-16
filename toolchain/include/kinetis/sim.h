@@ -298,6 +298,6 @@ struct SIM_t {
         uint32_t uidml;
         uint32_t uidl;
 };
-_Static_assert(sizeof(struct SIM_t) == 4196, "Size assertion failed");
+CTASSERT_SIZE_BYTE(struct SIM_t, 0x1064);
 
 extern volatile struct SIM_t SIM;
