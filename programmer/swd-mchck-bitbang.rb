@@ -19,10 +19,30 @@ class MchckBitbangSwd < BitbangSwd
     @dev = SerialPort.new(opt[:dev], opt[:speed] || 115200)
     @dev.flow_control = SerialPort::NONE
 
-    @dev.write(CMD_HANDSHAKE)
-    if @dev.read(CMD_HANDSHAKE_REPLY.length) != CMD_HANDSHAKE_REPLY
-      raise RuntimeError, "not a MC HCK SWD bitbang adapter"
+    # The Arduino automatically resets when connecting on the serial
+    # port.  Once the Ardunio resets, it will run its bootloader,
+    # which will just discard data arriving on the serial port, until
+    # it timeouts and passes control to the sketch.  Therefore, we
+    # have to poll the port a bit, until we get a reply, or it took
+    # unreasonably long.
+
+    @dev.read_timeout = 100     # 100 ms timeout for handshaking
+    tries = 20                  # try for 2 seconds
+    tries.times do
+      Log(:phys, 3){ 'sending handshake' }
+      @dev.write(CMD_HANDSHAKE)
+      reply = @dev.read(CMD_HANDSHAKE_REPLY.length)
+      Log(:phys, 3){ 'received handshake %s' % reply.inspect }
+
+      tries -= 1
+      next if reply.nil? && tries >= 0
+
+      if reply != CMD_HANDSHAKE_REPLY
+        raise RuntimeError, "not a MC HCK SWD bitbang adapter: received `#{reply}'"
+      end
+      break
     end
+    @dev.read_timeout = 0
 
     @cur_dir = :out
   end
