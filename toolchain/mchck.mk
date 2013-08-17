@@ -10,17 +10,24 @@ include $$(addsuffix /Makefile.part,$${_libdir-$(1)})
 _objs-$(1)=	$$(addsuffix .o, $$(basename $$(addprefix $(1)-lib-,$${SRCS-$(1)})))
 OBJS+=	$${_objs-$(1)}
 CLEANFILES+=	$${_objs-$(1)}
+_deps-$(1)=	$$(addsuffix .d, $$(basename $$(addprefix $(1)-lib-,$${SRCS-$(1)})))
+DEPS+=	$${_deps-$(1)}
 
 $(1)-lib-%.o: $${_libdir-$(1)}/%.c
 	$$(COMPILE.c) $$(OUTPUT_OPTION) $$<
+$(1)-lib-%.d: $${_libdir-$(1)}/%.c
+	$$(GENERATE.d)
 endef
+
+GENERATE.d=	$(CC) -MM ${CPPFLAGS} -MT $@ -MT ${@:.d=.o} -MP -MF $@ $<
 
 
 # Common config
 
-CFLAGS+=	-I${_libdir}/include -I${_libdir}/lib
+CPPFLAGS+=	-I${_libdir}/include -I${_libdir}/lib
+CPPFLAGS+=	-std=c11
+CFLAGS+=	-fplan9-extensions
 CFLAGS+=	-ggdb3
-CFLAGS+=	-std=c11 -fplan9-extensions
 ifndef DEBUG
 CFLAGS+=	${COPTFLAGS}
 else
@@ -32,12 +39,13 @@ SRCS?=	${PROG}.c
 _objs=	$(addsuffix .o, $(basename ${SRCS}))
 CLEANFILES+=	${_objs}
 OBJS+=	${_objs}
-
+DEPS+=	$(addsuffix .d, $(basename ${SRCS}))
+CLEANFILES+=	${DEPS}
 
 # Host config (VUSB)
 
 ifeq (${TARGET},host)
-CFLAGS+=	-DTARGET_HOST
+CPPFLAGS+=	-DTARGET_HOST
 CFLAGS+=	-fshort-enums
 
 all: ${PROG}
@@ -83,8 +91,8 @@ CFLAGS+=	-mcpu=cortex-m4 -msoft-float -mthumb -ffunction-sections -fdata-section
 ifndef NO_LTO
 CFLAGS+=	-flto
 endif
-CFLAGS+=	-I${_libdir}/CMSIS/Include -I.
-CFLAGS+=	-include ${_libdir}/include/mchck_internal.h
+CPPFLAGS+=	-I${_libdir}/CMSIS/Include -I.
+CPPFLAGS+=	-include ${_libdir}/include/mchck_internal.h
 
 LDFLAGS+=	-Wl,--gc-sections
 LDFLAGS+=	-fwhole-program
@@ -143,6 +151,12 @@ flash: ${PROG}.bin
 swd-flash: ${PROG}.bin
 	${RUBY} ${_libdir}/../programmer/flash.rb ${MCHCKADAPTER} $< ${LOADADDR}
 endif
+
+# from the make info manual
+%.d: %.c
+	$(GENERATE.d)
+
+-include ${DEPS}
 
 clean:
 	-rm -f ${CLEANFILES}
