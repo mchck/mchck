@@ -162,17 +162,33 @@ usb_rx(struct usbd_ep_pipe_state_t *s, void *buf, size_t len, ep_callback_t cb, 
 	return (len);
 }
 
+void *
+usb_ep0_tx_inplace_prepare(size_t len)
+{
+	enum usb_ep_pingpong pp = usb.ep_state[0].tx.pingpong;
+
+	if (len > EP0_BUFSIZE)
+		return (NULL);
+
+	return (ep0_buf[pp]);
+}
+
 int
 usb_ep0_tx_cp(const void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_data)
 {
-	enum usb_ep_pingpong pp = usb.ep_state[0].tx.pingpong;
-	void *destbuf = ep0_buf[pp];
+	void *destbuf = usb_ep0_tx_inplace_prepare(len);
 
-	if (len > EP0_BUFSIZE)
+	if (destbuf == NULL)
 		return (-1);
-	memcpy(destbuf, buf, len);
 
-	return (usb_tx(&usb.ep_state[0].tx, destbuf, len, reqlen, cb, cb_data));
+	memcpy(destbuf, buf, len);
+	return (usb_ep0_tx(destbuf, len, reqlen, cb, cb_data));
+}
+
+int
+usb_ep0_tx(void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_data)
+{
+	return (usb_tx(&usb.ep_state[0].tx, buf, len, reqlen, cb, cb_data));
 }
 
 int

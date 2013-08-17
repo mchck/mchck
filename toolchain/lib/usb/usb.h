@@ -367,6 +367,8 @@ int usb_rx(struct usbd_ep_pipe_state_t *, void *, size_t, ep_callback_t, void *)
 int usb_tx(struct usbd_ep_pipe_state_t *, const void *, size_t, size_t, ep_callback_t, void *);
 
 int usb_ep0_rx(void *, size_t, ep_callback_t, void *);
+void *usb_ep0_tx_inplace_prepare(size_t len);
+int usb_ep0_tx(void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_data);
 int usb_ep0_tx_cp(const void *, size_t, size_t, ep_callback_t, void *);
 
 #endif
