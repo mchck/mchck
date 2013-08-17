@@ -112,7 +112,5 @@ main(void)
         flash_prepare_flashing();
 
         usb_init(&dfu_device);
-        for (;;) {
-                usb_intr();
-        }
+        sys_yield_for_frogs();
 }
