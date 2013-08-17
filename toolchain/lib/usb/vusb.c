@@ -424,6 +424,14 @@ usb_queue_next(struct usbd_ep_pipe_state_t *s, void *addr, size_t len)
         vusb_dev.activity = 1;
 }
 
+int
+usb_tx_serialno(size_t reqlen)
+{
+        const struct usb_desc_string_t *d = USB_DESC_STRING(u"vusb serial placeholder");
+
+        usb_ep0_tx_cp(d, d->bLength, reqlen, NULL, NULL);
+        return (0);
+}
 
 static void
 vusb_deliver_packet(int ep, enum usb_ep_dir dir, struct vusb_desc *ps)

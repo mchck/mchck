@@ -232,3 +232,40 @@ usb_poll(void)
 {
         USB0_Handler();
 }
+
+int
+usb_tx_serialno(size_t reqlen)
+{
+        struct usb_desc_string_t *d;
+        const size_t nregs = 3;
+        /**
+         * actually 4, but UIDH is 0xffffffff.  Also our output buffer
+         * is only 64 bytes, and 128 bit + desc header exceeds this by
+         * 2 bytes.
+         */
+        const size_t len = nregs * 4 * 2 * 2 + sizeof(*d);
+
+        d = usb_ep0_tx_inplace_prepare(len);
+
+        if (d == NULL)
+                return (-1);
+
+        d->bLength = len;
+        d->bDescriptorType = USB_DESC_STRING;
+
+        size_t bufpos = 0;
+        for (size_t reg = 0; reg < nregs; ++reg) {
+                /* registers run MSW first */
+                uint32_t val = (&SIM.uidmh)[reg];
+
+                for (size_t bits = 32; bits > 0; bits -= 4, val <<= 4) {
+                        int nibble = val >> 28;
+
+                        if (nibble > 9)
+                                nibble += 'a' - '9' - 1;
+                        ((char16_t *)d->bString)[bufpos++] = nibble + '0';
+                }
+        }
+        usb_ep0_tx(d, len, reqlen, NULL, NULL);
+        return (0);
+}

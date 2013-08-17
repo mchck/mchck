@@ -180,6 +180,7 @@ CTASSERT_SIZE_BYTE(struct usb_desc_string_t, 2);
 			s					\
 	}
 #define USB_DESC_STRING_LANG_ENUS USB_DESC_STRING(u"\x0409")
+#define USB_DESC_STRING_SERIALNO ((const void *)1)
 
 
 struct usb_ctrl_req_t {
@@ -355,6 +356,7 @@ void vusb_main_loop(void);
 #else
 void usb_poll(void);
 #endif
+int usb_tx_serialno(size_t reqlen);
 
 /* Provided by MI code */
 void usb_init(const struct usbd_device *);

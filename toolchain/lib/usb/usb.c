@@ -249,10 +249,15 @@ usb_tx_string_desc(int idx, int reqlen)
 
 	for (d = usb.identity->string_descs; idx != 0 && *d != NULL; ++d)
 		--idx;
-	if (*d == NULL)
+	switch ((uintptr_t)*d) {
+	case (uintptr_t)NULL:
 		return (-1);
-	usb_ep0_tx_cp(*d, (*d)->bLength, reqlen, NULL, NULL);
-	return (0);
+	case (uintptr_t)USB_DESC_STRING_SERIALNO:
+		return (usb_tx_serialno(reqlen));
+	default:
+		usb_ep0_tx_cp(*d, (*d)->bLength, reqlen, NULL, NULL);
+		return (0);
+	}
 }
 
 

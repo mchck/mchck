@@ -11,7 +11,7 @@ const static struct usb_desc_dev_t cdc_dev_desc = {
         .bcdDevice = { .raw = 0 },
         .iManufacturer = 1,
         .iProduct = 2,
-        .iSerialNumber = 0,
+        .iSerialNumber = 3,
         .bNumConfigurations = 1,
 };
 
@@ -19,7 +19,7 @@ const struct usb_desc_string_t * const cdc_string_descs[] = {
         USB_DESC_STRING_LANG_ENUS,
         USB_DESC_STRING(u"mchck.org"),
         USB_DESC_STRING(u"MC HCK serial test"),
-        USB_DESC_STRING(u"weh?"),
+        USB_DESC_STRING_SERIALNO,
         NULL
 };
 
