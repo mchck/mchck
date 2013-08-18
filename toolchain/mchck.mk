@@ -89,7 +89,7 @@ CWARNFLAGS?=	-Wall -Wno-main
 
 CFLAGS+=	-mcpu=cortex-m4 -msoft-float -mthumb -ffunction-sections -fdata-sections -fno-builtin -fstrict-volatile-bitfields
 ifndef NO_LTO
-CFLAGS+=	-flto
+CFLAGS+=	-flto -fno-use-linker-plugin
 endif
 CPPFLAGS+=	-I${_libdir}/CMSIS/Include -I.
 CPPFLAGS+=	-include ${_libdir}/include/mchck_internal.h
