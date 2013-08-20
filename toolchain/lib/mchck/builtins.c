@@ -31,3 +31,15 @@ memcmp(const void *a, const void *b, size_t len)
 		/* NOTHING */;
 	return (val);
 }
+
+void *
+memchr(const void *addr, int val, size_t len)
+{
+	const uint8_t *buf = addr;
+
+	for (; len > 0; --len, ++buf) {
+		if (*buf == val)
+			return ((void *)buf);
+	}
+	return (NULL);
+}
