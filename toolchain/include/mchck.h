@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <sys/cdefs.h>
 #include <stdint.h>
+#include <stdfix.h>
 
 #include <mchck-cdefs.h>
 

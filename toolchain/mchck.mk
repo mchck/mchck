@@ -25,7 +25,7 @@ GENERATE.d=	$(CC) -MM ${CPPFLAGS} -MT $@ -MT ${@:.d=.o} -MP -MF $@ $<
 # Common config
 
 CPPFLAGS+=	-I${_libdir}/include -I${_libdir}/lib
-CPPFLAGS+=	-std=c11
+CPPFLAGS+=	-std=gnu11
 CFLAGS+=	-fplan9-extensions
 CFLAGS+=	-ggdb3
 ifndef DEBUG
