@@ -415,6 +415,33 @@ class ARMv7
     match
   end
 
+  def mmap
+    map = mmap_ranges.map do |e|
+      attrs = [:type, :start, :length]
+
+      '<memory %s>%s</memory>' %
+        [attrs.map{|k| '%s="%s"' % [k, e[k]]}.join(' '),
+         (e.keys - attrs).map{|k| '<property name="%s">%s</property>' % [k, e[k]]}.join]
+    end.join("\n")
+
+    s = <<__end__
+<?xml version="1.0"?>
+<!DOCTYPE memory-map
+	PUBLIC "+//IDN gnu.org//DTD GDB Memory Map V1.0//EN"
+	"http://sourceware.org/gdb/gdb-memory-map.dtd">
+<memory-map>
+  #{map}
+</memory-map>
+__end__
+  end
+
+  def mmap_ranges
+    [
+     {:type => :ram, :start => 0x40000000, :length => 0x20000000}, # peripherals
+     {:type => :ram, :start => 0xe0000000, :length => 0x20000000} # ARM peripherals
+    ]
+  end
+
   def reg_desc
     regs = (0..12).map{|i| {:name => "r#{i}".to_sym}}
     regs << {:name => :sp, :type => "data_ptr"}

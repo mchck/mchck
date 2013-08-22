@@ -164,6 +164,243 @@ class Kinetis < ARMv7
     end
   end
 
+  class SIM
+    include Peripheral
+
+    default_address 0x40047000
+
+    register :SOPT, 0x00 do
+      bool :USBREGEN, 31
+      bool :USBSSTBY, 30
+      bool :USBVSTBY, 29
+      enum :OSC32KSEL, 19..18, {
+        :OSC32KCKL => 0b00,
+        :RTC32K => 0b10,
+        :LPO1K => 0b11
+      }
+      enum :RAMSIZE, 15..12, {
+        8192 => 0b0001,
+        16384 => 0b0011
+      }
+    end
+
+    register :SOPT1CFG, 0x04 do
+      bool :USSWE, 26
+      bool :UVSWE, 25
+      bool :URWE, 24
+    end
+
+    register :SOPT2, 0x1004 do
+      enum :USBSRC, 18, {
+        :USB_CLKIN => 0,
+        :MCGPLLFLLCLK => 1
+      }
+      enum :PLLFLLSEL, 16, {
+        :MCGFLLCLK => 0,
+        :MCGPLLCLK => 1
+      }
+      enum :TRACECLKSEL, 12, {
+        :MCGOUTCLK => 0,
+        :CORECLK => 1
+      }
+      enum :PTD7PAD, 11, {
+        :single => 0,
+        :double => 1
+      }
+      enum :CLKOUTSEL, 7..5, {
+        :FLASH => 0b010,
+        :LPO => 0b011,
+        :MCGIRCLK => 0b100,
+        :RTC32K => 0b101,
+        :OSCERCLK0 => 0b110
+      }
+      enum :RTCCLKOUTSEL, 4, {
+        :RTC1Hz => 0,
+        :RTC32K => 1
+      }
+    end
+
+    register :SOPT4, 0x100c do
+      enum :FTM0TRG0SRC, 28, {
+        :HSCMP0 => 0,
+        :FTM1MATCH => 1
+      }
+      enum :FTM1CLKSEL, 25, {
+        :FTM_CLK0 => 0,
+        :FTM_CLK1 => 1
+      }
+      enum :FTM0CLKSEL, 24, {
+        :FTM_CLK0 => 0,
+        :FTM_CLK1 => 1
+      }
+      enum :FTM1CH0SRC, 19..18, {
+        :FTM_CH0 => 0b00,
+        :CMP0 => 0b01,
+        :CMP1 => 0b10,
+        :USB_SOF => 0b11
+      }
+      enum :FTM1FLT0, 4, {
+        :FTM1_FLT0 => 0,
+        :CMP0 => 1
+      }
+      enum :FTM0FLT1, 1, {
+        :FTM0_FLT1 => 0,
+        :CMP1 => 1
+      }
+      enum :FTM0FLT0, 0, {
+        :FTM0_FLT0 => 0,
+        :CMP0 => 1
+      }
+    end
+
+    register :SOPT5, 0x1010 do
+      enum :UART1RXSRC, 7..6, {
+        :UART1_RX => 0b00,
+        :CMP0 => 0b01,
+        :CMP1 => 0b10
+      }
+      enum :UART1TXSRC, 4, {
+        :UART1_TX => 0,
+        :UART1_TX_FTM1_CH0 => 1
+      }
+      enum :UART0RXSRC, 3..2, {
+        :UART0_RX => 0b00,
+        :CMP0 => 0b01,
+        :CMP1 => 0b10
+      }
+      enum :UART0TXSRC, 4, {
+        :UART0_TX => 0,
+        :UART0_TX_FTM1_CH0 => 1
+      }
+    end
+
+    register :SOPT7, 0x1018 do
+      enum :ADC0ALTTRGEN, 7, {
+        :PDB => 0,
+        :alternate => 1
+      }
+      enum :ADC0PRETRGSEL, 4, {
+        :A => 0,
+        :B => 1
+      }
+      enum :ADC0TRGSEL, 3..0, {
+        :PDB0_EXTRG => 0b0000,
+        :HSCMP0 => 0b0001,
+        :HSCMP1 => 0b0010,
+        :PIT0 => 0b0100,
+        :PIT1 => 0b0101,
+        :PIT2 => 0b0110,
+        :PIT3 => 0b0111,
+        :FTM0 => 0b1000,
+        :FTM1 => 0b1001,
+        :RTC_alarm => 0b1100,
+        :RTC_seconds => 0b1101,
+        :LPT => 0b1110
+      }
+    end
+
+    register :SDID, 0x1024 do
+      unsigned :REVID, 15..12
+      enum :FAMID, 6..4, {
+        :K10 => 0b000,
+        :K20 => 0b001
+      }
+      enum :PINID, 3..0, {
+        32 => 0b0010,
+        48 => 0b0100,
+        64 => 0b0101
+      }
+    end
+
+    register :SCGC4, 0x1034 do
+      bool :VREF, 20
+      bool :CMP, 19
+      bool :USBOTG, 18
+      bool :UART2, 12
+      bool :UART1, 11
+      bool :UART0, 10
+      bool :I2C0, 6
+      bool :CMT, 2
+      bool :EWM, 1
+    end
+
+    register :SCGC5, 0x1038 do
+      bool :PORTE, 13
+      bool :PORTD, 12
+      bool :PORTC, 11
+      bool :PORTB, 10
+      bool :PORTA, 9
+      bool :TSI, 5
+      bool :LPTIMER, 0
+    end
+
+    register :SCGC6, 0x103c do
+      bool :RTC, 29
+      bool :ADC0, 27
+      bool :FTM1, 25
+      bool :FTM0, 24
+      bool :PIT, 23
+      bool :PDB, 22
+      bool :USBDCD, 21
+      bool :CRC, 18
+      bool :I2S, 15
+      bool :SPI0, 12
+      bool :DMAMUX, 1
+      bool :FTFL, 0
+    end
+
+    register :SCGC7, 0x1040 do
+      bool :DMA, 1
+    end
+
+    register :CLKDIV1, 0x1044 do
+      unsigned :OUTDIV1, 31..28
+      unsigned :OUTDIV2, 27..24
+      unsigned :OUTDIV4, 19..16
+    end
+
+    register :CLKDIV2, 0x1048 do
+      unsigned :USBDIV, 3..1
+      unsigned :USBFRAC, 0
+    end
+
+    register :FCFG1, 0x104c do
+      enum :NVMSIZE, 31..28, {
+        0 => 0b0000,
+        32768 => 0b0011
+      }
+      enum :PFSIZE, 27..24, {
+        32768 => 0b0011,
+        65536 => 0b0101,
+        0x20000 => 0b0111
+      }
+      enum :EESIZE, 19..16, {
+        2048 => 0b0011,
+        1024 => 0b0100,
+        512 => 0b0101,
+        256 => 0b0110,
+        128 => 0b0111,
+        64 => 0b1000,
+        32 => 0b1001,
+        0 => 0b1111
+      }
+      unsigned :DEPART, 11..8
+      bool :FLASHDOZE, 1
+      bool :FLASHDIS, 0
+    end
+
+    register :FCFG2, 0x1050 do
+      unsigned :MAXADDR0, 30..24
+      enum :PFLSH, 23, {
+        :FlexNVM => 0,
+        :program => 1
+      }
+      unsigned :MAXADDR1, 22..16
+    end
+
+    unsigned :UID, 0x1054, :vector => 4
+  end
+
   def initialize(adiv5, magic_halt=false)
     super(adiv5)
     @mdmap = adiv5.ap(1)
@@ -217,6 +454,7 @@ class Kinetis < ARMv7
 
     @ftfl = Kinetis::FTFL.new(@dap)
     @flexram = Kinetis::FlexRAM.new(@dap)
+    @sim = Kinetis::SIM.new(@dap)
     @sector_size = 1024
   end
 
@@ -265,10 +503,20 @@ class Kinetis < ARMv7
     while datapos < data.bytesize
       sectaddr = addr + datapos
       sector = data.byteslice(datapos, @sector_size)
-      yield [sectaddr, datapos, data.bytesize]
+      yield [sectaddr, datapos, data.bytesize] if block_given?
       program_sector(sectaddr, sector)
       datapos += @sector_size
     end
+  end
+
+  def mmap_ranges
+    ramsize = @sim.SOPT.RAMSIZE
+    flashsize = @sim.FCFG1.PFSIZE
+    super +
+      [
+       {:type => :flash, :start => 0, :length => flashsize, :blocksize => @sector_size},
+       {:type => :ram, :start => 0x20000000 - ramsize/2, :length => ramsize}
+      ]
   end
 end
 

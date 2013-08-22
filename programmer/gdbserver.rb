@@ -95,9 +95,11 @@ class GDBServer
       # we always attach to an existing process
       '1'
     when /^qSupported.*/
-      'PacketSize=0400;qXfer:features:read+'
+      'PacketSize=4000;qXfer:features:read+;qXfer:memory-map:read+'
     when /^qXfer:features:read:target.xml:([[:xdigit:]]+),([[:xdigit:]]+)$/
       send_tdesc($1, $2)
+    when /^qXfer:memory-map:read::([[:xdigit:]]+),([[:xdigit:]]+)$/
+      send_mmap($1, $2)
     when /^R..$/
       # reset system
       reset_system(false)
@@ -266,6 +268,16 @@ class GDBServer
       @target.remove_breakpoint(type, addr, kind)
     end
     'OK'
+  end
+
+  def send_mmap(addrstr, lenstr)
+    addr, len = parse_int(addrstr), parse_int(lenstr)
+    desc = @target.mmap[addr,len]
+    if desc.empty?
+      'l'
+    else
+      "m#{desc}"
+    end
   end
 
   def send_tdesc(addrstr, lenstr)
