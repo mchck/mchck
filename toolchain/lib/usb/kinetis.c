@@ -116,7 +116,6 @@ usb_pipe_disable(struct usbd_ep_pipe_state_t *s)
         USB0.endpt[s->ep_num].raw &= ~((struct USB_ENDPT_t){
                         .eptxen = s->ep_dir == USB_EP_TX,
                                 .eprxen = s->ep_dir == USB_EP_RX,
-                                .ephshk = 1,
                                 .epctldis = 1
                                 }).raw;
 }
