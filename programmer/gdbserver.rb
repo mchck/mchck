@@ -129,12 +129,16 @@ class GDBServer
     str.to_i(16)
   end
 
-  def parse_binary(data)
+  def parse_hex_binary(data)
     [data].pack('H*')
   end
 
-  def code_binary(data)
+  def code_hex_binary(data)
     data.unpack('H*').first
+  end
+
+  def parse_raw_binary(data)
+    data.gsub(/\x7d./){|m| (m[1].ord ^ 0x20).chr}
   end
 
   def attach
@@ -163,20 +167,20 @@ class GDBServer
   end
 
   def read_registers
-    code_binary(@target.read_registers)
+    code_hex_binary(@target.read_registers)
   end
 
   def write_registers(regstr)
-    @target.write_registers!(parse_binary(regstr))
+    @target.write_registers!(parse_hex_binary(regstr))
     'OK'
   end
 
   def read_mem(addrstr, lenstr)
-    code_binary(@target.read_mem(parse_int(addrstr), parse_int(lenstr)))
+    code_hex_binary(@target.read_mem(parse_int(addrstr), parse_int(lenstr)))
   end
 
   def write_mem(addrstr, datastr)
-    @target.write_mem(parse_int(addrstr), parse_binary(datastr))
+    @target.write_mem(parse_int(addrstr), parse_hex_binary(datastr))
     'OK'
   end
 
@@ -236,7 +240,7 @@ class GDBServer
       sig_num = Signal.list[halt_reason.to_s] || Signal.list["INT"]
       pc_num = @target.reg_desc.index{|r| r[:name] == :pc}
       cur_pc = @target.get_register(:pc, true)
-      'T%02x%02x:%s;thread:1;%s' % [sig_num, pc_num, code_binary(cur_pc), aux]
+      'T%02x%02x:%s;thread:1;%s' % [sig_num, pc_num, code_hex_binary(cur_pc), aux]
     when :ok
       'OK'
     when false
