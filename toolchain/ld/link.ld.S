@@ -7,6 +7,8 @@
 
 OUTPUT_FORMAT ("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 
+ENTRY(Reset_Handler)
+
 /* Section Definitions */
 SECTIONS
 {

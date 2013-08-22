@@ -109,6 +109,13 @@ class GDBServer
       single_step($1)
     when /^vAttach;.*$/
       attach
+    when /^vFlashErase:([[:xdigit:]]+),([[:xdigit:]]+)$/
+      flash_prepare($1, $2)
+    when /^vFlashWrite:([[:xdigit:]]+):(.*)$/m
+      # flash to address $1 data $2
+      flash_write($1, $2)
+    when /^vFlashDone$/
+      flash_commit
     when /^vKill;/
       ret = reset_system(:ok)
       @state = :killed
@@ -293,6 +300,32 @@ class GDBServer
     else
       "m#{desc}"
     end
+  end
+
+  def flash_prepare(addrstr, lenstr)
+    addr, len = parse_int(addrstr), parse_int(lenstr)
+    @flashdata ||= {}
+    @flashdata[addr] = 0xff.chr * len
+    'OK'
+  end
+
+  def flash_write(addrstr, datastr)
+    addr, data = parse_int(addrstr), parse_raw_binary(datastr)
+    @flashdata.each do |fa, fd|
+      next if fa > addr || fa + fd.length < addr + data.length
+      fd[addr - fa, data.length] = data
+      return 'OK'
+    end
+    raise RuntimeError, "memory region not prepared"
+  end
+
+  def flash_commit
+    sections = @flashdata.sort_by{|k,v| k}
+
+    sections.each do |addr, data|
+      @target.program(addr, data)
+    end
+    reset_system(:ok)
   end
 end
 
