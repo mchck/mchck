@@ -24,8 +24,9 @@ class GDBServer
 
   def handle_connection
     Log(:gdb, 1){ "accepted connection" }
-    @data = ""
+    @data = String.new          # ASCII-8BIT
     @sock.setsockopt(:TCP, :NODELAY, true)
+    @sock.set_encoding('binary')
     attach
     while @state != :detached
       cmd = read_packet
@@ -46,12 +47,12 @@ class GDBServer
 
   def read_packet
     while !(m = /^(.*[$])([^#]*)[#]..(.*)/.match(@data))
-      Log(:gdb, 3){ "data #{@data.unpack('H*').first} no full packet, reading more" }
+      Log(:gdb, 3){ "data length #{@data.length} no full packet, reading more" }
       @data += @sock.readpartial(1024)
     end
     _, discard, pkt, @data = m.to_a
     @sock.write('+')            # ack
-    Log(:gdb, 2){ "received pkt #{pkt}, discarded leading `#{discard}'" }
+    Log(:gdb, 2){ "received pkt #{pkt.gsub(/[^[:print:]]/, '.')}, discarded leading `#{discard}'" }
     pkt
   end
 
