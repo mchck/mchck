@@ -65,25 +65,27 @@ pin_configure(enum swd_pin pin, enum swd_pin_mode mode)
         }
 }
 
-interrupt(USCIAB0RX_VECTOR) USCI0RX_ISR(void)
+interrupt(USCIAB0RX_VECTOR)
+USCI0RX_ISR(void)
 {
         uint8_t x = UCA0RXBUF;
         process_data(&x, 1);
 }
 
-interrupt(USCIAB0TX_VECTOR) USCI0TX_ISR(void)
+interrupt(USCIAB0TX_VECTOR)
+USCI0TX_ISR(void)
 {
-	if (head == tail) {
-		//buffer empty
+        if (head == tail) {
+                //buffer empty
 
-		IE2 &= ~UCA0TXIE;//disable interrupt
-		return;
-	}
-	
-	unsigned char c = tx_buffer[tail];
-	tail = (tail+1)%16;
-	
-	UCA0TXBUF = c;
+                IE2 &= ~UCA0TXIE;//disable interrupt
+                return;
+        }
+
+        unsigned char c = tx_buffer[tail];
+        tail = (tail+1)%16;
+
+        UCA0TXBUF = c;
 }
 
 int
