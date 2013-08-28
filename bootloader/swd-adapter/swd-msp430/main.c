@@ -28,7 +28,9 @@ pin_read(enum swd_pin pin)
 int
 outpipe_space(size_t len)
 {
-        if ((tx_buffer.tail - tx_buffer.head) + (-((char) (tx_buffer.tail <= tx_buffer.head)) & sizeof(tx_buffer.buf) >= len)) {
+        uint8_t available = (tx_buffer.tail > tx_buffer.head) ? tx_buffer.tail-tx_buffer.head : sizeof(tx_buffer.buf) - tx_buffer.head + tx_buffer.tail;
+
+        if (available >= len) {
                 return 1;
         }
 
