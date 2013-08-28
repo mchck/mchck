@@ -5,9 +5,13 @@
 
 #include "../swduino/swd.h"
 
+struct buffer {
+        unsigned char buf[16];
+        volatile unsigned int tail;
+        volatile unsigned int head;
+};
 
-unsigned char tx_buffer[16];
-volatile unsigned int tail = 0, head = 0;
+struct buffer tx_buffer = { {0}, 0, 0 };
 
 void
 signal_led(void)
@@ -43,13 +47,13 @@ reply_write(const uint8_t *buf, size_t len)
         int i = 0;
 
         for(; i < len; i++) {
-                unsigned int pos = (head+1) % 16;
+                unsigned int pos = (tx_buffer.head+1) % 16;
 
-                while(pos == tail)//buffer is full, wait
+                while(pos == tx_buffer.tail)//buffer is full, wait
                         /* NOTHING */;
 
-                tx_buffer[head] = buf[i];
-                head = pos;
+                tx_buffer.buf[tx_buffer.head] = buf[i];
+                tx_buffer.head = pos;
 
                 IE2 |= UCA0TXIE;//enable interrupt                  		
         }
@@ -75,15 +79,15 @@ USCI0RX_ISR(void)
 interrupt(USCIAB0TX_VECTOR)
 USCI0TX_ISR(void)
 {
-        if (head == tail) {
+        if (tx_buffer.head == tx_buffer.tail) {
                 //buffer empty
 
                 IE2 &= ~UCA0TXIE;//disable interrupt
                 return;
         }
 
-        unsigned char c = tx_buffer[tail];
-        tail = (tail+1)%16;
+        unsigned char c = tx_buffer.buf[tx_buffer.tail];
+        tx_buffer.tail = (tx_buffer.tail+1)%16;
 
         UCA0TXBUF = c;
 }
