@@ -11,7 +11,7 @@ struct buffer {
         volatile unsigned int head;
 };
 
-struct buffer tx_buffer = { {0}, 0, 0 };
+struct buffer tx_buffer = { .buf = {0}, .tail = 0, .head = 0 };
 
 void
 signal_led(void)
@@ -47,15 +47,16 @@ reply_write(const uint8_t *buf, size_t len)
         int i = 0;
 
         for(; i < len; i++) {
-                unsigned int pos = (tx_buffer.head+1) % 16;
+                unsigned int pos = (tx_buffer.head + 1) % sizeof(tx_buffer.buf);
 
-                while(pos == tx_buffer.tail)//buffer is full, wait
+                //buffer is full, wait
+                while(pos == tx_buffer.tail)
                         /* NOTHING */;
 
                 tx_buffer.buf[tx_buffer.head] = buf[i];
                 tx_buffer.head = pos;
 
-                IE2 |= UCA0TXIE;//enable interrupt                  		
+                IE2 |= UCA0TXIE; //enable interrupt                  		
         }
 }
 
@@ -82,12 +83,12 @@ USCI0TX_ISR(void)
         if (tx_buffer.head == tx_buffer.tail) {
                 //buffer empty
 
-                IE2 &= ~UCA0TXIE;//disable interrupt
+                IE2 &= ~UCA0TXIE; //disable interrupt
                 return;
         }
 
         unsigned char c = tx_buffer.buf[tx_buffer.tail];
-        tx_buffer.tail = (tx_buffer.tail+1)%16;
+        tx_buffer.tail = (tx_buffer.tail + 1) % sizeof(tx_buffer.buf);
 
         UCA0TXBUF = c;
 }
@@ -109,8 +110,8 @@ main()
         UCA0CTL1 |= UCSSEL_2; // SMCLK
 
         //use this for 9600 bps
-        UCA0BR0 = 130;                          // 16MHz 9600
-        UCA0BR1 = 6;                              // 16MHz 9600
+        UCA0BR0 = 130; // 16MHz 9600
+        UCA0BR1 = 6; // 16MHz 9600
 
         UCA0MCTL = UCBRS1 + UCBRS0; // Modulation UCBRSx = 3
         UCA0CTL1 &= ~UCSWRST;
