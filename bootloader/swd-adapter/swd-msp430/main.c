@@ -28,7 +28,11 @@ pin_read(enum swd_pin pin)
 int
 outpipe_space(size_t len)
 {
-        return 1; // XXX can always write (I hope)
+        if ((tx_buffer.tail - tx_buffer.head) + (-((char) (tx_buffer.tail <= tx_buffer.head)) & sizeof(tx_buffer.buf) >= len)) {
+                return 1;
+        }
+
+        return 0; //cannot fit len chars in buffer
 }
 
 void
