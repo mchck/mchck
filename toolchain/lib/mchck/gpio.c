@@ -9,7 +9,7 @@ gpio_mode(enum gpio_pin_id pin, enum gpio_pin_mode mode)
         SIM.scgc5.raw |= 1 << (gpio_portnum_from_pin(pin) + 8);
 
         volatile struct GPIO_t *gpio = gpio_physgpio_from_pin(pin);
-        volatile struct PCR_t pcr = gpio_physport_from_pin(pin)->pcr[pinnum];
+        struct PCR_t pcr = gpio_physport_from_pin(pin)->pcr[pinnum];
 
         if (mode & GPIO_MODE_RESET) {
                 pcr.raw &= ~0xff;
