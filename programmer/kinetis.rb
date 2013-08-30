@@ -419,6 +419,27 @@ class Kinetis < ARMv7
         # get kicked in the nuts regularly.  Holding the system & core in
         # reset prevents this.
         # XXX hack
+
+        # We might have a secure device
+        if (status = @mdmap.read_ap(0)) & 0b100 != 0
+          Log(:kinetis, 1){ "chip is secure, attempting mass erase." }
+          if status & 0b100000 == 0
+            raise RuntimeError, "chip secure and mass erase disabled"
+          end
+          Log(:kinetis, 1){ "please keep chip in reset.  retry if necessary." }
+          # trigger mass erase and wait for acknowledge to come on
+          @mdmap.write_ap(4, 0b1)
+          while @mdmap.read_ap(0) & 0b1 != 0b1
+            @mdmap.write_ap(4, 0b1)
+          end
+          # wait for progress to finish
+          while @mdmap.read_ap(4) & 0b1 != 0
+            sleep 0.1
+          end
+          # now we should be erased and unsecure
+          Log(:kinetis, 1){ "please release reset now." }
+        end
+
         Log(:kinetis, 1){ "holding system in reset" }
         # This waits until the system is in reset
         while @mdmap.read_ap(0) & 0b1110 != 0b0010
