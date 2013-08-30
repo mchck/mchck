@@ -77,6 +77,7 @@ struct FTM_t {
                 UNION_STRUCT_START(32);
                 uint32_t ftmen   : 1;
                 uint32_t init    : 1;
+		uint32_t wpdis	 : 1;
                 uint32_t pwmsync : 1;
                 uint32_t captest : 1;
                 enum FTM_FAULTM_t {
