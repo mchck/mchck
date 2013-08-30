@@ -64,6 +64,8 @@ struct cdc_function_desc {
 };
 
 #define USB_FUNCTION_CDC_IFACE_COUNT	2
+#define USB_FUNCTION_CDC_TX_EP_COUNT	2
+#define USB_FUNCTION_CDC_RX_EP_COUNT	1
 
 #define USB_FUNCTION_DESC_CDC_DECL \
         struct cdc_function_desc

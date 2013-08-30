@@ -3,8 +3,6 @@
 #include <usb/usb.h>
 #include <usb/cdc-acm.h>
 
-#include "desc.c"
-
 static struct cdc_ctx cdc;
 
 static int temp_count = 0;
@@ -58,17 +56,14 @@ init_vcdc(int config)
         cdc_init(new_data, NULL, &cdc);
 }
 
-const static struct usbd_config cdc_config = {
-        .init = init_vcdc,
-        .desc = &cdc_desc_config.config,
-        .function = { &cdc_function, NULL },
-};
-
-const struct usbd_device cdc_device = {
-        .dev_desc = &cdc_dev_desc,
-        .string_descs = cdc_string_descs,
-        .configs = { &cdc_config, NULL }
-};
+static struct usbd_device cdc_device =
+        USB_INIT_DEVICE(0x2323,              /* vid */
+                        3,                   /* pid */
+                        u"mchck.org",        /* vendor */
+                        u"temperature test", /* product" */
+                        (init_vcdc,          /* init */
+                         CDC),               /* functions */
+                )
 
 void
 main(void)
