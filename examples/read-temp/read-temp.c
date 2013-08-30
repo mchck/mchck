@@ -56,7 +56,7 @@ init_vcdc(int config)
         cdc_init(new_data, NULL, &cdc);
 }
 
-static struct usbd_device cdc_device =
+static const struct usbd_device cdc_device =
         USB_INIT_DEVICE(0x2323,              /* vid */
                         3,                   /* pid */
                         u"mchck.org",        /* vendor */
