@@ -40,5 +40,9 @@ GPIOC       = 0x400ff080;
 GPIOD       = 0x400ff0C0;
 GPIOE       = 0x400ff100;
 
+FTM0        = 0x40038000;
+FTM1        = 0x40039000;
+
 NVIC        = 0xe000e100;
 SCB         = 0xe000ed00;
+
