@@ -410,7 +410,7 @@ struct usbd_device {
 			__REPEAT(1, USB__INCREMENT, USB__DEFINE_CONFIG, __VA_ARGS__) \
 			NULL						\
 		}							\
-	};
+	}
 
 
 /* Provided by MD code */

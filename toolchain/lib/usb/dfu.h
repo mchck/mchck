@@ -95,9 +95,9 @@ struct dfu_function_desc {
 #define USB_FUNCTION_DESC_DFU_DECL                         \
         struct dfu_function_desc
 
-#define USB_FUNCTION_DESC_DFU_NIFACE	1
-#define USB_FUNCTION_DESC_DFU_NRXEP	0
-#define USB_FUNCTION_DESC_DFU_NTXEP	0
+#define USB_FUNCTION_DFU_IFACE_COUNT	1
+#define USB_FUNCTION_DFU_RX_EP_COUNT	0
+#define USB_FUNCTION_DFU_TX_EP_COUNT	0
 
 #define USB_FUNCTION_DESC_DFU(state...)                                 \
         {                                                               \
