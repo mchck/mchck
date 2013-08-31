@@ -21,6 +21,7 @@ SECTIONS
  */
 /* PACK SECTIONS START */
         KEEP(*(.isr_vector .isr_vector.*))
+        KEEP(*(.flash_config))
         *(.text .text.* .gnu.linkonce.t.*)
         *(.glue_7t) *(.glue_7)
         *(.rodata .rodata* .gnu.linkonce.r.*)
