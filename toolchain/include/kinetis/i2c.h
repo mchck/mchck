@@ -15,7 +15,7 @@ struct I2C {
                 } mult            : 2;
 
                 UNION_STRUCT_END;
-        } c1;
+        } f;
         struct I2C_C1 {
                 UNION_STRUCT_START(8);
                 uint8_t dmaen    : 1;
@@ -27,7 +27,7 @@ struct I2C {
                 uint8_t iicie    : 1;
                 uint8_t iicen    : 1;
                 UNION_STRUCT_END;
-        } s;
+        } c1;
         struct I2C_S {
                 UNION_STRUCT_START(8);
                 uint8_t rxak     : 1;
@@ -39,7 +39,7 @@ struct I2C {
                 uint8_t iaas     : 1;
                 uint8_t tcf      : 1;
                 UNION_STRUCT_END;
-        };
+        } s;
         uint8_t d;
         struct I2C_C2 {
                 UNION_STRUCT_START(8);
