@@ -18,8 +18,6 @@ linker_in = nil
 save_temps = false
 output_linker_script = nil
 
-$stderr.puts ARGV.join " "
-
 while arg = ARGV.shift
   case arg
   when /^-o$/
@@ -64,11 +62,6 @@ if linker_in
     $stdout.puts "keeping intermediary map file #{path}"
   end
 
-  args = ["arm-none-eabi-ld", "-o", tmp_obj.path, "-T", linker_in, *object_files, *call_args, "-Map=#{tmp_map.path}"]
-  if !system(*args)
-    exit $?.exitstatus
-  end
-
   ln = File.readlines(linker_in)
   ln.grep(/PACK SECTIONS FIX\s+([^\s]+)\s*=\s*(0x[[:xdigit:]]+|[[:digit:]]+)[^\w]/) do |m|
     s = Objdump::Section.new
@@ -79,6 +72,11 @@ if linker_in
   all_sect = Objdump.new object_files
   ln.grep(/PACK SECTIONS IGNORE\s+([^\s]+)/) do |m|
     all_sect.delete_if{|s| File.fnmatch($1, s.name)}
+  end
+
+  args = ["arm-none-eabi-ld", "-o", tmp_obj.path, "-T", linker_in, *object_files, *call_args, "-Map=#{tmp_map.path}"]
+  if !system(*args)
+    exit $?.exitstatus
   end
 
   # XXX getting ugly, move to separate functions
@@ -104,6 +102,10 @@ if linker_in
     carryover = []
     sect, _, _, file = line
     all_sect.delete_if{|s| s.name == sect && s.file == file}
+  end
+
+  fixed_sects.delete_if do |fs|
+    all_sect.select{|s| s.name == fs.name}.empty?
   end
 
   l = Linker.new(all_sect, fixed_sects)
