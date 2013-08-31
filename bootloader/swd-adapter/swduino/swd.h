@@ -17,12 +17,27 @@
           SWD_MODE_OUTPUT = OUTPUT,
           SWD_MODE_INPUT = INPUT
   };
+#elif MSP430
+  #include <msp430.h>
+  #include <legacymsp430.h>
+  #include <stdlib.h>
+  #include <signal.h>
+	
+  enum swd_pin {
+          SWD_DIO_PIN = BIT5,
+          SWD_CLK_PIN = BIT4
+  };
+	
+  enum swd_pin_mode {
+          SWD_MODE_OUTPUT,
+          SWD_MODE_INPUT
+  };
 #else
   #include <mchck.h>
 
   enum swd_pin {
-          SWD_DIO_PIN = GPIO_PTB16,
-          SWD_CLK_PIN = GPIO_PTB3
+          SWD_DIO_PIN = GPIO_PTC5,
+          SWD_CLK_PIN = GPIO_PTB17
   };
 
   enum swd_pin_mode {
