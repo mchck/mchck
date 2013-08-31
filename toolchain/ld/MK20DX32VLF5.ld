@@ -20,6 +20,7 @@ FTFL_CONFIG = 0x00000400;
 FlexRAM     = 0x14000000;
 
 FTFL        = 0x40020000;
+SPI0        = 0x4002c000;
 ADC0        = 0x4003b000;
 SIM         = 0x40047000;
 
