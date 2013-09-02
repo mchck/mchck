@@ -70,6 +70,11 @@ cdc_write(const uint8_t *buf, size_t len, struct cdc_ctx *ctx)
         return (len);
 }
 
+ssize_t
+cdc_write_string(const char *s, struct cdc_ctx *ctx)
+{
+        return (cdc_write((const void *)s, strlen(s), ctx));
+}
 
 /**
  * control requests received:
