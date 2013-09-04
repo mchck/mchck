@@ -11,7 +11,11 @@ struct FTFL_CONFIG_t flash_config = {
                 .meen = FTFL_FSEC_MEEN_ENABLE,
                 .keyen = FTFL_FSEC_KEYEN_ENABLE
         },
-        .fopt = 0xff,
+        .fopt = {
+                .nmi_dis = 0,
+                .ezport_dis = 1,
+                .lpboot = 1,
+        },
         .feprot = 0xff,
         .fdprot = 0xff
 };

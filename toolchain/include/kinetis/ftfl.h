@@ -204,7 +204,7 @@ struct FTFL_CONFIG_t {
         uint8_t key[8];
         uint8_t fprot[4];
         struct FTFL_FSEC_t fsec;
-        uint8_t fopt;
+        struct FTFL_FOPT_t fopt;
         uint8_t feprot;
         uint8_t fdprot;
 };
