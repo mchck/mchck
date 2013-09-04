@@ -1,5 +1,3 @@
-#include <mchck.h>
-
 /* Pin Control Register n */
 struct PCR_t {
         UNION_STRUCT_START(32);
@@ -53,14 +51,43 @@ struct GPCR_t {
 };
 CTASSERT_SIZE_BIT(struct GPCR_t, 32);
 
+/**
+ * The digital filter registers are undocumented.
+ * Information found in K11P80M50SF4RM.
+ */
+/* Digital Filter Clock register */
+struct PORT_DFCR_t {
+        UNION_STRUCT_START(32);
+        enum {
+                PORT_CS_BUS = 0,
+                PORT_CS_LPO = 1
+        } cs : 1;
+        unsigned _rsvd0 : 31;
+        UNION_STRUCT_END;
+};
+CTASSERT_SIZE_BIT(struct PORT_DFCR_t, 32);
+
+struct PORT_DFWR_t {
+        UNION_STRUCT_START(32);
+        unsigned filt : 5;
+        unsigned _rsvd0 : 27;
+        UNION_STRUCT_END;
+};
+CTASSERT_SIZE_BIT(struct PORT_DFWR_t, 32);
+
 /* a single complete port register structure */
 struct PORT_t {
         struct PCR_t pcr[32];
         struct GPCR_t gpclr;
         struct GPCR_t gpchr;
+        uint32_t _pad0[(0xa0 - 0x84)/4 - 1];
         uint32_t isfr;
+        uint32_t _pad1[(0xc0 - 0xa0)/4 - 1];
+        uint32_t dfer;
+        struct PORT_DFCR_t dfcr;
+        struct PORT_DFWR_t dfwr;
 };
-CTASSERT_SIZE_BYTE(struct PORT_t, 140);
+CTASSERT_SIZE_BYTE(struct PORT_t, 0xc8+4);
 
 /* port structures are not contiguous in memory, can't allocate them as an array */
 extern volatile struct PORT_t PORTA;
