@@ -1,4 +1,4 @@
-SRCS-mchck=	builtins.c system.c gpio.c pin.c adc.c
+SRCS-mchck=	builtins.c system.c gpio.c pin.c adc.c spi.c
 SRCS-mchck+=	flash.c onboard-led.c
 
 ifeq (${TARGET},MK20DX32VLF5)
