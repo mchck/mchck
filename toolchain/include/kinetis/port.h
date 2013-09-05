@@ -3,17 +3,17 @@ struct PCR_t {
         UNION_STRUCT_START(32);
         enum {
                 PCR_PULLDOWN = 0,
-                PCR_PULLUP = 1
-        } ps : 1;
-        uint8_t pe : 1;
-        uint8_t sre : 1;
-        uint8_t _rsvd0 : 1;
-        uint8_t pfe : 1;
-        uint8_t ode : 1;
-        uint8_t dse : 1;
-        uint8_t _rsvd1 : 1;
+                PCR_PULLUP   = 1
+        } ps            : 1;
+        unsigned pe     : 1;
+        unsigned sre    : 1;
+        unsigned _rsvd0 : 1;
+        unsigned pfe    : 1;
+        unsigned ode    : 1;
+        unsigned dse    : 1;
+        unsigned _rsvd1 : 1;
         enum PCR_MUX_t {
-                PCR_MUX_DISABLE = 0x0,
+                PCR_MUX_ALT0 = 0x0, PCR_MUX_ANALOG = 0x0,
                 PCR_MUX_ALT1 = 0x1, PCR_MUX_GPIO = 0x1,   /* aliases, ALT1 is always GPIO */
                 PCR_MUX_ALT2 = 0x2,
                 PCR_MUX_ALT3 = 0x3,
@@ -21,9 +21,9 @@ struct PCR_t {
                 PCR_MUX_ALT5 = 0x5,
                 PCR_MUX_ALT6 = 0x6,
                 PCR_MUX_ALT7 = 0x7
-        } mux : 3;
-        uint8_t _rsvd2 : 4;
-        uint8_t lk : 1;
+        } mux           : 3;
+        unsigned _rsvd2 : 4;
+        unsigned lk     : 1;
         enum PCR_IRQC_t {
                 PCR_IRQC_DISABLED    = 0x0,
                 PCR_IRQC_DMA_RISING  = 0x1,
@@ -34,10 +34,10 @@ struct PCR_t {
                 PCR_IRQC_INT_FALLING = 0xA,
                 PCR_IRQC_INT_EITHER  = 0xB,
                 PCR_IRQC_INT_ONE     = 0xC
-        } irqc : 4;
-        uint8_t _rsvd3 : 4;
-        uint8_t isf : 1;
-        uint8_t _rsvd4 : 7;
+        } irqc          : 4;
+        unsigned _rsvd3 : 4;
+        unsigned isf    : 1;
+        unsigned _rsvd4 : 7;
         UNION_STRUCT_END;
 };
 CTASSERT_SIZE_BIT(struct PCR_t, 32);
@@ -45,8 +45,8 @@ CTASSERT_SIZE_BIT(struct PCR_t, 32);
 /* Global Pin Control register */
 struct GPCR_t {
         UNION_STRUCT_START(32);
-        uint16_t gpwe;
-        uint16_t gpwd;
+        unsigned gpwe : 16;
+        unsigned gpwd : 16;
         UNION_STRUCT_END;
 };
 CTASSERT_SIZE_BIT(struct GPCR_t, 32);
@@ -61,7 +61,7 @@ struct PORT_DFCR_t {
         enum {
                 PORT_CS_BUS = 0,
                 PORT_CS_LPO = 1
-        } cs : 1;
+        } cs            : 1;
         unsigned _rsvd0 : 31;
         UNION_STRUCT_END;
 };
@@ -69,7 +69,7 @@ CTASSERT_SIZE_BIT(struct PORT_DFCR_t, 32);
 
 struct PORT_DFWR_t {
         UNION_STRUCT_START(32);
-        unsigned filt : 5;
+        unsigned filt   : 5;
         unsigned _rsvd0 : 27;
         UNION_STRUCT_END;
 };
