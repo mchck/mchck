@@ -122,5 +122,7 @@ spi_init(void)
                         .tfff_re = 1,
                                 .rfdf_re = 1,
                                 }).raw;
+#ifndef SHORT_ISR
         int_enable(IRQ_SPI0);
+#endif
 }
