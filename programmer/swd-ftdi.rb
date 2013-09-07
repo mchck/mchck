@@ -104,8 +104,8 @@ class FtdiSwd < BitbangSwd
 
   def initialize(opt = {})
     super
-    @outbuf = ""
-    @inbuf = ""
+    @outbuf = String.new
+    @inbuf = String.new
 
     self.speed = opt[:speed] || 10000000
     @bits = 0xbc02
@@ -127,7 +127,7 @@ class FtdiSwd < BitbangSwd
     return if @outbuf.empty?
     Log(:phys, 2){ ['flush', hexify(@outbuf)] }
     @dev.write_data(@outbuf)
-    @outbuf = ""
+    @outbuf = String.new
   end
 
   def set_line_mode(dir)
