@@ -1,6 +1,6 @@
 #include <mchck.h>
 
-static inline volatile struct PORT_t *
+volatile struct PORT_t *
 pin_physport_from_pin(enum pin_id pin)
 {
         switch (pin_port_from_pin(pin)) {
