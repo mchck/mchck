@@ -11,6 +11,14 @@ class Log
     end
   end
 
+  def self.[](sub)
+    @@levels.fetch(sub.to_sym, nil)
+  end
+
+  def self.[]=(sub, lvl)
+    @@levels[sub.to_sym] = Integer(lvl)
+  end
+
   def self.log(subsys, level)
     if level <= @@levels[subsys]
       args = yield
