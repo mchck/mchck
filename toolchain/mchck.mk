@@ -3,6 +3,10 @@ _libdir:=       $(dir $(lastword ${MAKEFILE_LIST}))
 -include .mchckrc
 -include ${_libdir}/../.mchckrc
 
+ifndef MAKECMDGOALS
+.DEFAULT_GOAL:=
+endif
+
 define _include_used_libs
 _libdir-$(1):=	$$(addprefix $${_libdir}/lib/,$(1))
 include $$(addsuffix /Makefile.part,$${_libdir-$(1)})
