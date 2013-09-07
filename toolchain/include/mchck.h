@@ -5,6 +5,7 @@
 #include <sys/cdefs.h>
 #include <stdint.h>
 #include <stdfix.h>
+#include <stdarg.h>
 
 #include <mchck-cdefs.h>
 
