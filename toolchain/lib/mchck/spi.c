@@ -1,6 +1,6 @@
 #include <mchck.h>
 
-static struct spi_ctx *spi_ctx;
+static struct spi_ctx_bare *spi_ctx;
 
 static void
 spi_start_xfer(void)
@@ -14,31 +14,65 @@ spi_start_xfer(void)
                                 .clr_rxf = 1,
                                 .halt = 0
                                 }).raw;
+        SPI0.rser.raw = ((struct SPI_RSER){
+                        .tfff_re = 1,
+                                .rfdf_re = spi_ctx->rx != 0,
+                                .eoqf_re = 1,
+                                }).raw;
+        SPI0.sr.raw |= 0;
+}
+
+static void
+spi_stop_xfer(void)
+{
+        SPI0.mcr.raw = ((struct SPI_MCR){
+                        .mstr = 1,
+                                .dconf = SPI_DCONF_SPI,
+                                .rooe = 1,
+                                .pcsis = 0b11111,
+                                .clr_txf = 1,
+                                .clr_rxf = 1,
+                                .halt = 1
+                                }).raw;
+        SPI0.rser.raw = 0;
+        SPI0.sr.raw |= 0;
 }
 
 void
-spi_xfer(enum spi_pcs pcs,
-         const uint8_t *tx_buf, size_t tx_len,
-         uint8_t *rx_buf, size_t rx_len,
-         struct spi_ctx *ctx,
-         spi_cb *cb, void *cbdata)
+spi_queue_xfer(struct spi_ctx *ctx,
+               enum spi_pcs pcs,
+               const uint8_t *txbuf, uint16_t txlen,
+               uint8_t *rxbuf, uint16_t rxlen,
+               spi_cb *cb, void *cbdata)
 {
-        *ctx = (struct spi_ctx){
-                .tx_pos = 0,
-                .rx_pos = 0,
+        spi_queue_xfer_sg(&ctx->ctx, pcs,
+                          sg_init(&ctx->tx_sg, (void *)txbuf, txlen),
+                          sg_init(&ctx->rx_sg, rxbuf, rxlen),
+                          cb, cbdata);
+}
+
+void
+spi_queue_xfer_sg(struct spi_ctx_bare *ctx,
+                  enum spi_pcs pcs,
+                  struct sg *tx, struct sg *rx,
+                  spi_cb *cb, void *cbdata)
+{
+        *ctx = (struct spi_ctx_bare){
+                .tx = sg_simplify(tx),
+                .rx = sg_simplify(rx),
                 .pcs = pcs,
-                .tx_buf = tx_buf,
-                .tx_len = tx_len,
-                .rx_buf = rx_buf,
-                .rx_len = rx_len,
                 .cb = cb,
-                .cbdata = cbdata,
-                .next = NULL
+                .cbdata = cbdata
         };
+
+        size_t tx_len = sg_total_lengh(ctx->tx);
+        size_t rx_len = sg_total_lengh(ctx->rx);
+        if (rx_len > tx_len)
+                ctx->rx_tail = rx_len - tx_len;
 
         crit_enter();
         /* search for tail and append */
-        for (struct spi_ctx **c = &spi_ctx; ; c = &(*c)->next) {
+        for (struct spi_ctx_bare **c = &spi_ctx; ; c = &(*c)->next) {
                 if (*c == NULL) {
                         *c = ctx;
                         /* we're at the head, so start xfer */
@@ -53,55 +87,64 @@ spi_xfer(enum spi_pcs pcs,
 void
 SPI0_Handler(void)
 {
+again:
         if (spi_ctx == NULL)
                 return;
 
-        size_t xfer_len = spi_ctx->rx_len > spi_ctx->tx_len ? spi_ctx->rx_len : spi_ctx->tx_len;
-        int rx_left = spi_ctx->rx_len - spi_ctx->rx_pos;
-        int tx_left = xfer_len - spi_ctx->tx_pos;
-
         for (;;) {
-                struct SPI_SR status;
+                struct SPI_SR status, flags;
 
                 status.raw = SPI0.sr.raw;
-                if (!((status.rfdf && rx_left > 0) || (status.tfff && tx_left > 0)))
-                        break;
+                flags.raw = status.raw & SPI0.rser.raw;
 
-                while (rx_left > 0 && SPI0.sr.rfdf) {
-                        spi_ctx->rx_buf[spi_ctx->rx_pos++] = SPI0.popr;
-                        --rx_left;
-                        /* not sure if this is needed - will it autoclear? */
-                        SPI0.sr.raw = ((struct SPI_SR){.rfdf = 1}).raw;
-                }
-
-                while (tx_left > 0 && SPI0.sr.tfff) {
-                        int last = spi_ctx->tx_pos + 1 == xfer_len;
+                if (flags.rfdf && spi_ctx->rx) {
+                        for (int i = status.rxctr; i > 0 && spi_ctx->rx; --i, sg_move(&spi_ctx->rx, 1))
+                                *sg_data(spi_ctx->rx) = SPI0.popr;
+                        /* disable interrupt if we're done receiving */
+                        if (!spi_ctx->rx)
+                                SPI0.rser.rfdf_re = 0;
+                        SPI0.sr.raw = ((struct SPI_SR){ .rfdf = 1 }).raw;
+                } else if ((spi_ctx->tx || spi_ctx->rx_tail > 0) && flags.tfff) {
+                        int more = 0;
                         uint8_t data;
 
-                        if (spi_ctx->tx_pos < spi_ctx->tx_len)
-                                data = spi_ctx->tx_buf[spi_ctx->tx_pos++];
-                        else
+                        if (spi_ctx->tx) {
+                                data = *sg_data(spi_ctx->tx);
+                                if (sg_move(&spi_ctx->tx, 1) != SG_END)
+                                        more = 1;
+                                else
+                                        more = 0;
+                        } else {
                                 data = 0xff;
+                                --spi_ctx->rx_tail;
+                        }
+                        more = more || (spi_ctx->rx_tail > 0);
 
                         SPI0.pushr.raw = ((struct SPI_PUSHR){
-                                        .cont = !last,
+                                        .cont = more,
                                                 .ctas = 0,
+                                                .eoq = !more,
                                                 .pcs = spi_ctx->pcs,
                                                 .txdata = data
                                                 }).raw;
-                        --tx_left;
-                        SPI0.sr.raw = ((struct SPI_SR){.tfff = 1}).raw;
+                        SPI0.sr.raw = ((struct SPI_SR){ .tfff = 1 }).raw;
+                } else if (flags.eoqf && !spi_ctx->tx && !spi_ctx->rx) {
+                        /* transfer done */
+                        struct spi_ctx_bare *ctx = spi_ctx;
+
+                        crit_enter();
+                        spi_ctx = ctx->next;
+                        if (spi_ctx != NULL)
+                                spi_start_xfer();
+                        else
+                                spi_stop_xfer();
+                        crit_exit();
+                        if (ctx->cb != NULL)
+                                ctx->cb(ctx->cbdata);
+                        goto again;
+                } else {
+                        break;
                 }
-        }
-
-        if (rx_left <= 0 && tx_left <= 0) {
-                struct spi_ctx *ctx = spi_ctx;
-
-                spi_ctx = ctx->next;
-                if (spi_ctx != NULL)
-                        spi_start_xfer();
-                if (ctx->cb != NULL)
-                        ctx->cb(ctx->rx_buf, ctx->rx_len, ctx->cbdata);
         }
 }
 
@@ -117,10 +160,6 @@ spi_init(void)
                                 .asc = 0b1000,
                                 .dt = 0b1000,
                                 .br = 0b1000
-                                }).raw;
-        SPI0.rser.raw = ((struct SPI_RSER){
-                        .tfff_re = 1,
-                                .rfdf_re = 1,
                                 }).raw;
 #ifndef SHORT_ISR
         int_enable(IRQ_SPI0);

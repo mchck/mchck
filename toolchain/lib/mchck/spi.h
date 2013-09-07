@@ -1,3 +1,5 @@
+#include <mchck/sg.h>
+
 enum spi_pcs {
         SPI_PCS0 = 1 << 0,
         SPI_PCS1 = 1 << 1,
@@ -7,24 +9,32 @@ enum spi_pcs {
         SPI_PCS5 = 1 << 5,
 };
 
-typedef void (spi_cb)(uint8_t *buf, size_t len, void *cbdata);
+typedef void (spi_cb)(void *cbdata);
 
-struct spi_ctx {
-        int             rx_pos;
-        int             tx_pos;
-        enum spi_pcs    pcs;
-        const uint8_t  *tx_buf;
-        size_t          tx_len;
-        uint8_t        *rx_buf;
-        size_t          rx_len;
-        spi_cb         *cb;
-        void           *cbdata;
-        struct spi_ctx *next;
+
+struct spi_ctx_bare {
+        struct sg           *tx;
+        struct sg           *rx;
+        uint16_t             rx_tail;
+        enum spi_pcs         pcs;
+        spi_cb              *cb;
+        void                *cbdata;
+        struct spi_ctx_bare *next;
 };
 
-void spi_xfer(enum spi_pcs pcs,
-              const uint8_t *tx_buf, size_t tx_len,
-              uint8_t *rx_buf, size_t rx_len,
-              struct spi_ctx *ctx,
-              spi_cb *cb, void *cbdata);
+struct spi_ctx {
+        struct spi_ctx_bare ctx;
+        struct sg tx_sg;
+        struct sg rx_sg;
+};
+
+void spi_queue_xfer(struct spi_ctx *ctx,
+                    enum spi_pcs pcs,
+                    const uint8_t *txbuf, uint16_t txlen,
+                    uint8_t *rxbuf, uint16_t rxlen,
+                    spi_cb *cb, void *cbdata);
+void spi_queue_xfer_sg(struct spi_ctx_bare *ctx,
+                       enum spi_pcs pcs,
+                       struct sg *tx, struct sg *rx,
+                       spi_cb *cb, void *cbdata);
 void spi_init(void);
