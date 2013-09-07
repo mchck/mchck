@@ -156,7 +156,9 @@ endif
 %.d: %.c
 	$(GENERATE.d)
 
+ifneq (${MAKECMDGOALS},clean)
 -include ${DEPS}
+endif
 
 clean:
 	-rm -f ${CLEANFILES}
