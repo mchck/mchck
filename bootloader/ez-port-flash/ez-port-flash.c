@@ -4,6 +4,7 @@
 #include <usb/dfu.h>
 #include <usb/cdc-acm.h>
 
+
 /**
  * 1. set pcs polarity to low
  * 2. configure pins in port register
@@ -20,6 +21,7 @@
  * D4: alt1, GPIO      -> float = power off; drive 0 = power on
  * D5: alt1, GPIO      <- button, pull-up, filter
  * D6: alt1, GPIO      <- target reset
+ * D7: alt1, GPIO      <- target onboard LED
  */
 
 enum {
@@ -30,6 +32,9 @@ enum {
         EZPORT_POWER = PIN_PTD4,
         PROG_BUTTON  = PIN_PTD5,
         TARGET_RESET = PIN_PTD6,
+        TARGET_LED   = PIN_PTD7,
+        LED_SUCCESS  = PIN_PTC7,
+        LED_FAIL     = PIN_PTC5,
 };
 
 enum {
@@ -61,7 +66,7 @@ struct EZPORT_STATUS {
         enum {
                 EZPORT_FLEXRAM_RAM    = 0,
                 EZPORT_FLEXRAM_EEPROM = 1
-        } flexram       : 1;
+        } flexram      : 1;
         uint8_t _rsvd0 : 2;
         uint8_t wef    : 1;
         uint8_t fs     : 1;
@@ -72,9 +77,16 @@ CTASSERT_SIZE_BIT(struct EZPORT_STATUS, 8);
 enum state_event {
         ev_button,
         ev_reset,
+        ev_led,
         ev_cmd_done,
+        ev_timeout,
 };
 
+enum result_status {
+        RESULT_UNKNOWN,
+        RESULT_SUCCESS,
+        RESULT_FAIL
+};
 
 extern uint8_t _binary_payload_bin_start[];
 extern int _binary_payload_bin_size;
@@ -199,6 +211,30 @@ disable_power(void)
 }
 
 static void
+signal_leds(enum result_status status)
+{
+        gpio_write(LED_SUCCESS, 0);
+        gpio_write(LED_FAIL, 0);
+
+        switch (status) {
+        case RESULT_SUCCESS:
+                gpio_write(LED_SUCCESS, 1);
+                break;
+        case RESULT_FAIL:
+                gpio_write(LED_FAIL, 1);
+                break;
+        default:
+                break;
+        }
+}
+
+static void
+timeout(void *data)
+{
+        statemachine(ev_timeout);
+}
+
+static void
 statemachine(enum state_event ev)
 {
         static enum {
@@ -207,18 +243,21 @@ statemachine(enum state_event ev)
                 st_ezport_running,
                 st_erasing,
                 st_programming,
-                st_resetting,
                 st_app_running,
         } state = st_off;
-        static size_t program_address = 0;
+        static size_t program_address;
+        static struct timeout_ctx t;
 
         if (state == st_off && ev == ev_button) {
                 state = st_power;
 
+                signal_leds(RESULT_UNKNOWN);
                 enable_power();
+                timeout_add(&t, 10, timeout, NULL);
         } else if (state == st_power && ev == ev_reset) {
                 state = st_ezport_running;
 
+                timeout_cancel(&t);
                 enable_spi();
                 check_status();
         } else if (state == st_ezport_running && ev == ev_cmd_done) {
@@ -228,6 +267,8 @@ statemachine(enum state_event ev)
                 state = st_erasing;
 
                 bulk_erase();
+                /* Datasheet 6.4.1.2 */
+                timeout_add(&t, 300, timeout, NULL);
         } else if (state == st_erasing && ev == ev_cmd_done) {
                 /* if still running, check again */
                 if (ezport_status.wip) {
@@ -235,6 +276,8 @@ statemachine(enum state_event ev)
                         return;
                 }
 
+                timeout_cancel(&t);
+                program_address = 0;
                 state = st_programming;
                 goto program;
         } else if (state == st_programming && ev == ev_cmd_done) {
@@ -244,23 +287,38 @@ statemachine(enum state_event ev)
                         return;
                 }
 
+                timeout_cancel(&t);
                 /* repeat if not done */
                 if (program_address < (size_t)&_binary_payload_bin_size) {
 program:
                         program_address = program_sector(program_address);
+                        /* Datasheet 6.4.1.2 */
+                        timeout_add(&t, 200, timeout, NULL);
                         return;
                 }
 
-                state = st_resetting;
-                reset_target();
-        } else if (state == st_resetting && ev == ev_reset) {
                 state = st_app_running;
-                /* count blinks, then power off */
+                reset_target();
+                timeout_add(&t, 1000, timeout, NULL);
+        } else if (state == st_app_running && ev == ev_led) {
+                /**
+                 * We reset the target here, but because there is a
+                 * cap on the reset line, we never see that reset
+                 * "edge" (actually an exponential slope).
+                 *
+                 * Instead, we wait for the LED to blink.
+                 */
+                state = st_off;
+
+                timeout_cancel(&t);
+                signal_leds(RESULT_SUCCESS);
+                disable_power();
         } else {
 error:
                 /* invalid transition */
-                /* XXX show error */
                 state = st_off;
+                timeout_cancel(&t);
+                signal_leds(RESULT_FAIL);
                 disable_power();
         }
 }
@@ -276,6 +334,10 @@ PORTD_Handler(void)
                 pin_physport_from_pin(TARGET_RESET)->pcr[pin_physpin_from_pin(TARGET_RESET)].raw |= 0; /* clear isf */
                 statemachine(ev_reset);
         }
+        if (pin_physport_from_pin(TARGET_LED)->pcr[pin_physpin_from_pin(TARGET_LED)].isf) {
+                pin_physport_from_pin(TARGET_LED)->pcr[pin_physpin_from_pin(TARGET_LED)].raw |= 0; /* clear isf */
+                statemachine(ev_led);
+        }
 }
 
 static void
@@ -285,6 +347,7 @@ init(void)
         gpio_dir(PROG_BUTTON, GPIO_INPUT);
         pin_mode(PROG_BUTTON, PIN_MODE_PULLUP);
         gpio_dir(TARGET_RESET, GPIO_INPUT);
+        gpio_dir(TARGET_LED, GPIO_INPUT);
 
         /* set digital debounce/filter */
         pin_physport_from_pin(PROG_BUTTON)->dfcr.cs = PORT_CS_LPO;
@@ -297,7 +360,15 @@ init(void)
         /* reset interrupt */
         pin_physport_from_pin(TARGET_RESET)->pcr[pin_physpin_from_pin(TARGET_RESET)].irqc = PCR_IRQC_INT_RISING;
 
+        /* LED interrupt */
+        pin_physport_from_pin(TARGET_LED)->pcr[pin_physpin_from_pin(TARGET_LED)].irqc = PCR_IRQC_INT_FALLING;
+
         int_enable(IRQ_PORTD);
+
+        gpio_dir(LED_SUCCESS, GPIO_OUTPUT);
+        gpio_dir(LED_FAIL, GPIO_OUTPUT);
+
+        timeout_init();
 }
 
 static void
@@ -321,4 +392,5 @@ main(void)
         init();
         usb_init(&cdc_device);
         sys_yield_for_frogs();
+        LPTMR0.cmr = 0;
 }
