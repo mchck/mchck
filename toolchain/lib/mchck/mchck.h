@@ -5,3 +5,4 @@
 #include <mchck/onboard-led.h>
 #include <mchck/adc.h>
 #include <mchck/spi.h>
+#include <mchck/timeout.h>
