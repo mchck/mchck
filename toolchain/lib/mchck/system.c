@@ -34,6 +34,24 @@ crit_exit(void)
                 __asm__("cpsie i");
 }
 
+int
+crit_active(void)
+{
+        return (crit_nest != 0);
+}
+
+static volatile const char *panic_reason;
+
+void __attribute__((noreturn))
+panic(const char *reason)
+{
+        crit_enter();
+        panic_reason = reason;
+
+        for (;;)
+                /* infinite loop */;
+}
+
 void
 int_enable(size_t intno)
 {
