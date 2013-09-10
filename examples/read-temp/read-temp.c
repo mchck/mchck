@@ -62,7 +62,7 @@ static const struct usbd_device cdc_device =
                         u"mchck.org",        /* vendor */
                         u"temperature test", /* product" */
                         (init_vcdc,          /* init */
-                         CDC),               /* functions */
+                         CDC)                /* functions */
                 );
 
 void
