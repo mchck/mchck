@@ -51,7 +51,7 @@ read_bits(size_t bits, int silent)
         size_t bit;
         for (bit = 0; bit < bits; ++bit) {
                 pin_write(SWD_CLK_PIN, 0);
-                val |= pin_read(SWD_DIO_PIN) << bit;
+                val |= !!pin_read(SWD_DIO_PIN) << bit;
                 pin_write(SWD_CLK_PIN, 1);
         }
         if (!silent)
