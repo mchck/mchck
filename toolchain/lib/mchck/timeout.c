@@ -28,7 +28,7 @@ static void
 timeout_reschedule(void)
 {
         if (timeout_queue == NULL) {
-                LPTMR0.csr.ten = 0;
+                LPTMR0.csr.raw &= ~((struct LPTMR_CSR){ .ten = 1, .tie = 1 }).raw;
                 return;
         }
         /* will we have to wrap the epoch before? */
@@ -117,13 +117,13 @@ void
 LPT_Handler(void)
 {
         crit_enter();
+        timeout_update_time();
         struct timeout_ctx *t = timeout_queue;
         if (t == NULL) {
                 crit_exit();
                 return;
         }
         timeout_queue = t->next;
-        timeout_update_time();
         timeout_reschedule();
         crit_exit();
         t->cb(t->cbdata);
