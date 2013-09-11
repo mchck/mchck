@@ -14,14 +14,16 @@
  * 5. disable power
  *
  * Pin Mapping:
- * D0: alt2, SPI0_PCS0 -> /EZ_CS
- * D1: alt2, SPI0_SCK  -> EZ_CLK
- * D2: alt2, SPI0_SOUT -> EZ_DI
- * D3: alt2, SPI0_SIN  <- EZ_DO
+ * D0: alt2, SPI0_PCS0 -> /EZ_CS, PTA4, pin 21
+ * D1: alt2, SPI0_SCK  -> EZ_CLK, PTA0, pin 17
+ * D2: alt2, SPI0_SOUT -> EZ_DI,  PTA1, pin 18
+ * D3: alt2, SPI0_SIN  <- EZ_DO,  PTA2, pin 19
  * D4: alt1, GPIO      -> float = power off; drive 0 = power on
  * D5: alt1, GPIO      <- button, pull-up, filter
- * D6: alt1, GPIO      <- target reset
- * D7: alt1, GPIO      <- target onboard LED
+ * D6: alt1, GPIO      <- target reset, pin 26
+ * D7: alt1, GPIO      <- target onboard LED, PTB16, pin 31
+ * C7: alt1, GPIO      -> green LED
+ * C5: alt1, GPIO      -> red LED
  */
 
 enum {
@@ -361,12 +363,15 @@ init(void)
         pin_physport_from_pin(TARGET_RESET)->pcr[pin_physpin_from_pin(TARGET_RESET)].irqc = PCR_IRQC_INT_RISING;
 
         /* LED interrupt */
-        pin_physport_from_pin(TARGET_LED)->pcr[pin_physpin_from_pin(TARGET_LED)].irqc = PCR_IRQC_INT_FALLING;
+        pin_mode(TARGET_LED, PIN_MODE_PULLDOWN);
+        pin_physport_from_pin(TARGET_LED)->pcr[pin_physpin_from_pin(TARGET_LED)].irqc = PCR_IRQC_INT_RISING;
 
         int_enable(IRQ_PORTD);
 
         gpio_dir(LED_SUCCESS, GPIO_OUTPUT);
+        pin_mode(LED_SUCCESS, PIN_MODE_DRIVE_HIGH);
         gpio_dir(LED_FAIL, GPIO_OUTPUT);
+        pin_mode(LED_FAIL, PIN_MODE_DRIVE_HIGH);
 
         timeout_init();
 }
