@@ -1,3 +1,5 @@
+/* -*- mode: c -*- */
+
 #include <mchck.h>
 
 #include <usb/usb.h>
@@ -77,11 +79,11 @@ struct EZPORT_STATUS {
 CTASSERT_SIZE_BIT(struct EZPORT_STATUS, 8);
 
 enum state_event {
-        ev_button,
-        ev_reset,
-        ev_led,
-        ev_cmd_done,
-        ev_timeout,
+        ev_button = 1,
+        ev_reset = 2,
+        ev_led = 3,
+        ev_cmd_done = 4,
+        ev_timeout = 5,
 };
 
 enum result_status {
@@ -97,20 +99,13 @@ extern int _binary_payload_bin_size;
 static struct cdc_ctx cdc;
 static struct EZPORT_STATUS ezport_status;
 
+%% machine ezport;
+%% import "ez-port-flash.rl";
+%% write data;
+
+
 static void statemachine(enum state_event ev);
 
-
-static void
-enable_power(void)
-{
-        /* pull CS low */
-        gpio_write(EZPORT_CS, 0);
-        gpio_dir(EZPORT_CS, GPIO_OUTPUT);
-
-        /* enable power */
-        gpio_write(EZPORT_POWER, 0);
-        gpio_dir(EZPORT_POWER, GPIO_OUTPUT);
-}
 
 static void
 walk_state(void *cbdata)
@@ -122,25 +117,9 @@ walk_state(void *cbdata)
 }
 
 static void
-enable_spi(void)
+timeout(void *data)
 {
-        spi_init();
-        pin_mode(EZPORT_CS, PIN_MODE_MUX_ALT2);
-        pin_mode(EZPORT_CLK, PIN_MODE_MUX_ALT2);
-        pin_mode(EZPORT_DI, PIN_MODE_MUX_ALT2);
-        pin_mode(EZPORT_DO, PIN_MODE_MUX_ALT2);
-}
-
-static void
-check_status(void)
-{
-        static struct spi_ctx rdsr_ctx;
-        static const enum EZPORT_CMD rdsr_cmd = EZPORT_RDSR;
-        static uint8_t rxbuf[2];
-
-        spi_queue_xfer(&rdsr_ctx, EZPORT_SPI_CS,
-                       &rdsr_cmd, 1, rxbuf, 2,
-                       walk_state, &rxbuf[1]);
+        statemachine(ev_timeout);
 }
 
 static void
@@ -152,64 +131,6 @@ write_enable(void)
         spi_queue_xfer(&wren_ctx, EZPORT_SPI_CS,
                        &wren_cmd, 1, NULL, 0,
                        NULL, NULL);
-}
-
-static void
-bulk_erase(void)
-{
-        static struct spi_ctx be_ctx;
-        static const enum EZPORT_CMD be_cmd = EZPORT_BE;
-
-        write_enable();
-        spi_queue_xfer(&be_ctx, EZPORT_SPI_CS,
-                       &be_cmd, 1, NULL, 0,
-                       NULL, NULL);
-        check_status();
-}
-
-static size_t
-program_sector(size_t addr)
-{
-        static struct spi_ctx_bare sp_ctx;
-        static struct sg tx_sg[2];
-        static uint8_t header[4];
-        size_t len = FLASH_SECTOR_SIZE;
-
-        write_enable();
-        header[0] = EZPORT_SP;
-        header[1] = addr >> 16;
-        header[2] = addr >> 8;
-        header[3] = addr;
-        sg_init(tx_sg,
-                (void *)header, 4,
-                _binary_payload_bin_start + addr, len);
-        spi_queue_xfer_sg(&sp_ctx, EZPORT_SPI_CS,
-                          tx_sg, NULL,
-                          NULL, NULL);
-        check_status();
-
-        return (addr + len);
-}
-
-static void
-reset_target(void)
-{
-        static struct spi_ctx reset_ctx;
-        static const enum EZPORT_CMD reset_cmd = EZPORT_RESET;
-
-        spi_queue_xfer(&reset_ctx, EZPORT_SPI_CS,
-                       &reset_cmd, 1, NULL, 0,
-                       NULL, NULL);
-}
-
-static void
-disable_power(void)
-{
-        pin_mode(EZPORT_CS, PIN_MODE_MUX_ANALOG);
-        pin_mode(EZPORT_CLK, PIN_MODE_MUX_ANALOG);
-        pin_mode(EZPORT_DI, PIN_MODE_MUX_ANALOG);
-        pin_mode(EZPORT_DO, PIN_MODE_MUX_ANALOG);
-        pin_mode(EZPORT_POWER, PIN_MODE_MUX_ANALOG);
 }
 
 static void
@@ -230,99 +151,171 @@ signal_leds(enum result_status status)
         }
 }
 
-static void
-timeout(void *data)
-{
-        statemachine(ev_timeout);
+%%{
+action init_vars {
+        program_address = 0;
 }
+
+action signal_leds_off {
+        signal_leds(RESULT_UNKNOWN);
+}
+
+action signal_leds_success {
+        signal_leds(RESULT_SUCCESS);
+}
+
+action signal_leds_fail {
+        signal_leds(RESULT_FAIL);
+}
+
+action disable_timeout {
+        timeout_cancel(&t);
+}
+
+action enable_power {
+        /* pull CS low */
+        gpio_write(EZPORT_CS, 0);
+        gpio_dir(EZPORT_CS, GPIO_OUTPUT);
+
+        /* enable power */
+        gpio_write(EZPORT_POWER, 0);
+        gpio_dir(EZPORT_POWER, GPIO_OUTPUT);
+
+        timeout_add(&t, 10, timeout, NULL);
+}
+
+action enable_spi {
+        spi_init();
+        pin_mode(EZPORT_CS, PIN_MODE_MUX_ALT2);
+        pin_mode(EZPORT_CLK, PIN_MODE_MUX_ALT2);
+        pin_mode(EZPORT_DI, PIN_MODE_MUX_ALT2);
+        pin_mode(EZPORT_DO, PIN_MODE_MUX_ALT2);
+}
+
+action check_status {
+        static struct spi_ctx rdsr_ctx;
+        static const enum EZPORT_CMD rdsr_cmd = EZPORT_RDSR;
+        static uint8_t rxbuf[2];
+
+        spi_queue_xfer(&rdsr_ctx, EZPORT_SPI_CS,
+                       &rdsr_cmd, 1, rxbuf, 2,
+                       walk_state, &rxbuf[1]);
+}
+
+action not_write_protected {
+        !(ezport_status.fs && ezport_status.bedis)
+}
+
+action write_busy {
+        ezport_status.wip
+}
+
+action bulk_erase {
+        static struct spi_ctx be_ctx;
+        static const enum EZPORT_CMD be_cmd = EZPORT_BE;
+
+        write_enable();
+        spi_queue_xfer(&be_ctx, EZPORT_SPI_CS,
+                       &be_cmd, 1, NULL, 0,
+                       NULL, NULL);
+
+        /* Datasheet 6.4.1.2 */
+        timeout_add(&t, 300, timeout, NULL);
+}
+
+action program_data_left {
+        program_address < (size_t)&_binary_payload_bin_size
+}
+
+action program_sector {
+        static struct spi_ctx_bare sp_ctx;
+        static struct sg tx_sg[2];
+        static uint8_t header[4];
+        size_t len = FLASH_SECTOR_SIZE;
+
+        write_enable();
+        header[0] = EZPORT_SP;
+        header[1] = program_address >> 16;
+        header[2] = program_address >> 8;
+        header[3] = program_address;
+        sg_init(tx_sg,
+                (void *)header, 4,
+                _binary_payload_bin_start + program_address, len);
+        program_address += len;
+
+        spi_queue_xfer_sg(&sp_ctx, EZPORT_SPI_CS,
+                          tx_sg, NULL,
+                          NULL, NULL);
+
+        /* Datasheet 6.4.1.2 */
+        timeout_add(&t, 200, timeout, NULL);
+}
+
+action reset_target {
+        static struct spi_ctx reset_ctx;
+        static const enum EZPORT_CMD reset_cmd = EZPORT_RESET;
+
+        spi_queue_xfer(&reset_ctx, EZPORT_SPI_CS,
+                       &reset_cmd, 1, NULL, 0,
+                       NULL, NULL);
+        timeout_add(&t, 1000, timeout, NULL);
+}
+
+action disable_power {
+        pin_mode(EZPORT_CS, PIN_MODE_MUX_ANALOG);
+        pin_mode(EZPORT_CLK, PIN_MODE_MUX_ANALOG);
+        pin_mode(EZPORT_DI, PIN_MODE_MUX_ANALOG);
+        pin_mode(EZPORT_DO, PIN_MODE_MUX_ANALOG);
+        pin_mode(EZPORT_POWER, PIN_MODE_MUX_ANALOG);
+}
+}%%
+
+%%{
+        action restart {
+                fgoto main;
+        }
+
+main := (
+
+        start: (
+                ev_button @init_vars @signal_leds_off @enable_power -> starting
+                ),
+        starting: (
+                ev_reset >disable_timeout @enable_spi @check_status -> ezport_running
+                ),
+        ezport_running: (
+                ev_cmd_done when not_write_protected >disable_timeout @bulk_erase @check_status -> erasing
+                ),
+        erasing: (
+                ev_cmd_done when write_busy @2 @check_status -> erasing |
+                ev_cmd_done @0 >disable_timeout @program_sector @check_status -> programming
+                ),
+        programming: (
+                ev_cmd_done when write_busy @2 @check_status -> programming |
+                ev_cmd_done when program_data_left @1 >disable_timeout @program_sector @check_status -> programming |
+                ev_cmd_done @0 >disable_timeout @reset_target -> app_running
+                ),
+        app_running: (
+                ev_led >disable_timeout @disable_power @signal_leds_success -> final
+                )
+        )*
+
+        $err(disable_timeout) $err(disable_power) $err(signal_leds_fail) $err(restart);
+}%%
 
 static void
 statemachine(enum state_event ev)
 {
-        static enum {
-                st_off,
-                st_power,
-                st_ezport_running,
-                st_erasing,
-                st_programming,
-                st_app_running,
-        } state = st_off;
+        /* state vars */
         static size_t program_address;
         static struct timeout_ctx t;
+        static int cs = %%{ write start; }%%;
 
-        if (state == st_off && ev == ev_button) {
-                state = st_power;
+        /* execution vars */
+        const static enum state_event *eof = NULL;
+        const enum state_event *p = &ev, * const pe = p + 1;
 
-                signal_leds(RESULT_UNKNOWN);
-                enable_power();
-                timeout_add(&t, 10, timeout, NULL);
-        } else if (state == st_power && ev == ev_reset) {
-                state = st_ezport_running;
-
-                timeout_cancel(&t);
-                enable_spi();
-                check_status();
-        } else if (state == st_ezport_running && ev == ev_cmd_done) {
-                /* Is chip bricked? */
-                if (ezport_status.fs && ezport_status.bedis)
-                        goto error;
-                state = st_erasing;
-
-                bulk_erase();
-                /* Datasheet 6.4.1.2 */
-                timeout_add(&t, 300, timeout, NULL);
-        } else if (state == st_erasing && ev == ev_cmd_done) {
-                /* if still running, check again */
-                if (ezport_status.wip) {
-                        check_status();
-                        return;
-                }
-
-                timeout_cancel(&t);
-                program_address = 0;
-                state = st_programming;
-                goto program;
-        } else if (state == st_programming && ev == ev_cmd_done) {
-                /* if still running, check again */
-                if (ezport_status.wip) {
-                        check_status();
-                        return;
-                }
-
-                timeout_cancel(&t);
-                /* repeat if not done */
-                if (program_address < (size_t)&_binary_payload_bin_size) {
-program:
-                        program_address = program_sector(program_address);
-                        /* Datasheet 6.4.1.2 */
-                        timeout_add(&t, 200, timeout, NULL);
-                        return;
-                }
-
-                state = st_app_running;
-                reset_target();
-                timeout_add(&t, 1000, timeout, NULL);
-        } else if (state == st_app_running && ev == ev_led) {
-                /**
-                 * We reset the target here, but because there is a
-                 * cap on the reset line, we never see that reset
-                 * "edge" (actually an exponential slope).
-                 *
-                 * Instead, we wait for the LED to blink.
-                 */
-                state = st_off;
-
-                timeout_cancel(&t);
-                signal_leds(RESULT_SUCCESS);
-                disable_power();
-        } else {
-error:
-                /* invalid transition */
-                state = st_off;
-                timeout_cancel(&t);
-                signal_leds(RESULT_FAIL);
-                disable_power();
-        }
+        %% write exec;
 }
 
 void
@@ -397,5 +390,4 @@ main(void)
         init();
         usb_init(&cdc_device);
         sys_yield_for_frogs();
-        LPTMR0.cmr = 0;
 }

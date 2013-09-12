@@ -1,4 +1,5 @@
 PROG=	ez-port-flash
+SRCS=	ez-port-flash.rl
 USE=	usb
 OBJS=	payload.o
 DEFAULT_PAYLOAD=	../usb-dfu/dfu.bin ../../examples/blink/blink.bin
@@ -17,5 +18,9 @@ payload.bin: ${PAYLOAD}
 
 ${DEFAULT_PAYLOAD}::
 	cd $(dir $@) && make DEBUG=
+
+%.c: %.rl
+	ragel -C -G0 -o $@ $<
+CLEANFILES+=	$(patsubst %.rl,%.c,$(filter %.rl,${SRCS}))
 
 include ../../toolchain/mchck.mk
