@@ -161,7 +161,5 @@ spi_init(void)
                                 .dt = 0b1000,
                                 .br = 0b1000
                                 }).raw;
-#ifndef SHORT_ISR
         int_enable(IRQ_SPI0);
-#endif
 }

@@ -87,10 +87,8 @@ adc_init(void)
         /* enable clock */
         SIM.scgc6.adc0 = 1;
 
-#ifndef SHORT_ISR
         /* enable interrupt handler */
         int_enable(IRQ_ADC0);
-#endif
 
         /* setup ADC calibration */
         adc_sample_prepare(ADC_MODE_SAMPLE_LONG | ADC_AVG_32);

@@ -64,9 +64,7 @@ timeout_init(void)
                         .tfc = 1,
                                 .tms = LPTMR_TMS_TIME,
                                 }).raw;
-#ifndef SHORT_ISR
         int_enable(IRQ_LPT);
-#endif
 }
 
 void
