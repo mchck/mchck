@@ -7,6 +7,9 @@ ifndef MAKECMDGOALS
 .DEFAULT_GOAL:=
 endif
 
+is-make-clean=	$(filter clean realclean,${MAKECMDGOALS})
+
+
 define _include_libs
 _libdir-$(1):=	$$(addprefix $${_libdir}/lib/,$(1))
 include $$(addsuffix /Makefile.part,$${_libdir-$(1)})
@@ -17,7 +20,7 @@ _objs-$(1)=	$$(addsuffix .o, $$(basename $$(addprefix $(1)-lib-,$${SRCS-$(1)})))
 _allobjs+=	$${_objs-$(1)}
 _libobjs+=	$${_objs-$(1)}
 CLEANFILES+=	$${_objs-$(1)}
-_deps-$(1)=	$$(addsuffix .d, $$(basename $$(addprefix $(1)-lib-,$${SRCS-$(1)})))
+_deps-$(1)=	$$(addsuffix .d, $$(basename $$(addprefix $(1)-lib-,$${SRCS-$(1)} $${SRCS.force-$(1)})))
 DEPS+=	$${_deps-$(1)}
 
 $(1)-lib-%.o: $${_libdir-$(1)}/%.c
@@ -167,7 +170,7 @@ endif
 %.d: %.c
 	$(GENERATE.d)
 
-ifneq (${MAKECMDGOALS},clean)
+ifeq ($(call is-make-clean),)
 -include $(patsubst %.o,%.d,${LINKOBJS})
 endif
 

@@ -16,19 +16,16 @@ define objdeps
 $(sort $(foreach __obj,$(1),${_syms.${__obj}}))
 endef
 
-# ${_libdir}/cache/%.linkdep: ${_libdir}/cache/%.o
-# 	${_libdir}/scripts/linkdep -o $@ $<
-
-GENERATE_LINKDEP=	${_libdir}/scripts/linkdep -o $@ $<
+GENERATE.linkdep=	${_libdir}/scripts/linkdep -o $@ $<
 
 
 LIBDEPCACHE=	${_libdir}/cache
 
-# ${LIBDEPCACHE}/%.linkdep: ${LIBDEPCACHE}/%.o
-# 	${GENERATE_LINKDEP}
+${LIBDEPCACHE}/%.linkdep: ${LIBDEPCACHE}/%.o
+	cd "${LIBDEPCACHE}" && ${GENERATE.linkdep} --no-path
 
 %.linkdep: %.o
-	${GENERATE_LINKDEP}
+	${GENERATE.linkdep}
 
 _libdeps=	$(addprefix ${LIBDEPCACHE}/,${_libobjs:.o=.linkdep})
 REALCLEANFILES+=	${_libdeps}
@@ -37,7 +34,7 @@ CLEANFILES+=	${_applinkdeps}
 _linkdeps=	${_libdeps} ${_applinkdeps}
 
 
-ifneq (${MAKECMDGOALS},clean)
+ifeq ($(call is-make-clean),)
 -include ${_linkdeps}
 endif
 

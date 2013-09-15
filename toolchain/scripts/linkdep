@@ -18,14 +18,14 @@ class Linkdep
     end
   end
 
-  def process(ls)
+  def process(ls, include_path=true)
     if not ls.respond_to? :each
-      return get_syms(ls){|o| process(o)}
+      return get_syms(ls){|o| process(o, include_path)}
     end
 
     ls.each do |l|
       _, file, sym, type = l.match(/^(.*): ([^[:space:]]*) (.) .*/).to_a
-      file = File.basename(file)
+      file = File.basename(file) if !include_path
       case type
       when 'U'
         @undef_syms[file] << sym
@@ -53,15 +53,19 @@ end
 
 if $0 == __FILE__
   output = nil
+  include_path = true
   OptionParser.new do |opts|
     opts.on("-o", "--output FILE") do |f|
       output = f
+    end
+    opts.on("--[no-]path") do |v|
+      include_path = v
     end
   end.parse!
 
   ld = Linkdep.new
   ARGV.each do |f|
-    ld.process f
+    ld.process f, include_path
   end
 
   if output
