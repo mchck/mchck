@@ -1,0 +1,2 @@
+include ${_libdir}/lib/mchck/Makefile.part
+include ${_libdir}/lib/usb/Makefile.part

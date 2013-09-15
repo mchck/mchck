@@ -6,4 +6,5 @@
 *.map
 *.ld
 *.ld-template
+*.linkdep
 .mchckrc

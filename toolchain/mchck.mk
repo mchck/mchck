@@ -7,12 +7,15 @@ ifndef MAKECMDGOALS
 .DEFAULT_GOAL:=
 endif
 
-define _include_used_libs
+define _include_libs
 _libdir-$(1):=	$$(addprefix $${_libdir}/lib/,$(1))
 include $$(addsuffix /Makefile.part,$${_libdir-$(1)})
 
-_objs-$(1)=	$$(addsuffix .o, $$(basename $$(addprefix $(1)-lib-,$${SRCS-$(1)})))
-OBJS+=	$${_objs-$(1)}
+_forceobjs-$(1)=	$$(addsuffix .o, $$(basename $$(addprefix $(1)-lib-,$${SRCS.force-$(1)})))
+FORCEOBJS+=	$${_forceobjs-$(1)}
+_objs-$(1)=	$$(addsuffix .o, $$(basename $$(addprefix $(1)-lib-,$${SRCS-$(1)}))) $${_forceobjs-$(1)}
+_allobjs+=	$${_objs-$(1)}
+_libobjs+=	$${_objs-$(1)}
 CLEANFILES+=	$${_objs-$(1)}
 _deps-$(1)=	$$(addsuffix .d, $$(basename $$(addprefix $(1)-lib-,$${SRCS-$(1)})))
 DEPS+=	$${_deps-$(1)}
@@ -43,6 +46,7 @@ SRCS?=	${PROG}.c
 _objs=	$(addsuffix .o, $(basename ${SRCS}))
 CLEANFILES+=	${_objs}
 OBJS+=	${_objs}
+_allobjs+=	${OBJS}
 DEPS+=	$(addsuffix .d, $(basename ${SRCS}))
 CLEANFILES+=	${DEPS}
 
@@ -54,7 +58,7 @@ CFLAGS+=	-fshort-enums
 
 all: ${PROG}
 
-$(foreach _uselib,host ${USE},$(eval $(call _include_used_libs,$(_uselib))))
+$(foreach _uselib,host ${USE},$(eval $(call _include_libs,$(_uselib))))
 
 $(PROG): $(OBJS)
 	$(LINK.c) $^ ${LDLIBS} -o $@
@@ -130,11 +134,14 @@ all: ${PROG}.bin
 
 # This has to go before the rule, because for some reason the updates to OBJS
 # are not incorporated into the target dependencies
-$(foreach _uselib,mchck ${USE},$(eval $(call _include_used_libs,$(_uselib))))
+include ${_libdir}/lib/Makefile.part
+$(foreach _uselib,${SRCS.libs},$(eval $(call _include_libs,$(_uselib))))
 
+# linkdep defines LINKOBJS
+include ${_libdir}/mk/linkdep.mk
 
-${PROG}.elf: ${OBJS} ${LDLIBS} ${LDTEMPLATE}
-	${CC} -o $@ ${CFLAGS} ${LDFLAGS} ${OBJS} ${LDLIBS}
+${PROG}.elf: ${LINKOBJS} ${LDLIBS} ${LDTEMPLATE}
+	${CC} -o $@ ${CFLAGS} ${LDFLAGS} ${LINKOBJS} ${LDLIBS}
 
 %.bin: %.elf
 	${OBJCOPY} -O binary $< $@.tmp
@@ -161,8 +168,11 @@ endif
 	$(GENERATE.d)
 
 ifneq (${MAKECMDGOALS},clean)
--include ${DEPS}
+-include $(patsubst %.o,%.d,${LINKOBJS})
 endif
 
 clean:
 	-rm -f ${CLEANFILES}
+
+realclean:
+	-rm -f ${REALCLEANFILES} ${CLEANFILES}

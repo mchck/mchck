@@ -6,3 +6,5 @@ CFLAGS+=	-DVUSB
 else
 SRCS-usb+=	kinetis.c
 endif
+
+SRCS.libs+=	usb

@@ -1,0 +1,74 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+
+class Linkdep
+  def initialize
+    @undef_syms = Hash.new{|h,k| h[k]=[]}
+    @def_syms = Hash.new{|h,k| h[k]=[]}
+  end
+
+  def symvar(sym)
+    "_syms.#{sym}"
+  end
+
+  def get_syms(obj)
+    IO.popen(%w{arm-none-eabi-nm -A -P -g} + [obj]) do |output|
+      yield output
+    end
+  end
+
+  def process(ls)
+    if not ls.respond_to? :each
+      return get_syms(ls){|o| process(o)}
+    end
+
+    ls.each do |l|
+      _, file, sym, type = l.match(/^(.*): ([^[:space:]]*) (.) .*/).to_a
+      file = File.basename(file)
+      case type
+      when 'U'
+        @undef_syms[file] << sym
+      else
+        @def_syms[file] << sym
+      end
+    end
+  end
+
+  def write(out)
+    @def_syms.each do |f, syms|
+      out.puts "#{symvar(f)}=\t#{f}"
+      syms.each do |s|
+        out.puts "#{symvar(s)}+=\t${#{symvar(f)}}"
+      end
+    end
+
+    @undef_syms.each do |f, syms|
+      vars = syms.map{|s| "$${#{symvar(s)}}"}
+      out.puts "#{symvar(f)}+=\t#{vars.join(' ')}"
+      out.puts "_syms_files+=\t#{symvar(f)}"
+    end
+  end
+end
+
+if $0 == __FILE__
+  output = nil
+  OptionParser.new do |opts|
+    opts.on("-o", "--output FILE") do |f|
+      output = f
+    end
+  end.parse!
+
+  ld = Linkdep.new
+  ARGV.each do |f|
+    ld.process f
+  end
+
+  if output
+    File.open(output, 'w') do |o|
+      ld.write(o)
+    end
+  else
+    ld.write($stdout)
+  end
+end
