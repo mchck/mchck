@@ -2,48 +2,48 @@
 #define SWD_H__
 
 #ifdef ARDUINO
-  #if ARDUINO >= 100
-    #include "Arduino.h"
-  #else
-    #include "WProgram.h"
-  #endif
-
-  enum swd_pin {
-          SWD_DIO_PIN = 11,
-          SWD_CLK_PIN = 12
-  };
-
-  enum swd_pin_mode {
-          SWD_MODE_OUTPUT = OUTPUT,
-          SWD_MODE_INPUT = INPUT
-  };
-#elif MSP430
-  #include <msp430.h>
-  #include <legacymsp430.h>
-  #include <stdlib.h>
-  #include <signal.h>
-
-  enum swd_pin {
-          SWD_DIO_PIN = BIT5,
-          SWD_CLK_PIN = BIT4
-  };
-
-  enum swd_pin_mode {
-          SWD_MODE_OUTPUT,
-          SWD_MODE_INPUT
-  };
+#if ARDUINO >= 100
+#include "Arduino.h"
 #else
-  #include <mchck.h>
+#include "WProgram.h"
+#endif
 
-  enum swd_pin {
-          SWD_DIO_PIN = GPIO_PTB16,
-          SWD_CLK_PIN = GPIO_PTB3
-  };
+enum swd_pin {
+SWD_DIO_PIN = 11,
+	SWD_CLK_PIN = 12
+};
 
-  enum swd_pin_mode {
-          SWD_MODE_OUTPUT = GPIO_MODE_OUTPUT | GPIO_MODE_SLEW_SLOW,
-          SWD_MODE_INPUT = GPIO_MODE_INPUT | GPIO_MODE_FILTER_ON
-  };
+enum swd_pin_mode {
+	SWD_MODE_OUTPUT = OUTPUT,
+	SWD_MODE_INPUT = INPUT
+};
+#elif MSP430
+#include <msp430.h>
+#include <legacymsp430.h>
+#include <stdlib.h>
+#include <signal.h>
+
+enum swd_pin {
+	SWD_DIO_PIN = BIT5,
+	SWD_CLK_PIN = BIT4
+};
+
+enum swd_pin_mode {
+	SWD_MODE_OUTPUT,
+	SWD_MODE_INPUT
+};
+#else
+#include <mchck.h>
+
+enum swd_pin {
+	SWD_DIO_PIN = GPIO_PTB16,
+	SWD_CLK_PIN = GPIO_PTB3
+};
+
+enum swd_pin_mode {
+	SWD_MODE_OUTPUT = GPIO_MODE_OUTPUT | GPIO_MODE_SLEW_SLOW,
+	SWD_MODE_INPUT = GPIO_MODE_INPUT | GPIO_MODE_FILTER_ON
+};
 #endif
 
 #ifdef __cplusplus
