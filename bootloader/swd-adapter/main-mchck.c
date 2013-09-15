@@ -20,7 +20,8 @@ signal_led(void)
 void
 pin_configure(enum swd_pin pin, enum swd_pin_mode mode)
 {
-        gpio_mode(pin, mode);
+        gpio_dir(pin, mode);
+        pin_mode(pin, PIN_MODE_SLEW_SLOW);
 }
 
 void
