@@ -100,3 +100,21 @@ cdc_init(void (*data_ready_cb)(uint8_t *, size_t), void (*data_sent_cb)(size_t),
         cdc_read_more(ctx);
         cdc_tx_done(ctx->outbuf, -1, ctx);
 }
+
+
+static size_t
+cdc_stdio_write(const uint8_t *buf, size_t len, void *data)
+{
+        return (cdc_write(buf, len, data));
+}
+
+static const struct _stdio_file_ops cdc_ops = {
+        .write = cdc_stdio_write,
+};
+
+void
+cdc_set_stdout(struct cdc_ctx *cdc)
+{
+        stdout->ops_data = cdc;
+        stdout->ops = &cdc_ops;
+}
