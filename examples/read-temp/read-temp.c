@@ -15,8 +15,7 @@ temp_done(uint16_t data, int error, void *cbdata)
         accum temp_diff = volt_diff * (1000K / 1.715K);
         accum temp_deg = 25k - temp_diff;
 
-        cdc_write((void *)&data, sizeof(data), &cdc);
-        cdc_write((void *)&temp_deg, sizeof(temp_deg), &cdc);
+        printf("raw: %u, temp: %#.8lx\r\n", data, *(uint32_t *)&temp_deg);
         onboard_led(ONBOARD_LED_TOGGLE);
 
         if (--temp_count > 0)
@@ -54,6 +53,7 @@ static void
 init_vcdc(int config)
 {
         cdc_init(new_data, NULL, &cdc);
+        cdc_set_stdout(&cdc);
 }
 
 static const struct usbd_device cdc_device =
