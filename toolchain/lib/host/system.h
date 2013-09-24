@@ -1,5 +1,5 @@
-void *memset(void *, int, size_t);
-void *memcpy(void *, const void *, size_t);
+#include <stdio.h>
+#include <string.h>
 
 void sys_reset(void);
 void crit_enter(void);

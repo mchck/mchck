@@ -102,6 +102,7 @@ cdc_init(void (*data_ready_cb)(uint8_t *, size_t), void (*data_sent_cb)(size_t),
 }
 
 
+#ifndef VUSB
 static size_t
 cdc_stdio_write(const uint8_t *buf, size_t len, void *data)
 {
@@ -118,3 +119,4 @@ cdc_set_stdout(struct cdc_ctx *cdc)
         stdout->ops_data = cdc;
         stdout->ops = &cdc_ops;
 }
+#endif
