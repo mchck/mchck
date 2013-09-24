@@ -61,9 +61,10 @@ CFLAGS+=	-fshort-enums
 
 all: ${PROG}
 
-$(foreach _uselib,host ${USE},$(eval $(call _include_libs,$(_uselib))))
+include ${_libdir}/lib/Makefile.part
+$(foreach _uselib,${SRCS.libs},$(eval $(call _include_libs,$(_uselib))))
 
-$(PROG): $(OBJS)
+${PROG}: ${_allobjs}
 	$(LINK.c) $^ ${LDLIBS} -o $@
 
 CLEANFILES+=	${PROG}
