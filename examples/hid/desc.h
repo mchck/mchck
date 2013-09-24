@@ -1,8 +1,5 @@
-#include <mchck.h>
-#include <usb/usb.h>
-
-static void init_my_hid(int config);
-
+// Required fwd declaration:
+//   void init_my_hid(inf config)
 
 struct hid_desc_t {
   uint8_t bLength;
@@ -142,17 +139,3 @@ static const struct usbd_device hid_dev = {
     NULL
   }
 };
-
-
-static void
-init_my_hid(int config)
-{
-  // hid_init();
-}
-
-void
-main(void)
-{
-  usb_init(&hid_dev);
-  sys_yield_for_frogs();
-}
