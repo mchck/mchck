@@ -7,6 +7,13 @@
 #include <usb/cdc-acm.h>
 
 
+#ifdef DEBUG
+#define debug_printf(...) printf(__VA_ARGS__)
+#else
+#define debug_printf(...)
+#endif
+
+
 /**
  * 1. set pcs polarity to low
  * 2. configure pins in port register
@@ -113,12 +120,14 @@ walk_state(void *cbdata)
         struct EZPORT_STATUS *status = cbdata;
 
         ezport_status = *status;
+        debug_printf("  status: %#.2x\r\n", ezport_status.raw);
         statemachine((uintptr_t)ev_cmd_done);
 }
 
 static void
 timeout(void *data)
 {
+        debug_printf("TIMEOUT\r\n");
         statemachine(ev_timeout);
 }
 
@@ -181,6 +190,7 @@ action enable_power {
         gpio_write(EZPORT_POWER, 0);
         gpio_dir(EZPORT_POWER, GPIO_OUTPUT);
 
+        debug_printf("power\r\n");
         timeout_add(&t, 10, timeout, NULL);
 }
 
@@ -223,6 +233,7 @@ action bulk_erase {
                        &be_cmd, 1, NULL, 0,
                        NULL, NULL);
 
+        debug_printf("erase\r\n");
         /* Datasheet 6.4.1.2 */
         timeout_add(&t, 300, timeout, NULL);
 }
@@ -251,6 +262,7 @@ action program_sector {
                           tx_sg, NULL,
                           NULL, NULL);
 
+        debug_printf("program %d\r\n", program_address - len);
         /* Datasheet 6.4.1.2 */
         timeout_add(&t, 200, timeout, NULL);
 }
@@ -262,6 +274,7 @@ action reset_target {
         spi_queue_xfer(&reset_ctx, EZPORT_SPI_CS,
                        &reset_cmd, 1, NULL, 0,
                        NULL, NULL);
+        debug_printf("reset\r\n");
         timeout_add(&t, 1000, timeout, NULL);
 }
 
@@ -271,6 +284,7 @@ action disable_power {
         pin_mode(EZPORT_DI, PIN_MODE_MUX_ANALOG);
         pin_mode(EZPORT_DO, PIN_MODE_MUX_ANALOG);
         pin_mode(EZPORT_POWER, PIN_MODE_MUX_ANALOG);
+        debug_printf("power off\r\n");
 }
 }%%
 
@@ -322,6 +336,8 @@ statemachine(enum state_event ev)
         /* execution vars */
         const static enum state_event *eof = NULL;
         const enum state_event *p = &ev, * const pe = p + 1;
+
+        debug_printf("  event: %d\r\n", ev);
 
         %% write exec;
 }
@@ -381,6 +397,7 @@ static void
 init_ezport(int config)
 {
         cdc_init(NULL, NULL, &cdc);
+        cdc_set_stdout(&cdc);
 }
 
 static const struct usbd_device cdc_device =
