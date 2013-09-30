@@ -184,6 +184,10 @@ action enable_power {
         timeout_add(&t, 10, timeout, NULL);
 }
 
+action wait_powerup {
+        timeout_add(&t, 50, timeout, NULL);
+}
+
 action enable_spi {
         spi_init();
         pin_mode(EZPORT_CS, PIN_MODE_MUX_ALT2);
@@ -278,11 +282,15 @@ action disable_power {
 main := (
 
         start: (
-                ev_button @init_vars @signal_leds_off @enable_power -> starting
+                ev_button @init_vars @signal_leds_off @enable_power -> starting1
                 ),
-        starting: (
-                ev_reset >disable_timeout @enable_spi @check_status -> ezport_running
+        starting1: (
+                ev_reset >disable_timeout @wait_powerup -> starting2
                 ),
+        starting2: (
+                ev_reset -> starting2 |
+                ev_timeout @enable_spi @check_status -> ezport_running
+        ),
         ezport_running: (
                 ev_cmd_done when not_write_protected >disable_timeout @bulk_erase @check_status -> erasing
                 ),
