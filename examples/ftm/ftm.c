@@ -23,17 +23,19 @@ void pwm_init(enum pwm_channels channels) {
     FTM0.sc.clks = FTM_CLKS_SYSTEM; /* system clock */
 
     for(int i = 0; i < PWM_CHNUM; i++) {
-        if(channels & (1<<i)) {
-            FTM0.csc[i].msb = 1;            /* edge-aligned PWM on channel i */
-            FTM0.csc[i].elsb = 1;           /* active-high output */
+        if(channels & (1 << i)) {
+            FTM0.channel[i].csc.raw = ((struct FTM_CSC_t){
+                    .msb = 1,            /* edge-aligned PWM on channel i */
+                        .elsb = 1,           /* active-high output */
+                }).raw;
         }
     }
 }
 
 void pwm_set(enum pwm_channels channels, uint16_t width) {
     for(int i = 0; i < PWM_CHNUM; i++)
-        if(channels & (1<<i))
-            FTM0.cv[i].val = width;
+        if(channels & (1 << i))
+            FTM0.channel[i].cv = width;
 }
 
 int

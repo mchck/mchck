@@ -45,25 +45,29 @@ struct FTM_t {
 	uint16_t _pad0;
 	uint16_t mod;
 	uint16_t _pad1;
-	struct FTM_CSC_t {
-		UNION_STRUCT_START(32);
-		uint32_t dma	: 1;
-		uint32_t _rsvd0 : 1;
-		uint32_t elsa	: 1;
-		uint32_t elsb	: 1;
-		uint32_t msa	: 1;
-		uint32_t msb	: 1;
-		uint32_t chie	: 1;
-		uint32_t chf	: 1;
-		uint32_t _rsvd1 : 24;
-		UNION_STRUCT_END;
-	} csc[8];
 	struct {
-		uint16_t val;
-		uint16_t _rsvd0;
-	} cv[8];
-	uint16_t cntin;
-	uint16_t _pad2;
+		struct FTM_CSC_t {
+			UNION_STRUCT_START(32);
+			uint32_t dma	: 1;
+			uint32_t _rsvd0 : 1;
+			uint32_t elsa	: 1;
+			uint32_t elsb	: 1;
+			uint32_t msa	: 1;
+			uint32_t msb	: 1;
+			uint32_t chie	: 1;
+			uint32_t chf	: 1;
+			uint32_t _rsvd1 : 24;
+			UNION_STRUCT_END;
+		} csc;
+		struct {
+			uint32_t cv     : 16;
+			uint32_t _rsvd0 : 16;
+		};
+	} channel[8];
+	struct {
+		uint32_t cntin : 16;
+		uint32_t _pad2 : 16;
+	};
 	struct FTM_PERCHANNEL_t status;
 	struct FTM_MODE_t {
 		UNION_STRUCT_START(32);
