@@ -7,3 +7,4 @@
 #include <mchck/spi.h>
 #include <mchck/timeout.h>
 #include <mchck/stdio.h>
+#include <mchck/ftm.h>
