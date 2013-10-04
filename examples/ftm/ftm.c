@@ -3,6 +3,8 @@
 int
 main(void)
 {
+	pin_mode(PIN_PTC1, PIN_MODE_MUX_ALT4);
+
 	SIM.scgc6.ftm0 = 1;
 	FTM0.mod = 0xffff;
 	FTM0.cntin = 0;
