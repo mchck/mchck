@@ -1,0 +1,402 @@
+# Copyright (c) 1995-2001 FreeBSD Inc.
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED.  IN NO EVENT SHALL [your name] OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+# SUCH DAMAGE.
+#
+# Style guide for DragonFly.  Based on the CSRG's KNF (Kernel Normal Form).
+#
+#+TITLE: source file style guide
+* DESCRIPTION
+This file specifies the preferred style for library source files in
+the mchck source tree.  It is also a guide for preferred application
+code style.  Many of the style rules are implicit in the examples.  Be
+careful to check the examples before assuming that /style/ is silent
+on an issue.
+#+BEGIN_SRC c
+/*
+ * VERY important single-line comments look like this.
+ */
+
+/* Most single-line comments look like this. */
+
+/*
+ * Multi-line comments look like this.  Make them real sentences.  Fill
+ * them so they look like real paragraphs.
+ */
+
+/*
+ * XXX in a comment indicates code which is incomplete, suboptimal,
+ * or otherwise deserving of further attention.
+ */
+
+#+END_SRC
+
+Leave a blank line between copyright header the header files.
+
+Library sources typically only include =<mchck.h>=.
+#+BEGIN_SRC c
+#include <mchck.h>		/* Library include in angle brackets. */
+#+END_SRC
+
+Leave a blank line before the user include files.
+#+BEGIN_SRC c
+#include "pathnames.h"		/* Local includes in double quotes. */
+#+END_SRC
+
+Do not =#define= or declare names in the implementation namespace
+except for implementing application interfaces.
+
+The names of "unsafe" macros (ones that have side effects), and the
+names of macros for manifest constants, are all in uppercase.  The
+expansions of expression-like macros are either a single token or have
+outer parentheses.  Put a single tab character between the =#define=
+and the macro name.  If a macro needs more than a single line, use
+braces (={= and =}=).  Right-justify the backslashes; it makes it
+easier to read.  If the macro encapsulates a compound statement,
+enclose it in a =do= loop, so that it can safely be used in =if=
+statements.  Any final statement-terminating semicolon should be
+supplied by the macro invocation rather than the macro, to make
+parsing easier for pretty-printers and editors.
+#+BEGIN_SRC c
+#define	MACRO(x, y) do {						\
+	variable = (x) + (y);						\
+	(y) += 2;							\
+} while (0)
+#+END_SRC
+
+Enumeration values are all uppercase.
+#+BEGIN_SRC c
+enum enumtype { ONE, TWO } et;
+#+END_SRC
+
+Use the standard integer types for fixed size integers.
+#+BEGIN_SRC c
+uint8_t		8 bits fixed size unsigned integer
+uint16_t	16 bits fixed size unsigned integer
+uint32_t	32 bits fixed size unsigned integer
+uint64_t	64 bits fixed size unsigned integer
+#+END_SRC
+
+When declaring variables in structures, try to declare them sorted by
+use, then by size, and then in alphabetical order; however, keep
+automatic alignment in mind.  The first category normally does not
+apply, but there are exceptions.  Each one gets its own line.  Try to
+make the structure readable by aligning the member names using either
+one or two tabs depending upon your judgment.  You should use one tab
+if it suffices to align most of the member names.  Names following
+extremely long types should be separated by a single space.
+
+Major structures should be declared at the top of the file in which
+they are used, or in separate header files if they are used in
+multiple source files.  Use of the structures should be by separate
+declarations and should be =extern= if they are declared in a header
+file.
+#+BEGIN_SRC c
+struct foo {
+	struct foo	*next;		/* List of active foo. */
+	struct mumble	amumble;	/* Comment for mumble. */
+	int		bar;		/* Try to align the comments. */
+	struct verylongtypename *baz;	/* Won't fit in 2 tabs. */
+};
+struct foo *foohead;			/* Head of global foo list. */
+#+END_SRC
+
+#+BEGIN_COMMENT
+Use
+.Xr queue 3
+macros rather than rolling your own lists, whenever possible.
+Thus,
+the previous example would be better written:
+
+#+BEGIN_SRC c
+#include <sys/queue.h>
+
+struct foo {
+	LIST_ENTRY(foo)	link;		/* Use queue macros for foo lists. */
+	struct mumble	amumble;	/* Comment for mumble. */
+	int		bar;		/* Try to align the comments. */
+	struct verylongtypename *baz;	/* Won't fit in 2 tabs. */
+};
+LIST_HEAD(, foo) foohead;		/* Head of global foo list. */
+#+END_SRC
+#+END_COMMENT
+
+Avoid using typedefs for structure types.  This makes it impossible
+for applications to use pointers to such a structure opaquely, which
+is both possible and beneficial when using an ordinary struct tag.
+When convention requires a =typedef=, make its name match the struct
+tag.  Avoid typedefs ending in "_t", except as specified in Standard C
+or by POSIX.
+
+#+BEGIN_SRC c
+/* Make the structure name match the typedef. */
+typedef struct bar {
+	int	level;
+} bar;
+typedef	int		foo;		/* This is foo. */
+typedef	const long	baz;		/* This is baz. */
+#+END_SRC
+
+All functions are prototyped somewhere.
+
+Function prototypes for private functions (i.e. functions not used
+elsewhere) go at the top of the first source module.  Functions local
+to one source module should be declared =static=.
+
+Functions used from other parts of the library are prototyped in the
+relevant include file.
+
+Functions that are used locally in more than one module go into a
+separate header file, e.g. =foo-internal.h=.
+
+Changes to existing files should be consistent with that file's
+conventions.  In general, code can be considered "new code" when
+it makes up about 50% or more of the file(s) involved.  This is enough
+to break precedents in the existing code and use the current /style/
+guidelines.
+
+Function prototypes for the library have parameter names associated
+with parameter types. E.g., in the library use:
+
+#+BEGIN_SRC c
+void	function(int fd);
+#+END_SRC
+
+Prototypes may have an extra space after a tab to enable function names
+to line up:
+#+BEGIN_SRC c
+static char	*function(int, const char *, struct foo *, struct bar *,
+		     struct baz **);
+static void	 usage(void);
+
+/*
+ * All major routines should have a comment briefly describing what
+ * they do.  The comment before the "main" routine should describe
+ * what the program does.
+ */
+int
+main(int argc, char **argv)
+{
+	long num;
+	int ch;
+	char *ep;
+
+#+END_SRC
+
+
+Elements in a
+=switch=
+statement that cascade should have a
+=FALLTHROUGH=
+comment, unless they contain no code of their own.
+Code that cannot be reached should have a
+=NOTREACHED=
+comment.
+
+Put a single space after control statement keywords =if=, =do=,
+=while=, =for=, =switch=.  No braces are used for control statements
+with zero or only a single statement unless that statement is more
+than a single line in which case they are permitted.  /Forever/ loops
+(loops with no test expression, which are only terminated by a
+=break=, =return= or =exit= inside the loop body) are done with
+=for='s , not =while='s.
+
+#+BEGIN_SRC c
+	for (p = buf; *p != '\0'; ++p)
+		;	/* nothing */
+	for (;;)
+		stmt;
+	for (;;) {
+		z = a + really + long + statement + that + needs +
+		    two + lines + gets + indented + four + spaces +
+		    on + the + second + and + subsequent + lines;
+	}
+	for (;;) {
+		if (cond)
+			stmt;
+	}
+	if (val != NULL)
+		val = realloc(val, newsize);
+#+END_SRC
+
+Parts of a =for= loop may be left empty.  Put declarations inside
+blocks unless the routine will get complicated that way.
+
+#+BEGIN_SRC c
+	for (int cnt = 0; cnt < 15; cnt++) {
+		stmt1;
+		stmt2;
+	}
+#+END_SRC
+
+Indentation used for program block structure is an 8 character tab.
+Second level indents used for line continuation are four spaces.
+If you have to wrap a long statement, put the operator at the end of the
+line.
+#+BEGIN_SRC c
+	while (cnt < 20 && this_variable_name_is_really_far_too_long &&
+	    ep != NULL) {
+		z = a + really + long + statement + that + needs +
+		    two + lines + gets + indented + four + spaces +
+		    on + the + second + and + subsequent + lines;
+	}
+#+END_SRC
+
+Do not add whitespace at the end of a line, and only use tabs followed
+by spaces to form the indentation.  Do not use more spaces than a tab
+will produce and do not use spaces in front of tabs.
+
+Closing and opening braces go on the same line as the =else=.  Braces
+that are not necessary may be left out, but always use braces around
+complex or confusing sequences, for example if any part of a
+conditional is multi-line, use braces for all parts of the
+conditional, and use braces around multi-line substatements of loops
+or conditionals even if they are theoretically one statement from the
+compiler's point of view.
+
+#+BEGIN_SRC c
+	if (test)
+		stmt;
+	else if (bar)
+		stmt;
+	else
+		stmt;
+
+	if (test) {
+		stmt;
+	} else if (bar) {
+		stmt;
+		stmt;
+	} else {
+		stmt;
+	}
+
+	/* THIS IS WRONG, BRACES SHOULD BE USED */
+	if (fubar)
+		/* xyz */
+		x = 1;
+
+	/* THIS IS ALSO WRONG, USE BRACES AROUND THE OUTER CONDITIONAL */
+	if (fubar)
+		if (barbaz)
+			x = 1;
+#+END_SRC
+
+Do not put spaces after function names, after =(= or =[= characters,
+or preceding =]= , =)= , =;= , or =,= characters.  But do put a space
+after commas and semicolons if there is further text on the same line.
+#+BEGIN_SRC c
+	error = function(a1, a2);
+	if (error != 0)
+		exit(error);
+#+END_SRC
+
+Unary operators do not require spaces around them, but binary
+operators (except for =.= and =->= ) do.  Do not use parentheses
+unless they are required for precedence or unless the statement is
+confusing without them.  Remember that other people may become
+confused more easily than you.  Do YOU understand the following?
+
+#+BEGIN_SRC c
+	a = b->c[0] + ~d == (e || f) || g && h ? i : j >> 1;
+	k = !(l & FLAGS);
+#+END_SRC
+
+Casts are not followed by a space.  Also, for the purposes of
+formatting, treat =sizeof= as function.  In other words, it is not
+followed by a space, and its single argument should be enclosed in
+parentheses.  Use parentheses around the argument of =return=, but
+also add a single space between =return= and its argument.
+
+
+The function type should be on a line by itself
+preceding the function.
+
+#+BEGIN_SRC c
+static char *
+function(int a1, int a2, float fl, int a4)
+{
+#+END_SRC
+
+
+When declaring variables in functions declare them sorted by size,
+then in alphabetical order; multiple ones per line are okay.  If a
+line overflows reuse the type keyword.
+
+
+Be careful to not obfuscate the code by initializing variables in the
+declarations.  Use this feature only thoughtfully.  DO NOT use
+function calls in initializers.
+#+BEGIN_SRC c
+	struct foo one, *two;
+	double three;
+	int *four, five;
+	char *six, seven, eight, nine, ten, eleven, twelve;
+
+	four = myfunction();
+#+END_SRC
+
+
+Do not declare functions inside other functions; ANSI C says that such
+declarations have file scope regardless of the nesting of the
+declaration.  Hiding file declarations in what appears to be a local
+scope is undesirable and will elicit complaints from a good compiler.
+
+
+=NULL= is the preferred null pointer constant.  Use =NULL= instead of
+=(type *) 0= or =(type *)NULL= in contexts where the compiler knows
+the type, e.g., in assignments.  Use =(type *)NULL= in other contexts,
+in particular function args of variadic functions.  Often testing pointers
+against =NULL= will lead to clearer code, e.g.:
+#+BEGIN_SRC c
+(p = f()) == NULL
+#+END_SRC
+
+instead of:
+#+BEGIN_SRC c
+!(p = f())
+#+END_SRC
+
+Do not use =!= for tests unless it is a boolean, e.g. use
+#+BEGIN_SRC c
+if (*p == '\0')
+#+END_SRC
+
+not
+#+BEGIN_SRC c
+if (!*p)
+#+END_SRC
+
+
+Do not cast the unused return value of a function to (void).
+
+Routines returning =void *= should not have their return values cast
+to any pointer type.
+
+New core library code should be reasonably compliant with the /style/
+guides.  Code that is approximately mchck /style/ compliant in the
+repository must not diverge from compliance.
+
+* HISTORY
+This style guide is largely based on the DragonFly BSD /style(9)/ man
+page, which itself is based on the =admin/style/style= file from
+the BSD 4.4 Lite2 release.
