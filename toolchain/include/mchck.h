@@ -44,6 +44,7 @@ extern uint32_t _sidata, _sdata, _edata, _sbss, _ebss, _app_rom;
 #include <kinetis/spi.h>
 #include <kinetis/lptmr.h>
 #include <kinetis/ftm.h>
+#include <kinetis/i2c.h>
 
 #include <arm/scb.h>
 #include <arm/nvic.h>
