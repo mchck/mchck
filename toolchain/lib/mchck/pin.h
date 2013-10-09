@@ -11,6 +11,7 @@ enum pin_id {
         PIN_PTA2 = PIN_PORTA | 2,
         PIN_PTA3 = PIN_PORTA | 3,
         PIN_PTA4 = PIN_PORTA | 4,
+        PIN_PTA18 = PIN_PORTA | 18,
         PIN_PTA19 = PIN_PORTA | 19,
         PIN_PTB0 = PIN_PORTB | 0,
         PIN_PTB1 = PIN_PORTB | 1,
