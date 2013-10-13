@@ -129,7 +129,7 @@ class MchckBitbangSwd < BitbangSwd
 end
 
 if $0 == __FILE__
-  s = BusPirateSwd.new(:dev=> ARGV[0])
+  s = MchckBitbangSwd.new(:dev=> ARGV[0])
 
   s.raw_out(255.chr * 7)
   s.raw_out([0xe79e].pack('v'))
