@@ -7,6 +7,7 @@ enum gpio_pin_id {
         GPIO_PTA2 = PIN_PTA2,
         GPIO_PTA3 = PIN_PTA3,
         GPIO_PTA4 = PIN_PTA4,
+        GPIO_PTA18 = PIN_PTA18,
         GPIO_PTA19 = PIN_PTA19,
         GPIO_PTB0 = PIN_PTB0,
         GPIO_PTB1 = PIN_PTB1,

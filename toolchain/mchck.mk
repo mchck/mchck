@@ -93,6 +93,8 @@ COMPILER_PATH=	${_libdir}/scripts
 export COMPILER_PATH
 
 TARGET?=	MK20DX32VLF5
+DFUVID?=	2323
+DFUPID?=	0001
 
 include ${_libdir}/${TARGET}.mk
 
@@ -161,7 +163,7 @@ gdb: ${PROG}.elf
 	${RUBY} ${_libdir}/../programmer/gdbserver.rb ${MCHCKADAPTER} -- ${GDB} -readnow -ex 'target extended-remote :1234' ${PROG}.elf
 
 flash: ${PROG}.bin
-	${DFUUTIL} -D ${PROG}.bin
+	${DFUUTIL} -d ${DFUVID}:${DFUPID} -D ${PROG}.bin
 
 swd-flash: ${PROG}.bin
 	${RUBY} ${_libdir}/../programmer/flash.rb ${MCHCKADAPTER} $< ${LOADADDR}
