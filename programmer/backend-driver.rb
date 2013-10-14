@@ -25,7 +25,7 @@ module BackendDriver
         s.strip!
         name, val = s.split(/[=]/, 2) # emacs falls over with a /=/ regexp :/
         if !val || val.empty?
-          raise RuntimError, "invalid option `#{s}'"
+          raise RuntimeError, "invalid option `#{s}'"
         end
         begin
           val = Integer(val)
