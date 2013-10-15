@@ -1,12 +1,24 @@
+#ifndef TEST_PRINTF
 #include <mchck.h>
+#else
+#include <stdio.h>
+#include <stdarg.h>
+#include <stdint.h>
+#define vfprintf my_vfprintf
+#define printf my_printf
+#endif
 
 //#define NO_PAD
 //#define NO_64
 
 #ifndef NO_64
 #define PRINTF_VAL_T long long
+#define PRINTF_FRAC_T long fract
+const static unsigned long long fract_half = 0x800000000000000ULL;
 #else
 #define PRINTF_VAL_T int
+#define PRINTF_FRAC_T fract
+const static unsigned long fract_half = 0x8000000UL;
 #endif
 
 
@@ -37,11 +49,17 @@ plain_output:
         int length = 32;
         int alternate = 0;
         int sign = 0;
+
         int print_sign = 0;
         int base = 10;
         int digit_off = 0;
         int pad = ' ';
         int pad_right = 0;
+        int print_frac = 0;
+        unsigned PRINTF_VAL_T val;
+#ifndef NO_FIX
+        unsigned PRINTF_FRAC_T frac;
+#endif
 
         /* flags */
         for (;; ++fmt) {
@@ -164,13 +182,108 @@ end_flags:
                 /* FALLTHROUGH */
         case 'u':
                 goto conv_int;
+
+#ifndef NO_FIX
+        case 'k': {
+                long accum fpval;
+
+                switch (length) {
+                case 64:
+                        fpval = va_arg(args, long accum);
+                        break;
+                case 16:
+                        fpval = va_arg(args, short accum);
+                        break;
+                default:
+                        fpval = va_arg(args, accum);
+                        break;
+                }
+                sign = 1;
+                if (fpval < 0) {
+                        fpval = -fpval;
+                        print_sign = '-';
+                }
+                val = fpval;
+                frac = fpval;
+                goto conv_frac;
+        }
+
+        case 'K': {
+                long unsigned accum fpval;
+
+                switch (length) {
+                case 64:
+                        fpval = va_arg(args, long unsigned accum);
+                        break;
+                case 16:
+                        fpval = va_arg(args, short unsigned accum);
+                        break;
+                default:
+                        fpval = va_arg(args, unsigned accum);
+                        break;
+                }
+                val = fpval;
+                frac = fpval;
+                goto conv_frac;
+        }
+
+        case 'r': {
+                long fract fpval;
+
+                switch (length) {
+                case 64:
+                        fpval = va_arg(args, long fract);
+                        break;
+                case 16:
+                        fpval = va_arg(args, short fract);
+                        break;
+                default:
+                        fpval = va_arg(args, fract);
+                        break;
+                }
+                sign = 1;
+                if (fpval < 0) {
+                        fpval = -fpval;
+                        print_sign = '-';
+                }
+                val = fpval;
+                frac = fpval;
+                goto conv_frac;
+        }
+
+        case 'R': {
+                unsigned long fract fpval;
+
+                switch (length) {
+                case 64:
+                        fpval = va_arg(args, unsigned long fract);
+                        break;
+                case 16:
+                        fpval = va_arg(args, unsigned short fract);
+                        break;
+                default:
+                        fpval = va_arg(args, unsigned fract);
+                        break;
+                }
+                val = fpval;
+                frac = fpval;
+                goto conv_frac;
+        }
+#endif  /* NO_FIX */
+
         }
 
         goto next_char;
 
-conv_int:;
-        unsigned PRINTF_VAL_T val;
+#ifndef NO_FIX
+conv_frac:
+        if (precision < 0)
+                precision = 6;
+        print_frac = 1;
+        goto print_int;
+#endif
 
+conv_int:
         if (length == 64)
                 val = va_arg(args, uint64_t);
         else
@@ -206,6 +319,8 @@ conv_int:;
                 break;
         }
 
+print_int:;
+
         /* determine first digit */
         unsigned PRINTF_VAL_T scale = 1;
 
@@ -213,39 +328,66 @@ conv_int:;
         if (precision < 0)
                 precision = 1;
 #endif
-        for (; val / base >= scale; --precision, --width)
+
+        int print_digits = 1;
+        while (val / base >= scale) {
                 scale *= base;
+                ++print_digits;
+        }
+
+        int print_width;
+
+        if (print_frac)
+                print_width = precision + print_digits;
+        else
+                print_width = precision > print_digits ? precision : print_digits;
+
 #ifndef NO_PAD
 
-        if (val == 0 && precision == 0) {
-                ++width;
+        if (alternate && base == 8 && val != 0 && precision <= print_digits)
+                print_width = precision = print_digits + 1;
+
+        if (val == 0 && precision == 0 && !(alternate && base == 8)) {
                 scale = 0;
+                print_width = 0;
+                print_digits = 0;
         }
 
+        /* will print sign */
         if (print_sign)
-                --width;
+                ++print_width;
 
-        if (alternate && base != 8 && val != 0) {
-                --width;
-                if (base > 10)
-                        --width;
+        /* will print decimal point */
+        if (print_frac && (precision > 0 || alternate))
+                ++print_width;
+
+        /* will print 0x prefix */
+        if (alternate && val != 0) {
+                switch (base) {
+                case 16:
+                        print_width += 2;
+                        break;
+                }
         }
-
-        if (alternate && base == 8 && precision < 2)
-                precision = 2;
 
         if (pad == '0') {
                 if (print_sign)
                         fputc(print_sign, f);
-                if (alternate && base != 8 && val != 0) {
-                        fputc('0', f);
-                        fputc('x', f);
+                if (alternate && val != 0) {
+                        switch (base) {
+                        case 16:
+                                fputc('0', f);
+                                fputc('x', f);
+                                break;
+                        }
                 }
         }
 
         if (!pad_right) {
-                for (; width > precision && width > 1; --width)
+                while (print_width < width) {
                         fputc(pad, f);
+                        ++print_width;
+                }
         }
 
         if (pad != '0')
@@ -253,15 +395,20 @@ conv_int:;
         {
                 if (print_sign)
                         fputc(print_sign, f);
-
-                if (alternate && base != 8 && val != 0) {
-                        fputc('0', f);
-                        fputc('x', f);
+                if (alternate && val != 0) {
+                        switch (base) {
+                        case 16:
+                                fputc('0', f);
+                                fputc('x', f);
+                                break;
+                        }
                 }
         }
 #ifndef NO_PAD
-        for (; precision > 1; --precision, --width)
+        while (!print_frac && print_digits < precision) {
                 fputc('0', f);
+                ++print_digits;
+        }
 #endif
         while (scale > 0) {
                 int digit = val / scale;
@@ -273,10 +420,29 @@ conv_int:;
                 val %= scale;
                 scale /= base;
         }
+
+        if (!print_frac || (precision <= 0 && !alternate))
+                goto pad_right;
+
+#ifndef NO_FIX
+        fputc('.', f);
+        for (; precision > 0; --precision) {
+                int digit = 10 * frac;
+
+                digit += '0';
+                fputc(digit, f);
+                frac *= 10;
+        }
+#endif
+
 #ifndef NO_PAD
+pad_right:
+
         if (pad_right) {
-                for (; width > precision && width > 1; --width)
+                while (print_width < width) {
                         fputc(' ', f);
+                        ++print_width;
+                }
         }
 #endif
         goto next_char;
@@ -299,6 +465,8 @@ printf(const char *fmt, ...)
 }
 
 #ifdef TEST_PRINTF
+#undef vfprintf
+#undef printf
 int
 main(void)
 {
