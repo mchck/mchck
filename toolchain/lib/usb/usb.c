@@ -34,6 +34,12 @@ usb_tx_next(struct usbd_ep_pipe_state_t *s)
 			thislen = s->ep_maxsize;
 
 		void *addr = s->data_buf + s->pos;
+
+		if (s->copy_source) {
+			/* Bounce buffer mode */
+			addr = s->data_buf;
+			memcpy(addr, s->copy_source + s->pos, thislen);
+		}
 		s->pos += thislen;
 		s->transfer_size -= thislen;
 
@@ -60,17 +66,11 @@ usb_tx_next(struct usbd_ep_pipe_state_t *s)
 	return (0);
 }
 
-/**
- * send USB data (IN device transaction)
- *
- * So far this function is specialized for EP 0 only.
- *
- * Returns: size to be transfered, or -1 on error.
- */
-int
-usb_tx(struct usbd_ep_pipe_state_t *s, const void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_data)
+static void
+setup_tx(struct usbd_ep_pipe_state_t *s, const void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_data)
 {
 	s->data_buf = (void *)buf;
+	s->copy_source = NULL;
 	s->transfer_size = len;
 	s->pos = 0;
 	s->callback = cb;
@@ -81,10 +81,28 @@ usb_tx(struct usbd_ep_pipe_state_t *s, const void *buf, size_t len, size_t reqle
 		s->short_transfer = 1;
 	else
 		s->short_transfer = 0;
+}
 
+static void
+submit_tx(struct usbd_ep_pipe_state_t *s)
+{
 	/* usb_tx_next() flips the data toggle, so invert this here. */
 	s->data01 ^= 1;
 	usb_tx_next(s);
+}
+
+/**
+ * send USB data (IN device transaction)
+ *
+ * So far this function is specialized for EP 0 only.
+ *
+ * Returns: size to be transfered, or -1 on error.
+ */
+int
+usb_tx(struct usbd_ep_pipe_state_t *s, const void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_data)
+{
+	setup_tx(s, buf, len, reqlen, cb, cb_data);
+	submit_tx(s);
 	return (s->transfer_size);
 }
 
@@ -162,6 +180,18 @@ usb_rx(struct usbd_ep_pipe_state_t *s, void *buf, size_t len, ep_callback_t cb, 
 	return (len);
 }
 
+int
+usb_ep0_tx_cp(const void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_data)
+{
+	struct usbd_ep_pipe_state_t *s = &usb.ep_state[0].tx;
+	enum usb_ep_pingpong pp = s->pingpong;
+
+	setup_tx(s, ep0_buf[pp], len, reqlen, cb, cb_data);
+	s->copy_source = buf;
+	submit_tx(s);
+	return (s->transfer_size);
+}
+
 void *
 usb_ep0_tx_inplace_prepare(size_t len)
 {
@@ -171,18 +201,6 @@ usb_ep0_tx_inplace_prepare(size_t len)
 		return (NULL);
 
 	return (ep0_buf[pp]);
-}
-
-int
-usb_ep0_tx_cp(const void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_data)
-{
-	void *destbuf = usb_ep0_tx_inplace_prepare(len);
-
-	if (destbuf == NULL)
-		return (-1);
-
-	memcpy(destbuf, buf, len);
-	return (usb_ep0_tx(destbuf, len, reqlen, cb, cb_data));
 }
 
 int
