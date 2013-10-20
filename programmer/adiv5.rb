@@ -59,6 +59,10 @@ class Adiv5
     end
     @dap
   end
+
+  def idcode
+    return @dp.IDCODE
+  end
 end
 
 

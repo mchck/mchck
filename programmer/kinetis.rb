@@ -473,6 +473,15 @@ class Kinetis < KinetisBase
     unsigned :UID, 0x1054, :vector => 4
   end
 
+  def self.detect(adiv5)
+    mdmap = adiv5.ap(1)
+    if mdmap && mdmap.IDR.to_i == 0x001c0000
+      Log(:Kinetis, 1) {"Detected Kinetis."}
+      return Kinetis.new(adiv5)
+    end
+    return nil
+  end
+
   def initialize(adiv5, magic_halt=false)
     super(adiv5)
     begin

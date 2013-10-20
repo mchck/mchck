@@ -13,6 +13,13 @@ class Adiv5
       bool :DAPABORT, 0
     end
 
+    register :IDCODE, 0 do
+      unsigned :VERSION, 31..28
+      unsigned :PARTNO, 27..12
+      unsigned :DESIGNER, 11..1
+      bool :SB1, 0
+    end
+
     register :CTRLSTAT, 4 do
       bool :CSYSPWRUPACK, 31
       bool :CSYSPWRUPREQ, 30

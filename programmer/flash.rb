@@ -1,19 +1,18 @@
 $: << File.realpath('..', __FILE__)
 
-require 'kinetis'
+require 'device'
 require 'backend-driver'
 
 $stderr.puts "Attaching debugger..."
 adiv5 = Adiv5.new(BackendDriver.from_string(ARGV[0]))
+k = Device.detect(adiv5)
 
 if ARGV[1] == '--mass-erase'
-  k = KinetisBase.new(adiv5)
   $stderr.puts "done."
   $stderr.puts "Mass erasing chip..."
   k.mass_erase
   $stderr.puts "done."
 else
-  k = Kinetis.new(adiv5, true)
   $stderr.puts "done."
 
   firmware = File.read(ARGV[1], :mode => 'rb')
