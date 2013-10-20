@@ -120,6 +120,10 @@ class NRF51 < ARMv7  # not actually true, it's and armv6 cortex m0 device.
     unsigned :CODESIZE, 0x014, :desc => "Code memory size"
     unsigned :CLENR0, 0x028, :desc => "Length of code region 0 in bytes"
     unsigned :PPFC, 0x02C, :desc => "Pre-programmed factory code present"
+
+    unsigned :NUMRAMBLOCK, 0x034, :desc => "Number of individually controllable RAM blocks"
+    unsigned :SIZERAMBLOCK, 0x038, :vector => 4, :desc => "Size of RAM block n in bytes"
+
   end
 
   #0x10001000 UICR UICR User Information Configuration Registers
@@ -142,27 +146,23 @@ class NRF51 < ARMv7  # not actually true, it's and armv6 cortex m0 device.
   end
 
   def program(addr, data)
-    if addr & (@sector_size - 1) != 0
-      raise RuntimeError, "program needs to start on sector boundary"
+    super(addr, data, @sector_size)
+  end
+
+  def mmap_ranges
+    ramsize = 0
+    @ficr.NUMRAMBLOCK.times do |i|
+      ramsize += @ficr.SIZERAMBLOCK[i]
     end
 
-    if !self.core_halted?
-      raise RuntimeError, "can only program flash when core is halted"
-    end
+    flashsize = @ficr.CODESIZE * @ficr.CODEPAGESIZE
 
-    # pad data
-    if data.bytesize % @sector_size != 0
-      data += ([0xff] * (@sector_size - data.bytesize % @sector_size)).pack('c*')
-    end
-
-    datapos = 0
-    while datapos < data.bytesize
-      sectaddr = addr + datapos
-      sector = data.byteslice(datapos, @sector_size)
-      yield [sectaddr, datapos, data.bytesize] if block_given?
-      program_sector(sectaddr, sector)
-      datapos += @sector_size
-    end
+    Log(:nrf51, 1){ "#{@ficr.NUMRAMBLOCK} ram blocks, ramsize #{ramsize}, flashsize #{flashsize}" }
+    super +
+        [
+            {:type => :flash, :start => 0, :length => flashsize, :blocksize => @sector_size},
+            {:type => :ram, :start => 0x20000000, :length => ramsize}
+        ]
   end
 
 end

@@ -523,27 +523,7 @@ class Kinetis < KinetisBase
   end
 
   def program(addr, data)
-    if addr & (@sector_size - 1) != 0
-      raise RuntimeError, "program needs to start on sector boundary"
-    end
-
-    if !self.core_halted?
-      raise RuntimeError, "can only program flash when core is halted"
-    end
-
-    # pad data
-    if data.bytesize % @sector_size != 0
-      data += ([0xff] * (@sector_size - data.bytesize % @sector_size)).pack('c*')
-    end
-
-    datapos = 0
-    while datapos < data.bytesize
-      sectaddr = addr + datapos
-      sector = data.byteslice(datapos, @sector_size)
-      yield [sectaddr, datapos, data.bytesize] if block_given?
-      program_sector(sectaddr, sector)
-      datapos += @sector_size
-    end
+    super(addr, data, @sector_size)
   end
 
   def mmap_ranges
