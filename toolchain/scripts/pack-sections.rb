@@ -22,7 +22,8 @@ class Objdump < Array
 
   def parse(f)
     rec = nil
-    `arm-none-eabi-objdump -h #{f}`.split("\n").each do |l|
+    objdump = ENV["OBJDUMP"] || "arm-none-eabi-objdump"
+    `#{objdump} -h #{f}`.split("\n").each do |l|
       case l
       when /^ *\d+ ([.][^\s]+)\s+([0-9a-f]{8})\s+.*?2[*][*](\d+)$/
         rec = Section.new

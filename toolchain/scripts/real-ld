@@ -17,6 +17,7 @@ linker_out = nil
 linker_in = nil
 save_temps = false
 output_linker_script = nil
+ld = ENV["LD"] || "arm-none-eabi-ld"
 
 while arg = ARGV.shift
   case arg
@@ -74,7 +75,7 @@ if linker_in
     all_sect.delete_if{|s| File.fnmatch($1, s.name)}
   end
 
-  args = ["arm-none-eabi-ld", "-o", tmp_obj.path, "-T", linker_in, *object_files, *call_args, "-Map=#{tmp_map.path}"]
+  args = [ld, "-o", tmp_obj.path, "-T", linker_in, *object_files, *call_args, "-Map=#{tmp_map.path}"]
   if !system(*args)
     exit $?.exitstatus
   end
@@ -135,7 +136,7 @@ end
 
 err = 1
 begin
-  args = ["arm-none-eabi-ld", "-o", output_file, "-T", linker_out.path, *object_files, *call_args]
+  args = [ld, "-o", output_file, "-T", linker_out.path, *object_files, *call_args]
   system(*args)
   err = $?.exitstatus
 ensure

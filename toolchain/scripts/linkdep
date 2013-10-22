@@ -13,7 +13,8 @@ class Linkdep
   end
 
   def get_syms(obj)
-    IO.popen(%w{arm-none-eabi-nm -A -P -g} + [obj]) do |output|
+    nm = ENV["NM"] || "arm-none-eabi-nm"
+    IO.popen([nm] + %w{-A -P -g} + [obj]) do |output|
       yield output
     end
   end
