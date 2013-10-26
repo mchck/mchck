@@ -47,7 +47,7 @@ class BusPirateSwd < BitbangSwd
       end
     end
     # switch to raw mode
-    Log(:phys, 2){ "setting raw mode" }
+    Log(:phys, 2){ "setting raw mode http://dangerousprototypes.com/docs/Raw-wire_(binary)" };
     @dev.write(0b00000101.chr)
     while data[-4..-1] != "RAW1"
       Log(:phys, 2){ "waiting for RAW1" }
@@ -58,14 +58,16 @@ class BusPirateSwd < BitbangSwd
       rescue IO::WaitReadable
       end
     end
-    Log(:phys, 2){ "configuring lines" }
-    # set LSB
+    Log(:phys, 2){ "configuring lines 3.3v, LSB" }
+    # 1000wxyz – Config, w=HiZ/3.3v, x=2/3wire, y=msb/lsb, z=not used
     @outbuf << (CMD_SET_CONFIG | 0b1010)
     @acks += 1
-    # set speed, seems to be required
+    Log(:phys, 2){ "set speed 400kHz" }
+    # 011000xx – Set speed, 3=~400kHz, 2=~100kHz, 1=~50kHz, 0=~5kHz
     @outbuf << (CMD_SET_SPEED | 0b0011)
     @acks += 1
-    # enable power
+    Log(:phys, 2){ "enable power" }
+    # 0100wxyz – Configure peripherals w=power, x=pullups, y=AUX, z=CS
     @outbuf << (CMD_CONFIG_PERIPH | 0b1000)
     @acks += 1
     flush!
