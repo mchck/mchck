@@ -222,7 +222,13 @@ struct usb_ctrl_req_t {
 		}; /* struct */
 		uint16_t type_and_req;
 	}; /* union */
-	uint16_t wValue;
+	union {
+		uint16_t wValue;
+		struct {
+			uint8_t wValueLow;
+			uint8_t wValueHigh;
+		};
+	};
 	uint16_t wIndex;
 	uint16_t wLength;
 };
