@@ -1,0 +1,14 @@
+device(:foo) {
+  idVendor 0x2323
+  idProduct 0x1
+  iManufacturer "mchck.org"
+  iProduct "descriptor test"
+  config {
+    initfun :foo_init
+
+    cdc {
+    }
+    dfu {
+    }
+  }
+}
