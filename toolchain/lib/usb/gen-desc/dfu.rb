@@ -1,5 +1,6 @@
 class DFUDesc < FunctionDesc
   TypeName = "struct dfu_function_desc"
+  FunctionVarName = "dfu_function"
 
   child_block :dfu
 

@@ -20,7 +20,8 @@ class LocationWrapper
 
   def to_loc_s
     v = if location
-          "\n#line #@location\n"
+          m = @location.match(/^(.*?):(\d+):/)
+          "\n#line #{m[2]} #{m[1].inspect}\n"
         else
           ""
         end
@@ -67,7 +68,7 @@ class DslItem
       opts = class_variable_get(:@@fields).values.find{|o| klass.ancestors.include? o[:klass]}
       define_method name_alias do |*args, &block|
         args = args.map do |a|
-          DslItem.attach_lineno(a)
+          DslItem.attach_lineno(a, caller[2])
         end
         val = klass.eval(*args, &block)
         set_or_exec(opts[:name], val, opts)

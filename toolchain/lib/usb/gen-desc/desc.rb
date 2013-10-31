@@ -1,3 +1,5 @@
+$: << File.dirname(__FILE__)
+
 require 'dsl'
 
 class EndpointDesc < DslItem
@@ -112,6 +114,10 @@ class FunctionDesc < DslItem
   def gen_vars
     ''
   end
+
+  def get_function_var
+    self.class::FunctionVarName
+  end
 end
 
 class ConfigDesc < DslItem
@@ -165,13 +171,14 @@ static const struct #@config_name #@config_name = {
 
 static const struct usbd_config #@var_name = {
 	.init = #{@initfun.to_loc_s},
-	.desc = &#@config_name.config
+	.desc = &#@config_name.config,
+  .function = {#{@function.map{|f| "&#{f.get_function_var}"}.join(",\n\t")}},
 };
 _end_
   end
 
   def get_var
-    @config_name
+    @var_name
   end
 end
 
@@ -222,13 +229,13 @@ static const struct usb_desc_dev_t #{@name.to_loc_s}_dev_desc = {
 
 static const struct usb_desc_string_t * const #{@name.to_loc_s}_str_desc[] = {
 	USB_DESC_STRING_LANG_ENUS,
-	USB_DESC_STRING(#{@iManufacturer.to_loc_s{|s| "w#{s.inspect}"}}),
-	USB_DESC_STRING(#{@iProduct.to_loc_s{|s| "w#{s.inspect}"}}),
+	USB_DESC_STRING(#{@iManufacturer.to_loc_s{|s| "u#{s.inspect}"}}),
+	USB_DESC_STRING(#{@iProduct.to_loc_s{|s| "u#{s.inspect}"}}),
 	USB_DESC_STRING_SERIALNO,
 	NULL
 };
 
-struct usbd #{@name.to_loc_s} = {
+struct usbd_device #{@name.to_loc_s} = {
 	.dev_desc = &#{@name.to_loc_s}_dev_desc,
 	.string_descs = #{@name.to_loc_s}_str_desc,
 	.configs = {

@@ -1,5 +1,6 @@
 class CDCDesc < FunctionDesc
   TypeName = "struct cdc_function_desc"
+  FunctionVarName = "cdc_function"
 
   child_block :cdc
 
@@ -56,7 +57,7 @@ class CDCDesc < FunctionDesc
 			.type_type = USB_DESC_TYPE_CLASS
 		},
 		.bDescriptorSubtype = USB_CDC_SUBTYPE_UNION,
-		.bControlInterface = #{@ctrl_iface.ifacenum}
+		.bControlInterface = #{@ctrl_iface.ifacenum},
 		.bSubordinateInterface0 = #{@data_iface.ifacenum}
 	},
 },
