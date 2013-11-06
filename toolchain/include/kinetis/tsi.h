@@ -61,22 +61,7 @@ struct TSI {
     } scanc;
     struct TSI_PEN {
         UNION_STRUCT_START(32);
-        uint32_t pen0       : 1;
-        uint32_t pen1       : 1;
-        uint32_t pen2       : 1;
-        uint32_t pen3       : 1;
-        uint32_t pen4       : 1;
-        uint32_t pen5       : 1;
-        uint32_t pen6       : 1;
-        uint32_t pen7       : 1;
-        uint32_t pen8       : 1;
-        uint32_t pen9       : 1;
-        uint32_t pen10      : 1;
-        uint32_t pen11      : 1;
-        uint32_t pen12      : 1;
-        uint32_t pen13      : 1;
-        uint32_t pen14      : 1;
-        uint32_t pen15      : 1;
+        uint32_t pen        : 16;
         uint32_t lpsp       : 4;
         uint32_t _rsvd0     : 12;
         UNION_STRUCT_END;
