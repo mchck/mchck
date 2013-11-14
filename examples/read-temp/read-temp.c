@@ -15,7 +15,7 @@ temp_done(uint16_t data, int error, void *cbdata)
         accum temp_diff = volt_diff * (1000K / 1.715K);
         accum temp_deg = 25k - temp_diff;
 
-        printf("raw: %u, temp: %.1k\r\n", data, temp_deg, temp_deg);
+        printf("raw: %u, temp: %.1k\r\n", data, temp_deg);
         onboard_led(ONBOARD_LED_TOGGLE);
 
         if (--temp_count > 0)
