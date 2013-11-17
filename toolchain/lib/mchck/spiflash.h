@@ -3,8 +3,8 @@ typedef void (spi_status_cb)(void *cbdata, uint8_t status);
 extern void
 spiflash_pins_init(void);
 
-extern int
-spiflash_is_present(void);
+extern void
+spiflash_is_present(spi_status_cb cb, void *cbdata);
 
 extern void
 spiflash_get_status(spi_status_cb cb, void *cbdata);

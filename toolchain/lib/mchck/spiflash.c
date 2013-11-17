@@ -17,23 +17,19 @@ spiflash_pins_init(void)
 }
 
 static void
-spiflash_info_spi_cb(void *cbdata)
+spiflash_is_present_cb(void *cbdata)
 {
-        int *complete = cbdata;
-        *complete = 1;
+        status_cb(cbdata, spi_response[1] == 0xEF && spi_response[2] == 0x40 && spi_response[3] == 0x14);
 }
 
-int
-spiflash_is_present(void)
+void
+spiflash_is_present(spi_status_cb cb, void *cbdata)
 {
         spi_query[0] = 0x9F;
         spi_query[1] = spi_query[2] = spi_query[3] = 0x00;
         
-        volatile int complete = 0;
-        spi_queue_xfer(&flash_spi_ctx, SPI_PCS4, (uint8_t *)spi_query, 4, (uint8_t *)spi_response, 4, spiflash_info_spi_cb, (void *)&complete);
-        while(!complete)
-                ;
-        return spi_response[1] == 0xEF && spi_response[2] == 0x40 && spi_response[3] == 0x14;
+        status_cb = cb;
+        spi_queue_xfer(&flash_spi_ctx, SPI_PCS4, (uint8_t *)spi_query, 4, (uint8_t *)spi_response, 4, spiflash_is_present_cb, cbdata);
 }
 
 static void
