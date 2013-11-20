@@ -3,7 +3,10 @@
 static struct spi_ctx flash_spi_ctx;
 static struct sg flash_tx_sg[2], flash_rx_sg[2];
 static spi_cb *post_status_cb;
-static spi_status_cb *status_cb;
+static union {
+        spiflash_info_cb *info_cb;
+        spiflash_status_cb *status_cb;
+} current_cb;
 static uint8_t spi_query[5];
 static uint8_t spi_response[4];
 
@@ -17,33 +20,41 @@ spiflash_pins_init(void)
 }
 
 static void
-spiflash_is_present_cb(void *cbdata)
+spiflash_get_id_cb(void *cbdata)
 {
-        status_cb(cbdata, spi_response[1] == 0xEF && spi_response[2] == 0x40 && spi_response[3] == 0x14);
+        current_cb.info_cb(cbdata, spi_response[1], spi_response[2], spi_response[3]);
 }
 
-void
-spiflash_is_present(spi_status_cb cb, void *cbdata)
+int
+spiflash_get_id(spiflash_info_cb cb, void *cbdata)
 {
+        if (spi_is_xfer_active())
+                return -1;
+
         spi_query[0] = 0x9F;
         spi_query[1] = spi_query[2] = spi_query[3] = 0x00;
-        
-        status_cb = cb;
-        spi_queue_xfer(&flash_spi_ctx, SPI_PCS4, (uint8_t *)spi_query, 4, (uint8_t *)spi_response, 4, spiflash_is_present_cb, cbdata);
+
+        current_cb.info_cb = cb;
+        spi_queue_xfer(&flash_spi_ctx, SPI_PCS4, (uint8_t *)spi_query, 4, (uint8_t *)spi_response, 4, spiflash_get_id_cb, cbdata);
+        return 0;
 }
 
 static void
 spiflash_status_spi_cb(void *cbdata)
 {
-        status_cb(cbdata, spi_response[1]);
+        current_cb.status_cb(cbdata, spi_response[1]);
 }
 
-void
-spiflash_get_status(spi_status_cb cb, void *cbdata)
+int
+spiflash_get_status(spiflash_status_cb cb, void *cbdata)
 {
+        if (spi_is_xfer_active())
+                return -1;
+
         spi_query[0] = 0x05;
-        status_cb = cb;
+        current_cb.status_cb = cb;
         spi_queue_xfer(&flash_spi_ctx, SPI_PCS4, spi_query, 1, (uint8_t *)spi_response, 2, spiflash_status_spi_cb, cbdata);
+        return 0;
 }
 
 static void
@@ -68,9 +79,12 @@ spiflash_program_spi_cb(void *cbdata)
         spi_queue_xfer_sg(&flash_spi_ctx.ctx, SPI_PCS4, flash_tx_sg, flash_rx_sg, spiflash_erase_spi_cb, cbdata);
 }
 
-void
+int
 spiflash_program_page(uint32_t addr, const uint8_t *src, uint8_t len, spi_cb cb, void *cbdata)
 {
+        if (spi_is_xfer_active())
+                return -1;
+
         spi_query[0] = 0x02; /* second command (program) */
         spi_query[1] = addr >> 16;
         spi_query[2] = addr >> 8;
@@ -81,11 +95,16 @@ spiflash_program_page(uint32_t addr, const uint8_t *src, uint8_t len, spi_cb cb,
         post_status_cb = cb;
         /* write enable, then proceed with programming from the callback */
         spi_queue_xfer(&flash_spi_ctx, SPI_PCS4, spi_query + 4, 1, NULL, 0, spiflash_program_spi_cb, cbdata);
+        
+        return 0;
 }
 
-void
+int
 spiflash_read_page(uint8_t *dest, uint32_t addr, uint32_t len, spi_cb cb, void *cbdata)
 {
+        if (spi_is_xfer_active())
+                return -1;
+
         spi_query[0] = 0x03;
         spi_query[1] = addr >> 16;
         spi_query[2] = addr >> 8;
@@ -93,12 +112,16 @@ spiflash_read_page(uint8_t *dest, uint32_t addr, uint32_t len, spi_cb cb, void *
         sg_init_list(flash_tx_sg, 1, spi_query, 4);
         sg_init_list(flash_rx_sg, 2, spi_response, 4, dest, len);
         spi_queue_xfer_sg(&flash_spi_ctx.ctx, SPI_PCS4, flash_tx_sg, flash_rx_sg, cb, cbdata);
-        
+
+        return 0;
 }
 
-void
+int
 spiflash_erase_sector(uint32_t addr, spi_cb cb, void *cbdata)
 {
+        if (spi_is_xfer_active())
+                return -1;
+
         spi_query[0] = 0x20; /* second command (erase) */
         spi_query[1] = addr >> 16;
         spi_query[2] = addr >> 8;
@@ -109,4 +132,6 @@ spiflash_erase_sector(uint32_t addr, spi_cb cb, void *cbdata)
         sg_init_list(flash_rx_sg, 0);
         /* write enable, then proceed with erasing from the callback */
         spi_queue_xfer(&flash_spi_ctx, SPI_PCS4, spi_query + 4, 1, NULL, 0, spiflash_program_spi_cb, cbdata);
+
+        return 0;
 }

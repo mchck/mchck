@@ -38,3 +38,5 @@ void spi_queue_xfer_sg(struct spi_ctx_bare *ctx,
                        struct sg *tx, struct sg *rx,
                        spi_cb *cb, void *cbdata);
 void spi_init(void);
+
+int spi_is_xfer_active(void);
