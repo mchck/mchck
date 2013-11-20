@@ -83,7 +83,7 @@ spiflash_read_page(struct spiflash_ctx *ctx, uint8_t *dest, uint32_t addr, uint3
         ctx->cbdata = cbdata;
         sg_init_list(ctx->flash_tx_sg, 1, ctx->spi_query, 4);
         sg_init_list(ctx->flash_rx_sg, 2, ctx->spi_response, 4, dest, len);
-        spi_queue_xfer_sg(&ctx->flash_spi_ctx.ctx, SPI_PCS4, ctx->flash_tx_sg, ctx->flash_rx_sg, cb, ctx);
+        spi_queue_xfer_sg(&ctx->flash_spi_ctx.ctx, SPI_PCS4, ctx->flash_tx_sg, ctx->flash_rx_sg, cb, cbdata);
 
         return 0;
 }
