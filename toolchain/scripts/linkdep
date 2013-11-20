@@ -5,7 +5,7 @@ require 'optparse'
 class Linkdep
   def initialize
     @undef_syms = Hash.new{|h,k| h[k]=[]}
-    @def_syms = Hash.new{|h,k| h[k]=[]}
+    @def_syms = {}
   end
 
   def symvar(sym)
@@ -19,19 +19,22 @@ class Linkdep
     end
   end
 
-  def process(ls, include_path=true)
-    if not ls.respond_to? :each
-      return get_syms(ls){|o| process(o, include_path)}
-    end
-
-    ls.each do |l|
-      _, file, sym, type = l.match(/^(.*): ([^[:space:]]*) (.) .*/).to_a
+  def process(file, include_path=true)
+    get_syms(file) do |ls|
       file = File.basename(file) if !include_path
-      case type
-      when 'U'
-        @undef_syms[file] << sym
-      else
-        @def_syms[file] << sym
+      # add an empty entry to def_syms so that we can output the link
+      # info for this file, even if it doesn't have any symbols.
+
+      @def_syms[file] = []
+
+      ls.each do |l|
+        _, _, sym, type = l.match(/^(.*): ([^[:space:]]*) (.) .*/).to_a
+        case type
+        when 'U'
+          @undef_syms[file] << sym
+        else
+          @def_syms[file] << sym
+        end
       end
     end
   end
