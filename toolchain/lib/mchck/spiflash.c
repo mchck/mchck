@@ -70,7 +70,7 @@ spiflash_write_enabled_spi_cb(void *cbdata)
 {
         struct spiflash_ctx *ctx = cbdata;
         /* Send the queued operation, then wait for the busy flag to clear */
-        spi_queue_xfer_sg(&ctx->flash_spi_ctx.ctx, SPI_PCS4, ctx->flash_tx_sg, ctx->flash_rx_sg, spiflash_write_dispatched_spi_cb, ctx->cbdata);
+        spi_queue_xfer_sg(&ctx->flash_spi_ctx.ctx, SPI_PCS4, ctx->flash_tx_sg, ctx->flash_rx_sg, spiflash_write_dispatched_spi_cb, ctx);
 }
 
 int
