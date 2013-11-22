@@ -142,6 +142,7 @@ class ConfigDesc < DslItem
   end
 
   def gen_defs
+    "usbd_init_fun_t #{@initfun.to_loc_s};\n" +
     @function.map{|f| f.gen_defs}.join +
       <<_end_
 struct #@config_name {
@@ -203,6 +204,7 @@ class DeviceDesc < DslItem
   end
 
   def gen_defs
+    "struct usbd_device #{@name.to_loc_s};\n" +
     @config.map{|c| c.gen_defs}.join("\n")
   end
 
@@ -261,18 +263,30 @@ class DescriptorRoot < DslItem
     end
   end
 
+  def gen_header
+    "#include <mchck.h>\n" +
+      @device.map{|d| d.gen_defs}.join("\n")
+  end
+
+  def gen_src(name=nil)
+    s = ""
+    if name
+      s += "#include #{name.inspect}"
+    end
+
+    s += @device.map{|d| d.gen_vars}.join("\n")
+    s
+  end
+
   def gen
-    @device.map{|d| d.gen_defs}.join("\n") +
-    @device.map{|d| d.gen_vars}.join("\n")
+    gen_header + gen_src
   end
 end
 
 
-require 'cdc'
-require 'dfu'
-
-
 if $0 == __FILE__
+  require 'cdc'
+  require 'dfu'
   require 'optparse'
 
   outname = nil

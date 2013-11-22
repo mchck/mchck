@@ -307,12 +307,15 @@ struct usbd_function_ctx_header {
 	int ep_tx_offset;
 };
 
+
+typedef void (usbd_init_fun_t)(int);
+
 /**
  * Configuration.  Contains one or more functions which all will be
  * active concurrently.
  */
 struct usbd_config {
-	void (*init)(int);
+	usbd_init_fun_t *init;
 	/**
 	 * We will not set a config for now, because there is not much to
 	 * configure, except for power
@@ -456,5 +459,8 @@ int usb_ep0_rx(void *, size_t, ep_callback_t, void *);
 void *usb_ep0_tx_inplace_prepare(size_t len);
 int usb_ep0_tx(void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_data);
 int usb_ep0_tx_cp(const void *, size_t, size_t, ep_callback_t, void *);
+
+#include <usb/dfu.h>
+#include <usb/cdc-acm.h>
 
 #endif

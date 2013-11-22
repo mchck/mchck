@@ -13,4 +13,6 @@ TARGET=	host
 SRCS+=	vdfu.c
 endif
 
+SRCS+=	dfu.desc
+
 include ../../toolchain/mchck.mk

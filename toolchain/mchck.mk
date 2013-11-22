@@ -45,12 +45,15 @@ NO_LTO=		no-lto
 endif
 CFLAGS+=	${CWARNFLAGS}
 
+
 SRCS?=	${PROG}.c
-_objs=	$(addsuffix .o, $(basename ${SRCS}))
+_compilesrc=	$(basename $(filter %.c,${SRCS}))
+_compilesrc+=	$(basename ${_gensrc})
+_objs=	$(addsuffix .o, ${_compilesrc})
 CLEANFILES+=	${_objs}
 OBJS+=	${_objs}
 _allobjs+=	${OBJS}
-DEPS+=	$(addsuffix .d, $(basename ${SRCS}))
+DEPS+=	$(addsuffix .d, ${_compilesrc})
 CLEANFILES+=	${DEPS}
 
 # Host config (VUSB)

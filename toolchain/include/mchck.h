@@ -53,6 +53,7 @@ extern uint32_t _sidata, _sdata, _edata, _sbss, _ebss, _app_rom;
 #include <arm/nvic.h>
 
 #include <mchck/mchck.h>
+#include <usb/usb.h>
 
 #ifdef __cplusplus
 }

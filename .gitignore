@@ -8,3 +8,4 @@
 *.ld-template
 *.linkdep
 .mchckrc
+*.desc.[ch]

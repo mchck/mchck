@@ -1,3 +1,6 @@
+#ifndef _USB_CDC_ACM_H
+#define _USB_CDC_ACM_H
+
 #define CDC_NOTICE_EP	1
 #define CDC_NOTICE_SIZE 8
 
@@ -153,3 +156,5 @@ ssize_t cdc_write_string(const char *, struct cdc_ctx *ctx);
 void cdc_init(void (*data_ready_cb)(uint8_t *, size_t), void (*data_sent_cb)(size_t), struct cdc_ctx *ctx);
 
 void cdc_set_stdout(struct cdc_ctx *cdc);
+
+#endif

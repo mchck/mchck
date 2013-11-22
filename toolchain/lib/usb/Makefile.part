@@ -1,3 +1,5 @@
+# -*- makefile-gmake -*-
+
 SRCS-usb=	usb.c dfu.c cdc-acm.c
 
 ifeq (${TARGET},host)
@@ -8,3 +10,11 @@ SRCS-usb+=	kinetis.c
 endif
 
 SRCS.libs+=	usb
+
+.SUFFIXES: .desc
+%.desc.h %.desc.c: %.desc
+	${_libdir}/lib/usb/gen-desc/gen-desc $^
+
+_descsrc+=	$(filter %.desc,${SRCS})
+_gensrc+=	$(addsuffix .c,${_descsrc})
+CLEANFILES+=	$(addsuffix .c,${_descsrc}) $(addsuffix .h,${_descsrc})
