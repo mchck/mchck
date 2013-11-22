@@ -53,11 +53,24 @@ extern uint32_t _sidata, _sdata, _edata, _sbss, _ebss, _app_rom;
 #include <arm/nvic.h>
 
 #include <mchck/mchck.h>
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif  /* !host */
+
+#ifdef __cplusplus
+extern "C" {
+#if 0                           /* to make emacs indent properly */
+}
+#endif
+#endif
+
 #include <usb/usb.h>
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif
 #endif

@@ -1,0 +1,13 @@
+device(:cdc_device) {
+  idVendor 0x2323
+  idProduct 4
+  iManufacturer "mchck.org"
+  iProduct "MC HCK SWD adapter"
+
+  config {
+    initfun :init_cdc
+
+    cdc {
+    }
+  }
+}

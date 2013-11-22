@@ -1,7 +1,7 @@
 #include <mchck.h>
 
-#include <usb/usb.h>
-#include <usb/cdc-acm.h>
+#include "tsi.desc.h"
+
 
 static struct cdc_ctx cdc;
 
@@ -12,7 +12,7 @@ TSI0_Handler(void)
                 TSI0.gencs.eosf = 1; /* clear end of scan flag */
                 printf("raw: %u\r\n", TSI0.cntr[0].ctn1);
                 onboard_led(ONBOARD_LED_TOGGLE);
-        
+
         }
 }
 
@@ -23,21 +23,12 @@ new_data(uint8_t *data, size_t len)
         cdc_read_more(&cdc);
 }
 
-static void
+void
 init_vcdc(int config)
 {
         cdc_init(new_data, NULL, &cdc);
         cdc_set_stdout(&cdc);
 }
-
-static const struct usbd_device cdc_device =
-        USB_INIT_DEVICE(0x2323,              /* vid */
-                        3,                   /* pid */
-                        u"mchck.org",        /* vendor */
-                        u"tsi test",         /* product" */
-                        (init_vcdc,          /* init */
-                         CDC)                /* functions */
-                );
 
 int
 main(void)

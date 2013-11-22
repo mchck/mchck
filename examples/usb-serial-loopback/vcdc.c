@@ -1,9 +1,8 @@
 #include <stdio.h>
+#include <mchck.h>
 
-#include <usb/usb.h>
-#include <usb/cdc-acm.h>
+#include "usb-serial-loopback.desc.h"
 
-#include "desc.c"
 
 static struct cdc_ctx cdc;
 
@@ -15,24 +14,11 @@ new_data(uint8_t *data, size_t len)
         cdc_read_more(&cdc);
 }
 
-static void
+void
 init_vcdc(int config)
 {
         cdc_init(new_data, NULL, &cdc);
 }
-
-
-const static struct usbd_config cdc_config = {
-        .init = init_vcdc,
-        .desc = &cdc_desc_config.config,
-        .function = { &cdc_function, NULL },
-};
-
-const struct usbd_device cdc_device = {
-        .dev_desc = &cdc_dev_desc,
-        .string_descs = cdc_string_descs,
-        .configs = { &cdc_config, NULL }
-};
 
 int
 main(void)

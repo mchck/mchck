@@ -1,7 +1,7 @@
 #include <mchck.h>
 
-#include <usb/usb.h>
-#include <usb/cdc-acm.h>
+#include "read-temp.desc.h"
+
 
 static struct cdc_ctx cdc;
 
@@ -49,21 +49,12 @@ new_data(uint8_t *data, size_t len)
         cdc_read_more(&cdc);
 }
 
-static void
+void
 init_vcdc(int config)
 {
         cdc_init(new_data, NULL, &cdc);
         cdc_set_stdout(&cdc);
 }
-
-static const struct usbd_device cdc_device =
-        USB_INIT_DEVICE(0x2323,              /* vid */
-                        3,                   /* pid */
-                        u"mchck.org",        /* vendor */
-                        u"temperature test", /* product" */
-                        (init_vcdc,          /* init */
-                         CDC)                /* functions */
-                );
 
 void
 main(void)

@@ -12,8 +12,6 @@ is-make-clean=	$(filter clean realclean,${MAKECMDGOALS})
 
 define _include_libs
 _libdir-$(1):=	$$(addprefix $${_libdir}/lib/,$(1))
-include $$(addsuffix /Makefile.part,$${_libdir-$(1)})
-
 _forceobjs-$(1)=	$$(addsuffix .o, $$(basename $$(addprefix $(1)-lib-,$${SRCS.force-$(1)})))
 FORCEOBJS+=	$${_forceobjs-$(1)}
 _objs-$(1)=	$$(addsuffix .o, $$(basename $$(addprefix $(1)-lib-,$${SRCS-$(1)}))) $${_forceobjs-$(1)}
@@ -45,16 +43,19 @@ NO_LTO=		no-lto
 endif
 CFLAGS+=	${CWARNFLAGS}
 
-
+ifeq (${SRCS},)
 SRCS?=	${PROG}.c
-_compilesrc=	$(basename $(filter %.c,${SRCS}))
-_compilesrc+=	$(basename ${_gensrc})
-_objs=	$(addsuffix .o, ${_compilesrc})
+_no_src_given:=	true
+endif
+
+_compilesrc=	$(filter %.c,${SRCS})
+_objs=	$(addsuffix .o, $(basename ${_compilesrc} ${_gensrc}))
 CLEANFILES+=	${_objs}
 OBJS+=	${_objs}
 _allobjs+=	${OBJS}
-DEPS+=	$(addsuffix .d, ${_compilesrc})
+DEPS+=	$(addsuffix .d, $(basename ${_compilesrc} ${_gensrc}))
 CLEANFILES+=	${DEPS}
+
 
 # Host config (VUSB)
 
@@ -81,7 +82,7 @@ AR=	arm-none-eabi-ar
 AS=	arm-none-eabi-as
 OBJCOPY=	arm-none-eabi-objcopy
 GDB=	arm-none-eabi-gdb
-DFUUTIL?=	dfu-util
+pDFUUTIL?=	dfu-util
 RUBY?=	ruby
 
 ifeq ($(shell which $(CC) 2>/dev/null),)
@@ -179,6 +180,8 @@ endif
 ifeq ($(call is-make-clean),)
 -include $(patsubst %.o,%.d,${LINKOBJS})
 endif
+
+${_objs} $(patsubst %.o,%.d,${_objs}): ${_gensrc}
 
 clean:
 	-rm -f ${CLEANFILES}

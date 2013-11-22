@@ -1,7 +1,6 @@
 #include <mchck.h>
 
-#include <usb/usb.h>
-#include <usb/dfu.h>
+#include "bootloader-update-dfu.desc.h"
 
 
 /**
@@ -86,13 +85,11 @@ finish_write(void *buf, size_t off, size_t len)
 
 static struct dfu_ctx dfu_ctx;
 
-static void
+void
 init_usb_bootloader(int config)
 {
         dfu_init(setup_write, finish_write, &dfu_ctx);
 }
-
-#include "desc.c"
 
 void
 main(void)

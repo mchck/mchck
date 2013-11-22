@@ -1,0 +1,13 @@
+device(:dfu_device) {
+  idVendor 0x2323
+  idProduct 2
+  iManufacturer "mchck.org"
+  iProduct "MC HCK bootloader updater"
+
+  config {
+    initfun :init_usb_bootloader
+
+    dfu {
+    }
+  }
+}

@@ -1,11 +1,8 @@
 #include <mchck.h>
 
-#include <usb/usb.h>
-#include <usb/cdc-acm.h>
-
+#include "swd-adapter.desc.h"
 #include "swduino/swd.h"
 
-#include "desc.c"
 
 static struct cdc_ctx cdc;
 
@@ -69,23 +66,11 @@ space_available(size_t len)
                 new_data(NULL, 0);
 }
 
-static void
+void
 init_cdc(int config)
 {
         cdc_init(new_data, space_available, &cdc);
 }
-
-const static struct usbd_config cdc_config = {
-        .init = init_cdc,
-        .desc = &cdc_desc_config.config,
-        .function = { &cdc_function, NULL },
-};
-
-const struct usbd_device cdc_device = {
-        .dev_desc = &cdc_dev_desc,
-        .string_descs = cdc_string_descs,
-        .configs = { &cdc_config, NULL }
-};
 
 void
 main(void)

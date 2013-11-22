@@ -1,7 +1,6 @@
 PROG=	swd-adapter
-USE=	usb
 
-SRCS=	main-mchck.c
+SRCS=	main-mchck.c swd-adapter.desc
 
 # Arduino requires the sketch to be in a directory of the same name,
 # and all required files to be in the same directory.
