@@ -82,7 +82,7 @@ AR=	arm-none-eabi-ar
 AS=	arm-none-eabi-as
 OBJCOPY=	arm-none-eabi-objcopy
 GDB=	arm-none-eabi-gdb
-pDFUUTIL?=	dfu-util
+DFUUTIL?=	dfu-util
 RUBY?=	ruby
 
 ifeq ($(shell which $(CC) 2>/dev/null),)
