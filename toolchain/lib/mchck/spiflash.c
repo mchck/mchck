@@ -1,5 +1,15 @@
 #include <mchck.h>
 
+enum {
+        PAGE_PROGRAM = 0x02,
+        READ_DATA = 0x03,
+        READ_STATUS_REGISTER_1 = 0x05,
+        WRITE_ENABLE = 0x06,
+        SECTOR_ERASE = 0x20,
+        BLOCK_ERASE_32KB = 0x52,
+        BLOCK_ERASE_64KB = 0xD8,
+};
+
 void
 spiflash_pins_init(void)
 {
@@ -76,7 +86,7 @@ spiflash_write_enabled_spi_cb(void *cbdata)
 int
 spiflash_read_page(struct spiflash_ctx *ctx, uint8_t *dest, uint32_t addr, uint32_t len, spi_cb cb, void *cbdata)
 {
-        ctx->spi_query[0] = 0x03;
+        ctx->spi_query[0] = READ_DATA;
         ctx->spi_query[1] = addr >> 16;
         ctx->spi_query[2] = addr >> 8;
         ctx->spi_query[3] = addr;
@@ -91,20 +101,20 @@ spiflash_read_page(struct spiflash_ctx *ctx, uint8_t *dest, uint32_t addr, uint3
 static int
 spiflash_write_cmd(struct spiflash_ctx *ctx, uint8_t cmd, uint32_t addr, const uint8_t *src, uint8_t len, spi_cb cb, void *cbdata)
 {
-        ctx->spi_query[0] = cmd; /* second command (program) */
-        ctx->spi_query[1] = addr >> 16;
-        ctx->spi_query[2] = addr >> 8;
-        ctx->spi_query[3] = addr;
-        ctx->spi_query[4] = 0x06; /* first command (write enable) */
+        ctx->spi_query[0] = WRITE_ENABLE; /* first command (write enable) */
+        ctx->spi_query[1] = cmd; /* second command (program/erase) */
+        ctx->spi_query[2] = addr >> 16;
+        ctx->spi_query[3] = addr >> 8;
+        ctx->spi_query[4] = addr;
         if (src)
-                sg_init_list(ctx->flash_tx_sg, 2, ctx->spi_query, 4, src, len);
+                sg_init_list(ctx->flash_tx_sg, 2, ctx->spi_query + 1, 4, src, len);
         else
-                sg_init_list(ctx->flash_tx_sg, 1, ctx->spi_query, 4);
+                sg_init_list(ctx->flash_tx_sg, 1, ctx->spi_query + 1, 4);
         sg_init_list(ctx->flash_rx_sg, 0);
         ctx->write_completed_cb = cb;
         ctx->cbdata = cbdata;
         /* write enable, then proceed with programming from the callback */
-        spi_queue_xfer(&ctx->flash_spi_ctx, SPI_PCS4, ctx->spi_query + 4, 1, NULL, 0, spiflash_write_enabled_spi_cb, ctx);
+        spi_queue_xfer(&ctx->flash_spi_ctx, SPI_PCS4, ctx->spi_query, 1, NULL, 0, spiflash_write_enabled_spi_cb, ctx);
         
         return 0;
 }
@@ -112,18 +122,18 @@ spiflash_write_cmd(struct spiflash_ctx *ctx, uint8_t cmd, uint32_t addr, const u
 int
 spiflash_program_page(struct spiflash_ctx *ctx, uint32_t addr, const uint8_t *src, uint8_t len, spi_cb cb, void *cbdata)
 {
-        return spiflash_write_cmd(ctx, 0x02, addr, src, len, cb, cbdata);
+        return spiflash_write_cmd(ctx, PAGE_PROGRAM, addr, src, len, cb, cbdata);
 }
 
 int
 spiflash_erase_sector(struct spiflash_ctx *ctx, uint32_t addr, spi_cb cb, void *cbdata)
 {
-        return spiflash_write_cmd(ctx, 0x20, addr, NULL, 0, cb, cbdata);
+        return spiflash_write_cmd(ctx, SECTOR_ERASE, addr, NULL, 0, cb, cbdata);
 }
 
 int
 spiflash_erase_block(struct spiflash_ctx *ctx, uint32_t addr, int is_64KB, spi_cb cb, void *cbdata)
 {
-        return spiflash_write_cmd(ctx, is_64KB ? 0xD8 : 0x52, addr, NULL, 0, cb, cbdata);
+        return spiflash_write_cmd(ctx, is_64KB ? BLOCK_ERASE_64KB : BLOCK_ERASE_32KB, addr, NULL, 0, cb, cbdata);
 }
 
