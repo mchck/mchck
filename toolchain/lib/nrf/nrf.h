@@ -13,8 +13,8 @@ enum nrf_tx_output_power_t {
 
 enum nrf_data_rate_t {
 	NRF_DATA_RATE_1MBPS = 0x0,
-	NRF_DATA_RATE_2MBPS = 0x1, // default
-	NRF_DATA_RATE_250KBPS = 0x4
+	NRF_DATA_RATE_250KBPS = 0x1,
+	NRF_DATA_RATE_2MBPS = 0x4 // default
 };
 
 struct nrf_addr_t {
