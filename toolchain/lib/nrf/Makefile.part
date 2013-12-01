@@ -1,0 +1,3 @@
+SRCS-nrf=	nrf.c
+
+SRCS.libs+=	nrf
