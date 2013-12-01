@@ -1,6 +1,7 @@
 #ifndef __NRF_H
 #define __NRF_H
 
+#include <mchck.h>
 #include <sys/types.h>
 
 enum nrf_tx_output_power_t {
