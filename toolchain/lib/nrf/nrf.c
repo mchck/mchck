@@ -230,6 +230,7 @@ handle_status(void *data)
 
 	if (trans->status.RX_DR && nrf_ctx.state == NRF_STATE_RECV_WAITING) {
 		nrf_ctx.state = NRF_STATE_RECV_FETCH_DATA;
+		// nrf_ctx.rx_pipe = trans->status.RX_P_NO;
 		nrf_handle_receive(NULL);
 	}
 
@@ -377,6 +378,11 @@ nrf_handle_setup(void *data)
 	default:
 	case NRF_STATE_SETUP_SET_POWER_RATE:
 		if (nrf_ctx.power_data_rate_dirty) {
+			// ARD must be at least 500uS for 250kbps (nRF datasheet p34)
+			if (nrf_ctx.data_rate == NRF_DATA_RATE_250KBPS && nrf_ctx.ard == 0) {
+				nrf_ctx.ard = 1; // 500 uS
+				nrf_ctx.autoretransmit_dirty = 1;
+			}
 			nrf_ctx.power_data_rate_dirty = 0;
 			static struct nrf_rf_setup_t rfsetup = {
 				.pad2 = 0, .pad1 = 0,
@@ -517,6 +523,7 @@ nrf_handle_send(void *data)
 		}
 		// (else) FALLTHROUGH
 	case NRF_STATE_SEND_TX_PAYLOAD:
+		/* TODO if TX_FULL is 1 we could fail instantly or FLUSH_TX. */
 		NRF_SET_CTX(NRF_CMD_W_TX_PAYLOAD,
 			nrf_ctx.payload_size, nrf_ctx.payload,
 			0, NULL,
