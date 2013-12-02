@@ -76,6 +76,7 @@ enum nrf_state_t {
 	NRF_STATE_RECV_SET_CE_HIGH,
 	NRF_STATE_RECV_WAITING,
 	NRF_STATE_RECV_FETCH_DATA,
+	NRF_STATE_RECV_POWER_DOWN,
 	NRF_STATE_RECV_USER_DATA,
 	// send
 	NRF_STATE_SEND_SET_RX_LOW,
@@ -84,9 +85,9 @@ enum nrf_state_t {
 	NRF_STATE_SEND_TX_PAYLOAD,
 	NRF_STATE_SEND_SET_CE_HIGH,
 	NRF_STATE_SEND_WAITING,
-	NRF_STATE_SEND_DATA_SENT,
 	NRF_STATE_SEND_MAX_RT,
-	NRF_STATE_SEND_TX_FLUSHED
+	NRF_STATE_SEND_POWER_DOWN,
+	NRF_STATE_SEND_USER_DATA
 };
 
 /* BEGIN nrf registers */
@@ -183,6 +184,7 @@ struct nrf_context_t {
 	enum nrf_crc_encoding_scheme crc_len;
 	uint8_t ard;
 	uint8_t arc;
+	uint8_t power_save;
 	union {
 		struct {
 			uint8_t addr_dirty : 1;
@@ -232,12 +234,14 @@ handle_status(void *data)
 	}
 
 	if (trans->status.TX_DS && nrf_ctx.state == NRF_STATE_SEND_WAITING) {
-		nrf_ctx.state = NRF_STATE_SEND_DATA_SENT;
+		nrf_ctx.state = nrf_ctx.power_save ? NRF_STATE_SEND_POWER_DOWN : NRF_STATE_SEND_USER_DATA;
 		nrf_handle_send(NULL);
 	}
 
 	if (trans->status.MAX_RT && nrf_ctx.state == NRF_STATE_SEND_WAITING) {
 		nrf_ctx.state = NRF_STATE_SEND_MAX_RT;
+		nrf_ctx.payload = NULL;
+		nrf_ctx.payload_size = 0;
 		nrf_handle_send(NULL);
 	}
 
@@ -265,6 +269,8 @@ PORTC_Handler(void)
 void
 nrf_init(void)
 {
+	nrf_ctx.power_save = 0;
+
 	nrf_ctx.ard = 0;
 	nrf_ctx.arc = 3;
 	nrf_ctx.channel = 2;
@@ -312,6 +318,18 @@ nrf_set_autoretransmit(uint8_t delay, uint8_t count)
 }
 
 void
+nrf_enable_powersave()
+{
+	nrf_ctx.power_save = 1;
+}
+
+void
+nrf_disable_powersave()
+{
+	nrf_ctx.power_save = 0;
+}
+
+void
 nrf_receive(struct nrf_addr_t *addr, void *data, uint8_t len, nrf_data_callback cb)
 {
 	nrf_ctx.addr_dirty = nrf_ctx.addr ? nrf_ctx.addr->value != addr->value : 1;
@@ -337,27 +355,19 @@ nrf_send(struct nrf_addr_t *addr, void *data, uint8_t len, nrf_data_callback cb)
 	nrf_handle_send(NULL);
 }
 
-void
-nrf_read_register(uint8_t reg, nrf_callback cb)
+static void
+nrf_prepare_config(uint8_t power_up, uint8_t prim_rx, enum nrf_state_t next)
 {
-	static uint8_t data;
-	nrf_ctx.trans.cmd = NRF_CMD_R_REGISTER | (NRF_REG_MASK & reg);
-	nrf_ctx.trans.tx_len = 0;
-	nrf_ctx.trans.tx_data = NULL;
-	nrf_ctx.trans.rx_len = 1;
-	nrf_ctx.trans.rx_data = &data;
-	send_command(&nrf_ctx.trans, cb, &data);
-}
-
-void
-nrf_write_register(uint8_t reg, void *data, size_t len, nrf_callback cb)
-{
-	nrf_ctx.trans.cmd = NRF_CMD_W_REGISTER | (NRF_REG_MASK & reg);
-	nrf_ctx.trans.tx_len = len;
-	nrf_ctx.trans.tx_data = data;
-	nrf_ctx.trans.rx_len = 0;
-	nrf_ctx.trans.rx_data = NULL;
-	send_command(&nrf_ctx.trans, cb, &data);
+	static struct nrf_reg_config_t config = {
+		.pad = 0, .MASK_MAX_RT = 0, .MASK_TX_DS = 0, .MASK_RX_DR = 0
+	};
+	config.PRIM_RX = prim_rx;
+	config.PWR_UP = power_up;
+	config.CRCO = nrf_ctx.crc_len;
+	NRF_SET_CTX(NRF_CMD_W_REGISTER | (NRF_REG_MASK & NRF_REG_ADDR_CONFIG),
+		1, &config,
+		0, NULL,
+		next);
 }
 
 static void
@@ -425,20 +435,9 @@ nrf_handle_receive(void *data)
 	}
 	case NRF_STATE_SETUP_DONE:
 		// FALLTHROUGH
-	case NRF_STATE_RECV_SET_RX_HIGH: {
-		static struct nrf_reg_config_t config = {
-			.pad = 0,
-			.PRIM_RX = NRF_PRIM_RX_PRX,
-			.PWR_UP = 1,
-			.MASK_MAX_RT = 0, .MASK_TX_DS = 0, .MASK_RX_DR = 0
-		};
-		config.CRCO = nrf_ctx.crc_len;
-		NRF_SET_CTX(NRF_CMD_W_REGISTER | (NRF_REG_MASK & NRF_REG_ADDR_CONFIG),
-			1, &config,
-			0, NULL,
-			NRF_STATE_RECV_SET_PAYLOAD_SIZE);
+	case NRF_STATE_RECV_SET_RX_HIGH:
+		nrf_prepare_config(1, NRF_PRIM_RX_PRX, NRF_STATE_RECV_SET_PAYLOAD_SIZE);
 		break;
-	}
 	case NRF_STATE_RECV_SET_PAYLOAD_SIZE:
 		if (nrf_ctx.payload_size_dirty) {
 			nrf_ctx.payload_size_dirty = 0;
@@ -473,7 +472,10 @@ nrf_handle_receive(void *data)
 		NRF_SET_CTX(NRF_CMD_R_RX_PAYLOAD,
 			0, NULL,
 			nrf_ctx.payload_size, nrf_ctx.payload,
-			NRF_STATE_RECV_USER_DATA);
+			nrf_ctx.power_save ? NRF_STATE_RECV_POWER_DOWN : NRF_STATE_RECV_USER_DATA);
+		break;
+	case NRF_STATE_RECV_POWER_DOWN:
+		nrf_prepare_config(0, NRF_PRIM_RX_PRX, NRF_STATE_RECV_USER_DATA);
 		break;
 	case NRF_STATE_RECV_USER_DATA:
 		nrf_ctx.user_cb(nrf_ctx.payload, nrf_ctx.payload_size);
@@ -492,20 +494,9 @@ nrf_handle_send(void *data)
 	}
 	case NRF_STATE_SETUP_DONE:
 		// FALLTHROUGH
-	case NRF_STATE_SEND_SET_RX_LOW: {
-		static struct nrf_reg_config_t config = {
-			.pad = 0,
-			.PRIM_RX = NRF_PRIM_RX_PTX,
-			.PWR_UP = 1,
-			.MASK_MAX_RT = 0, .MASK_TX_DS = 0, .MASK_RX_DR = 0
-		};
-		config.CRCO = nrf_ctx.crc_len;
-		NRF_SET_CTX(NRF_CMD_W_REGISTER | (NRF_REG_MASK & NRF_REG_ADDR_CONFIG),
-			1, &config,
-			0, NULL,
-			NRF_STATE_SEND_SET_TX_ADDR);
+	case NRF_STATE_SEND_SET_RX_LOW:
+		nrf_prepare_config(1, NRF_PRIM_RX_PTX, NRF_STATE_SEND_SET_TX_ADDR);
 		break;
-	}
 	case NRF_STATE_SEND_SET_TX_ADDR:
 		if (nrf_ctx.addr_dirty) {
 			NRF_SET_CTX(NRF_CMD_W_REGISTER | (NRF_REG_MASK & NRF_REG_ADDR_TX_ADDR),
@@ -537,17 +528,17 @@ nrf_handle_send(void *data)
 		// FALLTHROUGH
 	case NRF_STATE_SEND_WAITING:
 		return;
-	case NRF_STATE_SEND_DATA_SENT:
-		nrf_ctx.user_cb(nrf_ctx.payload, nrf_ctx.payload_size);
-		return;
 	case NRF_STATE_SEND_MAX_RT:
 		NRF_SET_CTX(NRF_CMD_FLUSH_TX,
 			0, NULL,
 			0, NULL,
-			NRF_STATE_SEND_TX_FLUSHED);
+			nrf_ctx.power_save ? NRF_STATE_SEND_POWER_DOWN : NRF_STATE_SEND_USER_DATA);
 		break;
-	case NRF_STATE_SEND_TX_FLUSHED:
-		nrf_ctx.user_cb(NULL, 0);
+	case NRF_STATE_SEND_POWER_DOWN:
+		nrf_prepare_config(0, NRF_PRIM_RX_PTX, NRF_STATE_SEND_USER_DATA);
+		break;
+	case NRF_STATE_SEND_USER_DATA:
+		nrf_ctx.user_cb(nrf_ctx.payload, nrf_ctx.payload_size);
 		return;
 	}
 	send_command(&nrf_ctx.trans, nrf_handle_send, NULL);

@@ -29,10 +29,9 @@ void nrf_init(void);
 void nrf_set_channel(uint8_t ch);
 void nrf_set_power_datarate(enum nrf_tx_output_power_t power, enum nrf_data_rate_t data_rate);
 void nrf_set_autoretransmit(uint8_t delay, uint8_t count); // delay in 250uS's
+void nrf_enable_powersave();
+void nrf_disable_powersave();
 void nrf_receive(struct nrf_addr_t *addr, void *data, uint8_t len, nrf_data_callback cb);
 void nrf_send(struct nrf_addr_t *addr, void *data, uint8_t len, nrf_data_callback cb);
-
-void nrf_read_register(uint8_t reg, nrf_callback cb);
-void nrf_write_register(uint8_t reg, void *data, size_t len, nrf_callback cb);
 
 #endif
