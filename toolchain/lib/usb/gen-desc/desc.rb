@@ -131,7 +131,7 @@ class ConfigDesc < DslItem
 
   def renumber!(confignum)
     @confignum = confignum
-    counts = {:iface => 0, :ep_in => 0, :ep_out => 0}
+    counts = {:iface => 0, :ep_in => 1, :ep_out => 1}
     @function.each do |f|
       counts = f.renumber!(counts)
     end
