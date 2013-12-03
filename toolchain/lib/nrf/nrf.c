@@ -67,21 +67,25 @@ enum nrf_state_t {
 	// setup
 	NRF_STATE_SETUP_SET_POWER_RATE,
 	NRF_STATE_SETUP_SET_CHANNEL,
+	NRF_STATE_SETUP_DPL,
 	NRF_STATE_SETUP_SET_AUTORETR,
 	NRF_STATE_SETUP_DONE,
 	// recv
 	NRF_STATE_RECV_SET_RX_HIGH,
 	NRF_STATE_RECV_SET_PAYLOAD_SIZE,
+	NRF_STATE_RECV_SET_DPL,
 	NRF_STATE_RECV_SET_RX_ADDRESS,
 	NRF_STATE_RECV_SET_CE_HIGH,
 	NRF_STATE_RECV_WAITING,
-	NRF_STATE_RECV_FETCH_DATA,
+	NRF_STATE_RECV_GET_PAYLOAD_SIZE,
+	NRF_STATE_RECV_GET_PAYLOAD,
 	NRF_STATE_RECV_POWER_DOWN,
 	NRF_STATE_RECV_USER_DATA,
 	// send
 	NRF_STATE_SEND_SET_RX_LOW,
 	NRF_STATE_SEND_SET_TX_ADDR,
 	NRF_STATE_SEND_SET_RX_ADDR_P0,
+	NRF_STATE_SEND_SET_DPL,
 	NRF_STATE_SEND_TX_PAYLOAD,
 	NRF_STATE_SEND_SET_CE_HIGH,
 	NRF_STATE_SEND_WAITING,
@@ -156,6 +160,14 @@ struct nrf_retries_t {
 	uint8_t ARD : 4; // in 250us steps, reset value 0
 } __packed;
 CTASSERT_SIZE_BYTE(struct nrf_retries_t, 1);
+
+struct nrf_feature_t {
+	uint8_t EN_DYN_ACK : 1;
+	uint8_t EN_ACK_PAY : 1;
+	uint8_t EN_DPL : 1;
+	uint8_t pad : 5; // 00000
+};
+CTASSERT_SIZE_BYTE(struct nrf_feature_t, 1);
 /* END nrf registers */
 
 struct nrf_transaction_t {
@@ -184,7 +196,13 @@ struct nrf_context_t {
 	enum nrf_crc_encoding_scheme crc_len;
 	uint8_t ard;
 	uint8_t arc;
-	uint8_t power_save;
+	union {
+		struct {
+			uint8_t power_save : 1;
+			uint8_t dynamic_payload : 1;
+		};
+		uint8_t flags;
+	};
 	union {
 		struct {
 			uint8_t addr_dirty : 1;
@@ -192,6 +210,7 @@ struct nrf_context_t {
 			uint8_t channel_dirty : 1;
 			uint8_t power_data_rate_dirty : 1;
 			uint8_t autoretransmit_dirty : 1;
+			uint8_t dynamic_payload_dirty : 1;
 		};
 		uint8_t dirty;
 	};
@@ -229,7 +248,7 @@ handle_status(void *data)
 	struct nrf_transaction_t *trans = data;
 
 	if (trans->status.RX_DR && nrf_ctx.state == NRF_STATE_RECV_WAITING) {
-		nrf_ctx.state = NRF_STATE_RECV_FETCH_DATA;
+		nrf_ctx.state = nrf_ctx.dynamic_payload ? NRF_STATE_RECV_GET_PAYLOAD_SIZE : NRF_STATE_RECV_GET_PAYLOAD;
 		// nrf_ctx.rx_pipe = trans->status.RX_P_NO;
 		nrf_handle_receive(NULL);
 	}
@@ -270,14 +289,14 @@ PORTC_Handler(void)
 void
 nrf_init(void)
 {
-	nrf_ctx.power_save = 0;
-
-	nrf_ctx.ard = 0;
-	nrf_ctx.arc = 3;
 	nrf_ctx.channel = 2;
 	nrf_ctx.data_rate = NRF_DATA_RATE_2MBPS;
 	nrf_ctx.power = NRF_TX_POWER_0DBM;
 	nrf_ctx.crc_len = NRF_CRC_ENC_1_BYTE;
+	nrf_ctx.ard = 0;
+	nrf_ctx.arc = 3;
+	nrf_ctx.power_save = 0;
+	nrf_ctx.dynamic_payload = 0;
 	nrf_ctx.dirty = 1;
 
 	spi_init();
@@ -331,10 +350,24 @@ nrf_disable_powersave()
 }
 
 void
+nrf_enable_dynamic_payload()
+{
+	nrf_ctx.dynamic_payload = 1;
+	nrf_ctx.dynamic_payload_dirty = 1;
+}
+
+void
+nrf_disable_dynamic_payload()
+{
+	nrf_ctx.dynamic_payload = 0;
+	nrf_ctx.dynamic_payload_dirty = 1;
+}
+
+void
 nrf_receive(struct nrf_addr_t *addr, void *data, uint8_t len, nrf_data_callback cb)
 {
 	nrf_ctx.addr_dirty = nrf_ctx.addr ? nrf_ctx.addr->value != addr->value : 1;
-	nrf_ctx.payload_size_dirty = nrf_ctx.payload_size != len;
+	nrf_ctx.payload_size_dirty = nrf_ctx.dynamic_payload ? 0 : nrf_ctx.payload_size != len;
 	nrf_ctx.addr = addr;
 	nrf_ctx.rx_pipe = 1;
 	nrf_ctx.payload_size = len;
@@ -355,6 +388,24 @@ nrf_send(struct nrf_addr_t *addr, void *data, uint8_t len, nrf_data_callback cb)
 	nrf_ctx.state = NRF_STATE_SETUP_SET_POWER_RATE;
 	nrf_handle_send(NULL);
 }
+
+/*void
+nrf_set_rx_addr1(struct nrf_addr_t *addr)
+{
+
+}
+
+void
+nrf_set_rx_addrN(uint8_t pipe, uint8_t addr_lsb)
+{
+
+}
+
+void
+nrf_multiceive(struct nrf_addr_t *addr0, void *data, uint8_t len, nrf_data_pipe_callback cb)
+{
+
+}*/
 
 static void
 nrf_prepare_config(uint8_t power_up, uint8_t prim_rx, enum nrf_state_t next)
@@ -381,7 +432,7 @@ nrf_handle_setup(void *data)
 			// ARD must be at least 500uS for 250kbps (nRF datasheet p34)
 			if (nrf_ctx.data_rate == NRF_DATA_RATE_250KBPS && nrf_ctx.ard == 0) {
 				nrf_ctx.ard = 1; // 500 uS
-				nrf_ctx.autoretransmit_dirty = 1;
+				nrf_ctx.autoretransmit_dirty = 1; // force set ARD
 			}
 			nrf_ctx.power_data_rate_dirty = 0;
 			static struct nrf_rf_setup_t rfsetup = {
@@ -406,6 +457,22 @@ nrf_handle_setup(void *data)
 			ch.RF_CH = nrf_ctx.channel;
 			NRF_SET_CTX(NRF_CMD_W_REGISTER | (NRF_REG_MASK & NRF_REG_ADDR_RF_CH),
 				1, &ch,
+				0, NULL,
+				NRF_STATE_SETUP_DPL);
+			break;
+		}
+		// (else) FALLTHROUGH
+	case NRF_STATE_SETUP_DPL:
+		if  (nrf_ctx.dynamic_payload_dirty) {
+			nrf_ctx.dynamic_payload_dirty = 0;
+			static struct nrf_feature_t feat = {
+				.pad = 0,
+				.EN_DYN_ACK = 0,
+				.EN_ACK_PAY = 0
+			};
+			feat.EN_DPL = nrf_ctx.dynamic_payload;
+			NRF_SET_CTX(NRF_CMD_W_REGISTER | (NRF_REG_MASK & NRF_REG_ADDR_FEATURE),
+				1, &feat,
 				0, NULL,
 				NRF_STATE_SETUP_SET_AUTORETR);
 			break;
@@ -454,10 +521,19 @@ nrf_handle_receive(void *data)
 			NRF_SET_CTX(NRF_CMD_W_REGISTER | (NRF_REG_MASK & (NRF_REG_ADDR_RX_PW_P0 + nrf_ctx.rx_pipe)),
 				1, &dps,
 				0, NULL,
-				NRF_STATE_RECV_SET_RX_ADDRESS);
+				NRF_STATE_RECV_SET_DPL);
 			break;
 		}
 		// (else) FALLTHROUGH
+	case NRF_STATE_RECV_SET_DPL: {
+		static uint8_t dynpd;
+		dynpd = nrf_ctx.dynamic_payload << nrf_ctx.rx_pipe;
+		NRF_SET_CTX(NRF_CMD_W_REGISTER | (NRF_REG_MASK & NRF_REG_ADDR_DYNPD),
+			1, &dynpd,
+			0, NULL,
+			NRF_STATE_RECV_SET_RX_ADDRESS);
+		break;
+	}
 	case NRF_STATE_RECV_SET_RX_ADDRESS:
 		if (nrf_ctx.addr_dirty) {
 			nrf_ctx.addr_dirty = 0;
@@ -474,11 +550,26 @@ nrf_handle_receive(void *data)
 		// FALLTHROUGH
 	case NRF_STATE_RECV_WAITING:
 		return; // wait for interrupt
-	case NRF_STATE_RECV_FETCH_DATA:
-		NRF_SET_CTX(NRF_CMD_R_RX_PAYLOAD,
+	case NRF_STATE_RECV_GET_PAYLOAD_SIZE:
+		NRF_SET_CTX(NRF_CMD_R_RX_PL_WID,
 			0, NULL,
-			nrf_ctx.payload_size, nrf_ctx.payload,
-			nrf_ctx.power_save ? NRF_STATE_RECV_POWER_DOWN : NRF_STATE_RECV_USER_DATA);
+			1, &nrf_ctx.payload_size,
+			NRF_STATE_RECV_GET_PAYLOAD);
+		break;
+	case NRF_STATE_RECV_GET_PAYLOAD:
+		if (nrf_ctx.dynamic_payload && nrf_ctx.payload_size > 32) {
+			// something is wrong with this packet, discard it. (see nrf datasheet p30)
+			nrf_ctx.payload = NULL;
+			NRF_SET_CTX(NRF_CMD_FLUSH_RX,
+				0, NULL,
+				0, NULL,
+				nrf_ctx.power_save ? NRF_STATE_RECV_POWER_DOWN : NRF_STATE_RECV_USER_DATA);
+		} else {
+			NRF_SET_CTX(NRF_CMD_R_RX_PAYLOAD,
+				0, NULL,
+				nrf_ctx.payload_size, nrf_ctx.payload,
+				nrf_ctx.power_save ? NRF_STATE_RECV_POWER_DOWN : NRF_STATE_RECV_USER_DATA);
+		}
 		break;
 	case NRF_STATE_RECV_POWER_DOWN:
 		nrf_prepare_config(0, NRF_PRIM_RX_PRX, NRF_STATE_RECV_USER_DATA);
@@ -518,10 +609,19 @@ nrf_handle_send(void *data)
 			NRF_SET_CTX(NRF_CMD_W_REGISTER | (NRF_REG_MASK & NRF_REG_ADDR_RX_ADDR_P0),
 				nrf_ctx.addr->size, &nrf_ctx.addr->value,
 				0, NULL,
-				NRF_STATE_SEND_TX_PAYLOAD);
+				NRF_STATE_SEND_SET_DPL);
 			break;
 		}
 		// (else) FALLTHROUGH
+	case NRF_STATE_SEND_SET_DPL: {
+		static uint8_t dynpd;
+		dynpd = nrf_ctx.dynamic_payload;
+		NRF_SET_CTX(NRF_CMD_W_REGISTER | (NRF_REG_MASK & NRF_REG_ADDR_DYNPD),
+			1, &dynpd,
+			0, NULL,
+			NRF_STATE_SEND_TX_PAYLOAD);
+		break;
+	}
 	case NRF_STATE_SEND_TX_PAYLOAD:
 		/* TODO if TX_FULL is 1 we could fail instantly or FLUSH_TX. */
 		NRF_SET_CTX(NRF_CMD_W_TX_PAYLOAD,

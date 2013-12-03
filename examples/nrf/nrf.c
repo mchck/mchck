@@ -53,6 +53,7 @@ main(void)
 	nrf_init();
 	nrf_set_channel(16);
 	nrf_set_power_datarate(NRF_TX_POWER_0DBM, NRF_DATA_RATE_1MBPS);
+	nrf_enable_dynamic_payload();
 	nrf_enable_powersave();
 	wait_for_ping();
 	sys_yield_for_frogs();

@@ -32,13 +32,13 @@ void nrf_set_power_datarate(enum nrf_tx_output_power_t power, enum nrf_data_rate
 void nrf_set_autoretransmit(uint8_t delay, uint8_t count); // delay in 250uS's
 void nrf_enable_powersave();
 void nrf_disable_powersave();
-/*void nrf_enable_dynamic_payload();
-void nrf_disable_dynamic_payload();*/
+void nrf_enable_dynamic_payload();
+void nrf_disable_dynamic_payload();
 void nrf_receive(struct nrf_addr_t *addr, void *data, uint8_t len, nrf_data_callback cb);
 void nrf_send(struct nrf_addr_t *addr, void *data, uint8_t len, nrf_data_callback cb);
 // MultiCeiver specific
 /*void nrf_set_rx_addr1(struct nrf_addr_t *addr);
 void nrf_set_rx_addrN(uint8_t pipe, uint8_t addr_lsb);
-void nrf_receive_multi(struct nrf_addr_t *addr0, void *data, uint8_t len, nrf_data_pipe_callback cb);*/
+void nrf_multiceive(struct nrf_addr_t *addr0, void *data, uint8_t len, nrf_data_pipe_callback cb);*/
 
 #endif
