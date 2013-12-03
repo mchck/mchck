@@ -42,3 +42,4 @@ void nrf_set_rx_addrN(uint8_t pipe, uint8_t addr_lsb);
 void nrf_multiceive(struct nrf_addr_t *addr0, void *data, uint8_t len, nrf_data_pipe_callback cb);*/
 
 #endif
+/* vim: set ts=8 sw=8 noexpandtab: */

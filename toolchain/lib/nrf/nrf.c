@@ -185,6 +185,8 @@ struct nrf_transaction_t {
 struct nrf_context_t {
 	struct nrf_transaction_t trans;
 	struct nrf_addr_t *addr;
+	//struct nrf_addr_t *addr1;
+	//uint8_t addrN[4];
 	uint8_t rx_pipe;
 	size_t payload_size;
 	void *payload;
@@ -392,13 +394,13 @@ nrf_send(struct nrf_addr_t *addr, void *data, uint8_t len, nrf_data_callback cb)
 /*void
 nrf_set_rx_addr1(struct nrf_addr_t *addr)
 {
-
+	nrf_ctx.addr1 = addr;
 }
 
 void
 nrf_set_rx_addrN(uint8_t pipe, uint8_t addr_lsb)
 {
-
+	nrf_ctx.addrN[pipe] = addr_lsb;
 }
 
 void
@@ -415,6 +417,7 @@ nrf_prepare_config(uint8_t power_up, uint8_t prim_rx, enum nrf_state_t next)
 	};
 	config.PRIM_RX = prim_rx;
 	config.PWR_UP = power_up;
+	config.EN_CRC = nrf_ctx.crc_len > 0;
 	config.CRCO = nrf_ctx.crc_len;
 	NRF_SET_CTX(NRF_CMD_W_REGISTER | (NRF_REG_MASK & NRF_REG_ADDR_CONFIG),
 		1, &config,
@@ -650,3 +653,4 @@ nrf_handle_send(void *data)
 	}
 	send_command(&nrf_ctx.trans, nrf_handle_send, NULL);
 }
+/* vim: set ts=8 sw=8 noexpandtab: */
