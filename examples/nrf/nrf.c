@@ -1,9 +1,9 @@
 #include <mchck.h>
 #include <nrf/nrf.h>
 
-// Wait for a uint32_t and send it back
+// Wait for (at least) a uint32_t and send it back
 
-#define RX_SIZE 4
+#define RX_SIZE 32
 
 static int32_t tx_buffer = 0;
 static uint8_t rx_buffer[RX_SIZE];
@@ -23,7 +23,7 @@ static void send_ping();
 static void
 ping_sent(void *data, uint8_t len)
 {
-	if (!len)
+	if (!data)
 		onboard_led(ONBOARD_LED_TOGGLE); // send failed, max RT reached
 	wait_for_ping();
 }
@@ -51,10 +51,13 @@ int
 main(void)
 {
 	nrf_init();
+	nrf_set_autoretransmit(3, 5); // 1000us, 5x
 	nrf_set_channel(16);
 	nrf_set_power_datarate(NRF_TX_POWER_0DBM, NRF_DATA_RATE_1MBPS);
 	nrf_enable_dynamic_payload();
-	nrf_enable_powersave();
-	wait_for_ping();
+	// nrf_enable_powersave();
+	send_ping();
 	sys_yield_for_frogs();
 }
+
+/* vim: set ts=8 sw=8 noexpandtab: */
