@@ -69,6 +69,8 @@ extern "C" {
 
 #include <usb/usb.h>
 
+#include <nrf/nrf.h>
+
 #ifdef __cplusplus
 }
 #endif
