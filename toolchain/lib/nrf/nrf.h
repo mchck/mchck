@@ -17,12 +17,16 @@ enum nrf_data_rate_t {
 	NRF_DATA_RATE_2MBPS = 0x4 // default
 };
 
+enum nrf_crc_encoding_scheme_t {
+	NRF_CRC_ENC_1_BYTE = 0, // default
+	NRF_CRC_ENC_2_BYTES = 1
+};
+
 struct nrf_addr_t {
 	uint64_t value; // 40 bits max
 	uint8_t size;
 };
 
-typedef void (nrf_data_pipe_callback)(uint8_t, void *, uint8_t);
 typedef void (nrf_data_callback)(void *, uint8_t);
 
 
@@ -34,12 +38,10 @@ void nrf_enable_powersave();
 void nrf_disable_powersave();
 void nrf_enable_dynamic_payload();
 void nrf_disable_dynamic_payload();
+void nrf_set_crc_length(enum nrf_crc_encoding_scheme_t len);
 void nrf_receive(struct nrf_addr_t *addr, void *data, uint8_t len, nrf_data_callback cb);
 void nrf_send(struct nrf_addr_t *addr, void *data, uint8_t len, nrf_data_callback cb);
-// MultiCeiver specific
-/*void nrf_set_rx_addr1(struct nrf_addr_t *addr);
-void nrf_set_rx_addrN(uint8_t pipe, uint8_t addr_lsb);
-void nrf_multiceive(struct nrf_addr_t *addr0, void *data, uint8_t len, nrf_data_pipe_callback cb);*/
 
 #endif
+
 /* vim: set ts=8 sw=8 noexpandtab: */

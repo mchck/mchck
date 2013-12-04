@@ -108,10 +108,7 @@ struct nrf_reg_config_t {
 		NRF_PRIM_RX_PRX = 1
 	} PRIM_RX : 1;
 	uint8_t PWR_UP : 1;
-	enum nrf_crc_encoding_scheme {
-		NRF_CRC_ENC_1_BYTE = 0, // reset value
-		NRF_CRC_ENC_2_BYTES = 1
-	} CRCO : 1;
+	enum nrf_crc_encoding_scheme_t CRCO : 1; // reset value 0
 	uint8_t EN_CRC : 1;  // reset value 1
 	uint8_t MASK_MAX_RT : 1;
 	uint8_t MASK_TX_DS : 1;
@@ -202,7 +199,7 @@ struct nrf_context_t {
 	uint8_t channel;
 	enum nrf_data_rate_t data_rate;
 	enum nrf_tx_output_power_t power;
-	enum nrf_crc_encoding_scheme crc_len;
+	enum nrf_crc_encoding_scheme_t crc_len;
 	uint8_t ard;
 	uint8_t arc;
 	union {
@@ -374,6 +371,12 @@ nrf_disable_dynamic_payload()
 }
 
 void
+nrf_set_crc_length(enum nrf_crc_encoding_scheme_t len)
+{
+	nrf_ctx.crc_len = len;
+}
+
+void
 nrf_receive(struct nrf_addr_t *addr, void *data, uint8_t len, nrf_data_callback cb)
 {
 	nrf_ctx.addr_dirty = nrf_ctx.addr ? nrf_ctx.addr->value != addr->value : 1;
@@ -383,7 +386,7 @@ nrf_receive(struct nrf_addr_t *addr, void *data, uint8_t len, nrf_data_callback 
 	nrf_ctx.payload_size = len;
 	nrf_ctx.payload = data;
 	nrf_ctx.user_cb = cb;
-	nrf_ctx.dynamic_payload_dirty |= (nrf_ctx.state & NRF_STATE_RECV != NRF_STATE_RECV);
+	nrf_ctx.dynamic_payload_dirty |= ((nrf_ctx.state & NRF_STATE_RECV) != NRF_STATE_RECV);
 	nrf_ctx.state = NRF_STATE_SETUP_SET_POWER_RATE;
 	nrf_handle_receive(NULL);
 }
@@ -396,28 +399,10 @@ nrf_send(struct nrf_addr_t *addr, void *data, uint8_t len, nrf_data_callback cb)
 	nrf_ctx.payload_size = len;
 	nrf_ctx.payload = data;
 	nrf_ctx.user_cb = cb;
-	nrf_ctx.dynamic_payload_dirty |= (nrf_ctx.state & NRF_STATE_SEND != NRF_STATE_SEND);
+	nrf_ctx.dynamic_payload_dirty |= ((nrf_ctx.state & NRF_STATE_SEND) != NRF_STATE_SEND);
 	nrf_ctx.state = NRF_STATE_SETUP_SET_POWER_RATE;
 	nrf_handle_send(NULL);
 }
-
-/*void
-nrf_set_rx_addr1(struct nrf_addr_t *addr)
-{
-	nrf_ctx.addr1 = addr;
-}
-
-void
-nrf_set_rx_addrN(uint8_t pipe, uint8_t addr_lsb)
-{
-	nrf_ctx.addrN[pipe] = addr_lsb;
-}
-
-void
-nrf_multiceive(struct nrf_addr_t *addr0, void *data, uint8_t len, nrf_data_pipe_callback cb)
-{
-
-}*/
 
 static void
 nrf_prepare_config(uint8_t power_up, uint8_t prim_rx, enum nrf_state_t next)
@@ -668,4 +653,5 @@ nrf_handle_send(void *data)
 	}
 	send_command(&nrf_ctx.trans, nrf_handle_send, NULL);
 }
+
 /* vim: set ts=8 sw=8 noexpandtab: */
