@@ -49,12 +49,12 @@ enum NRF_REG_ADDR {
 
 /* pin mapping */
 enum {
-	NRF_CE   = PIN_PTC3,
-	NRF_CSN  = PIN_PTC2,
-	NRF_SCK  = PIN_PTC5,
-	NRF_MOSI = PIN_PTC6,
-	NRF_MISO = PIN_PTC7,
-	NRF_IRQ  = PIN_PTC4
+	NRF_CE		= PIN_PTC3,
+	NRF_CSN		= PIN_PTC2,
+	NRF_SCK		= PIN_PTC5,
+	NRF_MOSI	= PIN_PTC6,
+	NRF_MISO	= PIN_PTC7,
+	NRF_IRQ		= PIN_PTC4
 };
 
 /* SPI */
@@ -62,16 +62,23 @@ enum {
 	NRF_SPI_CS = SPI_PCS2
 };
 
-/* nrf lib state */
+/* nrf lib states (key) */
+enum {
+	NRF_STATE_SETUP	= 0,
+	NRF_STATE_RECV	= 0x20,
+	NRF_STATE_SEND	= 0x40
+};
+
+/* nrf lib states (all) */
 enum nrf_state_t {
 	// setup
-	NRF_STATE_SETUP_SET_POWER_RATE,
+	NRF_STATE_SETUP_SET_POWER_RATE	= NRF_STATE_SETUP,
 	NRF_STATE_SETUP_SET_CHANNEL,
 	NRF_STATE_SETUP_DPL,
 	NRF_STATE_SETUP_SET_AUTORETR,
 	NRF_STATE_SETUP_DONE,
 	// recv
-	NRF_STATE_RECV_SET_RX_HIGH,
+	NRF_STATE_RECV_SET_RX_HIGH	= NRF_STATE_RECV,
 	NRF_STATE_RECV_SET_PAYLOAD_SIZE,
 	NRF_STATE_RECV_SET_DPL,
 	NRF_STATE_RECV_SET_RX_ADDRESS,
@@ -82,7 +89,7 @@ enum nrf_state_t {
 	NRF_STATE_RECV_POWER_DOWN,
 	NRF_STATE_RECV_USER_DATA,
 	// send
-	NRF_STATE_SEND_SET_RX_LOW,
+	NRF_STATE_SEND_SET_RX_LOW	= NRF_STATE_SEND,
 	NRF_STATE_SEND_SET_TX_ADDR,
 	NRF_STATE_SEND_SET_RX_ADDR_P0,
 	NRF_STATE_SEND_SET_DPL,
@@ -291,6 +298,7 @@ PORTC_Handler(void)
 void
 nrf_init(void)
 {
+	nrf_ctx.state = 0;
 	nrf_ctx.channel = 2;
 	nrf_ctx.data_rate = NRF_DATA_RATE_2MBPS;
 	nrf_ctx.power = NRF_TX_POWER_0DBM;
@@ -375,6 +383,7 @@ nrf_receive(struct nrf_addr_t *addr, void *data, uint8_t len, nrf_data_callback 
 	nrf_ctx.payload_size = len;
 	nrf_ctx.payload = data;
 	nrf_ctx.user_cb = cb;
+	nrf_ctx.dynamic_payload_dirty |= (nrf_ctx.state & NRF_STATE_RECV != NRF_STATE_RECV);
 	nrf_ctx.state = NRF_STATE_SETUP_SET_POWER_RATE;
 	nrf_handle_receive(NULL);
 }
@@ -387,6 +396,7 @@ nrf_send(struct nrf_addr_t *addr, void *data, uint8_t len, nrf_data_callback cb)
 	nrf_ctx.payload_size = len;
 	nrf_ctx.payload = data;
 	nrf_ctx.user_cb = cb;
+	nrf_ctx.dynamic_payload_dirty |= (nrf_ctx.state & NRF_STATE_SEND != NRF_STATE_SEND);
 	nrf_ctx.state = NRF_STATE_SETUP_SET_POWER_RATE;
 	nrf_handle_send(NULL);
 }
@@ -413,11 +423,10 @@ static void
 nrf_prepare_config(uint8_t power_up, uint8_t prim_rx, enum nrf_state_t next)
 {
 	static struct nrf_reg_config_t config = {
-		.pad = 0, .MASK_MAX_RT = 0, .MASK_TX_DS = 0, .MASK_RX_DR = 0
+		.pad = 0, .MASK_MAX_RT = 0, .MASK_TX_DS = 0, .MASK_RX_DR = 0, .EN_CRC = 1
 	};
 	config.PRIM_RX = prim_rx;
 	config.PWR_UP = power_up;
-	config.EN_CRC = nrf_ctx.crc_len > 0;
 	config.CRCO = nrf_ctx.crc_len;
 	NRF_SET_CTX(NRF_CMD_W_REGISTER | (NRF_REG_MASK & NRF_REG_ADDR_CONFIG),
 		1, &config,
@@ -467,7 +476,7 @@ nrf_handle_setup(void *data)
 		// (else) FALLTHROUGH
 	case NRF_STATE_SETUP_DPL:
 		if  (nrf_ctx.dynamic_payload_dirty) {
-			nrf_ctx.dynamic_payload_dirty = 0;
+			// nrf_ctx.dynamic_payload_dirty is cleared by send/recv
 			static struct nrf_feature_t feat = {
 				.pad = 0,
 				.EN_DYN_ACK = 0,
@@ -528,15 +537,18 @@ nrf_handle_receive(void *data)
 			break;
 		}
 		// (else) FALLTHROUGH
-	case NRF_STATE_RECV_SET_DPL: {
-		static uint8_t dynpd;
-		dynpd = nrf_ctx.dynamic_payload << nrf_ctx.rx_pipe;
-		NRF_SET_CTX(NRF_CMD_W_REGISTER | (NRF_REG_MASK & NRF_REG_ADDR_DYNPD),
-			1, &dynpd,
-			0, NULL,
-			NRF_STATE_RECV_SET_RX_ADDRESS);
-		break;
-	}
+	case NRF_STATE_RECV_SET_DPL:
+		if (nrf_ctx.dynamic_payload_dirty) {
+			nrf_ctx.dynamic_payload_dirty = 0;
+			static uint8_t dynpd;
+			dynpd = nrf_ctx.dynamic_payload << nrf_ctx.rx_pipe;
+			NRF_SET_CTX(NRF_CMD_W_REGISTER | (NRF_REG_MASK & NRF_REG_ADDR_DYNPD),
+				1, &dynpd,
+				0, NULL,
+				NRF_STATE_RECV_SET_RX_ADDRESS);
+			break;
+		}
+		// (else) FALLTHROUGH
 	case NRF_STATE_RECV_SET_RX_ADDRESS:
 		if (nrf_ctx.addr_dirty) {
 			nrf_ctx.addr_dirty = 0;
@@ -616,15 +628,18 @@ nrf_handle_send(void *data)
 			break;
 		}
 		// (else) FALLTHROUGH
-	case NRF_STATE_SEND_SET_DPL: {
-		static uint8_t dynpd;
-		dynpd = nrf_ctx.dynamic_payload;
-		NRF_SET_CTX(NRF_CMD_W_REGISTER | (NRF_REG_MASK & NRF_REG_ADDR_DYNPD),
-			1, &dynpd,
-			0, NULL,
-			NRF_STATE_SEND_TX_PAYLOAD);
-		break;
-	}
+	case NRF_STATE_SEND_SET_DPL:
+		if (nrf_ctx.dynamic_payload_dirty) {
+			nrf_ctx.dynamic_payload_dirty = 0;
+			static uint8_t dynpd;
+			dynpd = nrf_ctx.dynamic_payload;
+			NRF_SET_CTX(NRF_CMD_W_REGISTER | (NRF_REG_MASK & NRF_REG_ADDR_DYNPD),
+				1, &dynpd,
+				0, NULL,
+				NRF_STATE_SEND_TX_PAYLOAD);
+			break;
+		}
+		// (else) FALLTHROUGH
 	case NRF_STATE_SEND_TX_PAYLOAD:
 		/* TODO if TX_FULL is 1 we could fail instantly or FLUSH_TX. */
 		NRF_SET_CTX(NRF_CMD_W_TX_PAYLOAD,
