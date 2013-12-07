@@ -9,3 +9,7 @@
 *.linkdep
 .mchckrc
 *.desc.[ch]
+.cproject
+.gdbinit
+.project
+.settings
