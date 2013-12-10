@@ -4,6 +4,21 @@
 
 #define UNUSED __attribute__((unused))
 
+#define BUFFER_LENGTH 32
+
+struct wire_s {
+    uint8_t rxBuffer[BUFFER_LENGTH];
+    uint8_t rxBufferIndex;
+    uint8_t rxBufferLength;
+
+    uint8_t txAddress;
+    uint8_t txBuffer[BUFFER_LENGTH];
+    uint8_t txBufferIndex;
+    uint8_t txBufferLength;
+
+    uint8_t transmitting;
+};
+
 struct wire_s wire;
 
 static void i2c_wait(void) {
@@ -13,6 +28,7 @@ static void i2c_wait(void) {
 }
 
 void wire_begin() {
+	// Enable I2C clock
 	SIM.scgc4.i2c0 = 1;
 
 	// On Teensy 3.0 external pullup resistors *MUST* be used
@@ -20,8 +36,9 @@ void wire_begin() {
 	// I2C will not work at all without pullup resistors
 	pin_mode(PIN_PTB2, PIN_MODE_MUX_ALT2 | PIN_MODE_PULLUP | PIN_MODE_OPEN_DRAIN_ON);
 	pin_mode(PIN_PTB3, PIN_MODE_MUX_ALT2 | PIN_MODE_PULLUP | PIN_MODE_OPEN_DRAIN_ON);
+
 	I2C0.f = (struct I2C_F ) { .mult = I2C_MULT_1, .icr = 0x1B };
-//	I2C0.c2.hdrs = 1;
+	I2C0.c2.hdrs = 1;
 	I2C0.c1.raw = ((struct I2C_C1) {.iicen=1} ).raw;
 }
 

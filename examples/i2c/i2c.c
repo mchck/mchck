@@ -1,9 +1,11 @@
 #include <mchck.h>
+#include <stdfix.h>
 
 #include "i2c.desc.h"
 
 #include "wire.h"
 
+// Silence warnings about unused variables
 #define UNUSED __attribute__((unused))
 
 // Silence warnings about %k,%K,%r,%R in printfs
@@ -127,7 +129,7 @@ void i2c_send(uint8_t address, uint8_t *data, unsigned int len) {
 	I2C0.d = (address << 1) | 0x00; // LSB = 0 => write transaction
 }
 
-void i2c_receive(uint8_t address, uint8_t* data, unsigned int len) {
+void i2c_receive(uint8_t address, uint8_t *data, unsigned int len) {
 	// change ctx
 	ctx.state = I2C_STATE_RX;
 	ctx.cur_buf = data;
@@ -140,7 +142,7 @@ void i2c_receive(uint8_t address, uint8_t* data, unsigned int len) {
 	I2C0.d = (address << 1) | 0x01; // LSB = 1 => read transaction
 }
 
-void read_mpu6050(void *data) {
+void read_mpu6050(void *cbdata) {
 	// receive whoami data
 	uint8_t whoami_req[1] = { 0x75 };
 	uint8_t whoami = 0;
@@ -164,7 +166,7 @@ void delay(int n)
         asm("nop");
 }
 
-void read_tmp101(void *data) {
+void read_tmp101(void *cbdata) {
 	onboard_led(ONBOARD_LED_ON);
 	delay(50);
 
@@ -185,7 +187,7 @@ void read_tmp101(void *data) {
 	printf("temperature: %x %x\r\n", temperature[0], temperature[1]);
 }
 
-void wire_read_tmp101(void *data) {
+void wire_read_tmp101(void *cbdata) {
 	onboard_led(ONBOARD_LED_ON);
 	delay(50);
 
@@ -200,13 +202,16 @@ void wire_read_tmp101(void *data) {
 	wire_write(0x0);
 	wire_endTransmission(1);
 
-	uint8_t temperature[2];
 	wire_requestFrom(TMP101_ADDR, 2, 1);
-	temperature[0] = wire_read();
-	temperature[1] = wire_read();
-	accum a = temperature[0] + temperature[1] / 256k;
-	printf("temperature: %.2k\n", a);
+	uint8_t data[2];
+	data[0] = wire_read();
+	data[1] = wire_read();
+	accum c = data[0] + data[1] / 256k;
+	accum f = c * 9k / 5k + 32;
+	printf("temperature: %.2k\n", f);
+
 	onboard_led(ONBOARD_LED_OFF);
+
 	timeout_add(&t, 1000, wire_read_tmp101, NULL);
 }
 
