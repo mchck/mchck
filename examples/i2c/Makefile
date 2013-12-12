@@ -1,5 +1,5 @@
-PROG=i2c
+PROG=tmp101a
 
-SRCS+=${PROG}.c wire.c t3.c i2c.desc
+SRCS+=${PROG}.c tmp101a.desc
 
 include ../../toolchain/mchck.mk

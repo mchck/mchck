@@ -1,22 +1,21 @@
 #include <mchck.h>
-#include "i2c.h"
 
 // Silence warnings about unused variables
 #define UNUSED __attribute__((unused))
 
-i2c_cb *rxCb;
-void *rxCbdata;
-uint8_t *rxBuffer;
-int rxLength;
-int rxIndex;
+static i2c_cb *rxCb;
+static void *rxCbdata;
+static uint8_t *rxBuffer;
+static int rxLength;
+static int rxIndex;
 
-i2c_cb *txCb;
-void *txCbdata;
-int txLength;
-int txIndex;
-uint8_t *txBuffer;
+static i2c_cb *txCb;
+static void *txCbdata;
+static int txLength;
+static int txIndex;
+static uint8_t *txBuffer;
 
-enum i2c_state {
+static enum i2c_state {
     I2C_STATE_IDLE,
     I2C_STATE_TX,
     I2C_STATE_RX,
