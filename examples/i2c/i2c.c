@@ -3,6 +3,7 @@
 
 #include "i2c.desc.h"
 
+#include "t3.h"
 #include "wire.h"
 
 // Silence warnings about unused variables
@@ -12,6 +13,10 @@
 #pragma GCC diagnostic ignored "-Wformat"
 #pragma GCC diagnostic ignored "-Wformat-extra-args"
 
+#define TMP101_ADDR	0x48
+#define	TEMPERATURE_REGISTER	0x00
+#define	CONFIGURATION_REGISTER	0x01
+#define	CONFIG_12_BITS			0b01100000
 
 static struct cdc_ctx cdc;
 
@@ -27,6 +32,8 @@ void init_vcdc(int config) {
 
 static struct timeout_ctx t;
 
+//#define SMEDING
+#ifdef SMEDING
 #define MPU6050_ADDR 0b1101000
 
 struct acc_value {
@@ -158,24 +165,15 @@ void read_mpu6050(void *cbdata) {
 	timeout_add(&t, 1000, read_mpu6050, NULL);
 }
 
-#define TMP101_ADDR	0x48
-
-void delay(int n)
-{
-    while (--n)
-        asm("nop");
-}
-
 void read_tmp101(void *cbdata) {
 	onboard_led(ONBOARD_LED_ON);
-	delay(50);
 
-	uint8_t configure[] = { 0x01, 0b01100000 };
+	uint8_t configure[] = { CONFIGURATION_REGISTER, CONFIG_12_BITS };
 	i2c_send(TMP101_ADDR, configure, sizeof(configure));
 	onboard_led(ONBOARD_LED_OFF);
 	while (ctx.state != I2C_STATE_IDLE)
 		;
-	uint8_t read_temp[] = { 0x00 };
+	uint8_t read_temp[] = { TEMPERATURE_REGISTER };
 	i2c_send(TMP101_ADDR, read_temp, sizeof(configure));
 	while (ctx.state != I2C_STATE_IDLE)
 		;
@@ -186,35 +184,61 @@ void read_tmp101(void *cbdata) {
 
 	printf("temperature: %x %x\r\n", temperature[0], temperature[1]);
 }
+#endif
 
 void wire_read_tmp101(void *cbdata) {
 	onboard_led(ONBOARD_LED_ON);
-	delay(50);
 
 	wire_begin();
 
 	wire_beginTransmission(TMP101_ADDR);
-	wire_write(0x01);
-	wire_write(0b01100000);
-	wire_endTransmission(1);
+	wire_write(CONFIGURATION_REGISTER);
+	wire_write(CONFIG_12_BITS);
+	wire_endTransmission(0);
 
 	wire_beginTransmission(TMP101_ADDR);
-	wire_write(0x0);
-	wire_endTransmission(1);
+	wire_write(TEMPERATURE_REGISTER);
+	wire_endTransmission(0);
 
-	wire_requestFrom(TMP101_ADDR, 2, 1);
 	uint8_t data[2];
+	wire_requestFrom(TMP101_ADDR, sizeof(data), 1);
 	data[0] = wire_read();
 	data[1] = wire_read();
 	accum c = data[0] + data[1] / 256k;
-	accum f = c * 9k / 5k + 32;
-	printf("temperature: %.2k\n", f);
+	accum f = c * 9k / 5k + 32k;
+	printf("temperature: %.2k\r\n", f);
 
 	onboard_led(ONBOARD_LED_OFF);
 
 	timeout_add(&t, 1000, wire_read_tmp101, NULL);
 }
 
+void t3_read_tmp101(void *cbdata) {
+	onboard_led(ONBOARD_LED_ON);
+
+	t3_begin(I2C_MASTER, 0, 0, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_100);
+
+	t3_beginTransmission(TMP101_ADDR);
+	t3_write(CONFIGURATION_REGISTER);
+	t3_write(CONFIG_12_BITS);
+	onboard_led(ONBOARD_LED_OFF);
+	t3_endTransmission(I2C_STOP);
+
+	t3_beginTransmission(TMP101_ADDR);
+	t3_write(TEMPERATURE_REGISTER);
+	t3_endTransmission(I2C_NOSTOP);
+
+	uint8_t data[2];
+	t3_requestFrom(TMP101_ADDR, sizeof(data), I2C_STOP);
+	data[0] = t3_read();
+	data[1] = t3_read();
+	accum c = data[0] + data[1] / 256k;
+	accum f = c * 9k / 5k + 32k;
+	printf("temperature: %.2k\r\n", f);
+
+
+//	timeout_add(&t, 1000, t3_read_tmp101, NULL);
+}
 
 void main(void) {
 	SIM.scgc5.portb = 1;
@@ -226,8 +250,10 @@ void main(void) {
 
 	timeout_init();
 	usb_init(&cdc_device);
+#ifdef SMEDING
 	i2c_init();
+#endif
 
-	timeout_add(&t, 1000, wire_read_tmp101, NULL);
+	timeout_add(&t, 1000, t3_read_tmp101, NULL);
 	sys_yield_for_frogs();
 }

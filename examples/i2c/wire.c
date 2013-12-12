@@ -58,14 +58,12 @@ uint8_t wire_endTransmission(uint8_t sendStop) {
 	// now take control of the bus...
 	if (I2C0.c1.mst) {
 		// we are already the bus master, so send a repeated start
-		//		I2C0_C1 = I2C_C1_IICEN | I2C_C1_MST | I2C_C1_RSTA | I2C_C1_TX;
 		I2C0.c1.raw = ((struct I2C_C1) {.iicen=1, .mst=1, .tx=1, .rsta=1} ).raw;
 	} else {
 		// we are not currently the bus master, so wait for bus ready
 		while (I2C0.s.busy)
 			;
 		// become the bus master in transmit mode (send start)
-		//		I2C0_C1 = I2C_C1_IICEN | I2C_C1_MST | I2C_C1_TX;
 		I2C0.c1.raw = ((struct I2C_C1) {.iicen=1, .mst=1, .tx=1} ).raw;
 	}
 	// transmit the address and data
@@ -85,7 +83,6 @@ uint8_t wire_endTransmission(uint8_t sendStop) {
 	}
 	if (sendStop) {
 		// send the stop condition
-		//		I2C0_C1 = I2C_C1_IICEN;
 		I2C0.c1.raw = ((struct I2C_C1) {.iicen=1} ).raw;
 		// TODO: do we wait for this somehow?
 	}
@@ -107,14 +104,12 @@ uint8_t wire_requestFrom(uint8_t address, uint8_t length, uint8_t sendStop) {
 	// now take control of the bus...
 	if (I2C0.c1.mst) {
 		// we are already the bus master, so send a repeated start
-		//		I2C0_C1 = I2C_C1_IICEN | I2C_C1_MST | I2C_C1_RSTA | I2C_C1_TX;
 		I2C0.c1.raw = ((struct I2C_C1) {.iicen=1, .mst=1, .tx=1, .rsta=1} ).raw;
 	} else {
 		// we are not currently the bus master, so wait for bus ready
 		while (I2C0.s.busy)
 			;
 		// become the bus master in transmit mode (send start)
-		//		I2C0_C1 = I2C_C1_IICEN | I2C_C1_MST | I2C_C1_TX;
 		I2C0.c1.raw = ((struct I2C_C1) {.iicen=1, .mst=1, .tx=1} ).raw;
 	}
 	// send the address
@@ -124,21 +119,17 @@ uint8_t wire_requestFrom(uint8_t address, uint8_t length, uint8_t sendStop) {
 	if ((status.rxak) || (status.arbl)) {
 		// the slave device did not acknowledge
 		// or we lost bus arbitration to another master
-		//		I2C0_C1 = I2C_C1_IICEN;
 		I2C0.c1.raw = ((struct I2C_C1) {.iicen=1} ).raw;
 		return 0;
 	}
 	if (length == 0) {
 		// TODO: does anybody really do zero length reads?
 		// if so, does this code really work?
-		//		I2C0_C1 = I2C_C1_IICEN | (sendStop ? 0 : I2C_C1_MST);
 		I2C0.c1.raw = ((struct I2C_C1) {.iicen=1, .mst = sendStop ? 0 : 1} ).raw;
 		return 0;
 	} else if (length == 1) {
-		//		I2C0_C1 = I2C_C1_IICEN | I2C_C1_MST | I2C_C1_TXAK;
 		I2C0.c1.raw = ((struct I2C_C1) {.iicen=1, .mst=1, .txak=1} ).raw;
 	} else {
-		//		I2C0_C1 = I2C_C1_IICEN | I2C_C1_MST;
 		I2C0.c1.raw = ((struct I2C_C1) {.iicen=1, .mst=1} ).raw;
 	}
 	tmp = I2C0.d; // initiate the first receive
@@ -146,18 +137,15 @@ uint8_t wire_requestFrom(uint8_t address, uint8_t length, uint8_t sendStop) {
 		i2c_wait();
 		length--;
 		if (length == 1) {
-			//			I2C0_C1 = I2C_C1_IICEN | I2C_C1_MST | I2C_C1_TXAK;
 			I2C0.c1.raw = ((struct I2C_C1) {.iicen=1, .mst=1, .txak=1} ).raw;
 		}
 		wire.rxBuffer[count++] = I2C0.d;
 	}
 	i2c_wait();
-	//	I2C0_C1 = I2C_C1_IICEN | I2C_C1_MST | I2C_C1_TX;
 	I2C0.c1.raw = ((struct I2C_C1) {.iicen=1, .mst=1, .tx=1} ).raw;
 
 	wire.rxBuffer[count++] = I2C0.d;
 	if (sendStop) {
-		//		I2C0_C1 = I2C_C1_IICEN;
 		I2C0.c1.raw = ((struct I2C_C1) {.iicen=1} ).raw;
 	}
 	wire.rxBufferLength = count;
