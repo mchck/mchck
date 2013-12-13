@@ -88,8 +88,6 @@ void i2c_init()
 }
 
 void i2c_recv(uint8_t address, uint8_t *data, int length, i2c_cb *cb, void *cbdata) {
-    blink(20);
-    
     rxBuffer = data;
     rxLength = length;
     rxIndex = 0;
@@ -101,8 +99,6 @@ void i2c_recv(uint8_t address, uint8_t *data, int length, i2c_cb *cb, void *cbda
 }
 
 void i2c_send(uint8_t *data, int length, i2c_cb *cb, void *cbdata) {
-    blink(20);
-
     txBuffer = data;
     txLength = length;
     txIndex = 0;
