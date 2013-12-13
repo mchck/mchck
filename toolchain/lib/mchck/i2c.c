@@ -76,9 +76,9 @@ void I2C0_Handler(void) {
 
 void i2c_init()
 {
-	SIM.scgc5.portb = 1;
-	pin_mode(PIN_PTB2, PIN_MODE_MUX_ALT2 | PIN_MODE_PULLUP | PIN_MODE_OPEN_DRAIN_ON);
-	pin_mode(PIN_PTB3, PIN_MODE_MUX_ALT2 | PIN_MODE_PULLUP | PIN_MODE_OPEN_DRAIN_ON);
+    SIM.scgc5.portb = 1;
+    pin_mode(PIN_PTB2, PIN_MODE_MUX_ALT2 | PIN_MODE_PULLUP | PIN_MODE_OPEN_DRAIN_ON);
+    pin_mode(PIN_PTB3, PIN_MODE_MUX_ALT2 | PIN_MODE_PULLUP | PIN_MODE_OPEN_DRAIN_ON);
 
     SIM.scgc4.i2c0 = 1;
     I2C0.f = (struct I2C_F ) { .mult = I2C_MULT_1, .icr = 0x1B };

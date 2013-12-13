@@ -15,7 +15,7 @@ void init_vcdc(int config) {
 static struct timeout_ctx t;
 
 void delay(int n) {
-    while(n--)
+    while (n--)
         asm("nop");
 }
 
@@ -38,12 +38,11 @@ void part1(void *cbdata);
 void part4(uint8_t *data, int length, void *cbdata) {
     blink(50);
     // Work in 1000ths of a degree to allow rounding to 100ths
-    long c = data[0] * 1000 + (int)((data[1]*1000)/256);
+    long c = data[0] * 1000 + (int) ((data[1] * 1000) / 256);
     long f = c * 9 / 5 + 32000;
     printf("temperature: %ld.%02ldC %ld.%02ldF\r\n",
-        c / 1000, ((c + 5) % 1000) / 10,
-        f / 1000, ((f + 5) % 1000) / 10);
-	timeout_add(&t, TIMEOUT_REPEAT, part1, NULL);
+            c / 1000, ((c + 5) % 1000) / 10, f / 1000, ((f + 5) % 1000) / 10);
+    timeout_add(&t, TIMEOUT_REPEAT, part1, NULL);
 }
 
 void part3(uint8_t *sent, int length, void *cbdata) {
@@ -66,7 +65,7 @@ void main(void) {
     usb_init(&cdc_device);
     i2c_init();
 
-	timeout_add(&t, TIMEOUT_REPEAT, part1, NULL);
+    timeout_add(&t, TIMEOUT_REPEAT, part1, NULL);
 
-	sys_yield_for_frogs();
+    sys_yield_for_frogs();
 }
