@@ -50,19 +50,19 @@ void part4(uint8_t *data, int length, void *cbdata) {
 void part3(uint8_t *sent, int length, void *cbdata) {
     delay(20);
     static uint8_t buffer[2];
-    i2c_recv(TMP101_ADDR, buffer, sizeof(buffer), part4, NULL);
+    i2c_recv(TMP101_ADDR, buffer, sizeof(buffer), I2C_STOP, part4, NULL);
 }
 
 void part2(uint8_t *sent, int length, void *cbdata) {
     delay(20);
     static uint8_t cmd[] = { TMP101_ADDR, TEMPERATURE_REGISTER };
-    i2c_send(cmd, sizeof(cmd), part3, NULL);
+    i2c_send(cmd, sizeof(cmd), I2C_NOSTOP, part3, NULL);
 }
 
 void part1(void *cbdata) {
     blink(10);
     static uint8_t cmd[] = { TMP101_ADDR, CONFIGURATION_REGISTER, CONFIG_12_BITS };
-    i2c_send(cmd, sizeof(cmd), part2, NULL);
+    i2c_send(cmd, sizeof(cmd), I2C_NOSTOP, part2, NULL);
 }
 
 void main(void) {
