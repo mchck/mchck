@@ -7,9 +7,12 @@ static void new_data(uint8_t *data, size_t len) {
     cdc_read_more(&cdc);
 }
 
+static volatile int usb_ready = 0;
+
 void init_vcdc(int config) {
     cdc_init(new_data, NULL, &cdc);
     cdc_set_stdout(&cdc);
+    usb_ready = 1;
 }
 
 static struct timeout_ctx t;
@@ -26,7 +29,7 @@ void blink(int n) {
     delay(n);
 }
 
-#define TMP101_ADDR 0x48
+#define TMP101_ADDR             0x48
 #define TEMPERATURE_REGISTER    0x00
 #define CONFIGURATION_REGISTER  0x01
 #define CONFIG_12_BITS          0b01100000
@@ -36,7 +39,6 @@ void blink(int n) {
 void part1(void *cbdata);
 
 void part4(uint8_t *data, int length, void *cbdata) {
-    blink(50);
     // Work in 1000ths of a degree to allow rounding to 100ths
     long c = data[0] * 1000 + (int) ((data[1] * 1000) / 256);
     long f = c * 9 / 5 + 32000;
@@ -46,23 +48,28 @@ void part4(uint8_t *data, int length, void *cbdata) {
 }
 
 void part3(uint8_t *sent, int length, void *cbdata) {
+    delay(20);
     static uint8_t buffer[2];
     i2c_recv(TMP101_ADDR, buffer, sizeof(buffer), part4, NULL);
 }
 
 void part2(uint8_t *sent, int length, void *cbdata) {
+    delay(20);
     static uint8_t cmd[] = { TMP101_ADDR, TEMPERATURE_REGISTER };
     i2c_send(cmd, sizeof(cmd), part3, NULL);
 }
 
 void part1(void *cbdata) {
+    blink(10);
     static uint8_t cmd[] = { TMP101_ADDR, CONFIGURATION_REGISTER, CONFIG_12_BITS };
     i2c_send(cmd, sizeof(cmd), part2, NULL);
 }
 
 void main(void) {
-    timeout_init();
     usb_init(&cdc_device);
+    while  (!usb_ready)
+        ;
+    timeout_init();
     i2c_init();
 
     timeout_add(&t, TIMEOUT_REPEAT, part1, NULL);
