@@ -87,14 +87,29 @@ void I2C0_Handler(void) {
     }
 }
 
-void i2c_init()
+void i2c_init(enum i2c_rate rate)
 {
     SIM.scgc5.portb = 1;
     pin_mode(PIN_PTB2, PIN_MODE_MUX_ALT2 | PIN_MODE_PULLUP | PIN_MODE_OPEN_DRAIN_ON);
     pin_mode(PIN_PTB3, PIN_MODE_MUX_ALT2 | PIN_MODE_PULLUP | PIN_MODE_OPEN_DRAIN_ON);
+//    pin_mode(PIN_PTB2, PIN_MODE_MUX_ALT2 | PIN_MODE_DRIVE_HIGH | PIN_MODE_SLEW_SLOW | PIN_MODE_OPEN_DRAIN_ON);
+//    pin_mode(PIN_PTB3, PIN_MODE_MUX_ALT2 | PIN_MODE_DRIVE_HIGH | PIN_MODE_SLEW_SLOW | PIN_MODE_OPEN_DRAIN_ON);
 
     SIM.scgc4.i2c0 = 1;
-    I2C0.f = (struct I2C_F ) { .mult = I2C_MULT_1, .icr = 0x1B };
+    switch(rate)                                // Freq  SCL Div
+    {                                           // ----  -------
+    case I2C_RATE_100:  I2C0_F = 0x27; break;   // 100k    480
+    case I2C_RATE_400:  I2C0_F = 0x85; break;   // 400k    120
+    case I2C_RATE_600:  I2C0_F = 0x14; break;   // 600k     80
+    case I2C_RATE_800:  I2C0_F = 0x45; break;   // 800k     60
+    case I2C_RATE_1000: I2C0_F = 0x0D; break;   // 1.0M     48
+    case I2C_RATE_1200: I2C0_F = 0x0B; break;   // 1.2M     40
+    case I2C_RATE_1500: I2C0_F = 0x09; break;   // 1.5M     32
+    case I2C_RATE_2000: I2C0_F = 0x02; break;   // 2.0M     24
+    case I2C_RATE_2400: I2C0_F = 0x00; break;   // 2.4M     20
+    default:            I2C0_F = 0x27; break;   // 100k    480 (defaults to slowest)
+    }
+    I2C0_FLT = 4;
     I2C0.c1.iicen = 1;
     state = I2C_STATE_IDLE;
     int_enable(IRQ_I2C0);

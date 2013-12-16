@@ -70,7 +70,7 @@ void main(void) {
     while  (!usb_ready)
         ;
     timeout_init();
-    i2c_init();
+    i2c_init(I2C_RATE_100);
 
     timeout_add(&t, TIMEOUT_REPEAT, part1, NULL);
 

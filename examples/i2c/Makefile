@@ -1,5 +1,4 @@
 PROG=tmp101a
-
-SRCS+=${PROG}.c tmp101a.desc
+#PROG=mpu6050
 
 include ../../toolchain/mchck.mk
