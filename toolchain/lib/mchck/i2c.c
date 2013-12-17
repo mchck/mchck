@@ -123,7 +123,11 @@ void i2c_recv(uint8_t address, uint8_t *data, int length, enum i2c_stop stop, i2
     rxCbdata = cbdata;
     sendStop = stop;
     state = I2C_STATE_RX_START;
+    while (!I2C0.s.tcf)
+        ;
     I2C0.c1.raw = ((struct I2C_C1) {.iicen=1, .iicie=1, .mst=1, .tx=1} ).raw;
+    if (length == 1)
+        I2C0.c1.txak = 1;
     I2C0.d = (address << 1) | 1;
 }
 
@@ -135,6 +139,8 @@ void i2c_send(uint8_t *data, int length, enum i2c_stop stop, i2c_cb *cb, void *c
     txCbdata = cbdata;
     sendStop = stop;
     state = I2C_STATE_TX;
+    while (!I2C0.s.tcf)
+        ;
     I2C0.c1.raw = ((struct I2C_C1) {.iicen=1, .iicie=1, .mst=1, .tx=1} ).raw;
     I2C0.d = txBuffer[txIndex++] << 1;
 }
