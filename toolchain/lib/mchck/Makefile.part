@@ -1,7 +1,7 @@
 SRCS-mchck=	builtins.c system.c gpio.c pin.c adc.c spi.c sg.c timeout.c
 SRCS-mchck+=	flash.c onboard-led.c stdio.c printf.c ftm.c i2c.c
 
-ifneq (,$(findstring MK20,${TARGET}))
+ifeq (${TARGET},MK20DX32VLF5)
 SRCS.force-mchck+=	startup_k20.c
 
 ifdef LOADER
