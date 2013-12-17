@@ -38,7 +38,7 @@ void blink(int n) {
 
 void part1(void *cbdata);
 
-void part4(uint8_t *data, int length, void *cbdata) {
+void part4(uint8_t *data, size_t length, void *cbdata) {
     // Work in 1000ths of a degree to allow rounding to 100ths
     long c = data[0] * 1000 + (int) ((data[1] * 1000) / 256);
     long f = c * 9 / 5 + 32000;
@@ -47,22 +47,20 @@ void part4(uint8_t *data, int length, void *cbdata) {
     timeout_add(&t, TIMEOUT_REPEAT, part1, NULL);
 }
 
-void part3(uint8_t *sent, int length, void *cbdata) {
-    delay(20);
+void part3(uint8_t *sent, size_t length, void *cbdata) {
     static uint8_t buffer[2];
     i2c_recv(TMP101_ADDR, buffer, sizeof(buffer), I2C_STOP, part4, NULL);
 }
 
-void part2(uint8_t *sent, int length, void *cbdata) {
-    delay(20);
-    static uint8_t cmd[] = { TMP101_ADDR, TEMPERATURE_REGISTER };
-    i2c_send(cmd, sizeof(cmd), I2C_NOSTOP, part3, NULL);
+void part2(uint8_t *sent, size_t length, void *cbdata) {
+    static uint8_t cmd[] = { TEMPERATURE_REGISTER };
+    i2c_send(TMP101_ADDR, cmd, sizeof(cmd), I2C_NOSTOP, part3, NULL);
 }
 
 void part1(void *cbdata) {
     blink(10);
-    static uint8_t cmd[] = { TMP101_ADDR, CONFIGURATION_REGISTER, CONFIG_12_BITS };
-    i2c_send(cmd, sizeof(cmd), I2C_NOSTOP, part2, NULL);
+    static uint8_t cmd[] = { CONFIGURATION_REGISTER, CONFIG_12_BITS };
+    i2c_send(TMP101_ADDR, cmd, sizeof(cmd), I2C_NOSTOP, part2, NULL);
 }
 
 void main(void) {
