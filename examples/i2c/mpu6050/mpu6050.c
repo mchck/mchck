@@ -1,20 +1,10 @@
 #include <mchck.h>
 #include "mpu6050.desc.h"
 
+#define MPU6050_ADDR    0x68
+#define TIMEOUT_REPEAT  1000
+
 static struct cdc_ctx cdc;
-
-static void new_data(uint8_t *data, size_t len) {
-    cdc_read_more(&cdc);
-}
-
-static volatile int usb_ready = 0;
-
-void init_vcdc(int config) {
-    cdc_init(new_data, NULL, &cdc);
-    cdc_set_stdout(&cdc);
-    usb_ready = 1;
-}
-
 static struct timeout_ctx t;
 
 void delay(int n) {
@@ -29,14 +19,10 @@ void blink(int n) {
     delay(n);
 }
 
-#define MPU6050_ADDR 0x68
-
-#define TIMEOUT_REPEAT          1000
-
 void part1(void *cbdata);
 
 void part3(uint8_t *data, size_t length, void *cbdata) {
-    printf("whoami: %02x\r\n", data[0], (char *)cbdata);
+    printf("whoami: 0x%02x\r\n", data[0]);
     timeout_add(&t, TIMEOUT_REPEAT, part1, NULL);
 }
 
@@ -46,19 +32,24 @@ void part2(uint8_t *sent, size_t length, void *cbdata) {
 }
 
 void part1(void *cbdata) {
-    blink(1);
+    blink(10);
     static uint8_t cmd[] = { 117 };
     i2c_send(MPU6050_ADDR, cmd, sizeof(cmd), I2C_NOSTOP, part2, NULL);
 }
 
+static void new_data(uint8_t *data, size_t len) {
+    cdc_read_more(&cdc);
+}
+
+void init_vcdc(int config) {
+    cdc_init(new_data, NULL, &cdc);
+    cdc_set_stdout(&cdc);
+    timeout_add(&t, TIMEOUT_REPEAT, part1, NULL);
+}
+
 void main(void) {
-    usb_init(&cdc_device);
-    while  (!usb_ready)
-        ;
     timeout_init();
     i2c_init(I2C_RATE_100);
-
-    timeout_add(&t, TIMEOUT_REPEAT, part1, NULL);
-
+    usb_init(&cdc_device);
     sys_yield_for_frogs();
 }

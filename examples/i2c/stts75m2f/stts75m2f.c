@@ -2,19 +2,6 @@
 #include "stts75m2f.desc.h"
 
 static struct cdc_ctx cdc;
-
-static void new_data(uint8_t *data, size_t len) {
-    cdc_read_more(&cdc);
-}
-
-static volatile int usb_ready = 0;
-
-void init_vcdc(int config) {
-    cdc_init(new_data, NULL, &cdc);
-    cdc_set_stdout(&cdc);
-    usb_ready = 1;
-}
-
 static struct timeout_ctx t;
 
 void delay(int n) {
@@ -33,7 +20,6 @@ void blink(int n) {
 #define TEMPERATURE_REGISTER    0x00
 #define CONFIGURATION_REGISTER  0x01
 #define CONFIG_12_BITS          0b01100000
-
 #define TIMEOUT_REPEAT          0
 
 void part1(void *cbdata);
@@ -63,14 +49,19 @@ void part1(void *cbdata) {
     i2c_send(STTS75M2f_ADDR, cmd, sizeof(cmd), I2C_NOSTOP, part2, NULL);
 }
 
+static void new_data(uint8_t *data, size_t len) {
+    cdc_read_more(&cdc);
+}
+
+void init_vcdc(int config) {
+    cdc_init(new_data, NULL, &cdc);
+    cdc_set_stdout(&cdc);
+    timeout_add(&t, TIMEOUT_REPEAT, part1, NULL);
+}
+
 void main(void) {
-    usb_init(&cdc_device);
-    while  (!usb_ready)
-        ;
     timeout_init();
     i2c_init(I2C_RATE_100);
-
-    timeout_add(&t, TIMEOUT_REPEAT, part1, NULL);
-
+    usb_init(&cdc_device);
     sys_yield_for_frogs();
 }
