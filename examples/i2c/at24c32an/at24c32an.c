@@ -1,5 +1,5 @@
 #include <mchck.h>
-#include "mpu6050.desc.h"
+#include "at24c32an.desc.h"
 
 static struct cdc_ctx cdc;
 
@@ -29,26 +29,25 @@ void blink(int n) {
     delay(n);
 }
 
-#define MPU6050_ADDR 0x68
+#define DEVICE_ADDR             0x50
 
 #define TIMEOUT_REPEAT          1000
 
 void part1(void *cbdata);
 
 void part3(uint8_t *data, size_t length, void *cbdata) {
-    printf("whoami: %02x %s\n", data[0], (char *)cbdata);
     timeout_add(&t, TIMEOUT_REPEAT, part1, NULL);
 }
 
 void part2(uint8_t *sent, size_t length, void *cbdata) {
     static uint8_t buffer[1];
-    i2c_recv(MPU6050_ADDR, buffer, sizeof(buffer), I2C_STOP, part3, NULL);
+    i2c_recv(DEVICE_ADDR, buffer, sizeof(buffer), I2C_STOP, part3, NULL);
 }
 
 void part1(void *cbdata) {
-    blink(1);
-    static uint8_t cmd[] = { 117 };
-    i2c_send(MPU6050_ADDR, cmd, sizeof(cmd), I2C_NOSTOP, part2, NULL);
+    blink(10);
+    static uint8_t cmd[] = { 0, 0 };
+    i2c_send(DEVICE_ADDR, cmd, sizeof(cmd), I2C_NOSTOP, part2, NULL);
 }
 
 void main(void) {
