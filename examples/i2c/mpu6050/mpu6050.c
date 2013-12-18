@@ -21,12 +21,12 @@ void blink(int n) {
 
 void part1(void *cbdata);
 
-void part3(uint8_t *data, size_t length, void *cbdata) {
+void part3(enum i2c_status status, uint8_t *data, size_t length, void *cbdata) {
     printf("whoami: 0x%02x\r\n", data[0]);
     timeout_add(&t, TIMEOUT_REPEAT, part1, NULL);
 }
 
-void part2(uint8_t *sent, size_t length, void *cbdata) {
+void part2(enum i2c_status status, uint8_t *data, size_t length, void *cbdata) {
     static uint8_t buffer[1];
     i2c_recv(MPU6050_ADDR, buffer, sizeof(buffer), I2C_STOP, part3, NULL);
 }

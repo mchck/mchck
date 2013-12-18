@@ -17,6 +17,7 @@ struct i2c_s {
 
 void I2C0_Handler(void) {
     I2C0.s.iicif = 1;
+    enum i2c_status status = I2C_STATUS_SUCCESS;
     switch (i2c.state) {
     case I2C_STATE_IDLE:
         break;
@@ -29,19 +30,21 @@ void I2C0_Handler(void) {
                     I2C0.c1.rsta = 1;
                 i2c.state = I2C_STATE_IDLE;
                 if (i2c.cb) {
-                    (*i2c.cb)(i2c.buffer, i2c.index, i2c.cbdata);
+                    (*i2c.cb)(status, i2c.buffer, i2c.index, i2c.cbdata);
                 }
             } else {
                 I2C0.d = i2c.buffer[i2c.index++];
             }
         } else {
+            if (!I2C0.s.rxak)
+                status = I2C_STATUS_NACK;
             if (i2c.sendStop)
                 I2C0.c1.mst = 0;
             else
                 I2C0.c1.rsta = 1;
             i2c.state = I2C_STATE_IDLE;
             if (i2c.cb) {
-                (*i2c.cb)(i2c.buffer, i2c.index, i2c.cbdata);
+                (*i2c.cb)(status, i2c.buffer, i2c.index, i2c.cbdata);
             }
         }
         break;
@@ -53,7 +56,7 @@ void I2C0_Handler(void) {
                 I2C0.c1.rsta = 1;
             i2c.state = I2C_STATE_IDLE;
             if (i2c.cb) {
-                (*i2c.cb)(i2c.buffer, i2c.index, i2c.cbdata);
+                (*i2c.cb)(status, i2c.buffer, i2c.index, i2c.cbdata);
             }
         } else {
             I2C0.c1.tx = 0;
@@ -73,7 +76,7 @@ void I2C0_Handler(void) {
         }
         i2c.buffer[i2c.index++] = I2C0.d;
         if (i2c.index == i2c.length && i2c.cb) {
-            (*i2c.cb)(i2c.buffer, i2c.length, i2c.cbdata);
+            (*i2c.cb)(status, i2c.buffer, i2c.length, i2c.cbdata);
         }
         break;
     }

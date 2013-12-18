@@ -24,7 +24,7 @@ void blink(int n) {
 
 void part1(void *cbdata);
 
-void part4(uint8_t *data, size_t length, void *cbdata) {
+void part4(enum i2c_status status, uint8_t *data, size_t length, void *cbdata) {
     // Work in 1000ths of a degree to allow rounding to 100ths
     long c = data[0] * 1000 + (int) ((data[1] * 1000) / 256);
     long f = c * 9 / 5 + 32000;
@@ -33,12 +33,12 @@ void part4(uint8_t *data, size_t length, void *cbdata) {
     timeout_add(&t, TIMEOUT_REPEAT, part1, NULL);
 }
 
-void part3(uint8_t *sent, size_t length, void *cbdata) {
+void part3(enum i2c_status status, uint8_t *data, size_t length, void *cbdata) {
     static uint8_t buffer[2];
     i2c_recv(TMP101_ADDR, buffer, sizeof(buffer), I2C_STOP, part4, NULL);
 }
 
-void part2(uint8_t *sent, size_t length, void *cbdata) {
+void part2(enum i2c_status status, uint8_t *data, size_t length, void *cbdata) {
     static uint8_t cmd[] = { TEMPERATURE_REGISTER };
     i2c_send(TMP101_ADDR, cmd, sizeof(cmd), I2C_NOSTOP, part3, NULL);
 }

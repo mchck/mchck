@@ -12,7 +12,11 @@ enum i2c_rate {
     I2C_RATE_2000,
     I2C_RATE_2400
 };
-typedef void (i2c_cb)(uint8_t *buffer, size_t length, void *cbdata);
+enum i2c_status {
+    I2C_STATUS_SUCCESS,
+    I2C_STATUS_NACK
+};
+typedef void (i2c_cb)(enum i2c_status status, uint8_t *buffer, size_t length, void *cbdata);
 void i2c_init(enum i2c_rate rate);
 void i2c_recv(uint8_t address, uint8_t *data, size_t length, enum i2c_stop stop, i2c_cb *cb, void *cbdata);
 void i2c_send(uint8_t address, uint8_t *data, size_t length, enum i2c_stop stop, i2c_cb *cb, void *cbdata);
