@@ -1,7 +1,7 @@
 require 'socket'
 
 $: << File.realpath('..', __FILE__)
-require 'kinetis'
+require 'device'
 require 'log'
 
 class GDBServer
@@ -337,7 +337,7 @@ if $0 == __FILE__
   end
 
   adiv5 = Adiv5.new(BackendDriver.from_string(ARGV[0]))
-  k = Kinetis.new(adiv5, false)
+  k = Device.detect(adiv5)
 
   if cmd
     trap("INT", "IGNORE")
