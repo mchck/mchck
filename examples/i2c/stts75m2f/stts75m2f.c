@@ -4,22 +4,6 @@
 static struct cdc_ctx cdc;
 static struct timeout_ctx t;
 
-void
-delay(int n)
-{
-        while (n--)
-                asm("nop");
-}
-
-void
-blink(int n)
-{
-        onboard_led(ONBOARD_LED_ON);
-        delay(n);
-        onboard_led(ONBOARD_LED_OFF);
-        delay(n);
-}
-
 #define STTS75M2f_ADDR          0x48
 #define TEMPERATURE_REGISTER    0x00
 #define CONFIGURATION_REGISTER  0x01
@@ -58,7 +42,6 @@ part2(enum i2c_status status, uint8_t *data, size_t length, void *cbdata)
 void
 part1(void *cbdata)
 {
-        blink(10);
         static uint8_t cmd[] = { CONFIGURATION_REGISTER, CONFIG_12_BITS };
         i2c_send(STTS75M2f_ADDR, cmd, sizeof(cmd), I2C_NOSTOP, part2, NULL);
 }

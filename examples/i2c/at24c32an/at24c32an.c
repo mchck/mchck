@@ -4,24 +4,7 @@
 static struct cdc_ctx cdc;
 static struct timeout_ctx t;
 
-void
-delay(int n)
-{
-        while (n--)
-                asm("nop");
-}
-
-void
-blink(int n)
-{
-        onboard_led(ONBOARD_LED_ON);
-        delay(n);
-        onboard_led(ONBOARD_LED_OFF);
-        delay(n);
-}
-
 #define DEVICE_ADDR             0x50
-
 #define TIMEOUT_REPEAT          1000
 
 void
@@ -43,7 +26,6 @@ part2(enum i2c_status status, uint8_t *data, size_t length, void *cbdata)
 void
 part1(void *cbdata)
 {
-        blink(10);
         static uint8_t cmd[] = { 0, 0 };
         i2c_send(DEVICE_ADDR, cmd, sizeof(cmd), I2C_NOSTOP, part2, NULL);
 }
