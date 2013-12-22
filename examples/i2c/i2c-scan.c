@@ -12,7 +12,7 @@ void
 part1(void *cbdata);
 
 void
-part2(enum i2c_status status, uint8_t *data, size_t length, void *cbdata)
+part2(enum i2c_result result, uint8_t *data, size_t length, void *cbdata)
 {
         if (address == 0) {
                 printf("\r\n  0123456789ABCDEF\r\n");
@@ -20,8 +20,9 @@ part2(enum i2c_status status, uint8_t *data, size_t length, void *cbdata)
         if (address % 16 == 0) {
                 printf("%x:", address / 16);
         }
-        printf("%d", status);
+        printf("%d", result);
         address++;
+        // Constrain the address to be between 0 and 128, 7 bits
         address &= 0x7f;
         if (address % 16 == 0) {
                 printf("\r\n");

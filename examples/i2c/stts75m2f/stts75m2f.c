@@ -14,7 +14,7 @@ void
 part1(void *cbdata);
 
 void
-part4(enum i2c_status status, uint8_t *data, size_t length, void *cbdata)
+part4(enum i2c_result result, uint8_t *data, size_t length, void *cbdata)
 {
         // Work in 1000ths of a degree to allow rounding to 100ths
         long c = data[0] * 1000 + (int) ((data[1] * 1000) / 256);
@@ -26,14 +26,14 @@ part4(enum i2c_status status, uint8_t *data, size_t length, void *cbdata)
 }
 
 void
-part3(enum i2c_status status, uint8_t *data, size_t length, void *cbdata)
+part3(enum i2c_result result, uint8_t *data, size_t length, void *cbdata)
 {
         static uint8_t buffer[2];
         i2c_recv(STTS75M2f_ADDR, buffer, sizeof(buffer), I2C_STOP, part4, NULL);
 }
 
 void
-part2(enum i2c_status status, uint8_t *data, size_t length, void *cbdata)
+part2(enum i2c_result result, uint8_t *data, size_t length, void *cbdata)
 {
         static uint8_t cmd[] = { TEMPERATURE_REGISTER };
         i2c_send(STTS75M2f_ADDR, cmd, sizeof(cmd), I2C_NOSTOP, part3, NULL);
