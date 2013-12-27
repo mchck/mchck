@@ -88,10 +88,6 @@ I2C0_Handler(void)
 void
 i2c_init(enum i2c_rate rate)
 {
-        //                          I2C0_F rate dividers, indexed by enum i2c_rate.
-        //                          100kHz 400   600   800   1000  1200  1500  2000  2400kHz
-        static uint8_t dividers[] = {0x27, 0x85, 0x14, 0x45, 0x0D, 0x0B, 0x09, 0x02, 0x00};
-
         // Enable clocks for I2C and PORTB
         SIM.scgc4.i2c0 = 1;
         SIM.scgc5.portb = 1;
@@ -99,9 +95,13 @@ i2c_init(enum i2c_rate rate)
         pin_mode(PIN_PTB2, PIN_MODE_MUX_ALT2 | PIN_MODE_PULLUP | PIN_MODE_OPEN_DRAIN_ON);
         pin_mode(PIN_PTB3, PIN_MODE_MUX_ALT2 | PIN_MODE_PULLUP | PIN_MODE_OPEN_DRAIN_ON);
 
-        if (rate < 0 || rate >= sizeof(dividers));
+        //                   I2C0_F values, indexed by enum i2c_rate.
+        //                   100kHz        400       600         800        1000  1200  1500  2000  2400kHz
+        static uint8_t f[] = {0x27, I2C_MULT_4|0x05, 0x14, I2C_MULT_2|0x05, 0x0D, 0x0B, 0x09, 0x02, 0x00};
+
+        if (rate < 0 || rate >= sizeof(f))
             rate = I2C_RATE_100;
-        I2C0_F = dividers[rate];
+        I2C0.f.raw = f[rate];
 
         // Filter glitches on the I2C bus, filter glitches up to 4 bus cycles long.
         I2C0_FLT = 4;
