@@ -32,6 +32,7 @@ class KinetisBase < ARMv7
     while @mdmap.read_ap(0) & 0b1110 != 0b0010
       @mdmap.write_ap(4, 0b11100)
     end
+    Log(:kinetis, 1){ "system out of reset, core in reset" }
     # Now take system out of reset, but keep core in reset
     while @mdmap.read_ap(0) & 0b1110 != 0b1010
       @mdmap.write_ap(4, 0b10000)
@@ -61,6 +62,7 @@ class KinetisBase < ARMv7
       @mdmap.write_ap(4, 0b1)
     end
     # wait for progress to finish
+    Log(:kinetis, 1){ "wait for erase to finish" }
     while @mdmap.read_ap(4) & 0b1 != 0
       sleep 0.1
     end
