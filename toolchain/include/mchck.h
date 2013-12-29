@@ -48,6 +48,7 @@ extern uint32_t _sidata, _sdata, _edata, _sbss, _ebss, _app_rom;
 #include <kinetis/pit.h>
 #include <kinetis/tsi.h>
 #include <kinetis/uart.h>
+#include <kinetis/rtc.h>
 #include <kinetis/crc.h>
 
 #include <arm/scb.h>
