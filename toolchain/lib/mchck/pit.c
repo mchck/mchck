@@ -23,7 +23,7 @@ pit_start(enum pit_id id, uint32_t cycles, pit_callback *cb)
 	volatile struct PIT_TIMER_t* timer = &PIT.timer[id];
 	timer->ldval = cycles;
 	timer->tflg.tif = 1;
-	timer->tctrl.tie = 1;
+	timer->tctrl.tie = cb != NULL;
 	timer->tctrl.ten = 1;
 }
 
@@ -43,8 +43,7 @@ static void
 common_handler(enum pit_id id)
 {
 	PIT.timer[id].tflg.tif = 1;
-	if (ctx[id].cb)
-		ctx[id].cb(id);
+	ctx[id].cb(id);
 }
 
 void
