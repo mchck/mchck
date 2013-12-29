@@ -8,3 +8,4 @@
 #include <mchck/timeout.h>
 #include <mchck/stdio.h>
 #include <mchck/ftm.h>
+#include <mchck/pit.h>
