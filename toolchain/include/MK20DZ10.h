@@ -10658,18 +10658,7 @@ typedef struct RTC_MemMap {
  */
 
 
-/* RTC - Register instance definitions */
-/* RTC */
-#define RTC_TSR                                  RTC_TSR_REG(RTC_BASE_PTR)
-#define RTC_TPR                                  RTC_TPR_REG(RTC_BASE_PTR)
-#define RTC_TAR                                  RTC_TAR_REG(RTC_BASE_PTR)
-#define RTC_TCR                                  RTC_TCR_REG(RTC_BASE_PTR)
-#define RTC_CR                                   RTC_CR_REG(RTC_BASE_PTR)
-#define RTC_SR                                   RTC_SR_REG(RTC_BASE_PTR)
-#define RTC_LR                                   RTC_LR_REG(RTC_BASE_PTR)
-#define RTC_IER                                  RTC_IER_REG(RTC_BASE_PTR)
-#define RTC_WAR                                  RTC_WAR_REG(RTC_BASE_PTR)
-#define RTC_RAR                                  RTC_RAR_REG(RTC_BASE_PTR)
+// These have been removed as they conflict with the mchck definitions
 
 /**
  * @}
