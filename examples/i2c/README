@@ -1,0 +1,3 @@
+Simple interrupt driven I2C example.
+
+The I2C library currently only supports master mode.
