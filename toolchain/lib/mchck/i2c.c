@@ -96,8 +96,8 @@ i2c_init(enum i2c_rate rate)
         pin_mode(PIN_PTB3, PIN_MODE_MUX_ALT2 | PIN_MODE_PULLUP | PIN_MODE_OPEN_DRAIN_ON);
 
         //                   I2C0_F values, indexed by enum i2c_rate.
-        //                   100kHz        400       600         800        1000  1200  1500  2000  2400kHz
-        static uint8_t f[] = {0x27, I2C_MULT_4|0x05, 0x14, I2C_MULT_2|0x05, 0x0D, 0x0B, 0x09, 0x02, 0x00};
+        //                   100kHz 400   600   800   1000  1200  1500  2000  2400kHz
+        static uint8_t f[] = {0x27, 0x85, 0x14, 0x45, 0x0D, 0x0B, 0x09, 0x02, 0x00};
 
         if (rate < 0 || rate >= sizeof(f))
             rate = I2C_RATE_100;
