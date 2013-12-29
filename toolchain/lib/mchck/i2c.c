@@ -104,7 +104,8 @@ i2c_init(enum i2c_rate rate)
         I2C0.f.raw = f[rate];
 
         // Filter glitches on the I2C bus, filter glitches up to 4 bus cycles long.
-        I2C0_FLT = 4;
+        //I2C0_FLT = 4;
+
         I2C0.c1.iicen = 1;
         i2c.state = I2C_STATE_IDLE;
         int_enable(IRQ_I2C0);
