@@ -10,3 +10,4 @@
 #include <mchck/ftm.h>
 #include <mchck/crc.h>
 #include <mchck/pit.h>
+#include <mchck/i2c.h>
