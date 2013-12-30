@@ -10,10 +10,10 @@ pit_init()
 	SIM.scgc6.pit = 1;
 	PIT.mcr.mdis = 0;
 	PIT.mcr.frz = 0;
-        int_enable(IRQ_PIT0);
-        int_enable(IRQ_PIT1);
-        int_enable(IRQ_PIT2);
-        int_enable(IRQ_PIT3);
+	int_enable(IRQ_PIT0);
+	int_enable(IRQ_PIT1);
+	int_enable(IRQ_PIT2);
+	int_enable(IRQ_PIT3);
 }
 
 void
