@@ -12,7 +12,8 @@ struct _stdio_file_ops {
 struct _stdio_file {
         const struct _stdio_file_ops *ops;
         void *ops_data;
-        size_t outbuf_pos;
+        unsigned int outbuf_head; // where characters are added
+        unsigned int outbuf_tail; // where characters are removed
         uint8_t outbuf[STDIO_OUTBUF_SIZE];
 };
 
