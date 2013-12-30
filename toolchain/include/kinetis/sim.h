@@ -201,7 +201,7 @@ struct SIM_t {
                 uint32_t _rsvd0 : 10;
                 uint32_t spi0 : 1;
                 uint32_t _rsvd1 : 2;
-                uint32_t i2c : 1;
+                uint32_t i2s : 1;
                 uint32_t _rsvd2 : 2;
                 uint32_t crc : 1;
                 uint32_t _rsvd3 : 2;
