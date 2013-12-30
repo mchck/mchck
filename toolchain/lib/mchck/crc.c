@@ -6,12 +6,11 @@ crc_init(
 	uint32_t poly,
 	uint8_t width,
 	enum crc_transpose_t totr,
-	enum crc_transpose_t tot)
+	enum crc_transpose_t tot,
+	uint8_t compl_xor)
 {
 	SIM.scgc6.crc = 1;
-	CRC.ctrl._pad = 0;
-	CRC.ctrl._res = 0;
-	CRC.ctrl.fxor = 0;
+	CRC.ctrl.fxor = compl_xor;
 	CRC.ctrl.tcrc = width;
 	CRC.ctrl.totr = totr;
 	CRC.ctrl.tot = tot;
