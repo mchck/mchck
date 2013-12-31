@@ -4,7 +4,7 @@ void
 crc_init(
 	uint32_t seed,
 	uint32_t poly,
-	uint8_t width,
+	enum crc_width_t width,
 	enum crc_transpose_t totr,
 	enum crc_transpose_t tot,
 	uint8_t compl_xor)

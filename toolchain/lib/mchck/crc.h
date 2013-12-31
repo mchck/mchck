@@ -1,3 +1,8 @@
+enum crc_width_t {
+	CRC_WIDTH_16_BITS = 0x0,
+	CRC_WIDTH_32_BITS = 0x1
+};
+
 enum crc_transpose_t {
 	CRC_TRANSPOSE_NONE      = 0x0,
 	CRC_TRANSPOSE_BITS      = 0x1,
@@ -8,7 +13,7 @@ enum crc_transpose_t {
 void crc_init(
 	uint32_t seed,
 	uint32_t poly,
-	uint8_t width,
+	enum crc_width_t width,
 	enum crc_transpose_t totr,
 	enum crc_transpose_t tot,
 	uint8_t compl_xor);
@@ -18,5 +23,5 @@ uint32_t crc_value();
 inline void
 crc_init_CRC32()
 {
-	crc_init(0xffffffff, 0x04C11DB7, 1, CRC_TRANSPOSE_NONE, CRC_TRANSPOSE_NONE, 0);
+	crc_init(0xffffffff, 0x04c11db7, CRC_WIDTH_32_BITS, CRC_TRANSPOSE_NONE, CRC_TRANSPOSE_NONE, 0);
 }
