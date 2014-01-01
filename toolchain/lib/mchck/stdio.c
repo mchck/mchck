@@ -30,3 +30,60 @@ fputc(int c, FILE *f)
         }
         crit_exit();
 }
+
+struct buffer_file_ctx {
+        char *buf;
+        size_t buflen;
+        size_t len;
+};
+
+static size_t
+buffer_file_write(const uint8_t *buf, size_t len, void *opts_data)
+{
+        struct buffer_file_ctx *ctx = opts_data;
+        if (ctx->len+len < ctx->buflen) {
+                size_t n = ctx->buflen - ctx->len;
+                if (len < n)
+                        n = len;
+                memcpy(&ctx->buf[ctx->len], buf, n);
+                ctx->len += len;
+                return n;
+        } else {
+                ctx->len += len;
+                return 0;
+        }
+}
+
+struct _stdio_file_ops buffer_opts = {
+        .init = NULL,
+        .write = buffer_file_write
+};
+
+static void
+buffer_file_init(FILE *f, struct buffer_file_ctx *ctx,
+                 char *buf, size_t buflen)
+{
+        ctx->buf = buf;
+        ctx->buflen = buflen;
+        ctx->len = 0;
+        f->ops_data = ctx;
+}
+
+int vsnprintf(char *buf, size_t n, const char *fmt, va_list args)
+{
+        FILE f;
+        struct buffer_file_ctx ctx;
+        buffer_file_init(&f, &ctx, buf, n);
+        return vfprintf(&f, fmt, args);
+}
+
+int snprintf(char *buf, size_t n, const char *fmt, ...)
+{
+        va_list args;
+        int ret;
+
+        va_start(args, fmt);
+        ret = vsnprintf(buf, n, fmt, args);
+        va_end(args);
+        return ret;
+}
