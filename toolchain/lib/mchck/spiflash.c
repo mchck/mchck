@@ -40,6 +40,7 @@ spiflash_queue_transaction(struct spiflash_device *dev,
         trans->done_cb = done_cb;
         trans->flags.write_enable = write_enable;
         trans->flags.wait_busy = wait_busy;
+        trans->flags.queued = true;
         crit_enter();
         if (dev->queue) {
                 struct spiflash_transaction *tail = dev->queue;
@@ -58,6 +59,8 @@ spiflash_transaction_done(struct spiflash_transaction *trans)
 {
         struct spiflash_device *dev = trans->dev;
         dev->queue = trans->next;
+        trans->flags.queued = false;
+        trans->flags.running = false;
         trans->done_cb(trans);
         spiflash_schedule(dev);
 }
@@ -110,8 +113,11 @@ spiflash_schedule(struct spiflash_device *dev)
 {
         if (dev->queue == NULL)
                 return;
+        if (dev->queue->flags.running)
+                return;
 
         struct spiflash_transaction *trans = dev->queue;
+        trans->flags.running = true;
         if (trans->flags.write_enable) {
                 /* send write enable then run transaction */
                 spi_queue_xfer(&trans->dev->flash_spi_ctx, trans->dev->cs,

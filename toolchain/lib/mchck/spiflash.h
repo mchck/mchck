@@ -17,6 +17,8 @@ struct spiflash_transaction {
                 UNION_STRUCT_START(8);
                 unsigned write_enable : 1; // needs WRITE_ENABLE command
                 unsigned wait_busy    : 1; // will set BUSY flag
+                unsigned running      : 1; // currently in progress
+                unsigned queued       : 1; // on the queue (either running or waiting to start)
                 UNION_STRUCT_END;
         } flags;
         struct sg       flash_tx_sg[2];
