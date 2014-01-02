@@ -11,7 +11,9 @@ enum {
         BLOCK_ERASE_64KB = 0xD8,
 };
 
-struct spiflash_device onboard_flash = {};
+struct spiflash_device onboard_flash = {
+        .cs = SPI_PCS4
+};
 
 const uint8_t write_enable_cmd[] = {WRITE_ENABLE};
 
@@ -68,7 +70,7 @@ spiflash_check_write_completed_spi_cb(void *cbdata)
         if (!(trans->spi_response[1] & 1)) {
                 spiflash_transaction_done(trans);
         } else {
-                spi_queue_xfer(&trans->dev->flash_spi_ctx, SPI_PCS4,
+                spi_queue_xfer(&trans->dev->flash_spi_ctx, trans->dev->cs,
                                trans->spi_query, 1, trans->spi_response, 2,
                                spiflash_check_write_completed_spi_cb, trans);
         }
@@ -81,7 +83,7 @@ spiflash_transaction_dispatched_spi_cb(void *cbdata)
         if (trans->flags.wait_busy) {
                 /* command and data transferred, wait for the busy flag to clear */
                 trans->spi_query[0] = 0x05;
-                spi_queue_xfer(&trans->dev->flash_spi_ctx, SPI_PCS4,
+                spi_queue_xfer(&trans->dev->flash_spi_ctx, trans->dev->cs,
                                trans->spi_query, 1, trans->spi_response, 2,
                                spiflash_check_write_completed_spi_cb, trans);
         } else {
@@ -92,7 +94,7 @@ spiflash_transaction_dispatched_spi_cb(void *cbdata)
 static void
 spiflash_run_transaction(struct spiflash_transaction *trans)
 {
-        spi_queue_xfer_sg(&trans->dev->flash_spi_ctx.ctx, SPI_PCS4,
+        spi_queue_xfer_sg(&trans->dev->flash_spi_ctx.ctx, trans->dev->cs,
                           trans->flash_tx_sg, trans->flash_rx_sg,
                           spiflash_transaction_dispatched_spi_cb, trans);
 }
@@ -112,7 +114,7 @@ spiflash_schedule(struct spiflash_device *dev)
         struct spiflash_transaction *trans = dev->queue;
         if (trans->flags.write_enable) {
                 /* send write enable then run transaction */
-                spi_queue_xfer(&trans->dev->flash_spi_ctx, SPI_PCS4,
+                spi_queue_xfer(&trans->dev->flash_spi_ctx, trans->dev->cs,
                                write_enable_cmd, 1, NULL, 0,
                                spiflash_write_enabled_spi_cb, trans);
         } else {

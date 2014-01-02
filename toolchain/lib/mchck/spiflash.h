@@ -37,6 +37,7 @@ struct spiflash_transaction {
         
 struct spiflash_device {
         struct spi_ctx  flash_spi_ctx;
+        enum spi_pcs cs;
         struct spiflash_transaction *queue;
 };
 
