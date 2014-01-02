@@ -38,6 +38,12 @@ spi_stop_xfer(void)
         SPI0.sr.raw |= 0;
 }
 
+int
+spi_is_xfer_active(void)
+{
+        return !SPI0.mcr.halt;
+}
+
 void
 spi_queue_xfer(struct spi_ctx *ctx,
                enum spi_pcs pcs,

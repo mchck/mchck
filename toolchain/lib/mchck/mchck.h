@@ -11,3 +11,4 @@
 #include <mchck/crc.h>
 #include <mchck/pit.h>
 #include <mchck/rtc.h>
+#include <mchck/spiflash.h>
