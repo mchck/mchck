@@ -2,40 +2,69 @@
 #define SPIFLASH_MEMTYPE_WINBOND_FLASH 0x40
 #define SPIFLASH_WINBOND_SIZE_1MB 0x14
 
-typedef void (spiflash_info_cb)(void *cbdata, uint8_t mfg_id, uint8_t memtype, uint8_t capacity);
+typedef void (spiflash_info_cb)(void *cbdata, uint8_t mfg_id, uint8_t memtype,
+                                uint8_t capacity);
 typedef void (spiflash_status_cb)(void *cbdata, uint8_t status);
 
-struct spiflash_ctx {
-        struct spi_ctx  flash_spi_ctx;
+
+struct spiflash_device;
+struct spiflash_transaction;
+
+typedef void (spiflash_transaction_done_cb)(struct spiflash_transaction *trans);
+
+struct spiflash_transaction {
+        struct spiflash_transaction_flags {
+                UNION_STRUCT_START(8);
+                unsigned write_enable : 1; // needs WRITE_ENABLE command
+                unsigned wait_busy    : 1; // will set BUSY flag
+                UNION_STRUCT_END;
+        } flags;
         struct sg       flash_tx_sg[2];
         struct sg       flash_rx_sg[2];
-        spi_cb         *write_completed_cb;
+        uint8_t         spi_query[5];
+        uint8_t         spi_response[4];
         union {
                 spiflash_info_cb        *info_cb;
                 spiflash_status_cb      *status_cb;
+                spi_cb                  *spi_cb;
         };
         void           *cbdata;
-        uint8_t         spi_query[5];
-        uint8_t         spi_response[4];
+
+        spiflash_transaction_done_cb *done_cb;
+        struct spiflash_device *dev;
+        struct spiflash_transaction *next;
 };
+        
+struct spiflash_device {
+        struct spi_ctx  flash_spi_ctx;
+        struct spiflash_transaction *queue;
+};
+
+extern struct spiflash_device onboard_flash;
 
 extern void
 spiflash_pins_init(void);
 
 extern int
-spiflash_get_id(struct spiflash_ctx *ctx, spiflash_info_cb cb, void *cbdata);
+spiflash_get_id(struct spiflash_device *dev, struct spiflash_transaction *trans,
+                spiflash_info_cb cb, void *cbdata);
 
 extern int
-spiflash_get_status(struct spiflash_ctx *ctx, spiflash_status_cb cb, void *cbdata);
+spiflash_get_status(struct spiflash_device *dev, struct spiflash_transaction *trans,
+                    spiflash_status_cb cb, void *cbdata);
 
 extern int
-spiflash_program_page(struct spiflash_ctx *ctx, uint32_t addr, const uint8_t *src, uint8_t len, spi_cb cb, void *cbdata);
+spiflash_program_page(struct spiflash_device *dev, struct spiflash_transaction *trans,
+                      uint32_t addr, const uint8_t *src, uint8_t len, spi_cb cb, void *cbdata);
 
 extern int
-spiflash_read_page(struct spiflash_ctx *ctx, uint8_t *dest, uint32_t addr, uint32_t len, spi_cb cb, void *cbdata);
+spiflash_read_page(struct spiflash_device *dev, struct spiflash_transaction *trans,
+                   uint8_t *dest, uint32_t addr, uint32_t len, spi_cb cb, void *cbdata);
 
 extern int
-spiflash_erase_sector(struct spiflash_ctx *ctx, uint32_t addr, spi_cb cb, void *cbdata);
+spiflash_erase_sector(struct spiflash_device *dev, struct spiflash_transaction *trans,
+                      uint32_t addr, spi_cb cb, void *cbdata);
 
 extern int
-spiflash_erase_block(struct spiflash_ctx *ctx, uint32_t addr, int is_64KB, spi_cb cb, void *cbdata);
+spiflash_erase_block(struct spiflash_device *dev, struct spiflash_transaction *trans,
+                     uint32_t addr, int is_64KB, spi_cb cb, void *cbdata);

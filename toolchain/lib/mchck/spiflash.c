@@ -1,4 +1,5 @@
 #include <mchck.h>
+#include <stdbool.h>
 
 enum {
         PAGE_PROGRAM = 0x02,
@@ -10,6 +11,12 @@ enum {
         BLOCK_ERASE_64KB = 0xD8,
 };
 
+struct spiflash_device onboard_flash = {};
+
+const uint8_t write_enable_cmd[] = {WRITE_ENABLE};
+
+static void spiflash_schedule(struct spiflash_device *dev);
+
 void
 spiflash_pins_init(void)
 {
@@ -20,120 +27,213 @@ spiflash_pins_init(void)
 }
 
 static void
-spiflash_get_id_cb(void *cbdata)
+spiflash_queue_transaction(struct spiflash_device *dev,
+                           struct spiflash_transaction *trans,
+                           bool write_enable,
+                           bool wait_busy,
+                           spiflash_transaction_done_cb *done_cb)
 {
-        struct spiflash_ctx *ctx = cbdata;
-        ctx->info_cb(ctx->cbdata, ctx->spi_response[1], ctx->spi_response[2], ctx->spi_response[3]);
-}
+        trans->next = NULL;
+        trans->dev = dev;
+        trans->done_cb = done_cb;
+        trans->flags.write_enable = write_enable;
+        trans->flags.wait_busy = wait_busy;
+        crit_enter();
+        if (dev->queue) {
+                struct spiflash_transaction *tail = dev->queue;
+                while (tail->next != NULL)
+                        tail = tail->next;
+                tail->next = trans;
+        } else
+                dev->queue = trans;
+        crit_exit();
 
-int
-spiflash_get_id(struct spiflash_ctx *ctx, spiflash_info_cb cb, void *cbdata)
-{
-        ctx->spi_query[0] = 0x9F;
-        ctx->spi_query[1] = ctx->spi_query[2] = ctx->spi_query[3] = 0x00;
-
-        ctx->info_cb = cb;
-        ctx->cbdata = cbdata;
-        spi_queue_xfer(&ctx->flash_spi_ctx, SPI_PCS4, (uint8_t *)ctx->spi_query, 4, (uint8_t *)ctx->spi_response, 4, spiflash_get_id_cb, ctx);
-        return 0;
+        spiflash_schedule(dev);
 }
 
 static void
-spiflash_status_spi_cb(void *cbdata)
+spiflash_transaction_done(struct spiflash_transaction *trans)
 {
-        struct spiflash_ctx *ctx = cbdata;
-        ctx->status_cb(ctx->cbdata, ctx->spi_response[1]);
-}
-
-int
-spiflash_get_status(struct spiflash_ctx *ctx, spiflash_status_cb cb, void *cbdata)
-{
-        ctx->spi_query[0] = 0x05;
-        ctx->status_cb = cb;
-        ctx->cbdata = cbdata;
-        spi_queue_xfer(&ctx->flash_spi_ctx, SPI_PCS4, ctx->spi_query, 1, ctx->spi_response, 2, spiflash_status_spi_cb, ctx);
-        return 0;
+        struct spiflash_device *dev = trans->dev;
+        dev->queue = trans->next;
+        trans->done_cb(trans);
+        spiflash_schedule(dev);
 }
 
 static void
 spiflash_check_write_completed_spi_cb(void *cbdata)
 {
-        struct spiflash_ctx *ctx = cbdata;
+        struct spiflash_transaction *trans = cbdata;
         /* if not busy, call the user callback; otherwise, reissue get status */
-        if (!(ctx->spi_response[1] & 1))
-                ctx->write_completed_cb(ctx->cbdata);
-        else
-                spi_queue_xfer(&ctx->flash_spi_ctx, SPI_PCS4, ctx->spi_query, 1, ctx->spi_response, 2, spiflash_check_write_completed_spi_cb, ctx);
+        if (!(trans->spi_response[1] & 1)) {
+                spiflash_transaction_done(trans);
+        } else {
+                spi_queue_xfer(&trans->dev->flash_spi_ctx, SPI_PCS4,
+                               trans->spi_query, 1, trans->spi_response, 2,
+                               spiflash_check_write_completed_spi_cb, trans);
+        }
 }
 
 static void
-spiflash_write_dispatched_spi_cb(void *cbdata)
+spiflash_transaction_dispatched_spi_cb(void *cbdata)
 {
-        /* command and data transferred, wait for the busy flag to clear */
-        struct spiflash_ctx *ctx = cbdata;
-        ctx->spi_query[0] = 0x05;
-        spi_queue_xfer(&ctx->flash_spi_ctx, SPI_PCS4, ctx->spi_query, 1, ctx->spi_response, 2, spiflash_check_write_completed_spi_cb, ctx);
+        struct spiflash_transaction *trans = cbdata;
+        if (trans->flags.wait_busy) {
+                /* command and data transferred, wait for the busy flag to clear */
+                trans->spi_query[0] = 0x05;
+                spi_queue_xfer(&trans->dev->flash_spi_ctx, SPI_PCS4,
+                               trans->spi_query, 1, trans->spi_response, 2,
+                               spiflash_check_write_completed_spi_cb, trans);
+        } else {
+                spiflash_transaction_done(trans);
+        }
+}
+
+static void
+spiflash_run_transaction(struct spiflash_transaction *trans)
+{
+        spi_queue_xfer_sg(&trans->dev->flash_spi_ctx.ctx, SPI_PCS4,
+                          trans->flash_tx_sg, trans->flash_rx_sg,
+                          spiflash_transaction_dispatched_spi_cb, trans);
 }
 
 static void
 spiflash_write_enabled_spi_cb(void *cbdata)
 {
-        struct spiflash_ctx *ctx = cbdata;
-        /* Send the queued operation, then wait for the busy flag to clear */
-        spi_queue_xfer_sg(&ctx->flash_spi_ctx.ctx, SPI_PCS4, ctx->flash_tx_sg, ctx->flash_rx_sg, spiflash_write_dispatched_spi_cb, ctx);
+        spiflash_run_transaction(cbdata);
+}
+
+static void
+spiflash_schedule(struct spiflash_device *dev)
+{
+        if (dev->queue == NULL)
+                return;
+
+        struct spiflash_transaction *trans = dev->queue;
+        if (trans->flags.write_enable) {
+                /* send write enable then run transaction */
+                spi_queue_xfer(&trans->dev->flash_spi_ctx, SPI_PCS4,
+                               write_enable_cmd, 1, NULL, 0,
+                               spiflash_write_enabled_spi_cb, trans);
+        } else {
+                spiflash_run_transaction(trans);
+        }
+}
+
+static void
+spiflash_setup_xfer(struct spiflash_transaction *trans,
+                    uint16_t txlen, uint16_t rxlen)
+{
+        sg_init(trans->flash_tx_sg, trans->spi_query, txlen);
+        sg_init(trans->flash_rx_sg, trans->spi_response, rxlen);
+}
+
+static void
+spiflash_get_id_done_cb(struct spiflash_transaction *trans)
+{
+        trans->info_cb(trans->cbdata, trans->spi_response[1],
+                       trans->spi_response[2], trans->spi_response[3]);
 }
 
 int
-spiflash_read_page(struct spiflash_ctx *ctx, uint8_t *dest, uint32_t addr, uint32_t len, spi_cb cb, void *cbdata)
+spiflash_get_id(struct spiflash_device *dev, struct spiflash_transaction *trans,
+                spiflash_info_cb cb, void *cbdata)
 {
-        ctx->spi_query[0] = READ_DATA;
-        ctx->spi_query[1] = addr >> 16;
-        ctx->spi_query[2] = addr >> 8;
-        ctx->spi_query[3] = addr;
-        ctx->cbdata = cbdata;
-        sg_init_list(ctx->flash_tx_sg, 1, ctx->spi_query, 4);
-        sg_init_list(ctx->flash_rx_sg, 2, ctx->spi_response, 4, dest, len);
-        spi_queue_xfer_sg(&ctx->flash_spi_ctx.ctx, SPI_PCS4, ctx->flash_tx_sg, ctx->flash_rx_sg, cb, cbdata);
+        trans->spi_query[0] = 0x9F;
+        trans->spi_query[1] = trans->spi_query[2] = trans->spi_query[3] = 0x00;
+        spiflash_setup_xfer(trans, 4, 4);
 
+        trans->info_cb = cb;
+        trans->cbdata = cbdata;
+        spiflash_queue_transaction(dev, trans, false, false, spiflash_get_id_done_cb);
+        return 0;
+}
+
+static void
+spiflash_status_done_cb(struct spiflash_transaction *trans)
+{
+        trans->status_cb(trans->cbdata, trans->spi_response[1]);
+}
+
+int
+spiflash_get_status(struct spiflash_device *dev, struct spiflash_transaction *trans,
+                    spiflash_status_cb cb, void *cbdata)
+{
+        trans->spi_query[0] = 0x05;
+        spiflash_setup_xfer(trans, 1, 2);
+
+        trans->status_cb = cb;
+        trans->cbdata = cbdata;
+        spiflash_queue_transaction(dev, trans, false, false, spiflash_status_done_cb);
+        return 0;
+}
+
+static void
+spiflash_spi_done_cb(struct spiflash_transaction *trans)
+{
+        trans->spi_cb(trans->cbdata);
+}
+
+int
+spiflash_read_page(struct spiflash_device *dev, struct spiflash_transaction *trans,
+                   uint8_t *dest, uint32_t addr, uint32_t len, spi_cb cb, void *cbdata)
+{
+        trans->spi_query[0] = READ_DATA;
+        trans->spi_query[1] = addr >> 16;
+        trans->spi_query[2] = addr >> 8;
+        trans->spi_query[3] = addr;
+
+        trans->spi_cb = cb;
+        trans->cbdata = cbdata;
+        sg_init_list(trans->flash_tx_sg, 1, trans->spi_query, 4);
+        sg_init_list(trans->flash_rx_sg, 2, trans->spi_response, 4, dest, len);
+        spiflash_queue_transaction(dev, trans, false, false, spiflash_spi_done_cb);
         return 0;
 }
 
 static int
-spiflash_write_cmd(struct spiflash_ctx *ctx, uint8_t cmd, uint32_t addr, const uint8_t *src, uint8_t len, spi_cb cb, void *cbdata)
+spiflash_write_cmd(struct spiflash_device *dev, struct spiflash_transaction *trans,
+                   uint8_t cmd, uint32_t addr, const uint8_t *src, uint8_t len,
+                   spi_cb cb, void *cbdata)
 {
-        ctx->spi_query[0] = WRITE_ENABLE; /* first command (write enable) */
-        ctx->spi_query[1] = cmd; /* second command (program/erase) */
-        ctx->spi_query[2] = addr >> 16;
-        ctx->spi_query[3] = addr >> 8;
-        ctx->spi_query[4] = addr;
+        trans->spi_query[0] = cmd;
+        trans->spi_query[1] = addr >> 16;
+        trans->spi_query[2] = addr >> 8;
+        trans->spi_query[3] = addr;
         if (src)
-                sg_init_list(ctx->flash_tx_sg, 2, ctx->spi_query + 1, 4, src, len);
+                sg_init_list(trans->flash_tx_sg, 2, trans->spi_query, 4, src, len);
         else
-                sg_init_list(ctx->flash_tx_sg, 1, ctx->spi_query + 1, 4);
-        sg_init_list(ctx->flash_rx_sg, 0);
-        ctx->write_completed_cb = cb;
-        ctx->cbdata = cbdata;
-        /* write enable, then proceed with programming from the callback */
-        spi_queue_xfer(&ctx->flash_spi_ctx, SPI_PCS4, ctx->spi_query, 1, NULL, 0, spiflash_write_enabled_spi_cb, ctx);
+                sg_init_list(trans->flash_tx_sg, 1, trans->spi_query, 4);
+        sg_init_list(trans->flash_rx_sg, 0);
+
+        trans->spi_cb = cb;
+        trans->cbdata = cbdata;
+        spiflash_queue_transaction(dev, trans, true, true, spiflash_spi_done_cb);
         
         return 0;
 }
 
 int
-spiflash_program_page(struct spiflash_ctx *ctx, uint32_t addr, const uint8_t *src, uint8_t len, spi_cb cb, void *cbdata)
+spiflash_program_page(struct spiflash_device *dev, struct spiflash_transaction *trans,
+                      uint32_t addr, const uint8_t *src, uint8_t len,
+                      spi_cb cb, void *cbdata)
 {
-        return spiflash_write_cmd(ctx, PAGE_PROGRAM, addr, src, len, cb, cbdata);
+        return spiflash_write_cmd(dev, trans, PAGE_PROGRAM, addr, src, len, cb, cbdata);
 }
 
 int
-spiflash_erase_sector(struct spiflash_ctx *ctx, uint32_t addr, spi_cb cb, void *cbdata)
+spiflash_erase_sector(struct spiflash_device *dev, struct spiflash_transaction *trans,
+                      uint32_t addr, spi_cb cb, void *cbdata)
 {
-        return spiflash_write_cmd(ctx, SECTOR_ERASE, addr, NULL, 0, cb, cbdata);
+        return spiflash_write_cmd(dev, trans, SECTOR_ERASE, addr, NULL, 0, cb, cbdata);
 }
 
 int
-spiflash_erase_block(struct spiflash_ctx *ctx, uint32_t addr, int is_64KB, spi_cb cb, void *cbdata)
+spiflash_erase_block(struct spiflash_device *dev, struct spiflash_transaction *trans,
+                     uint32_t addr, int is_64KB, spi_cb cb, void *cbdata)
 {
-        return spiflash_write_cmd(ctx, is_64KB ? BLOCK_ERASE_64KB : BLOCK_ERASE_32KB, addr, NULL, 0, cb, cbdata);
+        return spiflash_write_cmd(dev, trans,
+                                  is_64KB ? BLOCK_ERASE_64KB : BLOCK_ERASE_32KB,
+                                  addr, NULL, 0, cb, cbdata);
 }
 
