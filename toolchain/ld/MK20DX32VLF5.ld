@@ -47,6 +47,7 @@ UART2       = 0x4006C080;
 USB0        = 0x40072000;
 LLWU        = 0x4007c000;
 PMC         = 0x4007d000;
+SMC         = 0x4007e000;
 RCM         = 0x4007f000;
 
 GPIOA       = 0x400ff000;
