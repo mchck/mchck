@@ -17,3 +17,17 @@ uint32_t rtc_get_time();
 
 /* Set the current time in seconds */
 void rtc_set_time(uint32_t seconds);
+
+typedef void (rtc_alarm_cb)(void *cbdata);
+
+struct rtc_alarm_ctx {
+        struct rtc_alarm_ctx *next;
+        uint32_t time;
+        rtc_alarm_cb *cb;
+        void *cbdata;
+};
+
+void rtc_alarm_add(struct rtc_alarm_ctx *ctx, uint32_t time,
+                   rtc_alarm_cb *cb, void *cbdata);
+
+void rtc_alarm_cancel(struct rtc_alarm_ctx *ctx);
