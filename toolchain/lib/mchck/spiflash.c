@@ -1,5 +1,4 @@
 #include <mchck.h>
-#include <stdbool.h>
 
 enum {
         PAGE_PROGRAM = 0x02,
@@ -245,3 +244,8 @@ spiflash_erase_block(struct spiflash_device *dev, struct spiflash_transaction *t
                                   addr, NULL, 0, cb, cbdata);
 }
 
+bool
+spiflash_is_idle(struct spiflash_device *dev)
+{
+        return dev->queue;
+}

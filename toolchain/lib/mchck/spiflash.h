@@ -1,3 +1,5 @@
+#include <stdbool.h>
+
 #define SPIFLASH_MFGID_WINBOND 0x9F
 #define SPIFLASH_MEMTYPE_WINBOND_FLASH 0x40
 #define SPIFLASH_WINBOND_SIZE_1MB 0x14
@@ -71,3 +73,6 @@ spiflash_erase_sector(struct spiflash_device *dev, struct spiflash_transaction *
 extern int
 spiflash_erase_block(struct spiflash_device *dev, struct spiflash_transaction *trans,
                      uint32_t addr, int is_64KB, spi_cb cb, void *cbdata);
+
+extern bool
+spiflash_is_idle(struct spiflash_device *dev);
