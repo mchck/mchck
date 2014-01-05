@@ -67,6 +67,7 @@ sleep_until_cont(void)
 int
 main(void)
 {
+        SIM.sopt1.usbregen = 0;
         SCB.scr.sleepdeep = 1;
         SMC.pmctrl.lpwui = 0;
 
