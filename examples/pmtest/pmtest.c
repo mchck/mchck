@@ -33,6 +33,7 @@ enter_vlpr()
         SMC.pmprot.raw = ((struct SMC_PMPROT) { .avlls = 1, .alls = 1, .avlp = 1 }).raw;
         SMC.pmctrl.raw = ((struct SMC_PMCTRL) { .runm = RUNM_VLPR, .stopm = STOPM_VLPS }).raw;
         //SMC.pmctrl.raw = ((struct SMC_PMCTRL) { .runm = RUNM_RUN, .stopm = STOPM_VLPS }).raw;
+        SMC.pmctrl.stopm = STOPM_LLS;
         onboard_led(1);
         while (PMC.regsc.regons != 0);
         while (SMC.pmstat.pmstat != PMSTAT_VLPR);
@@ -77,9 +78,7 @@ main(void)
         pin_mode(PIN_PTC6, PIN_MODE_PULLUP | PIN_MODE_MUX_GPIO);
         pin_mode(PIN_PTC7, PIN_MODE_PULLUP | PIN_MODE_MUX_GPIO);
                 
-        //move_to_blpi();
         enter_vlpr();
-        //SMC.pmctrl.stopm = STOPM_LLS;
 
         if (0) {
                 ftm_init();
@@ -100,8 +99,8 @@ main(void)
         gpio_dir(GPIO_PTA4, GPIO_INPUT);
         PORTA.pcr[4].irqc = PCR_IRQC_INT_FALLING;
         int_enable(IRQ_PORTA);
-        //int_enable(IRQ_LLWU);
-        //LLWU.wupe[0].wupe3 = LLWU_PE_FALLING;
+        int_enable(IRQ_LLWU);
+        LLWU.wupe[0].wupe3 = LLWU_PE_FALLING;
 
         sleep_forever();
 }
@@ -136,7 +135,7 @@ LLWU_Handler(void)
         LLWU.wuf1 = 0xff;
         LLWU.wuf2 = 0xff;
         LLWU.mwuf = 0xff;
-        onboard_led(1);
+        onboard_led(-1);
         PORTA_Handler();
 }
 
