@@ -13,7 +13,7 @@ ftm_init(void)
                 FTM0.channel[i].cv = 0x8000;
         }
 
-        FTM0.sc.clks = 1;       // select clock for counter
+        FTM0.sc.clks = FTM_CLKS_SYSTEM;       // select clock for counter
 }
 
 void
