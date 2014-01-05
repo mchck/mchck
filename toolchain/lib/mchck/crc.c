@@ -4,7 +4,7 @@ void
 crc_init(
 	uint32_t seed,
 	uint32_t poly,
-	uint8_t width,
+	enum crc_width_t width,
 	enum crc_transpose_t totr,
 	enum crc_transpose_t tot,
 	uint8_t compl_xor)
@@ -21,9 +21,16 @@ crc_init(
 }
 
 void
-crc_update(uint32_t value)
+crc_update(void *buf, size_t len)
 {
-	CRC.crc = value;
+	size_t n = len / 4;
+	while (n-- > 0) {
+		CRC.crc = *(uint32_t*)buf;
+		buf += 4;
+	}
+	n = len % 4;
+	while (n-- > 0)
+		CRC.crc_ll = *(uint8_t*)buf++;
 }
 
 uint32_t

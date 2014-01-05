@@ -1,9 +1,23 @@
 #include <mchck.h>
 
 struct CRC_t {
-	uint32_t crc;
-	uint32_t poly;
-	struct CRC_CTRL_t {
+	union {
+		struct {
+			uint8_t crc_ll;
+			uint8_t crc_lu;
+			uint8_t crc_hl;
+			uint8_t crc_hu;
+		};
+		uint32_t crc;
+	};
+	union {
+		struct {
+			uint16_t poly_low;
+			uint16_t poly_high;
+		};
+		uint32_t poly;
+	};
+	struct {
 		UNION_STRUCT_START(32);
 		uint32_t _pad : 24;
 		uint32_t tcrc : 1;
