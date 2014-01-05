@@ -38,6 +38,12 @@ spi_stop_xfer(void)
         SPI0.sr.raw |= 0;
 }
 
+int
+spi_is_xfer_active(void)
+{
+        return !SPI0.mcr.halt;
+}
+
 void
 spi_queue_xfer(struct spi_ctx *ctx,
                enum spi_pcs pcs,
@@ -98,8 +104,11 @@ again:
                 flags.raw = status.raw & SPI0.rser.raw;
 
                 if (flags.rfdf && spi_ctx->rx) {
-                        for (int i = status.rxctr; i > 0 && spi_ctx->rx; --i, sg_move(&spi_ctx->rx, 1))
-                                *sg_data(spi_ctx->rx) = SPI0.popr;
+                        for (int i = status.rxctr; i > 0 && spi_ctx->rx; --i, sg_move(&spi_ctx->rx, 1)) {
+                                uint8_t d = SPI0.popr;
+                                if (sg_data(spi_ctx->rx) != NULL)
+                                        *sg_data(spi_ctx->rx) = d;
+                        }
                         /* disable interrupt if we're done receiving */
                         if (!spi_ctx->rx)
                                 SPI0.rser.rfdf_re = 0;

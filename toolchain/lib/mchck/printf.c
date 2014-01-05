@@ -58,7 +58,7 @@ plain_output:
         int print_frac = 0;
         unsigned PRINTF_VAL_T val;
 #ifndef NO_FIX
-        unsigned PRINTF_FRAC_T frac;
+        unsigned PRINTF_FRAC_T frac = 0;
 #endif
 
         /* flags */

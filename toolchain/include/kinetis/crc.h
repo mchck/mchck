@@ -17,7 +17,7 @@ struct CRC_t {
 		};
 		uint32_t poly;
 	};
-	struct CRC_CTRL_t {
+	struct {
 		UNION_STRUCT_START(32);
 		uint32_t _pad : 24;
 		uint32_t tcrc : 1;
