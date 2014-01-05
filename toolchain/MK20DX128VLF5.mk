@@ -1,4 +1,4 @@
-# MK20DX32VLF5 with bootloader
+# MK20DX128VLF5 with bootloader
 TARGET_FAMILY=		K20
 
 FIXED_SECTIONS+=	-s 0:.isr_vector
@@ -6,5 +6,5 @@ FIXED_SECTIONS+=	-s 0x400:.flash_config
 
 LOADER_SIZE=	3072
 LOADER_ADDR=	0
-APP_SIZE=	29696
+APP_SIZE=	128000
 APP_ADDR=	3072
