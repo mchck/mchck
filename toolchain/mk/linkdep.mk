@@ -19,8 +19,6 @@ endef
 GENERATE.linkdep=	${_libdir}/scripts/linkdep -o $@ $<
 
 
-LIBDEPCACHE=	${_libdir}/cache
-
 ${LIBDEPCACHE}/%.linkdep: ${LIBDEPCACHE}/%.o
 	cd "${LIBDEPCACHE}" && ${GENERATE.linkdep} --no-path
 
