@@ -61,6 +61,7 @@ rtc_alarm_add(struct rtc_alarm_ctx *ctx, uint32_t time,
                 ctx->next = tail;
                 *last_next = ctx;
         } else {
+                ctx->next = NULL;
                 alarm_head = ctx;
         }
         rtc_alarm_update();
