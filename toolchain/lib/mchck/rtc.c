@@ -36,6 +36,9 @@ rtc_set_time(uint32_t seconds)
 static void
 rtc_alarm_update()
 {
+        if (rtc_get_time() == RTC_INVALID_TIME)
+                return;
+
         if (alarm_head) {
                 int_enable(IRQ_RTC_alarm);
                 RTC.tar = alarm_head->time;
