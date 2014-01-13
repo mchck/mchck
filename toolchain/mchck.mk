@@ -175,7 +175,7 @@ flash: ${PROG}.bin
 	${DFUUTIL} -d ${DFUVID}:${DFUPID} -D ${PROG}.bin
 
 swd-flash: check-programmer ${PROG}.bin
-	${RUBY} ${_libdir}/../programmer/flash.rb ${MCHCKADAPTER} $< ${LOADADDR}
+	${RUBY} ${_libdir}/../programmer/flash.rb ${MCHCKADAPTER} ${PROG}.bin ${LOADADDR}
 
 check-programmer:
 	cd ${_libdir}/.. && git submodule update --init programmer
