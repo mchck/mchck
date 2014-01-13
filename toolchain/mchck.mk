@@ -178,7 +178,7 @@ swd-flash: check-programmer ${PROG}.bin
 	${RUBY} ${_libdir}/../programmer/flash.rb ${MCHCKADAPTER} $< ${LOADADDR}
 
 check-programmer:
-	cd ${_libdir}/.. && git submodule update programmer
+	cd ${_libdir}/.. && git submodule update --init programmer
 endif
 
 # from the make info manual
