@@ -1,0 +1,11 @@
+device(:cdc_device) {
+  idVendor 0x2323
+  idProduct 3
+  iManufacturer "mchck.org"
+  iProduct "i2c scan"
+  config {
+    initfun :init_vcdc
+    cdc {
+    }
+  }
+}
