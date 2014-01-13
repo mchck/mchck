@@ -168,14 +168,17 @@ ${LDTEMPLATE}: ${_libdir}/ld/link.ld.S ${LDSCRIPTS}
 	${CPP} -o $@ ${CPPFLAGS.ld} $<
 CLEANFILES+=	${LDTEMPLATE} ${PROG}.ld
 
-gdb: ${PROG}.elf
+gdb: check-programmer ${PROG}.elf
 	${RUBY} ${_libdir}/../programmer/gdbserver.rb ${MCHCKADAPTER} -- ${GDB} -readnow -ex 'target extended-remote :1234' ${PROG}.elf
 
 flash: ${PROG}.bin
 	${DFUUTIL} -d ${DFUVID}:${DFUPID} -D ${PROG}.bin
 
-swd-flash: ${PROG}.bin
+swd-flash: check-programmer ${PROG}.bin
 	${RUBY} ${_libdir}/../programmer/flash.rb ${MCHCKADAPTER} $< ${LOADADDR}
+
+check-programmer:
+	cd ${_libdir}/.. && git submodule update programmer
 endif
 
 # from the make info manual
