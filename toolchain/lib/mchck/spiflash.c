@@ -1,6 +1,7 @@
 #include <mchck.h>
 
 enum {
+        GET_STATUS = 0x05,
         PAGE_PROGRAM = 0x02,
         READ_DATA = 0x03,
         READ_STATUS_REGISTER_1 = 0x05,
@@ -8,6 +9,7 @@ enum {
         SECTOR_ERASE = 0x20,
         BLOCK_ERASE_32KB = 0x52,
         BLOCK_ERASE_64KB = 0xD8,
+        GET_IDENTIFICATION = 0x9F,
 };
 
 struct spiflash_device onboard_flash = {
@@ -146,7 +148,7 @@ int
 spiflash_get_id(struct spiflash_device *dev, struct spiflash_transaction *trans,
                 spiflash_info_cb cb, void *cbdata)
 {
-        trans->spi_query[0] = 0x9F;
+        trans->spi_query[0] = GET_IDENTIFICATION;
         trans->spi_query[1] = trans->spi_query[2] = trans->spi_query[3] = 0x00;
         spiflash_setup_xfer(trans, 4, 4);
 
@@ -166,7 +168,7 @@ int
 spiflash_get_status(struct spiflash_device *dev, struct spiflash_transaction *trans,
                     spiflash_status_cb cb, void *cbdata)
 {
-        trans->spi_query[0] = 0x05;
+        trans->spi_query[0] = GET_STATUS;
         spiflash_setup_xfer(trans, 1, 2);
 
         trans->status_cb = cb;
