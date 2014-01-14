@@ -19,8 +19,11 @@ _eram = ORIGIN(ram) + LENGTH(ram);
 FTFL_CONFIG = 0x00000400;
 FlexRAM     = 0x14000000;
 
+DMA         = 0x40008000;
+DMAMUX      = 0x40021000;
 FTFL        = 0x40020000;
 SPI0        = 0x4002c000;
+I2S0        = 0x4002f000;
 CRC         = 0x40032000;
 PIT         = 0x40037000;
 FTM0        = 0x40038000;
@@ -45,7 +48,9 @@ UART1       = 0x4006B000;
 UART2       = 0x4006C080;
 
 USB0        = 0x40072000;
+LLWU        = 0x4007c000;
 PMC         = 0x4007d000;
+SMC         = 0x4007e000;
 RCM         = 0x4007f000;
 
 GPIOA       = 0x400ff000;
@@ -54,5 +59,6 @@ GPIOC       = 0x400ff080;
 GPIOD       = 0x400ff0C0;
 GPIOE       = 0x400ff100;
 
+SYSTICK     = 0xe000e010;
 NVIC        = 0xe000e100;
 SCB         = 0xe000ed00;

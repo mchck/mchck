@@ -34,7 +34,7 @@ struct TSI {
         uint32_t _rsvd2     : 3;
         UNION_STRUCT_END;
     } gencs;
-    struct TSI_SCANS {
+    struct TSI_SCANC {
         UNION_STRUCT_START(32);
         enum {
             TSI_AM_PS_1     = 0b000,
