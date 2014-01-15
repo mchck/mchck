@@ -75,13 +75,13 @@ void
 rtc_alarm_cancel(struct rtc_alarm_ctx *ctx)
 {
         crit_enter();
-        struct rtc_alarm_ctx *tail = alarm_head;
-        while (tail) {
-                if (tail->next == ctx) {
-                        tail->next = ctx->next;
+        struct rtc_alarm_ctx **next = &alarm_head;
+        while (*next) {
+                if (*next == ctx) {
+                        *next = ctx->next;
                         break;
                 }
-                tail = tail->next;
+                next = &(*next)->next;
         }
         crit_exit();
 }
