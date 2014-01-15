@@ -36,9 +36,12 @@ rtc_set_time(uint32_t seconds)
 static void
 rtc_alarm_update()
 {
+        if (rtc_get_time() == RTC_INVALID_TIME)
+                return;
+
         if (alarm_head) {
-                int_enable(IRQ_RTC_alarm);
                 RTC.tar = alarm_head->time;
+                int_enable(IRQ_RTC_alarm);
         } else {
                 int_disable(IRQ_RTC_alarm);
         }
@@ -61,6 +64,7 @@ rtc_alarm_add(struct rtc_alarm_ctx *ctx, uint32_t time,
                 ctx->next = tail;
                 *last_next = ctx;
         } else {
+                ctx->next = NULL;
                 alarm_head = ctx;
         }
         rtc_alarm_update();
@@ -71,13 +75,13 @@ void
 rtc_alarm_cancel(struct rtc_alarm_ctx *ctx)
 {
         crit_enter();
-        struct rtc_alarm_ctx *tail = alarm_head;
-        while (tail) {
-                if (tail->next == ctx) {
-                        tail->next = ctx->next;
+        struct rtc_alarm_ctx **next = &alarm_head;
+        while (*next) {
+                if (*next == ctx) {
+                        *next = ctx->next;
                         break;
                 }
-                tail = tail->next;
+                next = &(*next)->next;
         }
         crit_exit();
 }

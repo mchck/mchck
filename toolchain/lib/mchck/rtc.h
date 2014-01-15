@@ -1,3 +1,5 @@
+#define RTC_INVALID_TIME 0xffffffff
+
 /* Enable access to the RTC and starts the oscillator. */
 void rtc_init();
 

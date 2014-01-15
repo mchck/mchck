@@ -1,4 +1,5 @@
 #include <mchck/sg.h>
+#include <stdbool.h>
 
 enum spi_pcs {
         SPI_PCS0 = 1 << 0,
@@ -20,6 +21,7 @@ struct spi_ctx_bare {
         spi_cb              *cb;
         void                *cbdata;
         struct spi_ctx_bare *next;
+        bool                 queued;
 };
 
 struct spi_ctx {
@@ -28,15 +30,15 @@ struct spi_ctx {
         struct sg rx_sg;
 };
 
-void spi_queue_xfer(struct spi_ctx *ctx,
-                    enum spi_pcs pcs,
-                    const uint8_t *txbuf, uint16_t txlen,
-                    uint8_t *rxbuf, uint16_t rxlen,
-                    spi_cb *cb, void *cbdata);
-void spi_queue_xfer_sg(struct spi_ctx_bare *ctx,
-                       enum spi_pcs pcs,
-                       struct sg *tx, struct sg *rx,
-                       spi_cb *cb, void *cbdata);
+int spi_queue_xfer(struct spi_ctx *ctx,
+                   enum spi_pcs pcs,
+                   const uint8_t *txbuf, uint16_t txlen,
+                   uint8_t *rxbuf, uint16_t rxlen,
+                   spi_cb *cb, void *cbdata);
+int spi_queue_xfer_sg(struct spi_ctx_bare *ctx,
+                      enum spi_pcs pcs,
+                      struct sg *tx, struct sg *rx,
+                      spi_cb *cb, void *cbdata);
 void spi_init(void);
 
 int spi_is_xfer_active(void);
