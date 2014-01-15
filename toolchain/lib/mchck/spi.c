@@ -44,31 +44,35 @@ spi_is_xfer_active(void)
         return !SPI0.mcr.halt;
 }
 
-void
+int
 spi_queue_xfer(struct spi_ctx *ctx,
                enum spi_pcs pcs,
                const uint8_t *txbuf, uint16_t txlen,
                uint8_t *rxbuf, uint16_t rxlen,
                spi_cb *cb, void *cbdata)
 {
-        spi_queue_xfer_sg(&ctx->ctx, pcs,
-                          sg_init(&ctx->tx_sg, (void *)txbuf, txlen),
-                          sg_init(&ctx->rx_sg, rxbuf, rxlen),
-                          cb, cbdata);
+        return spi_queue_xfer_sg(&ctx->ctx, pcs,
+                                 sg_init(&ctx->tx_sg, (void *)txbuf, txlen),
+                                 sg_init(&ctx->rx_sg, rxbuf, rxlen),
+                                 cb, cbdata);
 }
 
-void
+int
 spi_queue_xfer_sg(struct spi_ctx_bare *ctx,
                   enum spi_pcs pcs,
                   struct sg *tx, struct sg *rx,
                   spi_cb *cb, void *cbdata)
 {
+        if (ctx->queued)
+                return 1;
+
         *ctx = (struct spi_ctx_bare){
                 .tx = sg_simplify(tx),
                 .rx = sg_simplify(rx),
                 .pcs = pcs,
                 .cb = cb,
-                .cbdata = cbdata
+                .cbdata = cbdata,
+                .queued = true
         };
 
         size_t tx_len = sg_total_lengh(ctx->tx);
@@ -88,6 +92,7 @@ spi_queue_xfer_sg(struct spi_ctx_bare *ctx,
                 }
         }
         crit_exit();
+        return 0;
 }
 
 void
@@ -142,6 +147,7 @@ again:
                         struct spi_ctx_bare *ctx = spi_ctx;
 
                         crit_enter();
+                        ctx->queued = false;
                         spi_ctx = ctx->next;
                         if (spi_ctx != NULL)
                                 spi_start_xfer();
