@@ -1,7 +1,7 @@
 #include <mchck.h>
 
 struct adc_ctx {
-        struct {
+        volatile struct {
                 adc_result_cb_t *cb;
                 void *cbdata;
                 int active;
