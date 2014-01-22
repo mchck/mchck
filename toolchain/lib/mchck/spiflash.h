@@ -56,16 +56,6 @@ extern int
 spiflash_get_id(struct spiflash_device *dev, struct spiflash_transaction *trans,
                 spiflash_info_cb cb, void *cbdata);
 
-/*
- * get the size in bytes from the capacity field provided by
- * spiflash_get_id
- */
-static inline size_t
-spiflash_capacity_to_bytes(uint8_t capacity)
-{
-        return (1 << capacity) * 0x40;
-}
-
 extern int
 spiflash_get_status(struct spiflash_device *dev, struct spiflash_transaction *trans,
                     spiflash_status_cb cb, void *cbdata);
