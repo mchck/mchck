@@ -17,12 +17,14 @@ typedef void (spiflash_transaction_done_cb)(struct spiflash_transaction *trans);
 struct spiflash_transaction {
         struct spiflash_transaction_flags {
                 UNION_STRUCT_START(8);
-                unsigned write_enable : 1; // needs WRITE_ENABLE command
                 unsigned wait_busy    : 1; // will set BUSY flag
                 unsigned running      : 1; // currently in progress
                 unsigned queued       : 1; // on the queue (either running or waiting to start)
                 UNION_STRUCT_END;
         } flags;
+        /* room for a single command sent before the actual command.
+           Used to send WRITE_ENABLE, etc. */
+        uint8_t         prelude_command;
         struct sg       flash_tx_sg[2];
         struct sg       flash_rx_sg[2];
         uint8_t         spi_query[5];
@@ -54,16 +56,6 @@ extern int
 spiflash_get_id(struct spiflash_device *dev, struct spiflash_transaction *trans,
                 spiflash_info_cb cb, void *cbdata);
 
-/*
- * get the size in bytes from the capacity field provided by
- * spiflash_get_id
- */
-static inline size_t
-spiflash_capacity_to_bytes(uint8_t capacity)
-{
-        return (1 << capacity) * 0x40;
-}
-
 extern int
 spiflash_get_status(struct spiflash_device *dev, struct spiflash_transaction *trans,
                     spiflash_status_cb cb, void *cbdata);
@@ -83,6 +75,10 @@ spiflash_erase_sector(struct spiflash_device *dev, struct spiflash_transaction *
 extern int
 spiflash_erase_block(struct spiflash_device *dev, struct spiflash_transaction *trans,
                      uint32_t addr, int is_64KB, spi_cb cb, void *cbdata);
+
+extern int 
+spiflash_set_protection(struct spiflash_device *dev, struct spiflash_transaction *trans,
+                        bool protected, spi_cb cb, void *cbdata);
 
 extern bool
 spiflash_is_idle(struct spiflash_device *dev);
