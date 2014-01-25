@@ -282,6 +282,8 @@ handle_status(void *data)
 void
 PORTC_Handler(void)
 {
+	if (!pin_physport_from_pin(NRF_IRQ)->pcr[pin_physpin_from_pin(NRF_IRQ)].isf)
+		return;
 	gpio_write(NRF_CE, 0); // go to standby-1
 	pin_physport_from_pin(NRF_IRQ)->pcr[pin_physpin_from_pin(NRF_IRQ)].raw |= 0; // clear MCU interrupt
 	static struct nrf_transaction_t trans = {

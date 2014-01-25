@@ -1,3 +1,6 @@
 [submodule "summon-arm-toolchain"]
 	path = summon-arm-toolchain
 	url = git://github.com/corecode/summon-arm-toolchain.git
+[submodule "programmer"]
+	path = programmer
+	url = git://github.com/mchck/programmer.git
