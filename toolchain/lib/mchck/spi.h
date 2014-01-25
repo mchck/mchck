@@ -41,4 +41,6 @@ int spi_queue_xfer_sg(struct spi_ctx_bare *ctx,
                       spi_cb *cb, void *cbdata);
 void spi_init(void);
 
+bool spi_is_idle(void);
+
 int spi_is_xfer_active(void);

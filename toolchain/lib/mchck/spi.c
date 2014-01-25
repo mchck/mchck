@@ -38,6 +38,11 @@ spi_stop_xfer(void)
         SPI0.sr.raw |= 0;
 }
 
+bool spi_is_idle(void)
+{
+        return spi_ctx == NULL;
+}
+
 int
 spi_is_xfer_active(void)
 {
