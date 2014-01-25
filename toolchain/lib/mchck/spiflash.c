@@ -260,9 +260,3 @@ spiflash_set_protection(struct spiflash_device *dev, struct spiflash_transaction
                                    false, spiflash_spi_done_cb);
         return 0;
 }
-
-bool
-spiflash_is_idle(struct spiflash_device *dev)
-{
-        return dev->queue;
-}

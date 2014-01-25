@@ -79,6 +79,3 @@ spiflash_erase_block(struct spiflash_device *dev, struct spiflash_transaction *t
 extern int 
 spiflash_set_protection(struct spiflash_device *dev, struct spiflash_transaction *trans,
                         bool protected, spi_cb cb, void *cbdata);
-
-extern bool
-spiflash_is_idle(struct spiflash_device *dev);
