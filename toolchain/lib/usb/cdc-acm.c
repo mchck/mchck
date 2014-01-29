@@ -10,7 +10,8 @@ cdc_rx_done(void *buf, ssize_t len, void *data)
 {
         struct cdc_ctx *ctx = data;
 
-        ctx->data_ready_cb(buf, len);
+        if (ctx->data_ready_cb)
+                ctx->data_ready_cb(buf, len);
 }
 
 void
