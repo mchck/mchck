@@ -444,6 +444,8 @@ void vusb_main_loop(void);
 void usb_poll(void);
 #endif
 int usb_tx_serialno(size_t reqlen);
+void usb_suspend();
+void usb_resume();
 
 /* Provided by MI code */
 void usb_init(const struct usbd_device *);
@@ -459,6 +461,15 @@ int usb_ep0_rx(void *, size_t, ep_callback_t, void *);
 void *usb_ep0_tx_inplace_prepare(size_t len);
 int usb_ep0_tx(void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_data);
 int usb_ep0_tx_cp(const void *, size_t, size_t, ep_callback_t, void *);
+
+typedef void (*usb_resume_handler)();
+
+extern usb_resume_handler usb_handle_resume;
+
+/**
+ * See usb_enter_suspend and usb_resume
+ */
+void usb_set_resume_handler(usb_resume_handler handler);
 
 #include <usb/dfu.h>
 #include <usb/cdc-acm.h>

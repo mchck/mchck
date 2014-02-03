@@ -177,7 +177,8 @@ usb_enable(void)
 
         /* reset module - not sure if needed */
         USB0.usbtrc0.raw = ((struct USB_USBTRC0_t){
-                        .usbreset = 1
+                        .usbreset = 1,
+                                .usbresmen = 1
                                 }).raw;
         while (USB0.usbtrc0.usbreset)
                 /* NOTHING */;
@@ -223,6 +224,10 @@ USB0_Handler(void)
                 struct usb_xfer_info stat = USB0.stat;
                 usb_handle_transaction(&stat);
         }
+        if (stat.resume) {
+                if (usb_handle_resume)
+                        usb_handle_resume();
+        }
         USB0.istat.raw = stat.raw;
 }
 
@@ -267,4 +272,23 @@ usb_tx_serialno(size_t reqlen)
         }
         usb_ep0_tx(d, len, reqlen, NULL, NULL);
         return (0);
+}
+
+/**
+ * This must be called before de-clocking the USB module to enable the
+ * RESUME interrupt
+ */
+void usb_suspend()
+{
+        USB0.usbctrl.susp = 1;
+        USB0.inten.resume = 1;
+}
+
+/**
+ * This should be called from the usb_resume_handler to disable the
+ * RESUME interrupt
+ */
+void usb_resume()
+{
+        USB0.inten.resume = 0;
 }

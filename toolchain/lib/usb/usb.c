@@ -10,6 +10,7 @@
 static uint8_t ep0_buf[2][EP0_BUFSIZE] __attribute__((aligned(4)));
 struct usbd_t usb;
 
+usb_resume_handler usb_handle_resume = NULL;
 
 /**
  * Returns: 0 when this is was the last transfer, 1 if there is still
@@ -547,6 +548,12 @@ usb_attach_function(const struct usbd_function *function, struct usbd_function_c
 	ctx->ep_rx_offset = prev->ep_rx_offset + prev->function->ep_rx_count;
 	ctx->ep_tx_offset = prev->ep_tx_offset + prev->function->ep_tx_count;
 	prev->next = ctx;
+}
+
+void
+usb_set_resume_handler(usb_resume_handler handler)
+{
+        usb_handle_resume = handler;
 }
 
 void
