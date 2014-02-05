@@ -1,3 +1,5 @@
+#define TARGET_SECTIONS_LDSCRIPT "K20-sections.ld"
+
 /* common peripheral / misc data for K20 series MCUs */
 
 _app_rom = ORIGIN(app_rom);
