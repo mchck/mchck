@@ -121,11 +121,11 @@ struct pin_change_handler {
         void *cbdata;
 };
 
-#define PIN_DEFINE_CALLBACK(pin, _polarity, _cb, _cbdata)        \
-        struct pin_change_handler pin_##pin##_##_polarity##_handler    \
-        __attribute__((__section__(".pin_hooks."#pin), __used__)) = { \
-                .pin_id = pin,                                          \
-                .polarity = _polarity,                                 \
-                .cb = _cb,                                             \
-                .cbdata = _cbdata                                      \
+#define PIN_DEFINE_CALLBACK(_pin, _polarity, _cb, _cbdata)              \
+        const struct pin_change_handler _CONCAT(_CONCAT(_CONCAT(pin_handler_, _pin), _), _polarity) \
+                __attribute__((__section__(".pin_hooks." _STR(_pin)), __used__)) = { \
+                .pin_id = _pin,                                         \
+                .polarity = _polarity,                                  \
+                .cb = _cb,                                              \
+                .cbdata = _cbdata                                       \
         };

@@ -7,6 +7,7 @@ _eram = ORIGIN(ram) + LENGTH(ram);
 
 /* PACK SECTIONS FIX .isr_vector = 0 */
 /* PACK SECTIONS FIX .flash_config = 0x400 */
+/* PACK SECTIONS IGNORE .pin_hooks.* */
 
 /* peripherals */
 FTFL_CONFIG = 0x00000400;
