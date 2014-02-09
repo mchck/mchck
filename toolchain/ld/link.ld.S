@@ -41,6 +41,10 @@ SECTIONS
     . = ALIGN(4);
     _etext = .;
 
+#ifdef TARGET_SECTIONS_LDSCRIPT
+#include TARGET_SECTIONS_LDSCRIPT
+#endif
+
     /* The USB BDT has to be aligned to a 512 byte boundary */
     .usb_bdt (NOLOAD) :
     {

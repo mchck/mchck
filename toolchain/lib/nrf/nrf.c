@@ -280,12 +280,9 @@ handle_status(void *data)
 }
 
 void
-PORTC_Handler(void)
+nrf_interrupt(void *cbdata)
 {
-	if (!pin_physport_from_pin(NRF_IRQ)->pcr[pin_physpin_from_pin(NRF_IRQ)].isf)
-		return;
 	gpio_write(NRF_CE, 0); // go to standby-1
-	pin_physport_from_pin(NRF_IRQ)->pcr[pin_physpin_from_pin(NRF_IRQ)].raw |= 0; // clear MCU interrupt
 	static struct nrf_transaction_t trans = {
 		.cmd = NRF_CMD_NOP,
 		.tx_len = 0,
@@ -293,6 +290,8 @@ PORTC_Handler(void)
 	};
 	send_command(&trans, handle_status, &trans); // nop it to get the status register
 }
+
+PIN_DEFINE_CALLBACK(PIN_PTC4, PIN_CHANGE_FALLING, nrf_interrupt, NULL);
 
 void
 nrf_init(void)
@@ -319,7 +318,6 @@ nrf_init(void)
 	gpio_write(NRF_CE, 0);
 
 	gpio_dir(NRF_IRQ, GPIO_INPUT);
-	pin_physport_from_pin(NRF_IRQ)->pcr[pin_physpin_from_pin(NRF_IRQ)].irqc = PCR_IRQC_INT_FALLING;
 	int_enable(IRQ_PORTC);
 }
 

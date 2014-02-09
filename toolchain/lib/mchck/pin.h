@@ -101,3 +101,31 @@ pin_physpin_from_pin(enum pin_id pin)
 
 volatile struct PORT_t *pin_physport_from_pin(enum pin_id pin);
 void pin_mode(enum pin_id pin, enum pin_mode mode);
+
+
+/* Pin change interrupt handling */
+enum pin_change_polarity {
+        PIN_CHANGE_ZERO     = 0x8,
+        PIN_CHANGE_ONE      = 0xC,
+        PIN_CHANGE_FALLING  = 0xA,
+        PIN_CHANGE_RISING   = 0x9,
+        PIN_CHANGE_EITHER   = 0xB
+};
+
+typedef void (*pin_change_cb)(void *);
+
+struct pin_change_handler {
+        enum pin_id pin_id;
+        enum pin_change_polarity polarity;
+        pin_change_cb cb;
+        void *cbdata;
+};
+
+#define PIN_DEFINE_CALLBACK(pin, _polarity, _cb, _cbdata)        \
+        struct pin_change_handler pin_##pin##_##_polarity##_handler    \
+        __attribute__((__section__(".pin_hooks."#pin), __used__)) = { \
+                .pin_id = pin,                                          \
+                .polarity = _polarity,                                 \
+                .cb = _cb,                                             \
+                .cbdata = _cbdata                                      \
+        };
