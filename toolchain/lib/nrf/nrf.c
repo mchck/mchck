@@ -318,7 +318,8 @@ nrf_init(void)
 	gpio_write(NRF_CE, 0);
 
 	gpio_dir(NRF_IRQ, GPIO_INPUT);
-	int_enable(IRQ_PORTC);
+
+	pin_change_init();
 }
 
 void
