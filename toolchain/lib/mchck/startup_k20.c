@@ -13,9 +13,6 @@ __attribute__ ((__section__(".co_stack")))
 __attribute__ ((__used__))
 static uint32_t sys_stack[STACK_SIZE / 4];
 
-/* Defined in pin.c */
-extern void pin_change_init();
-
 /**
  * What follows is some macro magic to populate the
  * ISR vector table and to declare weak symbols for the handlers.
@@ -148,8 +145,6 @@ Default_Reset_Handler(void)
 
         memcpy(&_sdata, &_sidata, (uintptr_t)&_edata - (uintptr_t)&_sdata);
         memset(&_sbss, 0, (uintptr_t)&_ebss - (uintptr_t)&_sbss);
-
-        pin_change_init();
 
         main();
 }

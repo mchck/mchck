@@ -4,7 +4,7 @@ int
 main(void)
 {
         pin_mode(PIN_PTB1, PIN_MODE_PULLUP | PIN_MODE_MUX_GPIO | PIN_MODE_FILTER_ON);
-        int_enable(IRQ_PORTB);
+        pin_change_init();
         sys_yield_for_frogs();
 }
 
