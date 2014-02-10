@@ -24,7 +24,6 @@ enter_vlpr()
 {
         // Enable very low power modes
         SIM.clkdiv1.raw = ((struct SIM_CLKDIV1_t) { .outdiv1 = 1, .outdiv2 = 1, .outdiv4 = 3 }).raw;
-        SMC.pmprot.raw = ((struct SMC_PMPROT) { .avlls = 1, .alls = 1, .avlp = 1 }).raw;
 
         SMC.pmctrl.raw = ((struct SMC_PMCTRL) { .runm = RUNM_VLPR, .stopm = STOPM_VLPS }).raw;
 
@@ -92,12 +91,16 @@ void
 set_sleepdeep(bool sleepdeep)
 {
         SCB.scr.sleepdeep = sleepdeep;
-        volatile bool sync = SCB.scr.sleepdeep;
+        volatile bool unused = SCB.scr.sleepdeep;
 }
+
+uint32_t *const state = (uint32_t*) 0x4003e000;
 
 int
 main(void)
 {
+        // enable low-power modes
+        SMC.pmprot.raw = ((struct SMC_PMPROT) { .avlls = 1, .alls = 1, .avlp = 1 }).raw;
         // ensure we stay in VLPR
         SMC.pmctrl.lpwui = 0;
         // but we want to be able to run after be awoken
@@ -120,65 +123,105 @@ main(void)
         pin_mode(PIN_PTA18, PIN_MODE_MUX_GPIO);
         gpio_dir(GPIO_PTA18, GPIO_OUTPUT);
 
-        // stage 1: baseline RUN
-        blink(1);
-        spin();
+        // Acknowledge isolation
+        PMC.regsc.ackiso = 1;
 
-        // stage 2: RUN (USB regulator disabled)
-        blink(2);
-        SIM.sopt1.usbregen = 0;
-        spin();
+        switch (*state) {
+        default:
+        case 0:
+                *state = 1;
+                blink(1);
+                spin();
 
-        // stage 3: wait
-        blink(3);
-        set_sleepdeep(0);
-        sleep_until_cont();
+                // stage 2: RUN (USB regulator disabled)
+                blink(2);
+                SIM.sopt1.usbregen = 0;
+                spin();
+                
+                // stage 3: wait
+                blink(3);
+                set_sleepdeep(0);
+                sleep_until_cont();
 
-        // stage 4: stop
-        blink(4);
-        set_sleepdeep(1);
-        sleep_until_cont();
+                // stage 4: stop
+                blink(4);
+                set_sleepdeep(1);
+                sleep_until_cont();
 
-        // stage 5: BLPI RUN
-        blink(5);
-        move_to_blpi();
-        blink_count /= 100;
-        spin();
+                // stage 5: BLPI RUN
+                blink(5);
+                move_to_blpi();
+                blink_count /= 100;
+                spin();
 
-        // stage 6: BLPI STOP
-        blink(6);
-        set_sleepdeep(1);
-        sleep_until_cont();
+                // stage 6: BLPI STOP
+                blink(6);
+                set_sleepdeep(1);
+                sleep_until_cont();
 
-        // stage 7: VLP RUN
-        blink(7);
-        enter_vlpr();
-        spin();
+                // stage 7: VLP RUN
+                blink(7);
+                enter_vlpr();
+                spin();
 
-        // stage 8: VLP WAIT
-        blink(8);
-        set_sleepdeep(0);
-        sleep_until_cont();
+                // stage 8: VLP WAIT
+                blink(8);
+                set_sleepdeep(0);
+                sleep_until_cont();
 
-        // stage 9: VLP STOP
-        blink(9);
-        set_sleepdeep(1);
-        sleep_until_cont();
+                // stage 9: VLP STOP
+                blink(9);
+                set_sleepdeep(1);
+                sleep_until_cont();
 
-        // stage 10: LLS
-        blink(10);
-        SMC.pmctrl.stopm = STOPM_LLS;
-        set_sleepdeep(1);
-        sleep_until_cont();
+                // stage 10: LLS
+                blink(10);
+                SMC.pmctrl.stopm = STOPM_LLS;
+                set_sleepdeep(1);
+                sleep_until_cont();
         
-        // stage 11: VLLS3
-        /*
-        blink(11);
-        SMC.pmctrl.stopm = STOPM_VLLS;
-        SMC.vllsctrl.vllsm = 3;
-        set_sleepdeep(1);
-        sleep_until_cont();
-        */
+        case 1:
+                // stage 11: VLLS3
+                *state = 2;
+                blink(11);
+                SMC.pmctrl.stopm = STOPM_VLLS;
+                SMC.vllsctrl.vllsm = 3;
+                set_sleepdeep(1);
+                sleep_until_cont();
+
+        case 2:
+                // stage 12: VLLS2
+                *state = 3;
+                blink(12);
+                SMC.pmctrl.stopm = STOPM_VLLS;
+                SMC.vllsctrl.vllsm = 2;
+                set_sleepdeep(1);
+                sleep_until_cont();
+
+        case 3:
+                // stage 13: VLLS1
+                *state = 4;
+                blink(13);
+                SMC.pmctrl.stopm = STOPM_VLLS;
+                SMC.vllsctrl.vllsm = 1;
+                set_sleepdeep(1);
+                sleep_until_cont();
+
+        case 4:
+                // stage 14: VLLS0
+                *state = 5;
+                blink(14);
+                SMC.pmctrl.stopm = STOPM_VLLS;
+                SMC.vllsctrl.vllsm = 1;
+                set_sleepdeep(1);
+                sleep_until_cont();
+
+        case 5:
+                break;
+        }
+
+        // reset state
+        *state = 0;
 
         // For identifying clock rate
         if (0) {
