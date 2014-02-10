@@ -10,4 +10,6 @@ SRCS.force-mchck+=	flashconfig_k20.c
 endif
 endif
 
+CFLAGS+=	$(patsubst %,-DPRINTF_WITH_%,${PRINTF_WITH})
+
 SRCS.libs+=	mchck

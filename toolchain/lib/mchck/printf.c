@@ -8,10 +8,10 @@
 #define printf my_printf
 #endif
 
-//#define NO_PAD
-//#define NO_64
+//#define PRINTF_WITH_PAD
+//#define PRINTF_WITH_64BIT
 
-#ifndef NO_64
+#ifdef PRINTF_WITH_64BIT
 #define PRINTF_VAL_T long long
 #define PRINTF_FRAC_T long fract
 const static unsigned long long fract_half = 0x800000000000000ULL;
@@ -29,7 +29,7 @@ vfprintf(FILE *f, const char *fmt, va_list args)
 
         --fmt;
 
- next_char:
+next_char:
         ++fmt;
 
         if (*fmt == 0)
@@ -53,11 +53,13 @@ plain_output:
         int print_sign = 0;
         int base = 10;
         int digit_off = 0;
+#ifdef PRINTF_WITH_PAD
         int pad = ' ';
         int pad_right = 0;
+#endif
         int print_frac = 0;
         unsigned PRINTF_VAL_T val;
-#ifndef NO_FIX
+#ifdef PRINTF_WITH_FIXPOINT
         unsigned PRINTF_FRAC_T frac = 0;
 #endif
 
@@ -70,14 +72,18 @@ plain_output:
                         alternate = 1;
                         break;
                 case '0':
+#ifdef PRINTF_WITH_PAD
                         pad = '0';
+#endif
                         break;
                 case ' ':
                 case '+':
                         print_sign = *fmt;;
                         break;
                 case '-':
+#ifdef PRINTF_WITH_PAD
                         pad_right = 1;
+#endif
                         break;
                 default:
                         goto end_flags;
@@ -123,9 +129,10 @@ end_flags:
         case 'l':
                 length = 32;
                 ++fmt;
-#ifndef NO_64
+#ifdef PRINTF_WITH_64BIT
                 if (*fmt == 'l') {
-                case 'j':
+                        /* FALLTHROUGH */
+        case 'j':
                         length = 64;
                         ++fmt;
                 }
@@ -183,7 +190,7 @@ end_flags:
         case 'u':
                 goto conv_int;
 
-#ifndef NO_FIX
+#ifdef PRINTF_WITH_FIXPOINT
         case 'k': {
                 long accum fpval;
 
@@ -269,13 +276,13 @@ end_flags:
                 frac = fpval;
                 goto conv_frac;
         }
-#endif  /* NO_FIX */
+#endif  /* PRINTF_WITH_FIXPOINT */
 
         }
 
         goto next_char;
 
-#ifndef NO_FIX
+#ifdef PRINTF_WITH_FIXPOINT
 conv_frac:
         if (precision < 0)
                 precision = 6;
@@ -319,12 +326,14 @@ conv_int:
                 break;
         }
 
+#ifdef PRINTF_WITH_FIXPOINT
 print_int:;
+#endif
 
         /* determine first digit */
         unsigned PRINTF_VAL_T scale = 1;
 
-#ifndef NO_PAD
+#ifdef PRINTF_WITH_PAD
         if (precision < 0)
                 precision = 1;
 #endif
@@ -335,14 +344,13 @@ print_int:;
                 ++print_digits;
         }
 
+#if defined(PRINTF_WITH_PAD)
         int print_width;
 
         if (print_frac)
                 print_width = precision + print_digits;
         else
                 print_width = precision > print_digits ? precision : print_digits;
-
-#ifndef NO_PAD
 
         if (alternate && base == 8 && val != 0 && precision <= print_digits)
                 print_width = precision = print_digits + 1;
@@ -404,7 +412,7 @@ print_int:;
                         }
                 }
         }
-#ifndef NO_PAD
+#ifdef PRINTF_WITH_PAD
         while (!print_frac && print_digits < precision) {
                 fputc('0', f);
                 ++print_digits;
@@ -424,7 +432,7 @@ print_int:;
         if (!print_frac || (precision <= 0 && !alternate))
                 goto pad_right;
 
-#ifndef NO_FIX
+#ifdef PRINTF_WITH_FIXPOINT
         fputc('.', f);
         for (; precision > 0; --precision) {
                 int digit = 10 * frac;
@@ -435,9 +443,8 @@ print_int:;
         }
 #endif
 
-#ifndef NO_PAD
 pad_right:
-
+#ifdef PRINTF_WITH_PAD
         if (pad_right) {
                 while (print_width < width) {
                         fputc(' ', f);
