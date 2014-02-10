@@ -24,7 +24,6 @@ enter_vlpr()
 {
         // Enable very low power modes
         SIM.clkdiv1.raw = ((struct SIM_CLKDIV1_t) { .outdiv1 = 1, .outdiv2 = 1, .outdiv4 = 3 }).raw;
-        SMC.pmprot.raw = ((struct SMC_PMPROT) { .avlls = 1, .alls = 1, .avlp = 1 }).raw;
 
         SMC.pmctrl.raw = ((struct SMC_PMCTRL) { .runm = RUNM_VLPR, .stopm = STOPM_VLPS }).raw;
 
@@ -100,6 +99,8 @@ uint32_t *const state = (uint32_t*) 0x4003e000;
 int
 main(void)
 {
+        // enable low-power modes
+        SMC.pmprot.raw = ((struct SMC_PMPROT) { .avlls = 1, .alls = 1, .avlp = 1 }).raw;
         // ensure we stay in VLPR
         SMC.pmctrl.lpwui = 0;
         // but we want to be able to run after be awoken
