@@ -112,7 +112,6 @@ main(void)
         // setup button (PTA4)
         pin_mode(PIN_PTA4, PIN_MODE_MUX_GPIO | PIN_MODE_PULLUP);
         gpio_dir(GPIO_PTA4, GPIO_INPUT);
-        PORTA.pcr[4].irqc = PCR_IRQC_INT_FALLING;
         int_enable(IRQ_PORTA);
         LLWU.wupe[0].wupe3 = LLWU_PE_FALLING;
         int_enable(IRQ_LLWU);
@@ -195,12 +194,12 @@ main(void)
 }
 
 void
-PORTA_Handler(void)
+button_handler(void *cbdata)
 {
-        PORTA.isfr = 0xffffffff;
         cont = true;
         //onboard_led(-1);
 }
+PIN_DEFINE_CALLBACK(PIN_PTA4, PIN_CHANGE_FALLING, button_handler, NULL);
 
 void
 LLWU_Handler(void)
