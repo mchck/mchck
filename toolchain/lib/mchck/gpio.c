@@ -32,6 +32,9 @@ gpio_dir(enum gpio_pin_id pin, enum gpio_dir dir)
         set_mux:
                 pin_mode(pin, PIN_MODE_MUX_ALT1);
                 break;
+        case GPIO_DISABLE:
+                pin_mode(pin, PIN_MODE_MUX_ANALOG);
+                break;
         }
 }
 

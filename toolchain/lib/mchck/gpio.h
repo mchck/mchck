@@ -35,7 +35,8 @@ enum gpio_pin_id {
 
 enum gpio_dir {
         GPIO_INPUT,
-        GPIO_OUTPUT
+        GPIO_OUTPUT,
+        GPIO_DISABLE
 };
 
 enum gpio_pin_value {
