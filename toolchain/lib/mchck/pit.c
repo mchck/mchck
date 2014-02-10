@@ -1,11 +1,11 @@
 #include <mchck.h>
 
 static struct pit_ctx_t {
-	pit_callback* cb;
+	pit_callback *cb;
 } ctx[4];
 
 void
-pit_init()
+pit_init(void)
 {
 	SIM.scgc6.pit = 1;
 	PIT.mcr.mdis = 0;
@@ -20,7 +20,7 @@ void
 pit_start(enum pit_id id, uint32_t cycles, pit_callback *cb)
 {
 	ctx[id].cb = cb;
-	volatile struct PIT_TIMER_t* timer = &PIT.timer[id];
+	volatile struct PIT_TIMER_t *timer = &PIT.timer[id];
 	timer->ldval = cycles;
 	timer->tflg.tif = 1;
 	timer->tctrl.tie = cb != NULL;

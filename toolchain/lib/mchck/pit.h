@@ -7,7 +7,7 @@ enum pit_id {
 
 typedef void (pit_callback)(enum pit_id id);
 
-void pit_init();
+void pit_init(void);
 void pit_start(enum pit_id id, uint32_t cycles, pit_callback *cb);
 void pit_stop(enum pit_id id);
 uint32_t pit_cycle(enum pit_id id);
