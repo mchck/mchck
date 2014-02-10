@@ -16,7 +16,7 @@ spi_start_xfer(void)
                                 }).raw;
         SPI0.rser.raw = ((struct SPI_RSER){
                         .tfff_re = 1,
-                                .rfdf_re = spi_ctx->rx != 0,
+                                .rfdf_re = spi_ctx->rx != NULL,
                                 .eoqf_re = 1,
                                 }).raw;
         SPI0.sr.raw |= 0;
