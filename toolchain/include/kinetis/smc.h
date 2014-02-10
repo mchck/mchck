@@ -29,7 +29,12 @@ struct SMC {
         } pmctrl;
         struct SMC_VLLSCTRL {
                 UNION_STRUCT_START(8);
-                uint8_t vllsm    : 3;
+                enum {
+                        VLLSM_VLLS0 = 0b000,
+                        VLLSM_VLLS1 = 0b001,
+                        VLLSM_VLLS2 = 0b010,
+                        VLLSM_VLLS3 = 0b011,
+                } vllsm          : 3;
                 uint8_t _rsvd0   : 2;
                 uint8_t porpo    : 1;
                 uint8_t _rsvd1   : 2;
