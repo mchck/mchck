@@ -216,13 +216,37 @@ usb_ep0_rx(void *buf, size_t len, ep_callback_t cb, void *cb_data)
 	return (usb_rx(&usb.ep_state[0].rx, buf, len, cb, cb_data));
 }
 
+
+const struct usbd_config *
+usb_get_config_data(int config)
+{
+	if (config <= 0)
+		config = usb.config;
+
+	if (config != 0)
+		return (usb.identity->configs[config - 1]);
+	else
+		return (NULL);
+}
+
 static int
 usb_set_config(int config)
 {
-	const struct usbd_config *config_data = usb.identity->configs[config - 1];
+	const struct usbd_config *config_data;
 
-	if (config_data->init != NULL)
-		config_data->init(1);
+	if (usb.config != 0) {
+		config_data = usb_get_config_data(-1);
+		if (config_data != NULL && config_data->init != NULL)
+			config_data->init(0);
+	}
+
+	if (config != 0) {
+		/* XXX overflow */
+		config_data = usb_get_config_data(config);
+		if (config_data != NULL && config_data->init != NULL)
+			config_data->init(1);
+	}
+	usb.config = config;
 	return (0);
 }
 

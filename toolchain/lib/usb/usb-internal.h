@@ -70,3 +70,4 @@ extern struct usbd_t usb;
 
 void usb_restart(void);
 void usb_enable(void);
+const struct usbd_config *usb_get_config_data(int config);
