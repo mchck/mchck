@@ -5,6 +5,7 @@
 #include <mchck/flash.h>
 #include <mchck/onboard-led.h>
 #include <mchck/adc.h>
+#include <mchck/adc_queue.h>
 #include <mchck/spi.h>
 #include <mchck/timeout.h>
 #include <mchck/stdio.h>
