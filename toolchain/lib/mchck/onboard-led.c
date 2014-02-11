@@ -5,6 +5,11 @@ static const enum gpio_pin_id led_pin = GPIO_PTB16;
 void
 onboard_led(enum onboard_led_state state)
 {
+        if (state == ONBOARD_LED_FLOAT) {
+                gpio_dir(led_pin, GPIO_DISABLE);
+                return;
+        }
+
         gpio_dir(led_pin, GPIO_OUTPUT);
         pin_mode(led_pin, PIN_MODE_DRIVE_HIGH);
 
