@@ -14,6 +14,9 @@ static struct adc_ctx adc_ctx;
 static void
 adc_calibrate_cb(uint16_t val, int error, void *cbdata)
 {
+        /* disable band-gap buffer */
+        PMC.regsc.bgbe = 1;
+
         /* base ADC calibration */
         if (error || ADC0.sc3.calf)
                 return;
