@@ -10,6 +10,10 @@ class LocationWrapper
     @val.send(method, *args, &block)
   end
 
+  def nil?
+    @val.nil?
+  end
+
   def to_s
     @val.to_s
   end
@@ -25,7 +29,7 @@ class LocationWrapper
         else
           ""
         end
-    val = self
+    val = @val
     val = yield val if block_given?
     v + val.to_s
   end

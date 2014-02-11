@@ -198,7 +198,8 @@ usb_enable(void)
         USB0.inten.raw = ((struct USB_ISTAT_t){
                         .tokdne = 1,
                                 .usbrst = 1,
-                                .stall = 1
+                                .stall = 1,
+                                .sleep = 1,
                                 }).raw;
 
 #ifndef SHORT_ISR
@@ -209,7 +210,8 @@ usb_enable(void)
 void
 USB0_Handler(void)
 {
-        struct USB_ISTAT_t stat = USB0.istat;
+        struct USB_ISTAT_t stat = {.raw = USB0.istat.raw };
+
         if (stat.usbrst) {
                 usb_reset();
                 return;
@@ -224,9 +226,38 @@ USB0_Handler(void)
                 struct usb_xfer_info stat = USB0.stat;
                 usb_handle_transaction(&stat);
         }
-        if (stat.resume) {
-                if (usb_handle_resume)
-                        usb_handle_resume();
+        if (stat.sleep) {
+                USB0.inten.sleep = 0;
+                USB0.inten.resume = 1;
+                USB0.usbctrl.susp = 1;
+                USB0.usbtrc0.usbresmen = 1;
+
+                /**
+                 * Clear interrupts now so that we can detect a fresh
+                 * resume later on.
+                 */
+                USB0.istat.raw = stat.raw;
+
+                const struct usbd_config *c = usb_get_config_data(-1);
+                if (c && c->suspend)
+                        c->suspend();
+        }
+        /**
+         * XXX it is unclear whether we will receive a synchronous
+         * resume interrupt if we were in sleep.  This code assumes we
+         * do.
+         */
+        if (stat.resume || USB0.usbtrc0.usb_resume_int) {
+                USB0.inten.resume = 0;
+                USB0.inten.sleep = 1;
+                USB0.usbtrc0.usbresmen = 0;
+                USB0.usbctrl.susp = 0;
+
+                const struct usbd_config *c = usb_get_config_data(-1);
+                if (c && c->resume)
+                        c->resume();
+
+                stat.resume = 1; /* always clear bit */
         }
         USB0.istat.raw = stat.raw;
 }
@@ -272,23 +303,4 @@ usb_tx_serialno(size_t reqlen)
         }
         usb_ep0_tx(d, len, reqlen, NULL, NULL);
         return (0);
-}
-
-/**
- * This must be called before de-clocking the USB module to enable the
- * RESUME interrupt
- */
-void usb_suspend()
-{
-        USB0.usbctrl.susp = 1;
-        USB0.inten.resume = 1;
-}
-
-/**
- * This should be called from the usb_resume_handler to disable the
- * RESUME interrupt
- */
-void usb_resume()
-{
-        USB0.inten.resume = 0;
 }

@@ -309,6 +309,7 @@ struct usbd_function_ctx_header {
 
 
 typedef void (usbd_init_fun_t)(int);
+typedef void (usbd_suspend_resume_fun_t)(void);
 
 /**
  * Configuration.  Contains one or more functions which all will be
@@ -316,6 +317,8 @@ typedef void (usbd_init_fun_t)(int);
  */
 struct usbd_config {
 	usbd_init_fun_t *init;
+	usbd_suspend_resume_fun_t *suspend;
+	usbd_suspend_resume_fun_t *resume;
 	/**
 	 * We will not set a config for now, because there is not much to
 	 * configure, except for power
@@ -325,6 +328,7 @@ struct usbd_config {
 	const struct usb_desc_config_t *desc;
 	const struct usbd_function *function[];
 };
+
 
 /**
  * Device.  Contains one or more configurations, out of which only one
@@ -444,8 +448,6 @@ void vusb_main_loop(void);
 void usb_poll(void);
 #endif
 int usb_tx_serialno(size_t reqlen);
-void usb_suspend();
-void usb_resume();
 
 /* Provided by MI code */
 void usb_init(const struct usbd_device *);
@@ -461,15 +463,6 @@ int usb_ep0_rx(void *, size_t, ep_callback_t, void *);
 void *usb_ep0_tx_inplace_prepare(size_t len);
 int usb_ep0_tx(void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_data);
 int usb_ep0_tx_cp(const void *, size_t, size_t, ep_callback_t, void *);
-
-typedef void (*usb_resume_handler)();
-
-extern usb_resume_handler usb_handle_resume;
-
-/**
- * See usb_enter_suspend and usb_resume
- */
-void usb_set_resume_handler(usb_resume_handler handler);
 
 #include <usb/dfu.h>
 #include <usb/cdc-acm.h>

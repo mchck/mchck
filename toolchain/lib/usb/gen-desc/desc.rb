@@ -126,6 +126,8 @@ class ConfigDesc < DslItem
   field :bMaxPower, :default => 100
 
   field :initfun
+  field :suspendfun
+  field :resumefun
 
   block :function, FunctionDesc, :list => true
 
@@ -142,9 +144,12 @@ class ConfigDesc < DslItem
   end
 
   def gen_defs
-    "usbd_init_fun_t #{@initfun.to_loc_s};\n" +
-    @function.map{|f| f.gen_defs}.join +
-      <<_end_
+    s = ""
+    s += "usbd_init_fun_t #{@initfun.to_loc_s};\n" if @initfun
+    s += "usbd_suspend_resume_fun_t #{@suspendfun.to_loc_s};\n" if !@suspendfun.nil?
+    s += "usbd_suspend_resume_fun_t #{@resumefun.to_loc_s};\n" if !@resumefun.nil?
+
+    s + @function.map{|f| f.gen_defs}.join + <<_end_
 struct #@config_name {
 	struct usb_desc_config_t config;
 	#{@function.map{|f| f.get_desc_struct}.join("\n\t")}
@@ -172,6 +177,8 @@ static const struct #@config_name #@config_name = {
 
 static const struct usbd_config #@var_name = {
 	.init = #{@initfun.to_loc_s},
+	.suspend = #{@suspendfun.to_loc_s{|s| s or "NULL"}},
+	.resume = #{@resumefun.to_loc_s{|s| s or "NULL"}},
 	.desc = &#@config_name.config,
   .function = {#{@function.map{|f| "&#{f.get_function_var}"}.join(",\n\t")}},
 };
@@ -204,7 +211,7 @@ class DeviceDesc < DslItem
   end
 
   def gen_defs
-    "struct usbd_device #{@name.to_loc_s};\n" +
+    "const struct usbd_device #{@name.to_loc_s};\n" +
     @config.map{|c| c.gen_defs}.join("\n")
   end
 
@@ -237,7 +244,7 @@ static const struct usb_desc_string_t * const #{@name.to_loc_s}_str_desc[] = {
 	NULL
 };
 
-struct usbd_device #{@name.to_loc_s} = {
+const struct usbd_device #{@name.to_loc_s} = {
 	.dev_desc = &#{@name.to_loc_s}_dev_desc,
 	.string_descs = #{@name.to_loc_s}_str_desc,
 	.configs = {
