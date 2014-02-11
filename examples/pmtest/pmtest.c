@@ -50,15 +50,17 @@ blink(unsigned int n)
 {
         for (unsigned int i=0; i < n; i++)
                 blink_once();
+        pin_mode(PIN_PTB16, PIN_MODE_MUX_ANALOG); /* detach led */
+        SIM.scgc5.portb = 0;                      /* disable port clk */
 }
 
 void
 sleep(void)
 {
         __asm__("wfi");
-        if (SMC.pmctrl.stopa) {
-                gpio_write(GPIO_PTA18, 1);
-        }
+        /* if (SMC.pmctrl.stopa) { */
+        /*         gpio_write(GPIO_PTA18, 1); */
+        /* } */
 }
 
 void
@@ -106,82 +108,167 @@ main(void)
         // but we want to be able to run after be awoken
         SCB.scr.sleeponexit = 0;
 
-        // pull up unused SPI FLASH pins
-        pin_mode(PIN_PTC0, PIN_MODE_PULLUP | PIN_MODE_MUX_GPIO);
-        pin_mode(PIN_PTC5, PIN_MODE_PULLUP | PIN_MODE_MUX_GPIO);
-        pin_mode(PIN_PTC6, PIN_MODE_PULLUP | PIN_MODE_MUX_GPIO);
-        pin_mode(PIN_PTC7, PIN_MODE_PULLUP | PIN_MODE_MUX_GPIO);
+        /* float JTAG/SWD pins */
+        gpio_dir(PIN_PTA0, GPIO_DISABLE);
+        gpio_dir(PIN_PTA1, GPIO_DISABLE);
+        gpio_dir(PIN_PTA2, GPIO_DISABLE);
+        gpio_dir(PIN_PTA3, GPIO_DISABLE);
 
         // setup button (PTA4)
         pin_mode(PIN_PTA4, PIN_MODE_MUX_GPIO | PIN_MODE_PULLUP);
         gpio_dir(GPIO_PTA4, GPIO_INPUT);
-        int_enable(IRQ_PORTA);
         LLWU.wupe[0].wupe3 = LLWU_PE_FALLING;
         int_enable(IRQ_LLWU);
 
-        // Extra LED (PTA18)
-        pin_mode(PIN_PTA18, PIN_MODE_MUX_GPIO);
-        gpio_dir(GPIO_PTA18, GPIO_OUTPUT);
+        pin_change_init();
 
         // Acknowledge isolation
         PMC.regsc.ackiso = 1;
 
+        /**
+         * All measurements done on external ~3.3V power, nothing
+         * connected except for button on A4; USB disconnected.
+         *
+         * Measurements:
+         *
+         * a. with stock setup: JTAG/SWD pins unmodified (i.e. default
+         *    pull up/down), LED pulled low, PORTC active & SPI lines
+         *    pulled high, A18 pulled low.  This is represents a
+         *    typical setup with some IO lines active.
+         *
+         * b. with USB Vreg disconnected from 3.3V (cut SJ6), same
+         *    peripheral setup as above.
+         *
+         * c. with USB Vreg disconnected from 3.3V (cut SJ6), no
+         *    peripherals/pins/ports active, except for A4 pulled
+         *    high.  This represents the practical low limit.
+         *
+         * All measurements were only taken ONCE on ONE SAMPLE.
+         */
+
         switch (*state) {
         default:
         case 0:
+                /**
+                 * 1. RUN (busy)
+                 *
+                 * a. 13.61mA
+                 * b. 13.08mA
+                 * c. 12.77mA
+                 */
                 *state = 1;
                 blink(1);
                 spin();
 
-                // stage 2: RUN (USB regulator disabled)
+                /**
+                 * 2. RUN (busy, USB regulator disabled from now on)
+                 *
+                 * a. 13.59mA
+                 * b. 13.05mA
+                 * c. 12.81mA
+                 */
                 blink(2);
                 SIM.sopt1.usbregen = 0;
                 spin();
-                
-                // stage 3: wait
+
+                /**
+                 * 3. WAIT
+                 *
+                 * a. 8.81mA
+                 * b. 8.26mA
+                 * c. 8.13mA
+                 */
                 blink(3);
                 set_sleepdeep(0);
                 sleep_until_cont();
 
-                // stage 4: stop
+                /**
+                 * 4. STOP
+                 *
+                 * a. 814uA
+                 * b. 335uA
+                 * c. 335uA
+                 */
                 blink(4);
                 set_sleepdeep(1);
                 sleep_until_cont();
 
-                // stage 5: BLPI RUN
+                /**
+                 * 5. BLPI RUN (busy)
+                 *
+                 * a. 1950uA
+                 * b. 1540uA
+                 * c. 1540uA
+                 */
                 blink(5);
                 move_to_blpi();
                 blink_count /= 100;
                 spin();
 
-                // stage 6: BLPI STOP
+                /**
+                 * 6. BLPI STOP
+                 *
+                 * a. 814uA
+                 * b. 335uA
+                 * c. 335uA
+                 */
                 blink(6);
                 set_sleepdeep(1);
                 sleep_until_cont();
 
-                // stage 7: VLP RUN
+                /**
+                 * 7. VLP RUN (busy)
+                 *
+                 * a. 598uA
+                 * b. 95.7uA
+                 * c. 94.0uA
+                 */
                 blink(7);
                 enter_vlpr();
                 spin();
 
-                // stage 8: VLP WAIT
+                /**
+                 * 8. VLP WAIT
+                 *
+                 * a. 574uA
+                 * b. 69.8uA
+                 * c. 68.2uA
+                 */
                 blink(8);
                 set_sleepdeep(0);
                 sleep_until_cont();
 
-                // stage 9: VLP STOP
+                /**
+                 * 9. VLP STOP
+                 *
+                 * a. 515uA
+                 * b. 4.7uA
+                 * c. 3.3uA
+                 */
                 blink(9);
                 set_sleepdeep(1);
                 sleep_until_cont();
 
-                // stage 10: LLS
+                /**
+                 * 10. LLS
+                 *
+                 * a. 514.2uA
+                 * b. 3.9uA
+                 * c. 2.5uA
+                 */
                 blink(10);
                 SMC.pmctrl.stopm = STOPM_LLS;
                 set_sleepdeep(1);
                 sleep_until_cont();
-        
+
         case 1:
-                // stage 11: VLLS3
+                /**
+                 * 11. VLLS3
+                 *
+                 * a. 513.7uA
+                 * b. 3.2uA
+                 * c. 1.8uA
+                 */
                 *state = 2;
                 blink(11);
                 SMC.pmctrl.stopm = STOPM_VLLS;
@@ -190,7 +277,13 @@ main(void)
                 sleep_until_cont();
 
         case 2:
-                // stage 12: VLLS2
+                /**
+                 * 12. VLLS2
+                 *
+                 * a. 513.7uA
+                 * b. 3.1uA
+                 * c. 1.7uA
+                 */
                 *state = 3;
                 blink(12);
                 SMC.pmctrl.stopm = STOPM_VLLS;
@@ -199,19 +292,49 @@ main(void)
                 sleep_until_cont();
 
         case 3:
-                // stage 13: VLLS1
+                /**
+                 * 13. VLLS1
+                 *
+                 * a. 513uA
+                 * b. 2.5uA
+                 * c. 0.9uA
+                 */
                 *state = 4;
-                blink(12);
+                blink(13);
                 SMC.pmctrl.stopm = STOPM_VLLS;
                 SMC.vllsctrl.vllsm = 1;
                 set_sleepdeep(1);
                 sleep_until_cont();
 
         case 4:
-                // stage 13: VLLS0
-                blink(12);
+                /**
+                 * 14. VLLS0 with PoR circuit enabled
+                 *
+                 * a. 513uA
+                 * b. 2.5uA
+                 * c. 0.6uA
+                 */
+                *state = 5;
+                blink(14);
                 SMC.pmctrl.stopm = STOPM_VLLS;
-                SMC.vllsctrl.vllsm = 1;
+                SMC.vllsctrl.vllsm = 0;
+                SMC.vllsctrl.porpo = 0; /* default */
+                set_sleepdeep(1);
+                sleep_until_cont();
+
+        case 5:
+                /**
+                 * 13. VLLS0 with PrR circuit disabled
+                 *
+                 * a. -
+                 * b. -
+                 * c. 0.4uA
+                 */
+                *state = 0;
+                blink(15);
+                SMC.pmctrl.stopm = STOPM_VLLS;
+                SMC.vllsctrl.vllsm = 0;
+                SMC.vllsctrl.porpo = 1;
                 set_sleepdeep(1);
                 sleep_until_cont();
         }
