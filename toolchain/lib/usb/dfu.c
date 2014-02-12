@@ -1,24 +1,6 @@
 #include <usb/usb.h>
 #include <usb/dfu.h>
 
-enum dfu_ctrl_req_code {
-        USB_CTRL_REQ_DFU_DETACH = 0,
-        USB_CTRL_REQ_DFU_DNLOAD = 1,
-        USB_CTRL_REQ_DFU_UPLOAD = 2,
-        USB_CTRL_REQ_DFU_GETSTATUS = 3,
-        USB_CTRL_REQ_DFU_CLRSTATUS = 4,
-        USB_CTRL_REQ_DFU_GETSTATE = 5,
-        USB_CTRL_REQ_DFU_ABORT = 6
-};
-
-struct dfu_status_t {
-        enum dfu_status bStatus : 8;
-        uint32_t bwPollTimeout : 24;
-        enum dfu_state bState : 8;
-        uint8_t iString;
-} __packed;
-CTASSERT_SIZE_BYTE(struct dfu_status_t, 6);
-
 
 void
 dfu_write_done(enum dfu_status err, struct dfu_ctx *ctx)
