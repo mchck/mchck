@@ -62,6 +62,7 @@ void
 adc_calibration_done(void)
 {
         adc_busy = false;
+        adc_queue_start();
 }
 
 void
