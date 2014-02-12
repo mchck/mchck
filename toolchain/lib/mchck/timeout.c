@@ -5,6 +5,7 @@ static struct timeout_ctx *timeout_queue;
 static union timeout_time timeout_lazy_now;
 struct timeout_ctx overflow;
 
+/* Here we use timeout_ctx.cb == NULL to indicate an unqueued context */
 
 /* call with crit_active() */
 static void
@@ -73,6 +74,12 @@ timeout_add(struct timeout_ctx *t, uint32_t ms, timeout_cb_t *cb, void *cbdata)
         crit_enter();
         timeout_update_time();
 
+        // Ensure this context isn't already queued
+        if (t->cb) {
+                crit_exit();
+                return;
+        }
+
         *t = (struct timeout_ctx){
                 .time.time = ms + timeout_lazy_now.time + 1,
                 .cb = cb,
@@ -105,6 +112,7 @@ timeout_cancel(struct timeout_ctx *t)
                         return (-1);
         }
         *p = t->next;
+        t->cb = NULL;
         if (*p == timeout_queue)
                 timeout_reschedule();
         crit_exit();
@@ -122,7 +130,9 @@ LPT_Handler(void)
                 return;
         }
         timeout_queue = t->next;
+        timeout_cb_t *cb = t->cb;
+        t->cb = NULL;
         timeout_reschedule();
         crit_exit();
-        t->cb(t->cbdata);
+        cb(t->cbdata);
 }

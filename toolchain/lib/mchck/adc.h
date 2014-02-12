@@ -1,3 +1,16 @@
+/*
+ * low-level adc interface
+ *
+ * This is a low-level interface to the ADC. Note that this does not
+ * make any attempt at queuing multiple sample requests. See
+ * adc_queue.h for a high-level interface which manages this for you.
+ *
+ * If you would prefer to use the low-level interface, you should
+ * define a function adc_calibration_done callback which will be
+ * called after adc_init once calibration has completed.
+ *
+ */
+
 enum adc_mode {
         ADC_MODE_POWER_NORMAL  = 0 << 0,
         ADC_MODE_POWER_LOW     = 1 << 0,
@@ -47,3 +60,6 @@ int adc_sample_start(enum adc_channel channel, adc_result_cb_t *cb, void *cbdata
 int adc_sample_abort(void);
 void adc_calibrate_voltage(unsigned accum reference);
 unsigned accum adc_as_voltage(uint16_t val);
+
+/* Weakly defined by adc_queue. Override if adc_queue is not used. */
+void adc_calibration_done(void);

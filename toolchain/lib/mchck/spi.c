@@ -77,7 +77,8 @@ spi_queue_xfer_sg(struct spi_ctx_bare *ctx,
                 .pcs = pcs,
                 .cb = cb,
                 .cbdata = cbdata,
-                .queued = true
+                .queued = true,
+                .next = NULL
         };
 
         size_t tx_len = sg_total_lengh(ctx->tx);
