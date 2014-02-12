@@ -4,7 +4,8 @@ int memcmp(const void *, const void *, size_t);
 void *memchr(const void *addr, int val, size_t len);
 size_t strlen(const char *str);
 
-void sys_reset(void);
+void __attribute__((noreturn)) sys_reset(void);
+void __attribute__((noreturn)) sys_reset_to_loader(void);
 void __attribute__((noreturn)) sys_yield_for_frogs(void);
 
 void crit_enter(void);
@@ -28,3 +29,5 @@ bitband_bitp(volatile void *addr, size_t bit)
         if (!(cond)) {                          \
                 panic(_STR(cond));              \
         }
+
+extern const uint8_t sys_reset_to_loader_magic[22];

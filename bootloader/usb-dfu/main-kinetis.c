@@ -83,13 +83,27 @@ jump_to_app(uintptr_t addr)
 void
 Reset_Handler(void)
 {
+	/**
+         * Disable Watchdog.  We spend too much time in here comparing
+         * the loader magic, which will lead to a watchdog
+         * configuration timeout.
+         */
+	WDOG_UNLOCK = 0xc520;
+	WDOG_UNLOCK = 0xd928;
+	WDOG_STCTRLH &= ~WDOG_STCTRLH_WDOGEN_MASK;
+        /* XXX maybe re-enable watchdog later? */
+
         /**
          * We treat _app_rom as pointer to directly read the stack
          * pointer and check for valid app code.  This is no fool
          * proof method, but it should help for the first flash.
          */
-        if (RCM.srs0.pin || _app_rom == 0xffffffff) {
+        if (RCM.srs0.pin ||
+            _app_rom == 0xffffffff ||
+            memcmp(&VBAT, sys_reset_to_loader_magic, sizeof(sys_reset_to_loader_magic)) == 0) {
                 extern void Default_Reset_Handler(void);
+
+                memset(&VBAT, 0, sizeof(VBAT));
                 Default_Reset_Handler();
         } else {
                 uint32_t addr = (uintptr_t)&_app_rom;
