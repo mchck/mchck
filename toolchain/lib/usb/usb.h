@@ -454,6 +454,7 @@ void usb_init(const struct usbd_device *);
 void usb_attach_function(const struct usbd_function *function, struct usbd_function_ctx_header *ctx);
 void usb_handle_transaction(struct usb_xfer_info *);
 void usb_setup_control(void);
+void usb_handle_control_status_cb(ep_callback_t cb);
 void usb_handle_control_status(int);
 struct usbd_ep_pipe_state_t *usb_init_ep(struct usbd_function_ctx_header *ctx, int ep, enum usb_ep_dir dir, size_t size);
 int usb_rx(struct usbd_ep_pipe_state_t *, void *, size_t, ep_callback_t, void *);

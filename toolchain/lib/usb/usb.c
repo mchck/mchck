@@ -313,27 +313,33 @@ usb_handle_control_done(void *data, ssize_t len, void *cbdata)
 }
 
 void
+usb_handle_control_status_cb(ep_callback_t cb)
+{
+	/* empty status transfer */
+	switch (usb.ctrl_dir) {
+	case USB_CTRL_REQ_IN:
+		usb.ep_state[0].rx.data01 = USB_DATA01_DATA1;
+		usb_rx(&usb.ep_state[0].rx, NULL, 0, cb, NULL);
+		break;
+
+	default:
+		usb.ep_state[0].tx.data01 = USB_DATA01_DATA1;
+		usb_ep0_tx_cp(NULL, 0, 1 /* short packet */, cb, NULL);
+		break;
+	}
+}
+
+void
 usb_handle_control_status(int fail)
 {
 	if (fail) {
 		usb_pipe_stall(&usb.ep_state[0].rx);
 		usb_pipe_stall(&usb.ep_state[0].tx);
-		return;
-	}
-
-	/* empty status transfer */
-	switch (usb.ctrl_dir) {
-	case USB_CTRL_REQ_IN:
-		usb.ep_state[0].rx.data01 = USB_DATA01_DATA1;
-		usb_rx(&usb.ep_state[0].rx, NULL, 0, usb_handle_control_done, NULL);
-		break;
-
-	default:
-		usb.ep_state[0].tx.data01 = USB_DATA01_DATA1;
-		usb_ep0_tx_cp(NULL, 0, 1 /* short packet */, usb_handle_control_done, NULL);
-		break;
+	} else {
+		usb_handle_control_status_cb(usb_handle_control_done);
 	}
 }
+
 
 /**
  * Dispatch non-standard request to registered USB functions.
