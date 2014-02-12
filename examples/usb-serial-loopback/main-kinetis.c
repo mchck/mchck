@@ -13,9 +13,11 @@ new_data(uint8_t *data, size_t len)
 }
 
 void
-init_vcdc(int config)
+init_vcdc(int enable)
 {
-        cdc_init(new_data, NULL, &cdc);
+        if (enable) {
+                cdc_init(new_data, NULL, &cdc);
+        }
 }
 
 void
