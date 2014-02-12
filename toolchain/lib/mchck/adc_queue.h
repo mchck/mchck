@@ -18,3 +18,6 @@ struct adc_queue_ctx {
 void adc_queue_sample(struct adc_queue_ctx *ctx,
                       enum adc_channel channel, enum adc_mode mode,
                       adc_result_cb_t *cb, void *cbdata);
+
+/* This should be called in lieu of adc_init() */
+void adc_queue_init(void);
