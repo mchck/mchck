@@ -111,9 +111,11 @@ dfu_handle_control(struct usb_ctrl_req_t *req, void *data)
                  * and reset the system to put the new firmware into
                  * effect.
                  */
-                usb_ep0_tx_cp(&st, sizeof(st), req->wLength,
-                              ctx->state == DFU_STATE_dfuMANIFEST ? dfu_reset_system : NULL,
-                              NULL);
+                usb_ep0_tx_cp(&st, sizeof(st), req->wLength, NULL, NULL);
+                if (ctx->state == DFU_STATE_dfuMANIFEST) {
+                        usb_handle_control_status_cb(dfu_reset_system);
+                        goto out_no_status;
+                }
                 break;
         }
         case USB_CTRL_REQ_DFU_CLRSTATUS:
