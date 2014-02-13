@@ -164,7 +164,7 @@ usb_reset(void)
         usb_restart();
 
         USB0.ctl.raw = ((struct USB_CTL_t){
-                        .txd_suspend = 0,
+                        	.txd_suspend = 0,
                                 .usben = 1
                                 }).raw;
 }
@@ -177,7 +177,7 @@ usb_enable(void)
 
         /* reset module - not sure if needed */
         USB0.usbtrc0.raw = ((struct USB_USBTRC0_t){
-                        .usbreset = 1,
+                        	.usbreset = 1,
                                 .usbresmen = 1
                                 }).raw;
         while (USB0.usbtrc0.usbreset)
@@ -188,7 +188,7 @@ usb_enable(void)
         USB0.bdtpage3 = (uintptr_t)bdt >> 24;
 
         USB0.control.raw = ((struct USB_CONTROL_t){
-                        .dppullupnonotg = 1 /* enable pullup */
+                        	.dppullupnonotg = 1 /* enable pullup */
                                 }).raw;
 
         USB0.usbctrl.raw = 0; /* resume peripheral & disable pulldowns */
