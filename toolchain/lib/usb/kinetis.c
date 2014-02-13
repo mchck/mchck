@@ -167,6 +167,17 @@ usb_reset(void)
                         	.txd_suspend = 0,
                                 .usben = 1
                                 }).raw;
+
+        /* we're only interested in reset and transfers */
+        USB0.inten.raw = ((struct USB_ISTAT_t){
+                        	.tokdne = 1,
+                                .usbrst = 1,
+                                .stall = 1,
+                                .sleep = 1,
+                                }).raw;
+
+        USB0.usbtrc0.usbresmen = 0;
+        USB0.usbctrl.susp = 0;
 }
 
 void
@@ -194,13 +205,16 @@ usb_enable(void)
         USB0.usbctrl.raw = 0; /* resume peripheral & disable pulldowns */
         usb_reset();          /* this will start usb processing */
 
-        /* we're only interested in reset and transfers */
+        /* really only one thing we want */
         USB0.inten.raw = ((struct USB_ISTAT_t){
-                        .tokdne = 1,
                                 .usbrst = 1,
-                                .stall = 1,
-                                .sleep = 1,
                                 }).raw;
+
+        /**
+         * Suspend transceiver now - we'll wake up at reset again.
+         */
+        USB0.usbctrl.susp = 1;
+        USB0.usbtrc0.usbresmen = 1;
 
 #ifndef SHORT_ISR
         int_enable(IRQ_USB0);
