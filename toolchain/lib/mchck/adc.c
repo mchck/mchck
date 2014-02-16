@@ -29,7 +29,6 @@ adc_calibrate_cb(uint16_t val, int error, void *cbdata)
         ADC0.mg = (calib >> 1) | 0x8000;
 
         adc_calibrate_voltage(0);
-        adc_calibration_done();
 }
 
 static void
@@ -61,6 +60,8 @@ adc_calibrate_voltage_cb(uint16_t val, int error, void *cbdata)
          */
 
         adc_ctx.scale = 1.0lR / val;
+
+        adc_calibration_done();
 }
 
 void
