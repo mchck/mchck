@@ -1,17 +1,31 @@
-enum uart_id {
-        UART_0,
-        UART_1,
-        UART_2
+typedef void (*uart_cb)(void *cbdata);
+
+struct uart_ctx {
+        volatile struct UART_t *uart;
+        struct uart_trans_ctx *tx_queue;
+        struct uart_trans_ctx *rx_queue;
 };
 
-volatile struct UART_t *phys_uart_from_id(enum uart_id id);
+struct uart_trans_ctx {
+        char *pos;
+        unsigned int remaining;
+        uart_cb cb;
+        void *cbdata;
+        struct uart_trans_ctx *next;
+};
 
-void uart_init(enum uart_id id);
+extern struct uart_ctx uart0, uart1, uart2;
 
-void uart_set_baudrate(enum uart_id id, unsigned int baudrate);
+void uart_init(struct uart_ctx *uart);
 
-void uart_enable(enum uart_id id);
-void uart_disable(enum uart_id id);
+void uart_set_baudrate(struct uart_ctx *uart, unsigned int baudrate);
 
-void uart_write(enum uart_id id, char c);
-char uart_read(enum uart_id id);
+void uart_enable(struct uart_ctx *uart);
+void uart_disable(struct uart_ctx *uart);
+
+void uart_write(struct uart_ctx *uart, struct uart_trans_ctx *ctx,
+                const char *c, size_t len,
+                uart_cb cb, void *cbdata);
+void uart_read(struct uart_ctx *uart, struct uart_trans_ctx *ctx,
+               char *c, size_t len,
+               uart_cb cb, void *cbdata);
