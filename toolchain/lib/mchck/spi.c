@@ -92,7 +92,7 @@ spi_queue_xfer_sg(struct spi_ctx_bare *ctx,
                 if (*c == NULL) {
                         *c = ctx;
                         /* we're at the head, so start xfer */
-                        if (*c == spi_ctx)
+                        if (c == &spi_ctx)
                                 spi_start_xfer();
                         break;
                 }
