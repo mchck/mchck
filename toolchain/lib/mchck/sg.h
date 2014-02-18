@@ -17,7 +17,7 @@ struct sg *sg_get_next(struct sg *sg);
 struct sg *sg_init1(struct sg *sg, uint8_t *buf, uint16_t len);
 struct sg *sg_init_list(struct sg *sg, size_t elems, ...);
 struct sg *sg_simplify(struct sg *sg);
-size_t sg_total_lengh(struct sg *sg);
+size_t sg_total_length(struct sg *sg);
 uint8_t *sg_data(struct sg *sg);
 enum sg_move sg_move(struct sg **sg, uint16_t amount);
 

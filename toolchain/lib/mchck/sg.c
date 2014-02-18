@@ -49,17 +49,17 @@ sg_simplify(struct sg *sg)
 }
 
 static size_t
-sg_total_lengh1(struct sg *sg, size_t len)
+sg_total_length1(struct sg *sg, size_t len)
 {
         if (sg == NULL)
                 return (len);
-        return (sg_total_lengh1(sg_get_next(sg), len + sg->len));
+        return (sg_total_length1(sg_get_next(sg), len + sg->len));
 }
 
 size_t
-sg_total_lengh(struct sg *sg)
+sg_total_length(struct sg *sg)
 {
-        return (sg_total_lengh1(sg, 0));
+        return (sg_total_length1(sg, 0));
 }
 
 uint8_t *

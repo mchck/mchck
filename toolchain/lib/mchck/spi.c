@@ -81,8 +81,8 @@ spi_queue_xfer_sg(struct spi_ctx_bare *ctx,
                 .next = NULL
         };
 
-        size_t tx_len = sg_total_lengh(ctx->tx);
-        size_t rx_len = sg_total_lengh(ctx->rx);
+        size_t tx_len = sg_total_length(ctx->tx);
+        size_t rx_len = sg_total_length(ctx->rx);
         if (rx_len > tx_len)
                 ctx->rx_tail = rx_len - tx_len;
 
