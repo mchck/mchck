@@ -1,5 +1,5 @@
 SRCS-mchck=	builtins.c system.c gpio.c pin.c pin_change.c adc.c spi.c sg.c timeout.c
-SRCS-mchck+=	flash.c onboard-led.c stdio.c printf.c ftm.c crc.c pit.c
+SRCS-mchck+=	flash.c onboard-led.c stdio.c printf.c ftm.c crc.c pit.c uart.c
 SRCS-mchck+=	rtc.c spiflash.c i2c.c adc_queue.c
 
 ifeq (${TARGET_FAMILY},K20)
