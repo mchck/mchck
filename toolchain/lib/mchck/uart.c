@@ -123,7 +123,12 @@ uart_start_rx(struct uart_ctx *uart)
                 *ctx->pos = uart->uart->d;
                 ctx->pos++;
                 ctx->remaining--;
-                if (ctx->remaining == 0) {
+
+                bool stop = false;
+                stop |= ctx->flags.stop_on_terminator
+                        && *(ctx->pos-1) == ctx->terminator;
+                stop |= ctx->remaining == 0;
+                if (stop) {
                         uart->rx_queue = ctx->next;
                         if (ctx->cb)
                                 ctx->cb(ctx->cbdata);
@@ -145,6 +150,24 @@ uart_read(struct uart_ctx *uart, struct uart_trans_ctx *ctx,
 {
         if (ctx->remaining)
                 return;
+        ctx->flags.stop_on_terminator = false;
+        ctx->pos = c;
+        ctx->remaining = len;
+        ctx->cb = cb;
+        ctx->cbdata = cbdata;
+        uart->uart->c2.rie = 1;
+        uart_queue_transfer(uart, ctx, &uart->rx_queue, uart_start_rx);
+}
+
+void
+uart_read_until(struct uart_ctx *uart, struct uart_trans_ctx *ctx,
+                char *c, size_t len, char until,
+                uart_cb cb, void *cbdata)
+{
+        if (ctx->remaining)
+                return;
+        ctx->flags.stop_on_terminator = true;
+        ctx->terminator = until;
         ctx->pos = c;
         ctx->remaining = len;
         ctx->cb = cb;
