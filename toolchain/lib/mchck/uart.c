@@ -36,7 +36,7 @@ uart_init(struct uart_ctx *uart)
 void
 uart_set_baudrate(struct uart_ctx *uart, unsigned int baudrate)
 {
-        unsigned int clockrate = 24000000;
+        unsigned int clockrate = 48000000;
         unsigned int sbr = clockrate / 16 / baudrate;
         unsigned int brfa = (2 * clockrate / baudrate) % 32;
         uart->uart->bdh.sbrh = sbr >> 8;
