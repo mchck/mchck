@@ -1,16 +1,17 @@
 #include <mchck.h>
 
-struct timeout_ctx timeout;
+char test[] = "hello world! ";
+char read_test[10];
 
-char test[] = "hello world!";
-
-struct uart_trans_ctx trans;
+struct uart_trans_ctx rx_trans, tx_trans, tx_trans2;
 
 static void
-hello(void *cbdata)
+read_done(void *cbdata)
 {
-        uart_write(&uart0, &trans, test, sizeof(test), NULL, NULL);
-        timeout_add(&timeout, 1000, hello, NULL);
+        onboard_led(ONBOARD_LED_TOGGLE);
+        uart_write(&uart0, &tx_trans, test, sizeof(test), NULL, NULL);
+        uart_write(&uart0, &tx_trans2, read_test, sizeof(read_test), NULL, NULL);
+        uart_read(&uart0, &rx_trans, read_test, sizeof(read_test), read_done, NULL);
 }
 
 void
@@ -20,7 +21,6 @@ main(void)
         pin_mode(PIN_PTA2, PIN_MODE_MUX_ALT2);
         uart_init(&uart0);
         uart_set_baudrate(&uart0, 57600);
-        timeout_init();
-        timeout_add(&timeout, 1000, hello, NULL);
+        read_done(NULL);
         sys_yield_for_frogs();
 }
