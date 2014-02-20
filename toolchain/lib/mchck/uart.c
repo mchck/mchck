@@ -185,8 +185,12 @@ uart_irq_handler(struct uart_ctx *uart)
         if (uart->uart->s1.rdrf) {
                 uart_start_rx(uart);
         }
+        if (uart->uart->s1.fe) {
+                /* simply clear flag and hope for the best */
+                (void) uart->uart->d;
+        }
 
-        // final clear of watermark flags
+        /* final clear of watermark flags */
         (void)uart->uart->s1.rdrf;
 }
 
