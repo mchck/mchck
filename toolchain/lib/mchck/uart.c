@@ -21,8 +21,8 @@ uart_init(struct uart_ctx *uart)
         uart->uart->pfifo.rxfe = 1;
         uart->uart->pfifo.txfe = 1;
         // XXX arbitrary FIFO watermarks
-        uart->uart->twfifo = uart->uart->pfifo.txfifosize - 1;
-        uart->uart->rwfifo = uart->uart->pfifo.rxfifosize - 1;
+        uart->uart->twfifo = 8;
+        uart->uart->rwfifo = 1; // FIXME: See comment at end of uart_start_rx
 
         if (uart->uart == &UART0) {
                 int_enable(IRQ_UART0_status);
@@ -139,8 +139,14 @@ uart_start_rx(struct uart_ctx *uart)
          * ensure watermark is low enough.
          * otherwise we may not be notified when the receive completes.
          */
+        #if 0
+        /* FIXME: This seems to lock up the peripheral */
+        unsigned int depth = 1 << (uart->uart->pfifo.rxfifosize + 1);
+        uart->uart->c2.re = 0;
         uart->uart->rwfifo = MIN(uart->uart->pfifo.rxfifosize - 1,
                                  uart->rx_queue->remaining);
+        uart->uart->c2.re = 1;
+        #endif
 }
 
 void
