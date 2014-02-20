@@ -122,6 +122,7 @@ uart_start_rx(struct uart_ctx *uart)
                 stop |= ctx->remaining == 0;
                 if (stop) {
                         uart->rx_queue = ctx->next;
+                        ctx->remaining = 0;
                         if (ctx->cb)
                                 ctx->cb(ctx->cbdata);
                 }
