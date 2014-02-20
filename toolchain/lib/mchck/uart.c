@@ -44,18 +44,6 @@ uart_set_baudrate(struct uart_ctx *uart, unsigned int baudrate)
         uart->uart->c4.brfa = brfa;
 }
 
-void
-uart_enable(struct uart_ctx *uart)
-{
-        uart->uart->c2.raw |= ((struct UART_C2_t) {.re = 1, .te = 1}.raw);
-}
-
-void
-uart_disable(struct uart_ctx *uart)
-{
-        uart->uart->c2.raw &= ~ ((struct UART_C2_t) {.re = 1, .te = 1}.raw);
-}
-
 static void
 uart_queue_transfer(struct uart_ctx *uart, struct uart_trans_ctx *ctx,
                     struct uart_trans_ctx **queue,
@@ -78,11 +66,13 @@ uart_queue_transfer(struct uart_ctx *uart, struct uart_trans_ctx *ctx,
 static void
 uart_start_tx(struct uart_ctx *uart)
 {
+        uart->uart->c2.te = 1;
         unsigned int depth = 1 << (uart->uart->pfifo.txfifosize + 1);
         while (uart->uart->tcfifo < depth) {
                 struct uart_trans_ctx *ctx = uart->tx_queue;
                 if (!ctx) {
                         uart->uart->c2.tie = 0;
+                        uart->uart->c2.te = 0;
                         return;
                 }
                 uart->uart->d = *ctx->pos;
@@ -114,10 +104,12 @@ uart_write(struct uart_ctx *uart, struct uart_trans_ctx *ctx,
 static void
 uart_start_rx(struct uart_ctx *uart)
 {
+        uart->uart->c2.re = 1;
         while (uart->uart->rcfifo > 0) {
                 struct uart_trans_ctx *ctx = uart->rx_queue;
                 if (!ctx) {
                         uart->uart->c2.rie = 0;
+                        uart->uart->c2.re = 0;
                         return;
                 }
                 *ctx->pos = uart->uart->d;

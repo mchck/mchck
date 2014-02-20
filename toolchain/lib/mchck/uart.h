@@ -24,9 +24,6 @@ void uart_init(struct uart_ctx *uart);
 
 void uart_set_baudrate(struct uart_ctx *uart, unsigned int baudrate);
 
-void uart_enable(struct uart_ctx *uart);
-void uart_disable(struct uart_ctx *uart);
-
 void uart_write(struct uart_ctx *uart, struct uart_trans_ctx *ctx,
                 const char *c, size_t len,
                 uart_cb cb, void *cbdata);
