@@ -37,21 +37,16 @@ struct buffer_file_ctx {
         size_t len;
 };
 
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
+
 static size_t
-buffer_file_write(const uint8_t *buf, size_t len, void *opts_data)
+buffer_file_write(const uint8_t *buf, size_t len, void *ops_data)
 {
-        struct buffer_file_ctx *ctx = opts_data;
-        if (ctx->len+len < ctx->buflen) {
-                size_t n = ctx->buflen - ctx->len;
-                if (len < n)
-                        n = len;
-                memcpy(&ctx->buf[ctx->len], buf, n);
-                ctx->len += len;
-                return n;
-        } else {
-                ctx->len += len;
-                return 0;
-        }
+        struct buffer_file_ctx *ctx = ops_data;
+        size_t n = MIN(ctx->buflen - ctx->len, len);
+        memcpy(&ctx->buf[ctx->len], buf, n);
+        ctx->len += n;
+        return n;
 }
 
 struct _stdio_file_ops buffer_opts = {
@@ -74,7 +69,10 @@ int vsnprintf(char *buf, size_t n, const char *fmt, va_list args)
         FILE f;
         struct buffer_file_ctx ctx;
         buffer_file_init(&f, &ctx, buf, n);
-        return vfprintf(&f, fmt, args);
+        vfprintf(&f, fmt, args);
+        // null terminate
+        buf[ctx.len] = 0;
+        return ctx.len - 1;
 }
 
 int snprintf(char *buf, size_t n, const char *fmt, ...)
