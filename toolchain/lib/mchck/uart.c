@@ -86,19 +86,20 @@ uart_start_tx(struct uart_ctx *uart)
         }
 }
 
-void
+int
 uart_write(struct uart_ctx *uart, struct uart_trans_ctx *ctx,
            const char *c, size_t len,
            uart_cb cb, void *cbdata)
 {
         if (ctx->remaining)
-                return;
+                return -1;
         ctx->pos = (char *) c;
         ctx->remaining = len;
         ctx->cb = cb;
         ctx->cbdata = cbdata;
         uart->uart->c2.tie = 1;
         uart_queue_transfer(uart, ctx, &uart->tx_queue, uart_start_tx);
+        return 0;
 }
 
 static void
