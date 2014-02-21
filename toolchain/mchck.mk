@@ -86,6 +86,7 @@ LD=	arm-none-eabi-ld
 AR=	arm-none-eabi-ar
 AS=	arm-none-eabi-as
 OBJCOPY=	arm-none-eabi-objcopy
+SIZE=	arm-none-eabi-size
 GDB=	arm-none-eabi-gdb
 DFUUTIL?=	dfu-util
 RUBY?=	ruby
@@ -159,10 +160,9 @@ ${PROG}.elf: ${LINKOBJS} ${LDLIBS} ${LDTEMPLATE}
 	${CC} -o $@ ${CFLAGS} ${LDFLAGS} ${LINKOBJS} ${LDLIBS}
 
 %.bin: %.elf
-	${OBJCOPY} -O binary $< $@.tmp
-	ls -l $@.tmp | awk '{ s=$$5; as=${BINSIZE}; printf "%d bytes available\n", (as - s); if (s > as) { exit 1; }}'
-	mv $@.tmp $@
-CLEANFILES+=	${PROG}.bin.tmp
+	@${SIZE} $< | tail -n-1 | awk '{ s=$$1+$$2; as=${BINSIZE}; printf "%d bytes of FLASH available\n", (as - s); if (s > as) { exit 1; }}'
+	@${SIZE} $< | tail -n-1 | awk '{ s=$$2+$$3; as=${RAM_SIZE}; printf "%d bytes of RAM available (static allocations only)\n", (as - s); if (s > as) { exit 1; }}'
+	${OBJCOPY} -O binary $< $@
 
 ${LDTEMPLATE}: ${_libdir}/ld/link.ld.S ${LDSCRIPTS}
 	${CPP} -o $@ ${CPPFLAGS.ld} $<
