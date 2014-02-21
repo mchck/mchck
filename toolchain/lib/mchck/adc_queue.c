@@ -49,7 +49,7 @@ adc_queue_sample(struct adc_queue_ctx *ctx,
         for (struct adc_queue_ctx **c = &head; ; c = &(*c)->next) {
                 if (*c == NULL) {
                         *c = ctx;
-                        if (*c == head)
+                        if (c == &head)
                                 adc_queue_start();
                         break;
                 }

@@ -12,6 +12,7 @@
 #include <mchck/ftm.h>
 #include <mchck/crc.h>
 #include <mchck/pit.h>
+#include <mchck/uart.h>
 #include <mchck/rtc.h>
 #include <mchck/spiflash.h>
 #include <mchck/i2c.h>
