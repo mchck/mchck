@@ -275,9 +275,9 @@ struct DMA_t {
 			UNION_STRUCT_END;
 		} csr;
 		union DMA_ITER_u biter;
-	} tcd[5];						// 0x40009000
+	} tcd[4];						// 0x40009000
 };
 
-CTASSERT_SIZE_BYTE(struct DMA_t, 0x10A0);
+CTASSERT_SIZE_BYTE(struct DMA_t, 0x1080);
 
 extern volatile	struct DMA_t DMA;
