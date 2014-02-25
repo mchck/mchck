@@ -291,7 +291,7 @@ nrf_interrupt(void *cbdata)
 	send_command(&trans, handle_status, &trans); // nop it to get the status register
 }
 
-PIN_DEFINE_CALLBACK(PIN_PTC4, PIN_CHANGE_FALLING, nrf_interrupt, NULL);
+PIN_DEFINE_CALLBACK(NRF_IRQ, PIN_CHANGE_FALLING, nrf_interrupt, NULL);
 
 void
 nrf_init(void)
