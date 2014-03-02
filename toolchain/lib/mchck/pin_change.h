@@ -18,6 +18,13 @@ struct pin_change_handler {
         void *cbdata;
 };
 
+/*
+ * Register a pin change callback.
+ *
+ * Note that _pin should be a PIN_* constant, not GPIO_*. Things will
+ * unfortunately fail silently if this is violated
+ *
+ */
 #define PIN_DEFINE_CALLBACK(_pin, _polarity, _cb, _cbdata)              \
         const struct pin_change_handler _CONCAT(_CONCAT(_CONCAT(pin_handler_, _pin), _), _polarity) \
                 __attribute__((__section__(".pin_hooks." _STR(_pin)), __used__)) = { \
