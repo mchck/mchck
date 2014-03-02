@@ -17,7 +17,7 @@ void crc_init(
 	enum crc_transpose_t totr,
 	enum crc_transpose_t tot,
 	uint8_t compl_xor);
-void crc_update(void *buf, size_t len);
+void crc_update(const void *buf, size_t len);
 uint32_t crc_value();
 
 inline void
