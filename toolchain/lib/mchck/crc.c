@@ -21,7 +21,7 @@ crc_init(
 }
 
 void
-crc_update(void *buf, size_t len)
+crc_update(const void *buf, size_t len)
 {
 	size_t n = len / 4;
 	while (n-- > 0) {

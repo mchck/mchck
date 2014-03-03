@@ -9,6 +9,7 @@
 #include <mchck/spi.h>
 #include <mchck/timeout.h>
 #include <mchck/stdio.h>
+#include <mchck/strtol.h>
 #include <mchck/ftm.h>
 #include <mchck/crc.h>
 #include <mchck/pit.h>
