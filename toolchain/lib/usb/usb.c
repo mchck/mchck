@@ -344,18 +344,26 @@ usb_handle_control_status(int fail)
 /**
  * Dispatch non-standard request to registered USB functions.
  */
-static void
-usb_handle_control_nonstd(struct usb_ctrl_req_t *req)
+static int
+usb_handle_control_nonstddev(struct usb_ctrl_req_t *req)
 {
 	/* XXX filter by interface/endpoint? */
 	for (struct usbd_function_ctx_header *fh = &usb.functions; fh != NULL; fh = fh->next) {
+		int handle_it = (req->recp == USB_CTRL_REQ_IFACE) ?
+				(req->wIndex >= fh->interface_offset &&
+				(req->wIndex < (fh->interface_offset + fh->function->interface_count))) : 1;
 		/* ->control() returns != 0 if it handled the request */
-		if (fh->function->control != NULL &&
+		if (handle_it &&
+		    fh->function->control != NULL &&
 		    fh->function->control(req, fh))
-			return;
+			return (1);
 	}
 
+	/* Standard requests will be handled by usb_handle_control */
+	if (req->type == USB_CTRL_REQ_STD)
+		return (0);
 	usb_handle_control_status(-1);
+	return (1);
 }
 
 
@@ -403,9 +411,13 @@ usb_handle_control(void *data, ssize_t len, void *cbdata)
 
 	usb.ctrl_dir = req->in;
 
-	if (req->type != USB_CTRL_REQ_STD) {
-		usb_handle_control_nonstd(req);
-		return;
+	/**
+	 * Pass control to our handlers for non standard
+	 * or non device (interface/class/other) requests.
+	 */
+	if (req->type != USB_CTRL_REQ_STD || req->recp != USB_CTRL_REQ_DEV) {
+		if (usb_handle_control_nonstddev(req) != 0)
+			return;
 	}
 
 	/* Only STD requests here */
