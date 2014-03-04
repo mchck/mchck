@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <sys/cdefs.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <stdfix.h>
 #include <stdarg.h>
 
@@ -53,9 +54,12 @@ extern uint32_t _sidata, _sdata, _edata, _sbss, _ebss, _app_rom;
 #include <kinetis/llwu.h>
 #include <kinetis/smc.h>
 #include <kinetis/vbat.h>
+#include <kinetis/i2s.h>
+#include <kinetis/dma.h>
 
 #include <arm/scb.h>
 #include <arm/nvic.h>
+#include <arm/systick.h>
 
 #include <mchck/mchck.h>
 
