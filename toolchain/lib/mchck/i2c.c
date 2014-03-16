@@ -15,6 +15,7 @@ static struct i2c_ctx ctx;
 static void
 i2c_start_transaction(void)
 {
+	while (I2C0.s.busy); // ensure STOP symbol has been sent
 	ctx.index = 0;
 	if (ctx.cur->direction == I2C_READ) {			// if this is a read transaction
 		ctx.state = I2C_STATE_RX_START;
