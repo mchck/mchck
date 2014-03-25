@@ -40,16 +40,16 @@ static struct hid_user_functions_t hid_funcs = {
 };
 
 static void
-hid_send_data_cb(void *buf, ssize_t len)
+hid_send_data_cb(void *buf, ssize_t len, void *extra)
 {
-	hid_send_data(&hid_ctx, &mouse_data, sizeof(struct mouse_data_t), MOUSE_TX_SIZE, hid_send_data_cb);
+	hid_send_data(&hid_ctx, &mouse_data, sizeof(struct mouse_data_t), MOUSE_TX_SIZE, hid_send_data_cb, NULL);
 }
 
 static void
 init_my_hid(int config) // see desc.h
 {
 	hid_init(&hid_funcs, &hid_ctx);
-	hid_send_data(&hid_ctx, &mouse_data, sizeof(struct mouse_data_t), MOUSE_TX_SIZE, hid_send_data_cb);
+	hid_send_data(&hid_ctx, &mouse_data, sizeof(struct mouse_data_t), MOUSE_TX_SIZE, hid_send_data_cb, NULL);
 }
 
 void

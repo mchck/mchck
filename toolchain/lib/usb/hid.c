@@ -117,36 +117,18 @@ hid_init(struct hid_user_functions_t *user_functions, struct hid_ctx *ctx)
 	ctx->rx_pipe = NULL;
 }
 
-static void
-hid_tx_done(void *buf, ssize_t len, void *data)
-{
-	struct hid_ctx *ctx = data;
-	if (ctx->tx_cb)
-		ctx->tx_cb(buf, len);
-}
-
 void
-hid_send_data(struct hid_ctx *ctx, void *data, size_t len, size_t tx_size, hid_send_data_cb_t cb)
+hid_send_data(struct hid_ctx *ctx, void *data, size_t len, size_t tx_size, ep_callback_t cb, void *extra)
 {
-	ctx->tx_cb = cb;
 	if (!ctx->tx_pipe)
 		ctx->tx_pipe = usb_init_ep(&ctx->header, HID_TX_EP, USB_EP_TX, tx_size);
-	usb_tx(ctx->tx_pipe, data, len, tx_size, hid_tx_done, ctx);
-}
-
-static void
-hid_rx_done(void *buf, ssize_t len, void *data)
-{
-	struct hid_ctx *ctx = data;
-	if (ctx->rx_cb)
-		ctx->rx_cb(buf, len);
+	usb_tx(ctx->tx_pipe, data, len, tx_size, cb, extra);
 }
 
 void
-hid_recv_data(struct hid_ctx *ctx, void **data_in, size_t rx_size, hid_recv_data_cb_t cb)
+hid_recv_data(struct hid_ctx *ctx, void **data_in, size_t rx_size, ep_callback_t cb, void * extra)
 {
-	ctx->rx_cb = cb;
 	if (!ctx->rx_pipe)
 		ctx->rx_pipe = usb_init_ep(&ctx->header, HID_RX_EP, USB_EP_RX, rx_size);
-	usb_rx(ctx->rx_pipe, *data_in, rx_size, hid_rx_done, ctx);
+	usb_rx(ctx->rx_pipe, *data_in, rx_size, cb, extra);
 }
