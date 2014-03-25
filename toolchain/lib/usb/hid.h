@@ -34,9 +34,6 @@ typedef void (*hid_set_idle_t)(const uint8_t duration, const uint8_t report_id);
 typedef uint8_t (*hid_get_idle_t)(uint8_t report_id);
 typedef void (*hid_set_protocol_t)(const enum hid_protocol_t protocol);
 typedef enum hid_protocol_t (*hid_get_protocol_t)();
-/* interrupt in/out callback */
-typedef void (*hid_send_data_cb_t)(void *buf, ssize_t len);
-typedef void (*hid_recv_data_cb_t)(void *buf, ssize_t len);
 
 // XXX probably rename this
 struct hid_user_functions_t {
@@ -54,12 +51,10 @@ struct hid_ctx {
 	struct hid_user_functions_t *user_functions;
 	struct usbd_ep_pipe_state_t *tx_pipe;
 	struct usbd_ep_pipe_state_t *rx_pipe;
-	hid_send_data_cb_t tx_cb;
-	hid_recv_data_cb_t rx_cb;
 };
 
 void hid_init(struct hid_user_functions_t *, struct hid_ctx *);
-void hid_send_data(struct hid_ctx *, void *, size_t, size_t, hid_send_data_cb_t);
-void hid_recv_data(struct hid_ctx *, void **, size_t, hid_recv_data_cb_t);
+void hid_send_data(struct hid_ctx *, void *, size_t, size_t, ep_callback_t, void *);
+void hid_recv_data(struct hid_ctx *, void **, size_t, ep_callback_t, void *);
 
 #endif
