@@ -1,25 +1,13 @@
-class LocationWrapper
+module Location
   attr_reader :location
 
-  def initialize(val, location)
-    @val = val
-    @location = location
-  end
-
-  def method_missing(method, *args, &block)
-    @val.send(method, *args, &block)
-  end
-
-  def nil?
-    @val.nil?
-  end
-
-  def to_s
-    @val.to_s
-  end
-
-  def inspect
-    @val.inspect
+  def self.attach(val, location)
+    val.singleton_class.instance_exec{include Location}
+    val.instance_exec{@location = location}
+    val
+  rescue Exception => e
+    val = LocationWrapper.new(val, location)
+    val
   end
 
   def to_loc_s
@@ -35,20 +23,64 @@ class LocationWrapper
   end
 end
 
+class LocationWrapper
+  include Location
+
+  attr_reader :val
+
+  def initialize(val, location)
+    @val = val
+    @location = location
+  end
+
+  def method_missing(method, *args, &block)
+    @val.send(method, *args, &block)
+  end
+
+  def respond_to?(m)
+    @val.respond_to? m
+  end
+
+  def nil?
+    @val.nil?
+  end
+
+  def to_s
+    @val.to_s
+  end
+
+  def inspect
+    @val.inspect
+  end
+
+  def is_a?(klass)
+    @val.is_a? klass
+  end
+
+  def eql?(other)
+    other = other.val if other.is_a? LocationWrapper
+    @val.eql?(other)
+  end
+end
+
 class DslItem
   class << self
+    def fields
+      instance_variable_get(:@fields) || superclass.fields
+    end
+
     def add_field(name, opts)
-      v = {}
       begin
-        v = class_variable_get(:@@fields)
+        v = self.fields
       rescue NameError
-        class_variable_set(:@@fields, v)
+        v = {}
       end
-      v[name] = opts
+      v = v.merge({name => opts})
+      instance_variable_set(:@fields, v)
     end
 
     def attach_lineno(val, lineno=caller[1])
-      LocationWrapper.new(val, lineno)
+      Location.attach(val, lineno)
     end
 
     def field(name, opts = {}, &action)
@@ -69,7 +101,7 @@ class DslItem
     end
 
     def field_alias(name_alias, klass)
-      opts = class_variable_get(:@@fields).values.find{|o| klass.ancestors.include? o[:klass]}
+      opts = self.fields.values.find{|o| klass.ancestors.include? o[:klass]}
       define_method name_alias do |*args, &block|
         args = args.map do |a|
           DslItem.attach_lineno(a, caller[2])
@@ -96,13 +128,11 @@ class DslItem
   end
 
   def post_eval
-    self.class.class_variable_get(:@@fields).each do |n, o|
+    self.class.fields.each do |n, o|
       if !instance_variable_defined?("@#{n}")
         instance_variable_set("@#{n}", DslItem.attach_lineno(o[:default] || (o[:list] ? [] : nil), nil))
       end
     end
-  rescue NameError
-    self.class.class_variable_set(:@@fields, {})
   end
 
   def set_or_exec(name, val, opts)
@@ -138,10 +168,10 @@ class DslItem
 
   def warnings
     r = @warnings.dup
-    self.class.class_variable_get(:@@fields).each do |name, opts|
+    self.class.fields.each do |name, opts|
       val = instance_variable_get("@#{name}")
-      if !opts.has_key?(:default) && !opts[:optional] && !val
-        r << "#@location: required field `#{name}' undefined"
+      if !opts.has_key?(:default) && !opts[:optional] && val.nil?
+        r << "#@location: required field `#{name}' for class #{self.class} undefined"
       end
       if val.respond_to? :warnings
         r += val.warnings
