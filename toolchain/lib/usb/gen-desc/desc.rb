@@ -302,7 +302,7 @@ class DescriptorRoot < DslItem
   def gen_src(name=nil)
     s = ""
     if name
-      s += "#include #{name.inspect}"
+      s += "#include #{name.inspect}\n"
     end
 
     s += @device.map{|d| d.gen_vars}.join("\n")
