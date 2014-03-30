@@ -149,8 +149,8 @@ class ConfigDesc < DslItem
   field :bMaxPower, :default => 100
 
   field :initfun
-  field :suspendfun
-  field :resumefun
+  field :suspendfun, :optional => true
+  field :resumefun, :optional => true
 
   block :function, FunctionDesc, :list => true
 
