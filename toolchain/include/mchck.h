@@ -53,6 +53,8 @@ extern uint32_t _sidata, _sdata, _edata, _sbss, _ebss, _app_rom;
 #include <kinetis/llwu.h>
 #include <kinetis/smc.h>
 #include <kinetis/vbat.h>
+#include <kinetis/vref.h>
+#include <kinetis/cmp.h>
 
 #include <arm/scb.h>
 #include <arm/nvic.h>
