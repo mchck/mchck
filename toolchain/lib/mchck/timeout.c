@@ -169,17 +169,25 @@ LPT_Handler(void)
 {
         crit_enter();
         timeout_update_time();
-        struct timeout_ctx *t = timeout_queue;
-        if (t == NULL) {
+        if (timeout_queue == NULL) {
+                // there are no tasks to run, schedule the next overflow
                 timeout_reschedule();
                 crit_exit();
                 return;
         }
 
-        timeout_queue = t->next;
-        timeout_cb_t *cb = t->cb;
-        t->cb = NULL;
+        // for each task whose time has past...
+        while (timeout_queue->time.time <= timeout_lazy_now.time) {
+                struct timeout_ctx *t = timeout_queue;
+                timeout_queue = t->next;
+                timeout_cb_t *cb = t->cb;
+                t->cb = NULL;
+                cb(t->cbdata);
+
+                timeout_update_time();
+                if (!timeout_queue)
+                        break;
+        }
         timeout_reschedule();
         crit_exit();
-        cb(t->cbdata);
 }
