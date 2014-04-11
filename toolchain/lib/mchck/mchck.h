@@ -17,3 +17,4 @@
 #include <mchck/rtc.h>
 #include <mchck/spiflash.h>
 #include <mchck/i2c.h>
+#include <mchck/i2c_reg.h>
