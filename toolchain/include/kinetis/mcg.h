@@ -5,7 +5,10 @@ struct MCG_t {
                 UNION_STRUCT_START(8);
                 uint8_t irefsten : 1;
                 uint8_t irclken : 1;
-                uint8_t irefs : 1;
+                enum {
+                        MCG_IREFS_EXTERNAL = 0,
+                        MCG_IREFS_INTERNAL = 1
+                } irefs : 1;
                 uint8_t frdiv : 3;
                 enum {
                         MCG_CLKS_FLLPLL = 0,
