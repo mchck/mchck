@@ -17,7 +17,7 @@ fputc(int c, FILE *f)
                 buffered += sizeof(f->outbuf) - 1;
 
         /* flush on newline or if more than half full */
-        if (c == '\n' || buffered > sizeof(f->outbuf) / 2) {
+        if (f->ops && (c == '\n' || buffered > sizeof(f->outbuf) / 2)) {
                 size_t n;
                 if (f->outbuf_head > f->outbuf_tail) {
                         n = buffered;
