@@ -19,7 +19,7 @@ spi_start_xfer(void)
                                 .rfdf_re = spi_ctx->rx != NULL,
                                 .eoqf_re = 1,
                                 }).raw;
-        SPI0.sr.raw |= 0;
+        SPI0.sr.raw |= 0xffffffff;
 }
 
 static void
@@ -35,7 +35,7 @@ spi_stop_xfer(void)
                                 .halt = 1
                                 }).raw;
         SPI0.rser.raw = 0;
-        SPI0.sr.raw |= 0;
+        SPI0.sr.raw |= 0xffffffff;
 }
 
 bool spi_is_idle(void)
