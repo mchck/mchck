@@ -1,0 +1,31 @@
+device(:hid_dev) {
+  idVendor 0x2323
+  idProduct 3
+  iManufacturer "mchck.org"
+  iProduct "hid test"
+
+  config {
+    initfun :init_my_hid
+    hid(:hid_ctx) {
+      get_report :get_report
+      collection(:generic_desktop, :mouse) {
+        report(:input) {
+          name :mouse_data
+          item(:buttons => 1..3) {
+            usage_page :button
+            size 1
+            logical_range 0..1
+            absolute
+          }
+          pad(5) {}
+          item(:x, :y) {
+            usage_page :generic_desktop
+            size 8
+            logical_range -127..127
+            relative
+          }
+        }
+      }
+    }
+  }
+}

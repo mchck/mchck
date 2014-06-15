@@ -202,7 +202,7 @@ usb_ep0_tx_inplace_prepare(size_t len)
 }
 
 int
-usb_ep0_tx(void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_data)
+usb_ep0_tx(const void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_data)
 {
 	return (usb_tx(&usb.ep_state[0].tx, buf, len, reqlen, cb, cb_data));
 }
@@ -231,16 +231,31 @@ usb_set_config(int config)
 {
 	const struct usbd_config *config_data;
 
-	if (usb.config != 0) {
-		config_data = usb_get_config_data(-1);
-		if (config_data != NULL && config_data->init != NULL)
+	if (usb.config != 0 && (config_data = usb_get_config_data(-1))) {
+		if (config_data->init != NULL)
 			config_data->init(0);
+
+		for (const struct usbd_function * const *fp = config_data->function; *fp != NULL; ++fp) {
+			const struct usbd_function *f = *fp;
+			if (f->init != NULL)
+				f->init(f, 0);
+		}
 	}
 
 	if (config != 0) {
 		/* XXX overflow */
 		config_data = usb_get_config_data(config);
-		if (config_data != NULL && config_data->init != NULL)
+
+		if (!config_data)
+			return (-1);
+
+		for (const struct usbd_function * const *fp = config_data->function; *fp != NULL; ++fp) {
+			const struct usbd_function *f = *fp;
+			if (f->init != NULL)
+				f->init(f, 1);
+		}
+
+		if (config_data->init != NULL)
 			config_data->init(1);
 	}
 	usb.config = config;

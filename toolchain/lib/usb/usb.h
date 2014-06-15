@@ -305,6 +305,7 @@ typedef void (*ep_callback_t)(void *buf, ssize_t len, void *data);
  * (Artificial) function.  Aggregates one or more interfaces.
  */
 struct usbd_function {
+	void (*init)(const struct usbd_function *, int enable);
 	int (*configure)(int orig_iface, int iface, int altsetting, void *data);
 	int (*control)(struct usb_ctrl_req_t *, void *);
 	int interface_count;
@@ -475,10 +476,11 @@ int usb_tx(struct usbd_ep_pipe_state_t *, const void *, size_t, size_t, ep_callb
 
 int usb_ep0_rx(void *, size_t, ep_callback_t, void *);
 void *usb_ep0_tx_inplace_prepare(size_t len);
-int usb_ep0_tx(void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_data);
+int usb_ep0_tx(const void *buf, size_t len, size_t reqlen, ep_callback_t cb, void *cb_data);
 int usb_ep0_tx_cp(const void *, size_t, size_t, ep_callback_t, void *);
 
 #include <usb/dfu.h>
 #include <usb/cdc-acm.h>
+#include <usb/hid.h>
 
 #endif

@@ -98,6 +98,10 @@ class FunctionDesc < DslItem
   field :bFunctionSubClass, :optional => true
   field :bFunctionProtocol, :optional => true
 
+  field :init_func, :optional => true
+  field :configure_func, :optional => true
+  field :control_func, :optional => true
+
   def renumber!(counts)
     @var_name = "usb_function_#{counts[:iface]}"
     @interface.each do |iface|
@@ -115,8 +119,43 @@ class FunctionDesc < DslItem
     @interface.map{|i| i.gen_defs}.join("\n")
   end
 
+
+  def gen_func_var?
+    !self.class.const_defined?(:FunctionVarName)
+  end
+
+  def gen_func_defs
+    <<_end_
+	struct usbd_function func;
+_end_
+  end
+
+  def gen_func_init
+    s = "\t{\n"
+    s += "\t\t.init = #{@init_func.to_loc_s},\n" if @init_func
+    s += "\t\t.configure = #{@configure_func.to_loc_s},\n" if @configure_func
+    s += "\t\t.control = #{@control_func.to_loc_s},\n" if @control_func
+    s += "\t\t.interface_count = #{@interface.count},\n"
+    s += "\t}\n"
+  end
+
+  def gen_func_var
+    s = <<_end_
+static const struct {
+#{gen_func_defs}
+} #@var_name = {
+#{gen_func_init}
+};
+
+_end_
+  end
+
   def gen_vars
-    ''
+    if gen_func_var?
+      gen_func_var
+    else
+      ''
+    end
   end
 
   def gen_iad_desc_init
@@ -138,8 +177,16 @@ class FunctionDesc < DslItem
 _end_
   end
 
-  def get_function_var
-    self.class::FunctionVarName
+  def get_function_var(func=nil)
+    if gen_func_var?
+      if not func
+        raise RuntimeError, "Implement get_function_var in subclass"
+      else
+        "#@var_name.#{func}"
+      end
+    else
+      self.class::FunctionVarName
+    end
   end
 end
 
@@ -203,7 +250,10 @@ static const struct usbd_config #@var_name = {
 	.suspend = #{@suspendfun.to_loc_s{|s| s or "NULL"}},
 	.resume = #{@resumefun.to_loc_s{|s| s or "NULL"}},
 	.desc = &#@config_name.config,
-  .function = {#{@function.map{|f| "&#{f.get_function_var}"}.join(",\n\t")}},
+	.function = {
+		#{@function.map{|f| "&#{f.get_function_var}"}.join(",\n\t")},
+		NULL
+	},
 };
 _end_
   end
@@ -290,7 +340,7 @@ class DescriptorRoot < DslItem
   def self.load(file)
     src = File.read(file)
     self.eval do
-      eval src
+      eval(src, binding, file)
     end
   end
 

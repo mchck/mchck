@@ -17,7 +17,7 @@ module Location
         else
           ""
         end
-    val = @val
+    val = self.class == LocationWrapper ? @val : self
     val = yield val if block_given?
     v + val.to_s
   end
@@ -82,6 +82,9 @@ class DslItem
       end
       v = v.merge({name => opts})
       instance_variable_set(:@fields, v)
+      define_method "get_#{name}" do
+        instance_variable_get("@#{name}")
+      end
     end
 
     def attach_lineno(val, lineno=caller[1])
@@ -93,9 +96,6 @@ class DslItem
       add_field(name, opts)
       define_method name do |val|
         set_or_exec(name, val, opts)
-      end
-      define_method "get_#{name}" do
-        instance_variable_get("@#{name}")
       end
     end
 

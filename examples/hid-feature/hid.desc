@@ -1,0 +1,22 @@
+device(:hid_dev) {
+  idVendor 0x2323
+  idProduct 3
+  iManufacturer "mchck.org"
+  iProduct "hid test"
+
+  config {
+    initfun :init_my_hid
+    hid(:hid_ctx) {
+      get_report :get_report
+      set_report :set_report
+      collection(0, 0) {
+        report(:feature) {
+          name :feature_report
+          item([:data, 50]) {
+            size 8
+          }
+        }
+      }
+    }
+  }
+}

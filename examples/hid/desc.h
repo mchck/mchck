@@ -1,22 +1,6 @@
 // Required fwd declaration:
 //   void init_my_hid(inf config)
 
-struct hid_desc_t {
-	uint8_t bLength;
-	uint8_t bDescriptorType;
-	uint16_t bcdHID;
-	uint8_t bCountryCode;
-	uint8_t bNumDescriptors;
-	uint8_t bDescriptorType1;
-	uint16_t wDescriptorLength;
-} __packed;
-
-struct hid_function_desc {
-	struct usb_desc_iface_t iface;
-	struct hid_desc_t hid_desc;
-	struct usb_desc_ep_t int_in_ep;
-} __packed;
-
 struct usb_config_hid {
 	struct usb_desc_config_t config;
 	struct hid_function_desc usb_function_0;

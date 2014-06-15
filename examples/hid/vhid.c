@@ -2,20 +2,11 @@
 #include <usb/usb.h>
 #include <usb/hid.h>
 
-static void init_my_hid(int config);
+#include "hid.desc.h"
 
-#include "desc.h"
-
-static struct hid_ctx hid_ctx;
-
-static size_t
-hid_get_descriptor(enum hid_report_descriptor_type type, uint8_t index, void **data_out)
-{
-	if (type != USB_HID_REPORT_DESC_TYPE_REPORT)
-		return (0);
-	*data_out = report_desc; // see desc.h
-	return (REPORT_DESC_SIZE);
-}
+struct mouse_data mouse_data = {
+	.x = 1
+};
 
 static size_t
 hid_get_report(enum hid_report_type type, uint8_t report_id, void **data_out)
@@ -23,7 +14,7 @@ hid_get_report(enum hid_report_type type, uint8_t report_id, void **data_out)
 	if (type != USB_HID_REPORT_TYPE_INPUT)
 		return (0);
 	*data_out = &mouse_data;
-	return (sizeof(struct mouse_data_t));
+	return (sizeof(mouse_data));
 }
 
 static void
@@ -32,23 +23,16 @@ hid_set_idle(const uint8_t duration, const uint8_t report_id)
 	printf("@@@@@ IDLE SET TO %d\n", duration * 4);
 }
 
-static struct hid_user_functions_t hid_funcs = {
-	.get_descriptor = hid_get_descriptor,
-	.get_report = hid_get_report,
-	.set_idle = hid_set_idle
-};
-
 static void
 hid_send_data_cb(void *buf, ssize_t len, void *extra)
 {
-	hid_send_data(&hid_ctx, &mouse_data, sizeof(struct mouse_data_t), MOUSE_TX_SIZE, hid_send_data_cb, NULL);
+	hid_send_data(&hid_ctx, &mouse_data, sizeof(mouse_data), sizeof(mouse_data), hid_send_data_cb, NULL);
 }
 
-static void
-init_my_hid(int config) // see desc.h
+void
+init_my_hid(int config)
 {
-	hid_init(&hid_funcs, &hid_ctx);
-	hid_send_data(&hid_ctx, &mouse_data, sizeof(struct mouse_data_t), MOUSE_TX_SIZE, hid_send_data_cb, NULL);
+	hid_send_data(&hid_ctx, &mouse_data, sizeof(mouse_data), sizeof(mouse_data), hid_send_data_cb, NULL);
 }
 
 int

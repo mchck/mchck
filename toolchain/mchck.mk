@@ -35,7 +35,7 @@ GENERATE.d=	$(CC) -MM ${CPPFLAGS} -MT $@ -MT ${@:.d=.o} -MP -MF $@ $<
 CPPFLAGS+=	-I${_libdir}/include -I${_libdir}/lib
 CPPFLAGS+=	-std=gnu11
 CFLAGS+=	-fplan9-extensions
-CFLAGS+=	-ggdb3
+CFLAGS+=	-ggdb3 -ffunction-sections -fdata-sections
 ifndef DEBUG
 CFLAGS+=	${COPTFLAGS}
 else
@@ -74,7 +74,7 @@ include ${_libdir}/lib/Makefile.part
 $(foreach _uselib,${SRCS.libs},$(eval $(call _include_libs,$(_uselib))))
 
 ${PROG}: ${_allobjs}
-	$(LINK.c) $^ ${LDLIBS} -o $@
+	$(LINK.c) -Wl,--start-group $^ -Wl,--end-group ${LDLIBS} -o $@
 
 CLEANFILES+=	${PROG}
 else
@@ -161,7 +161,7 @@ $(foreach _uselib,${SRCS.libs},$(eval $(call _include_libs,$(_uselib))))
 include ${_libdir}/mk/linkdep.mk
 
 ${PROG}.elf: ${LINKOBJS} ${LDLIBS} ${LDTEMPLATE}
-	${CC} -o $@ ${CFLAGS} ${LDFLAGS} ${LINKOBJS} ${LDLIBS}
+	${CC} -o $@ ${CFLAGS} ${LDFLAGS} -Wl,--start-group ${LINKOBJS} ${LDLIBS} -Wl,--end-group
 	@${SIZE} $@ | awk 'END { \
 		used_flash=$$1; \
 		used_ram=$$2+$$3; \

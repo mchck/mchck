@@ -7,4 +7,6 @@ TARGET=	host
 SRCS+=	vhid.c
 endif
 
+SRCS+=	hid.desc
+
 include ../../toolchain/mchck.mk

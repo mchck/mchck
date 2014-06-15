@@ -13,6 +13,20 @@ enum hid_ctrl_req_code {
 
 #define USB_FUNCTION_HID_IFACE_COUNT 1
 
+static void
+hid_set_report_done(void *buf, ssize_t len, void *cbdata)
+{
+	struct hid_ctx *ctx = cbdata;
+	int ret = -1;
+
+	ret = ctx->hidf->set_report(ctx->set_report_type, ctx->set_report_id, &buf, ctx->set_report_length);
+
+	if (ret > 0)
+		usb_handle_control_status(0);
+	else
+		usb_handle_control_status(1);
+}
+
 /*
  * Handle class (HID) specific calls.
  *
@@ -21,49 +35,62 @@ enum hid_ctrl_req_code {
 static int
 hid_handle_control_class(struct usb_ctrl_req_t *req, struct hid_ctx *ctx)
 {
-	void *buf = NULL;
 	size_t len = 0;
 
+	/* XXX maintain state for all report descriptors */
+
 	switch ((enum hid_ctrl_req_code)req->bRequest) {
-	case USB_CTRL_REQ_HID_GET_REPORT:
-		if (!ctx->user_functions->get_report)
-			return (0);
-		len = ctx->user_functions->get_report(req->wValueHigh, req->wValueLow, &buf);
-		if (!len)
-			return (0);
-		usb_ep0_tx_cp(buf, len, req->wLength, NULL, NULL);
+	case USB_CTRL_REQ_HID_GET_REPORT: {
+		enum hid_report_type report_type = req->wValue >> 8;
+		uint8_t report_id = req->wValue & 0xff;
+		int ret = -1;
+
+		ctx->get_report_outstanding_length = req->wLength;
+		if (ctx->hidf->get_report)
+			ret = ctx->hidf->get_report(ctx, report_type, report_id);
+		if (ret <= 0) {
+			ctx->get_report_outstanding_length = 0;
+			usb_handle_control_status(1);
+		}
+		return (1);
+	}
+
+	case USB_CTRL_REQ_HID_SET_REPORT: {
+		int ret = -1;
+		void *buf = NULL;
+		ctx->set_report_length = req->wLength;
+		ctx->set_report_type = req->wValue >> 8;
+		ctx->set_report_id = req->wValue & 0xff;
+
+		if (ctx->hidf->set_report)
+			ret = ctx->hidf->set_report(ctx->set_report_type, ctx->set_report_id, &buf, ctx->set_report_length);
+		if (ret > 0)
+			usb_ep0_rx(buf, ctx->set_report_length, hid_set_report_done, ctx);
+		else
+			usb_handle_control_status(1);
+		return (1);
+	}
+
+	case USB_CTRL_REQ_HID_GET_IDLE:
+		/* XXX implement */
+		usb_ep0_tx_cp(&len, 1, req->wLength, NULL, NULL);
 		usb_handle_control_status(0);
 		return (1);
 
-	case USB_CTRL_REQ_HID_GET_IDLE:
-		if (!ctx->user_functions->get_idle)
-			return (0);
-		len = ctx->user_functions->get_idle(req->wValueLow);
-		usb_ep0_tx_cp(&len, 1, req->wLength, NULL, NULL);
+	case USB_CTRL_REQ_HID_SET_IDLE:
+		/* XXX implement */
 		usb_handle_control_status(0);
 		return (1);
 
 	case USB_CTRL_REQ_HID_GET_PROTOCOL:
-		if (!ctx->user_functions->get_protocol)
-			return (0);
-		len = ctx->user_functions->get_protocol();
-		usb_ep0_tx_cp(&len, 1, req->wLength, NULL, NULL);
-		usb_handle_control_status(0);
-		return (1);
-
-	case USB_CTRL_REQ_HID_SET_REPORT: // TODO
-		return (0);
-
-	case USB_CTRL_REQ_HID_SET_IDLE:
-		if (!ctx->user_functions->set_idle)
-			return (0);
-		ctx->user_functions->set_idle(req->wValueHigh, req->wValueLow);
+		/* XXX implement */
+		/* usb_ep0_tx_cp(&len, 1, req->wLength, NULL, NULL); */
+		/* usb_handle_control_status(0); */
 		return (0);
 
 	case USB_CTRL_REQ_HID_SET_PROTOCOL:
-		if (!ctx->user_functions->set_protocol)
-			return (0);
-		ctx->user_functions->set_protocol(req->wValue);
+		/* XXX implement */
+		usb_handle_control_status(0);
 		return (1);
 
 	default:
@@ -76,11 +103,11 @@ hid_handle_control_class(struct usb_ctrl_req_t *req, struct hid_ctx *ctx)
  *
  * return non-zero if the call was handled.
  */
-static int
+int
 hid_handle_control(struct usb_ctrl_req_t *req, void *data)
 {
 	struct hid_ctx *ctx = data;
-	void *buf = NULL;
+	const void *buf = NULL;
 	size_t len = 0;
 
 	if (req->type == USB_CTRL_REQ_CLASS)
@@ -88,8 +115,14 @@ hid_handle_control(struct usb_ctrl_req_t *req, void *data)
 
 	switch (req->bRequest) {
 	case USB_CTRL_REQ_GET_DESCRIPTOR:
-		len = ctx->user_functions->get_descriptor(req->wValueHigh, req->wValueLow, &buf);
-		if (!len)
+		if (req->wValueHigh == USB_HID_REPORT_DESC_TYPE_REPORT) {
+			buf = ctx->hidf->report_desc;
+			len = ctx->hidf->report_desc_size;
+		} else {
+			if (ctx->hidf->get_descriptor)
+				len = ctx->hidf->get_descriptor(req->wValueHigh, req->wValueLow, &buf);
+		}
+		if (len == 0)
 			return (0);
 		usb_ep0_tx_cp(buf, len, req->wLength, NULL, NULL);
 		usb_handle_control_status(0);
@@ -103,32 +136,28 @@ hid_handle_control(struct usb_ctrl_req_t *req, void *data)
 	}
 }
 
-const struct usbd_function hid_function = {
-	.control = hid_handle_control,
-	.interface_count = USB_FUNCTION_HID_IFACE_COUNT
-};
-
 void
-hid_init(struct hid_user_functions_t *user_functions, struct hid_ctx *ctx)
+hid_init(const struct usbd_function *f, int enable)
 {
-	usb_attach_function(&hid_function, &ctx->header);
-	ctx->user_functions = user_functions;
-	ctx->tx_pipe = NULL;
-	ctx->rx_pipe = NULL;
+	const struct hid_function *hidf = (void *)f;
+	struct hid_ctx *ctx = hidf->ctx;
+
+	if (enable) {
+		ctx->hidf = hidf;
+		usb_attach_function(&hidf->usb_func, &ctx->header);
+		if (hidf->report_max_size > 0)
+			ctx->tx_pipe = usb_init_ep(&ctx->header, HID_TX_EP, USB_EP_TX, hidf->report_max_size);
+	}
 }
 
 void
-hid_send_data(struct hid_ctx *ctx, void *data, size_t len, size_t tx_size, ep_callback_t cb, void *extra)
+hid_update_data(struct hid_ctx *ctx, uint8_t report_id, const void *data, size_t len)
 {
-	if (!ctx->tx_pipe)
-		ctx->tx_pipe = usb_init_ep(&ctx->header, HID_TX_EP, USB_EP_TX, tx_size);
-	usb_tx(ctx->tx_pipe, data, len, tx_size, cb, extra);
-}
-
-void
-hid_recv_data(struct hid_ctx *ctx, void **data_in, size_t rx_size, ep_callback_t cb, void * extra)
-{
-	if (!ctx->rx_pipe)
-		ctx->rx_pipe = usb_init_ep(&ctx->header, HID_RX_EP, USB_EP_RX, rx_size);
-	usb_rx(ctx->rx_pipe, *data_in, rx_size, cb, extra);
+	if (ctx->get_report_outstanding_length != 0) {
+		usb_ep0_tx(data, len, ctx->get_report_outstanding_length, NULL, NULL);
+		ctx->get_report_outstanding_length = 0;
+		usb_handle_control_status(0);
+	} else if (ctx->hidf->report_max_size > 0)  {
+		usb_tx(ctx->tx_pipe, data, len, ctx->hidf->report_max_size, NULL, NULL);
+	}
 }
