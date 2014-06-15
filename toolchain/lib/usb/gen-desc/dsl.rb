@@ -94,6 +94,9 @@ class DslItem
       define_method name do |val|
         set_or_exec(name, val, opts)
       end
+      define_method "get_#{name}" do
+        instance_variable_get("@#{name}")
+      end
     end
 
     def block(name, klass, opts = {}, &action)
