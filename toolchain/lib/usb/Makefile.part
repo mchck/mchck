@@ -11,9 +11,11 @@ endif
 
 SRCS.libs+=	usb
 
+_GEN_DESC_SRCS=	$(wildcard ${_libdir}/lib/usb/gen-desc/*.rb)
+
 .SUFFIXES: .desc
-%.desc.h %.desc.c: %.desc
-	${_libdir}/lib/usb/gen-desc/gen-desc $^
+%.desc.h %.desc.c: %.desc ${_GEN_DESC_SRCS}
+	${_libdir}/lib/usb/gen-desc/gen-desc $<
 
 _descsrc+=	$(filter %.desc,${SRCS})
 
