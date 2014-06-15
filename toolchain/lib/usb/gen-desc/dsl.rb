@@ -57,6 +57,11 @@ class LocationWrapper
     @val.is_a? klass
   end
 
+  def ==(other)
+    other = other.val if other.is_a? LocationWrapper
+    @val == other
+  end
+
   def eql?(other)
     other = other.val if other.is_a? LocationWrapper
     @val.eql?(other)
