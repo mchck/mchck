@@ -57,9 +57,13 @@ main(void)
         flash_prepare_flashing();
 
         usb_init(&dfu_device);
+#ifdef SHORT_ISR
         for (;;) {
                 usb_poll();
         }
+#else
+        sys_yield_for_frogs();
+#endif
 }
 
 __attribute__((noreturn))
