@@ -5,7 +5,7 @@
 struct uart_ctx uart0 = {.uart = &UART0};
 struct uart_ctx uart1 = {.uart = &UART1};
 struct uart_ctx uart2 = {.uart = &UART2};
-        
+
 void
 uart_init(struct uart_ctx *uart)
 {
@@ -36,7 +36,7 @@ uart_init(struct uart_ctx *uart)
 void
 uart_set_baudrate(struct uart_ctx *uart, unsigned int baudrate)
 {
-        unsigned int clockrate = 48000000;
+        unsigned int clockrate = 48000000; /* XXX use real clock rate */
         unsigned int sbr = clockrate / 16 / baudrate;
         unsigned int brfa = (2 * clockrate / baudrate) % 32;
         uart->uart->bdh.sbrh = sbr >> 8;
@@ -67,7 +67,11 @@ static void
 uart_start_tx(struct uart_ctx *uart)
 {
         uart->uart->c2.te = 1;
+
         unsigned int depth = 1 << (uart->uart->pfifo.txfifosize + 1);
+        if (depth == 2)
+                depth = 1;
+
         while (uart->uart->tcfifo < depth) {
                 struct uart_trans_ctx *ctx = uart->tx_queue;
                 if (!ctx) {
@@ -80,19 +84,19 @@ uart_start_tx(struct uart_ctx *uart)
                 if (ctx->remaining == 0) {
                         uart->tx_queue = ctx->next;
                         if (ctx->cb)
-                                ctx->cb(ctx->cbdata);
+                                ctx->cb(ctx->buf, ctx->pos - ctx->buf, ctx->cbdata);
                 }
         }
 }
 
 int
 uart_write(struct uart_ctx *uart, struct uart_trans_ctx *ctx,
-           const char *c, size_t len,
+           const uint8_t *buf, size_t len,
            uart_cb cb, void *cbdata)
 {
         if (ctx->remaining)
                 return -1;
-        ctx->pos = (char *) c;
+        ctx->pos = (uint8_t *) (ctx->buf = buf);
         ctx->remaining = len;
         ctx->cb = cb;
         ctx->cbdata = cbdata;
@@ -124,7 +128,7 @@ uart_start_rx(struct uart_ctx *uart)
                         uart->rx_queue = ctx->next;
                         ctx->remaining = 0;
                         if (ctx->cb)
-                                ctx->cb(ctx->cbdata);
+                                ctx->cb(ctx->buf, ctx->pos - ctx->buf, ctx->cbdata);
                 }
         }
 
@@ -144,13 +148,13 @@ uart_start_rx(struct uart_ctx *uart)
 
 void
 uart_read(struct uart_ctx *uart, struct uart_trans_ctx *ctx,
-          char *c, size_t len,
+          uint8_t *buf, size_t len,
           uart_cb cb, void *cbdata)
 {
         if (ctx->remaining)
                 return;
         ctx->flags.stop_on_terminator = false;
-        ctx->pos = c;
+        ctx->pos = (uint8_t *) (ctx->buf = buf);
         ctx->remaining = len;
         ctx->cb = cb;
         ctx->cbdata = cbdata;
@@ -160,14 +164,14 @@ uart_read(struct uart_ctx *uart, struct uart_trans_ctx *ctx,
 
 void
 uart_read_until(struct uart_ctx *uart, struct uart_trans_ctx *ctx,
-                char *c, size_t len, char until,
+                uint8_t *buf, size_t len, char until,
                 uart_cb cb, void *cbdata)
 {
         if (ctx->remaining)
                 return;
         ctx->flags.stop_on_terminator = true;
         ctx->terminator = until;
-        ctx->pos = c;
+        ctx->pos = (uint8_t *) (ctx->buf = buf);
         ctx->remaining = len;
         ctx->cb = cb;
         ctx->cbdata = cbdata;
@@ -178,19 +182,21 @@ uart_read_until(struct uart_ctx *uart, struct uart_trans_ctx *ctx,
 void
 uart_irq_handler(struct uart_ctx *uart)
 {
-        if (uart->uart->s1.tdre) {
+        struct UART_S1_t s1 = { .raw = uart->uart->s1.raw };
+
+        if (s1.tdre && uart->tx_queue) {
                 uart_start_tx(uart);
         }
-        if (uart->uart->s1.rdrf) {
+        if (s1.rdrf) {
                 uart_start_rx(uart);
         }
-        if (uart->uart->s1.fe) {
+        if (s1.fe) {
                 /* simply clear flag and hope for the best */
                 (void) uart->uart->d;
         }
 
         /* final clear of watermark flags */
-        (void)uart->uart->s1.rdrf;
+        (void)uart->uart->s1.raw;
 }
 
 void
