@@ -72,7 +72,6 @@ uart_start_tx(struct uart_ctx *uart)
                 struct uart_trans_ctx *ctx = uart->tx_queue;
                 if (!ctx) {
                         uart->uart->c2.tie = 0;
-                        uart->uart->c2.te = 0;
                         return;
                 }
                 uart->uart->d = *ctx->pos;
