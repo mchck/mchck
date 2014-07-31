@@ -25,7 +25,7 @@ class DFUDesc < FunctionDesc
 			.type_type = USB_DESC_TYPE_CLASS
 		},
 		.will_detach = 1,
-		.manifestation_tolerant = 0,
+		.manifestation_tolerant = 1,
 		.can_upload = 0,
 		.can_download = 1,
 		.wDetachTimeOut = 0,

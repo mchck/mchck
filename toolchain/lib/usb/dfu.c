@@ -6,16 +6,18 @@ void
 dfu_write_done(enum dfu_status err, struct dfu_ctx *ctx)
 {
         ctx->status = err;
-        if (ctx->status == DFU_STATUS_OK) {
-                switch (ctx->state) {
-                case DFU_STATE_dfuDNBUSY:
-                        ctx->state = DFU_STATE_dfuDNLOAD_IDLE;
-                        break;
-                default:
-                        break;
-                }
-        } else {
+        if (ctx->status != DFU_STATUS_OK)
                 ctx->state = DFU_STATE_dfuERROR;
+
+        switch (ctx->state) {
+        case DFU_STATE_dfuDNLOAD_SYNC:
+                ctx->state = DFU_STATE_dfuDNLOAD_IDLE;
+                break;
+        case DFU_STATE_dfuMANIFEST_SYNC:
+                ctx->state = DFU_STATE_dfuIDLE;
+                break;
+        default:
+                break;
         }
 }
 
@@ -24,24 +26,14 @@ dfu_dnload_complete(void *buf, ssize_t len, void *cbdata)
 {
         struct dfu_ctx *ctx = cbdata;
 
-        if (len > 0)
-                ctx->state = DFU_STATE_dfuDNBUSY;
-        else
-                ctx->state = DFU_STATE_dfuMANIFEST;
-        ctx->status = ctx->finish_write(buf, ctx->off, len);
+        enum dfu_status s = ctx->finish_write(buf, ctx->off, len);
         ctx->off += len;
         ctx->len = len;
 
-        if (ctx->status != DFU_STATUS_async)
-                dfu_write_done(ctx->status, ctx);
+        if (s != DFU_STATUS_async)
+                dfu_write_done(s, ctx);
 
         usb_handle_control_status(ctx->state == DFU_STATE_dfuERROR);
-}
-
-static void
-dfu_reset_system(void *buf, ssize_t len, void *cbdata)
-{
-        sys_reset();
 }
 
 static int
@@ -74,10 +66,13 @@ dfu_handle_control(struct usb_ctrl_req_t *req, void *data)
                         goto err_have_status;
                 }
 
-                if (req->wLength > 0)
+                if (req->wLength > 0) {
+                        ctx->state = DFU_STATE_dfuDNLOAD_SYNC;
                         usb_ep0_rx(buf, req->wLength, dfu_dnload_complete, ctx);
-                else
+                } else {
+                        ctx->state = DFU_STATE_dfuMANIFEST_SYNC;
                         dfu_dnload_complete(NULL, 0, ctx);
+                }
                 goto out_no_status;
         }
         case USB_CTRL_REQ_DFU_GETSTATUS: {
@@ -85,7 +80,7 @@ dfu_handle_control(struct usb_ctrl_req_t *req, void *data)
 
                 st.bState = ctx->state;
                 st.bStatus = ctx->status;
-                st.bwPollTimeout = 1000; /* XXX */
+                st.bwPollTimeout = 1; /* XXX allow setting in desc? */
                 /**
                  * If we're in DFU_STATE_dfuMANIFEST, we just finished
                  * the download, and we're just about to send our last
@@ -94,13 +89,11 @@ dfu_handle_control(struct usb_ctrl_req_t *req, void *data)
                  * effect.
                  */
                 usb_ep0_tx_cp(&st, sizeof(st), req->wLength, NULL, NULL);
-                if (ctx->state == DFU_STATE_dfuMANIFEST) {
-                        usb_handle_control_status_cb(dfu_reset_system);
-                        goto out_no_status;
-                }
                 break;
         }
         case USB_CTRL_REQ_DFU_CLRSTATUS:
+                if (ctx->state != DFU_STATE_dfuERROR)
+                        goto err;
                 ctx->state = DFU_STATE_dfuIDLE;
                 ctx->status = DFU_STATUS_OK;
                 break;
