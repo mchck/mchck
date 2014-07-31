@@ -1,4 +1,4 @@
-typedef void (*uart_cb)(const uint8_t *buf, size_t len, void *cbdata);
+typedef void (*uart_cb)(const void *buf, size_t len, void *cbdata);
 
 struct uart_ctx {
         volatile struct UART_t *uart;
@@ -7,7 +7,7 @@ struct uart_ctx {
 };
 
 struct uart_trans_ctx {
-        const uint8_t *buf;
+        uint8_t *buf;
         uint8_t *pos;
         unsigned int remaining;
         struct uart_trans_flags {
@@ -16,7 +16,7 @@ struct uart_trans_ctx {
         uint8_t terminator;
         uart_cb cb;
         void *cbdata;
-        struct uart_trans_ctx *queue;
+        struct uart_trans_ctx **queue;
         struct uart_trans_ctx *next;
 };
 
@@ -27,11 +27,12 @@ void uart_init(struct uart_ctx *uart);
 void uart_set_baudrate(struct uart_ctx *uart, unsigned int baudrate);
 
 int uart_write(struct uart_ctx *uart, struct uart_trans_ctx *ctx,
-               const uint8_t *buf, size_t len,
+               const void *buf, size_t len,
                uart_cb cb, void *cbdata);
 void uart_read(struct uart_ctx *uart, struct uart_trans_ctx *ctx,
-               uint8_t *buf, size_t len,
+               void *buf, size_t len,
                uart_cb cb, void *cbdata);
 void uart_read_until(struct uart_ctx *uart, struct uart_trans_ctx *ctx,
-                     uint8_t *buf, size_t len, char until,
+                     void *buf, size_t len, char until,
                      uart_cb cb, void *cbdata);
+int uart_abort(struct uart_ctx *uart, struct uart_trans_ctx *ctx);

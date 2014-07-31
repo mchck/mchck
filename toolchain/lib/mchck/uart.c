@@ -46,16 +46,15 @@ uart_set_baudrate(struct uart_ctx *uart, unsigned int baudrate)
 
 static void
 uart_queue_transfer(struct uart_ctx *uart, struct uart_trans_ctx *ctx,
-                    struct uart_trans_ctx **queue,
                     void (*start_queue)(struct uart_ctx *uart))
 {
         crit_enter();
         ctx->next = NULL;
-        for (struct uart_trans_ctx **c = queue; ; c = &(*c)->next) {
+        for (struct uart_trans_ctx **c = ctx->queue; ; c = &(*c)->next) {
                 if (*c == NULL) {
                         *c = ctx;
                         /* we're at the head, so start transfer */
-                        if (c == queue)
+                        if (c == ctx->queue)
                                 start_queue(uart);
                         break;
                 }
@@ -74,10 +73,8 @@ uart_start_tx(struct uart_ctx *uart)
 
         while (uart->uart->tcfifo < depth) {
                 struct uart_trans_ctx *ctx = uart->tx_queue;
-                if (!ctx) {
-                        uart->uart->c2.tie = 0;
+                if (!ctx)
                         return;
-                }
                 uart->uart->d = *ctx->pos;
                 ctx->pos++;
                 ctx->remaining--;
@@ -91,17 +88,18 @@ uart_start_tx(struct uart_ctx *uart)
 
 int
 uart_write(struct uart_ctx *uart, struct uart_trans_ctx *ctx,
-           const uint8_t *buf, size_t len,
+           const void *buf, size_t len,
            uart_cb cb, void *cbdata)
 {
         if (ctx->remaining)
                 return -1;
-        ctx->pos = (uint8_t *) (ctx->buf = buf);
+        ctx->pos = ctx->buf = (void *)buf;
         ctx->remaining = len;
         ctx->cb = cb;
         ctx->cbdata = cbdata;
+        ctx->queue = &uart->tx_queue;
         uart->uart->c2.tie = 1;
-        uart_queue_transfer(uart, ctx, &uart->tx_queue, uart_start_tx);
+        uart_queue_transfer(uart, ctx, uart_start_tx);
         return 0;
 }
 
@@ -109,13 +107,10 @@ static void
 uart_start_rx(struct uart_ctx *uart)
 {
         uart->uart->c2.re = 1;
-        while (uart->uart->rcfifo > 0) {
+        while (uart->uart->s1.rdrf != 0) {
                 struct uart_trans_ctx *ctx = uart->rx_queue;
-                if (!ctx) {
-                        uart->uart->c2.rie = 0;
-                        uart->uart->c2.re = 0;
+                if (!ctx)
                         return;
-                }
                 *ctx->pos = uart->uart->d;
                 ctx->pos++;
                 ctx->remaining--;
@@ -148,35 +143,58 @@ uart_start_rx(struct uart_ctx *uart)
 
 void
 uart_read(struct uart_ctx *uart, struct uart_trans_ctx *ctx,
-          uint8_t *buf, size_t len,
+          void *buf, size_t len,
           uart_cb cb, void *cbdata)
 {
         if (ctx->remaining)
                 return;
         ctx->flags.stop_on_terminator = false;
-        ctx->pos = (uint8_t *) (ctx->buf = buf);
+        ctx->pos = ctx->buf = buf;
         ctx->remaining = len;
         ctx->cb = cb;
         ctx->cbdata = cbdata;
+        ctx->queue = &uart->rx_queue;
         uart->uart->c2.rie = 1;
-        uart_queue_transfer(uart, ctx, &uart->rx_queue, uart_start_rx);
+        uart_queue_transfer(uart, ctx, uart_start_rx);
 }
 
 void
 uart_read_until(struct uart_ctx *uart, struct uart_trans_ctx *ctx,
-                uint8_t *buf, size_t len, char until,
+                void *buf, size_t len, char until,
                 uart_cb cb, void *cbdata)
 {
         if (ctx->remaining)
                 return;
         ctx->flags.stop_on_terminator = true;
         ctx->terminator = until;
-        ctx->pos = (uint8_t *) (ctx->buf = buf);
+        ctx->pos = ctx->buf = buf;
         ctx->remaining = len;
         ctx->cb = cb;
         ctx->cbdata = cbdata;
+        ctx->queue = &uart->rx_queue;
         uart->uart->c2.rie = 1;
-        uart_queue_transfer(uart, ctx, &uart->rx_queue, uart_start_rx);
+        uart_queue_transfer(uart, ctx, uart_start_rx);
+}
+
+int
+uart_abort(struct uart_ctx *uart, struct uart_trans_ctx *ctx)
+{
+        int success = 0;
+
+        crit_enter();
+        for (struct uart_trans_ctx **c = ctx->queue; *c != NULL; c = &(*c)->next) {
+                if (*c == ctx) {
+                        *c = ctx->next;
+                        success = 1;
+                        ctx->remaining = 0;
+                        if (ctx->pos != ctx->buf && ctx->cb)
+                                ctx->cb(ctx->buf, ctx->pos - ctx->buf, ctx->cbdata);
+                        break;
+                }
+        }
+        crit_exit();
+
+        return (success);
 }
 
 void
@@ -184,11 +202,17 @@ uart_irq_handler(struct uart_ctx *uart)
 {
         struct UART_S1_t s1 = { .raw = uart->uart->s1.raw };
 
-        if (s1.tdre && uart->tx_queue) {
-                uart_start_tx(uart);
+        if (s1.tdre) {
+                if (uart->tx_queue != NULL)
+                        uart_start_tx(uart);
+                else
+                        uart->uart->c2.tie = 0;
         }
         if (s1.rdrf) {
-                uart_start_rx(uart);
+                if (uart->rx_queue != NULL)
+                        uart_start_rx(uart);
+                else
+                        uart->uart->c2.rie = 0;
         }
         if (s1.fe) {
                 /* simply clear flag and hope for the best */
