@@ -150,7 +150,7 @@ LDFLAGS+=	-Wl,-output-linker-script=${PROG}.ld
 
 CLEANFILES+=	${PROG}.hex ${PROG}.elf ${PROG}.bin ${PROG}.map
 
-all: ${PROG}.bin
+all: ${PROG}.bin ${PROG}.hex
 
 # This has to go before the rule, because for some reason the updates to OBJS
 # are not incorporated into the target dependencies
@@ -162,11 +162,14 @@ include ${_libdir}/mk/linkdep.mk
 
 ${PROG}.elf: ${LINKOBJS} ${LDLIBS} ${LDTEMPLATE}
 	${CC} -o $@ ${CFLAGS} ${LDFLAGS} ${LINKOBJS} ${LDLIBS}
-
-%.bin: %.elf
 	@${SIZE} $< | tail -n-1 | awk '{ s=$$1+$$2; as=${BINSIZE}; printf "%d bytes of FLASH available\n", (as - s); if (s > as) { exit 1; }}'
 	@${SIZE} $< | tail -n-1 | awk '{ s=$$2+$$3; as=${RAM_SIZE}; printf "%d bytes of RAM available (static allocations only)\n", (as - s); if (s > as) { exit 1; }}'
+
+%.bin: %.elf
 	${OBJCOPY} -O binary $< $@
+
+%.hex: %.elf
+	${OBJCOPY} -O ihex $< $@
 
 ${LDTEMPLATE}: ${_libdir}/ld/link.ld.S ${LDSCRIPTS}
 	${CPP} -o $@ ${CPPFLAGS.ld} $<
