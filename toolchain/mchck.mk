@@ -162,8 +162,8 @@ include ${_libdir}/mk/linkdep.mk
 
 ${PROG}.elf: ${LINKOBJS} ${LDLIBS} ${LDTEMPLATE}
 	${CC} -o $@ ${CFLAGS} ${LDFLAGS} ${LINKOBJS} ${LDLIBS}
-	@${SIZE} $< | tail -n-1 | awk '{ s=$$1+$$2; as=${BINSIZE}; printf "%d bytes of FLASH available\n", (as - s); if (s > as) { exit 1; }}'
-	@${SIZE} $< | tail -n-1 | awk '{ s=$$2+$$3; as=${RAM_SIZE}; printf "%d bytes of RAM available (static allocations only)\n", (as - s); if (s > as) { exit 1; }}'
+	@${SIZE} $@ | tail -n-1 | awk '{ s=$$1+$$2; as=${BINSIZE}; printf "%d bytes of FLASH available\n", (as - s); if (s > as) { exit 1; }}'
+	@${SIZE} $@ | tail -n-1 | awk '{ s=$$2+$$3; as=${RAM_SIZE}; printf "%d bytes of RAM available (static allocations only)\n", (as - s); if (s > as) { exit 1; }}'
 
 %.bin: %.elf
 	${OBJCOPY} -O binary $< $@
