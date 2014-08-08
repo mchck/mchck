@@ -2,7 +2,6 @@
 
 #include <inttypes.h>
 #include <string.h>
-#include <wchar.h>
 
 #include <usb/usb.h>
 #include "usb-internal.h"
