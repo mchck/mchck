@@ -106,11 +106,16 @@ uart_write(struct uart_ctx *uart, struct uart_trans_ctx *ctx,
 static void
 uart_start_rx(struct uart_ctx *uart)
 {
+        int remaining;
+
         uart->uart->c2.re = 1;
-        while (uart->uart->s1.rdrf != 0) {
+        while ((remaining = uart->uart->rcfifo) != 0) {
                 struct uart_trans_ctx *ctx = uart->rx_queue;
                 if (!ctx)
                         return;
+                /* clear flags */
+                if (remaining == 1)
+                        (void)uart->uart->s1;
                 *ctx->pos = uart->uart->d;
                 ctx->pos++;
                 ctx->remaining--;
@@ -208,7 +213,7 @@ uart_irq_handler(struct uart_ctx *uart)
                 else
                         uart->uart->c2.tie = 0;
         }
-        if (s1.rdrf) {
+        if (uart->uart->rcfifo > 0) {
                 if (uart->rx_queue != NULL)
                         uart_start_rx(uart);
                 else
