@@ -19,6 +19,7 @@ payload.bin: ${PAYLOAD}
 ${DEFAULT_PAYLOAD}::
 	cd $(dir $@) && make DEBUG=
 
+_gensrc+=	$(addsuffix .c,$(basename $(filter %.rl,${SRCS})))
 %.c: %.rl
 	ragel -C -G0 -o $@ $<
 CLEANFILES+=	$(patsubst %.rl,%.c,$(filter %.rl,${SRCS}))
