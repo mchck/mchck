@@ -13,7 +13,12 @@ $$(foreach _var,$${_syms_files},$$(eval $$(call _update_symvar,$${_var})))
 endef
 
 define objdeps
-$(sort $(foreach __obj,$(1),${_syms.${__obj}}))
+$(call uniq,$(foreach __obj,$(1),${_syms.${__obj}}))
+endef
+
+# from <https://stackoverflow.com/questions/16144115/makefile-remove-duplicate-words-without-sorting>
+define uniq
+$(if $1,$(call uniq,$(filter-out $(lastword $1),$1)) $(lastword $1))
 endef
 
 GENERATE.linkdep=	${_libdir}/scripts/linkdep -o $@ $<
@@ -39,4 +44,4 @@ endif
 $(foreach _iter,${_syms_files},$(eval $(call _update_symvars)))
 $(foreach _iter,${_syms_files},$(eval $(call _clean_symvar,${_iter})))
 
-LINKOBJS=	$(sort ${OBJS} $(call objdeps,${FORCEOBJS}))
+LINKOBJS=	$(call uniq,${OBJS} $(call objdeps,${FORCEOBJS}))
