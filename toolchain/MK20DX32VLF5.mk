@@ -1,11 +1,23 @@
-# MK20DX32VLF5 with bootloader
 TARGET_FAMILY=		K20
 
 FIXED_SECTIONS+=	-s 0:.isr_vector
 FIXED_SECTIONS+=	-s 0x400:.flash_config
+
+ifneq ($(filter noboot,${TARGET_MODE}),)
+
+LOADER=		yes
+LOADER_SIZE=	32768
+LOADER_ADDR=	0
+APP_SIZE=	0
+APP_ADDR=	32768
+RAM_SIZE=	8192
+
+else
 
 LOADER_SIZE=	3072
 LOADER_ADDR=	0
 APP_SIZE=	29696
 APP_ADDR=	3072
 RAM_SIZE=	8192
+
+endif

@@ -48,7 +48,7 @@ static char staging[FLASH_SECTOR_SIZE * 3];
 static enum dfu_status
 setup_write(size_t off, size_t len, void **buf)
 {
-        if (len > sizeof(staging))
+        if (off + len > sizeof(staging))
                 return (DFU_STATUS_errADDRESS);
         *buf = staging + off;
         return (DFU_STATUS_OK);
@@ -57,8 +57,6 @@ setup_write(size_t off, size_t len, void **buf)
 static enum dfu_status
 finish_write(void *buf, size_t off, size_t len)
 {
-        void *target;
-
         /* buffer all while we are not done */
         if (len != 0)
                 return (DFU_STATUS_OK);
@@ -73,11 +71,7 @@ finish_write(void *buf, size_t off, size_t len)
         flash_ALLOW_BRICKABLE_ADDRESSES = 0x00023420;
 
         for (size_t pos = 0; pos < sizeof(staging); pos += FLASH_SECTOR_SIZE) {
-                target = flash_get_staging_area(pos, FLASH_SECTOR_SIZE);
-                if (!target)
-                        return (DFU_STATUS_errADDRESS);
-                memcpy(target, staging + pos, FLASH_SECTOR_SIZE);
-                if (flash_program_sector(pos, FLASH_SECTOR_SIZE) != 0)
+                if (flash_program_sector(staging + pos, pos, FLASH_SECTOR_SIZE) != 0)
                         return (DFU_STATUS_errADDRESS);
         }
         return (DFU_STATUS_OK);
@@ -94,16 +88,6 @@ init_usb_bootloader(int config)
 void
 main(void)
 {
-        /**
-         * Make sure our idea of the bootloader size matches reality.
-         */
-        if (sizeof(staging) != (uintptr_t)&_app_rom) {
-                /* Bad - abort */
-                for (;;) {
-                        onboard_led_morse_raw("...---... ");
-                }
-        }
-
         onboard_led(1);
 
         flash_prepare_flashing();

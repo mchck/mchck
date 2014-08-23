@@ -122,6 +122,10 @@ LDFLAGS+=	-Wl,--gc-sections
 LDFLAGS+=	-fwhole-program
 CPPFLAGS.ld+=	-P -CC -I${_libdir}/ld -I.
 CPPFLAGS.ld+=	-DTARGET_LDSCRIPT='"${TARGETLD}"'
+CPPFLAGS.ld+=	-DLOADER_ADDR='${LOADER_ADDR}'
+CPPFLAGS.ld+=	-DLOADER_SIZE='${LOADER_SIZE}'
+CPPFLAGS.ld+=	-DAPP_ADDR='${APP_ADDR}'
+CPPFLAGS.ld+=	-DAPP_SIZE='${APP_SIZE}'
 LDSCRIPTS+=	${_libdir}/ld/${TARGETLD}
 TARGETLD?=	${TARGET}.ld
 
@@ -146,7 +150,7 @@ LDFLAGS+=	-Wl,-output-linker-script=${PROG}.ld
 
 CLEANFILES+=	${PROG}.hex ${PROG}.elf ${PROG}.bin ${PROG}.map
 
-all: ${PROG}.bin
+all: ${PROG}.bin ${PROG}.hex
 
 # This has to go before the rule, because for some reason the updates to OBJS
 # are not incorporated into the target dependencies
@@ -158,11 +162,23 @@ include ${_libdir}/mk/linkdep.mk
 
 ${PROG}.elf: ${LINKOBJS} ${LDLIBS} ${LDTEMPLATE}
 	${CC} -o $@ ${CFLAGS} ${LDFLAGS} ${LINKOBJS} ${LDLIBS}
+	@${SIZE} $@ | awk 'END { \
+		used_flash=$$1; \
+		used_ram=$$2+$$3; \
+		binsize=${BINSIZE}; \
+		ramsize=${RAM_SIZE}; \
+		printf "%d bytes of FLASH available\n", (binsize - used_flash); \
+		printf "%d bytes of RAM available (static allocations only)\n", (ramsize - used_ram); \
+		if (used_flash > binsize || used_ram > ramsize) { \
+			exit 1; \
+		} \
+	}'
 
 %.bin: %.elf
-	@${SIZE} $< | tail -n-1 | awk '{ s=$$1+$$2; as=${BINSIZE}; printf "%d bytes of FLASH available\n", (as - s); if (s > as) { exit 1; }}'
-	@${SIZE} $< | tail -n-1 | awk '{ s=$$2+$$3; as=${RAM_SIZE}; printf "%d bytes of RAM available (static allocations only)\n", (as - s); if (s > as) { exit 1; }}'
 	${OBJCOPY} -O binary $< $@
+
+%.hex: %.elf
+	${OBJCOPY} -O ihex $< $@
 
 ${LDTEMPLATE}: ${_libdir}/ld/link.ld.S ${LDSCRIPTS}
 	${CPP} -o $@ ${CPPFLAGS.ld} $<

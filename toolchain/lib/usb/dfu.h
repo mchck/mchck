@@ -7,6 +7,7 @@
 #define USB_FUNCTION_DFU_IFACE_COUNT 1
 
 
+/* XXX move into desc */
 #ifndef USB_DFU_TRANSFER_SIZE
 #define USB_DFU_TRANSFER_SIZE	FLASH_SECTOR_SIZE
 #endif

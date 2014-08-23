@@ -4,8 +4,8 @@
 
 MEMORY
 {
-	loader_rom (rx) : ORIGIN = 0x0, LENGTH = 128K
-	app_rom (rx) : ORIGIN = 3K, LENGTH = 128K-3K
+        loader_rom (rx) : ORIGIN = LOADER_ADDR, LENGTH = LOADER_SIZE
+        app_rom (rx) : ORIGIN = APP_ADDR, LENGTH = APP_SIZE
 	ram (rwx) : ORIGIN = 0x20000000 - 16K / 2, LENGTH = 16K
 }
 
