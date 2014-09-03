@@ -1,5 +1,5 @@
 #ifndef STDIO_OUTBUF_SIZE
-#define STDIO_OUTBUF_SIZE	16
+#define STDIO_OUTBUF_SIZE	128
 #endif
 
 typedef struct _stdio_file FILE;
