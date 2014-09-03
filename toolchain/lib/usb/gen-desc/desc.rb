@@ -234,7 +234,7 @@ class DeviceDesc < DslItem
   end
 
   def gen_defs
-    "const struct usbd_device #{@name.to_loc_s};\n" +
+    "extern const struct usbd_device #{@name.to_loc_s};\n" +
     @config.map{|c| c.gen_defs}.join("\n")
   end
 

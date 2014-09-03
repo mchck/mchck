@@ -211,7 +211,7 @@ struct cdc_function_desc {
 
 struct cdc_ctx;
 
-const struct usbd_function cdc_function;
+extern const struct usbd_function cdc_function;
 
 void cdc_read_more(struct cdc_ctx *ctx);
 size_t cdc_write_space(struct cdc_ctx *ctx);
