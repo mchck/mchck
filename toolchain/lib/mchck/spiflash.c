@@ -12,6 +12,7 @@ enum spiflash_command {
         ENABLE_WRITE_STATUS_REGISTER = 0x50,
         BLOCK_ERASE_32KB = 0x52,
         BLOCK_ERASE_64KB = 0xD8,
+        DEVICE_ERASE = 0xC7,
         GET_IDENTIFICATION = 0x9F,
 };
 
@@ -246,6 +247,17 @@ spiflash_erase_block(struct spiflash_device *dev, struct spiflash_transaction *t
         return spiflash_write_cmd(dev, trans,
                                   is_64KB ? BLOCK_ERASE_64KB : BLOCK_ERASE_32KB,
                                   addr, NULL, 0, cb, cbdata);
+}
+
+int
+spiflash_erase_device(struct spiflash_device *dev, struct spiflash_transaction *trans, spi_cb cb, void *cbdata)
+{
+        trans->spi_query[0] = DEVICE_ERASE;
+        spiflash_setup_xfer(trans, 1, 0);
+        trans->spi_cb = cb;
+        trans->cbdata = cbdata;
+        spiflash_queue_transaction(dev, trans, WRITE_ENABLE, true, spiflash_spi_done_cb);
+        return 0;
 }
 
 int
