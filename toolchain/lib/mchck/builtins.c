@@ -55,3 +55,39 @@ strlen(const char *str)
 	}
 	return (len);
 }
+
+char *
+strchr(const char *str, int chr)
+{
+	for (; *str != 0; ++str) {
+		if (*str == chr)
+			return ((char *)str);
+	}
+
+	return (NULL);
+}
+
+int
+strcmp(const char *a, const char *b)
+{
+	for (; *a != 0 && *b != 0; ++a, ++b) {
+		if (*a != *b)
+			break;
+	}
+
+	return (*a - *b);
+}
+
+int
+strncmp(const char *a, const char *b, size_t len)
+{
+	for (; *a != 0 && *b != 0 && len != 0; ++a, ++b, --len) {
+		if (*a != *b)
+			break;
+	}
+
+	if (len == 0)
+		return (0);
+
+	return (*a - *b);
+}
