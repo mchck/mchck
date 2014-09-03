@@ -24,7 +24,8 @@ enum usb_desc_type {
 	USB_DESC_EP = 5,
 	USB_DESC_DEVQUAL = 6,
 	USB_DESC_OTHERSPEED = 7,
-	USB_DESC_POWER = 8
+	USB_DESC_POWER = 8,
+	USB_DESC_IAD = 11
 };
 
 struct usb_desc_type_t {
@@ -143,6 +144,18 @@ struct usb_desc_iface_t {
 	uint8_t iInterface;
 };
 CTASSERT_SIZE_BYTE(struct usb_desc_iface_t, 9);
+
+struct usb_desc_iad_t {
+	uint8_t bLength;
+	enum usb_desc_type bDescriptorType : 8; /* = USB_DESC_IAD */
+	uint8_t bFirstInterface;
+	uint8_t bInterfaceCount;
+	enum usb_dev_class bFunctionClass : 8;
+	enum usb_dev_subclass bFunctionSubClass : 8;
+	enum usb_dev_proto bFunctionProtocol : 8;
+	uint8_t iFunction;
+} __packed;
+CTASSERT_SIZE_BYTE(struct usb_desc_iad_t, 8);
 
 struct usb_desc_config_t {
 	uint8_t bLength;

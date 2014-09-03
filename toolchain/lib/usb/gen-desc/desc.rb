@@ -94,6 +94,10 @@ end
 class FunctionDesc < DslItem
   block :interface, InterfaceDesc, :list => true
 
+  field :bFunctionClass, :optional => true
+  field :bFunctionSubClass, :optional => true
+  field :bFunctionProtocol, :optional => true
+
   def renumber!(counts)
     @var_name = "usb_function_#{counts[:iface]}"
     @interface.each do |iface|
@@ -113,6 +117,25 @@ class FunctionDesc < DslItem
 
   def gen_vars
     ''
+  end
+
+  def gen_iad_desc_init
+    first_iface = @interface[0].ifacenum
+    iface_count = @interface.count
+
+    return '' if iface_count <= 1
+
+    <<_end_
+{
+	.bLength = sizeof(struct usb_desc_iad_t),
+	.bDescriptorType = USB_DESC_IAD,
+	.bFirstInterface = #{first_iface},
+	.bInterfaceCount = #{iface_count},
+	.bFunctionClass = #{(@bFunctionClass || @interface[0].bInterfaceClass).to_loc_s},
+	.bFunctionSubClass = #{(@bFunctionSubClass || @interface[0].bInterfaceSubClass).to_loc_s},
+	.bFunctionProtocol = #{(@bFunctionProtocol || @interface[0].bInterfaceProtocol).to_loc_s}
+}
+_end_
   end
 
   def get_function_var
@@ -216,6 +239,7 @@ class DeviceDesc < DslItem
   end
 
   def gen_vars
+    # XXX change class/subclass to declare IAD when present
     @config.map{|c| c.gen_vars}.join("\n") +
       <<_end_
 
