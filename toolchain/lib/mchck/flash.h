@@ -1,6 +1,6 @@
 #define FLASH_SECTOR_SIZE 1024
 #define FLASH_SECTION_SIZE 1024
-#define FLASH_ELEM_SIZE 8
+#define FLASH_ELEM_SIZE 4
 
 __attribute__((section(".ramtext.ftfl_submit_cmd"), long_call))
 int ftfl_submit_cmd(void);
