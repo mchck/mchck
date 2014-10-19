@@ -19,7 +19,7 @@ rtc_start_counter(void)
 }
 
 uint32_t
-rtc_get_time()
+rtc_get_time(void)
 {
         return RTC.tsr;
 }
@@ -34,7 +34,7 @@ rtc_set_time(uint32_t seconds)
 }
 
 static void
-rtc_alarm_update()
+rtc_alarm_update(void)
 {
         if (rtc_get_time() == RTC_INVALID_TIME)
                 return;

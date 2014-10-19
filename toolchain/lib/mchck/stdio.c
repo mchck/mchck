@@ -5,29 +5,48 @@ static FILE _stdout_instance;
 FILE *stdout = &_stdout_instance;
 
 void
+fflush(FILE *f)
+{
+        size_t n;
+
+        while (f->outbuf_head != f->outbuf_tail) {
+                if (f->outbuf_head >= f->outbuf_tail) {
+                        n = f->outbuf_head - f->outbuf_tail;
+                } else {
+                        n = sizeof(f->outbuf) - f->outbuf_tail;
+                }
+
+                if (n == 0)
+                        return;
+
+                size_t written = f->ops->write(&f->outbuf[f->outbuf_tail], n, f->ops_data);
+                f->outbuf_tail = (f->outbuf_tail + written) % sizeof(f->outbuf);
+                if (written != n)
+                        break;
+        }
+}
+
+static size_t
+buf_count(FILE *f)
+{
+        /* number of buffered characters */
+        size_t buffered = f->outbuf_head - f->outbuf_tail;
+        if (buffered < 0)
+                buffered += sizeof(f->outbuf) - 1;
+
+        return (buffered);
+}
+
+void
 fputc(int c, FILE *f)
 {
         crit_enter();
         f->outbuf[f->outbuf_head] = c;
         f->outbuf_head = (f->outbuf_head + 1) % sizeof(f->outbuf);
 
-        /* number of buffered characters */
-        size_t buffered = f->outbuf_head - f->outbuf_tail;
-        if (buffered < 0)
-                buffered += sizeof(f->outbuf) - 1;
-
         /* flush on newline or if more than half full */
-        if (f->ops && (c == '\n' || buffered > sizeof(f->outbuf) / 2)) {
-                size_t n;
-                if (f->outbuf_head > f->outbuf_tail) {
-                        n = buffered;
-                } else {
-                        n = sizeof(f->outbuf) - f->outbuf_tail;
-                }
-                size_t written = f->ops->write(&f->outbuf[f->outbuf_tail],
-                                               n, f->ops_data);
-                f->outbuf_tail = (f->outbuf_tail + written) % sizeof(f->outbuf);
-        }
+        if (f->ops && (c == '\n' || buf_count(f) > sizeof(f->outbuf) / 2))
+                fflush(f);
         crit_exit();
 }
 

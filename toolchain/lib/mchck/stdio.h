@@ -1,5 +1,5 @@
 #ifndef STDIO_OUTBUF_SIZE
-#define STDIO_OUTBUF_SIZE	16
+#define STDIO_OUTBUF_SIZE	128
 #endif
 
 typedef struct _stdio_file FILE;
@@ -22,6 +22,7 @@ extern FILE *stdout;
 
 int printf(const char *fmt, ...)  __attribute__((__format__ (printf, 1, 2)));
 int vfprintf(FILE *f, const char *fmt, va_list args);
+void fflush(FILE *f);
 void fputc(int c, FILE *f);
 int snprintf(char *buf, size_t n, const char *fmt, ...) __attribute__((__format__ (printf, 3, 4)));
 int vsnprintf(char *buf, size_t n, const char *fmt, va_list args);

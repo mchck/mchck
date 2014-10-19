@@ -1,7 +1,7 @@
 #define RTC_INVALID_TIME 0xffffffff
 
 /* Enable access to the RTC and starts the oscillator. */
-void rtc_init();
+void rtc_init(void);
 
 /* Start the RTC counter
  *
@@ -12,10 +12,10 @@ void rtc_init();
  * One should allow around one second between calling rtc_init and
  * starting the counter to allow the oscillator to stabilize.
  */
-int rtc_start_counter();
+int rtc_start_counter(void);
 
 /* Get the current time in seconds */
-uint32_t rtc_get_time();
+uint32_t rtc_get_time(void);
 
 /* Set the current time in seconds */
 void rtc_set_time(uint32_t seconds);

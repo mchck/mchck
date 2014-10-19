@@ -12,6 +12,7 @@ enum spiflash_command {
         ENABLE_WRITE_STATUS_REGISTER = 0x50,
         BLOCK_ERASE_32KB = 0x52,
         BLOCK_ERASE_64KB = 0xD8,
+        DEVICE_ERASE = 0xC7,
         GET_IDENTIFICATION = 0x9F,
 };
 
@@ -181,7 +182,8 @@ spiflash_get_status(struct spiflash_device *dev, struct spiflash_transaction *tr
 static void
 spiflash_spi_done_cb(struct spiflash_transaction *trans)
 {
-        trans->spi_cb(trans->cbdata);
+        if (trans->spi_cb)
+                trans->spi_cb(trans->cbdata);
 }
 
 int
@@ -218,8 +220,8 @@ spiflash_write_cmd(struct spiflash_device *dev, struct spiflash_transaction *tra
 
         trans->spi_cb = cb;
         trans->cbdata = cbdata;
-        spiflash_queue_transaction(dev, trans, WRITE_ENABLE, true, spiflash_spi_done_cb);
-        
+        spiflash_queue_transaction(dev, trans, WRITE_ENABLE, cb != NULL ? true : false, spiflash_spi_done_cb);
+
         return 0;
 }
 
@@ -247,7 +249,18 @@ spiflash_erase_block(struct spiflash_device *dev, struct spiflash_transaction *t
                                   addr, NULL, 0, cb, cbdata);
 }
 
-int 
+int
+spiflash_erase_device(struct spiflash_device *dev, struct spiflash_transaction *trans, spi_cb cb, void *cbdata)
+{
+        trans->spi_query[0] = DEVICE_ERASE;
+        spiflash_setup_xfer(trans, 1, 0);
+        trans->spi_cb = cb;
+        trans->cbdata = cbdata;
+        spiflash_queue_transaction(dev, trans, WRITE_ENABLE, true, spiflash_spi_done_cb);
+        return 0;
+}
+
+int
 spiflash_set_protection(struct spiflash_device *dev, struct spiflash_transaction *trans,
                         bool protected, spi_cb cb, void *cbdata)
 {

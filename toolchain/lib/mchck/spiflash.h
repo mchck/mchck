@@ -40,7 +40,7 @@ struct spiflash_transaction {
         struct spiflash_device *dev;
         struct spiflash_transaction *next;
 };
-        
+
 struct spiflash_device {
         struct spi_ctx  flash_spi_ctx;
         enum spi_pcs cs;
@@ -76,6 +76,10 @@ extern int
 spiflash_erase_block(struct spiflash_device *dev, struct spiflash_transaction *trans,
                      uint32_t addr, int is_64KB, spi_cb cb, void *cbdata);
 
-extern int 
+extern int
+spiflash_erase_device(struct spiflash_device *dev, struct spiflash_transaction *trans,
+                     spi_cb cb, void *cbdata);
+
+extern int
 spiflash_set_protection(struct spiflash_device *dev, struct spiflash_transaction *trans,
                         bool protected, spi_cb cb, void *cbdata);

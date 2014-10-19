@@ -1,11 +1,11 @@
 # magic make snippet to select all objects that are required to be linked
 
 define _update_symvar
-$(1):= $$(sort ${$(1)})
+$(1):= $$(call uniq,${$(1)})
 endef
 
 define _clean_symvar
-$(1):= $$(sort $$(filter-out $$$$%,${$(1)}))
+$(1):= $$(call uniq,$$(filter-out $$$$%,${$(1)}))
 endef
 
 define _update_symvars
