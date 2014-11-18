@@ -1,6 +1,6 @@
 # -*- makefile-gmake -*-
 
-SRCS-usb=	usb.c dfu.c dfu-app.c cdc-acm.c
+SRCS-usb=	usb.c dfu.c dfu-app.c cdc-acm.c hid.c
 
 ifeq (${TARGET},host)
 SRCS-usb+=	vusb.c

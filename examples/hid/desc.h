@@ -22,6 +22,57 @@ struct usb_config_hid {
 	struct hid_function_desc usb_function_0;
 } __packed;
 
+#define MOUSE_TX_SIZE 8
+
+// Mouse example pg. 71
+#define REPORT_DESC_SIZE 50
+static uint8_t report_desc[REPORT_DESC_SIZE] = {
+	0x05, 0x01,
+	0x09, 0x02,
+	0xA1, 0x01,
+	0x09, 0x01,
+	0xA1, 0x00,
+	0x05, 0x09,
+	0x19, 0x01,
+	0x29, 0x03,
+	0x15, 0x00,
+	0x25, 0x01,
+	0x95, 0x03,
+	0x75, 0x01,
+	0x81, 0x02,
+	0x95, 0x01,
+	0x75, 0x05,
+	0x81, 0x01,
+	0x05, 0x01,
+	0x09, 0x30,
+	0x09, 0x31,
+	0x15, 0x81,
+	0x25, 0x7F,
+	0x75, 0x08,
+	0x95, 0x02,
+	0x81, 0x06,
+	0xC0,
+	0xC0
+};
+
+struct mouse_data_t {
+	uint8_t btn1 : 1;
+	uint8_t btn2 : 1;
+	uint8_t btn3 : 1;
+	uint8_t pad : 5;
+	char x;
+	char y;
+} __packed;
+
+static struct mouse_data_t mouse_data = {
+	.btn1 = 0,
+	.btn2 = 0,
+	.btn3 = 0,
+	.pad = 0,
+	.x = 20,
+	.y = 0
+};
+
 static const struct usb_config_hid hid_desc_config = {
 	.config = {
 		.bLength = sizeof(struct usb_desc_config_t),
@@ -31,37 +82,37 @@ static const struct usb_config_hid hid_desc_config = {
 		.bConfigurationValue = 1,
 		.iConfiguration = 0,
 		.one = 1,
-		.bMaxPower = 100
+		.bMaxPower = 50
 	},
 	.usb_function_0 = {
 		.iface = {
 			.bLength = sizeof(struct usb_desc_iface_t),
-			.bDescriptorType = USB_DESC_IFACE,
-			.bInterfaceNumber = 0,
-			.bAlternateSetting = 0,
-			.bNumEndpoints = 1,
-			.bInterfaceClass = 3,
-			.bInterfaceSubClass = 0,
-			.bInterfaceProtocol = 0,
-			.iInterface = 0
+			.bDescriptorType = 0x4,
+			.bInterfaceNumber = 0x0,
+			.bAlternateSetting = 0x0,
+			.bNumEndpoints = 0x1,
+			.bInterfaceClass = 0x3,
+			.bInterfaceSubClass = 0x0,
+			.bInterfaceProtocol = 0x2,
+			.iInterface = 0x0
 		},
 		.hid_desc = {
-			.bLength = 9,
+			.bLength = 0x9,
 			.bDescriptorType = 0x21,
 			.bcdHID = 0x101,
-			.bCountryCode = 0,
-			.bNumDescriptors = 1,
+			.bCountryCode = 0x0,
+			.bNumDescriptors = 0x1,
 			.bDescriptorType1 = 0x22,
 			.wDescriptorLength = 0x32,
 		},
 		.int_in_ep = {
-			.bLength = sizeof(struct usb_desc_ep_t),
-			.bDescriptorType = USB_DESC_EP,
+			.bLength = 0x7,
+			.bDescriptorType = 0x5,
 			.ep_num = 1,
 			.in = 1,
 			.type = USB_EP_INTR,
-			.wMaxPacketSize = 8,
-			.bInterval = 0x0A
+			.wMaxPacketSize = MOUSE_TX_SIZE,
+			.bInterval = 0xA
 		}
 	}
 };
@@ -88,11 +139,11 @@ hid_usb_dev_desc = {
 	.bLength = sizeof(struct usb_desc_dev_t),
 	.bDescriptorType = USB_DESC_DEV,
 	.bcdUSB = { .maj = 2 },
-	.bDeviceClass = USB_DEV_CLASS_SEE_IFACE,
-	.bDeviceSubClass = USB_DEV_SUBCLASS_SEE_IFACE,
-	.bDeviceProtocol = USB_DEV_PROTO_SEE_IFACE,
+	.bDeviceClass = 0,
+	.bDeviceSubClass = 0,
+	.bDeviceProtocol = 0,
 	.bMaxPacketSize0 = EP0_BUFSIZE,
-	.idVendor = 8995,
+	.idVendor = 0x2323,
 	.idProduct = 3,
 	.bcdDevice = { .raw = 0 },
 	.iManufacturer = 1,
