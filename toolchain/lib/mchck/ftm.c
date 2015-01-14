@@ -7,7 +7,7 @@ ftm_init(void)
 	FTM0.mod = 0xffff;      // set counter modulo value to maximum
 	FTM0.cntin = 0;
 
-        for (int i = 0; i <= FTM_NUM_CH; i++) {
+        for (int i = 0; i < FTM_NUM_CH; i++) {
                 FTM0.channel[i].csc.msb = 1;
                 FTM0.channel[i].csc.elsb = 1;
                 FTM0.channel[i].cv = 0x8000;
