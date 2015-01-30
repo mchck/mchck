@@ -2,6 +2,14 @@
 
 uint32_t flash_ALLOW_BRICKABLE_ADDRESSES;
 
+static void
+flash_prepare_cmd(enum FTFL_FCMD cmd)
+{
+        FTFL.fccob.generic.fcmd = cmd;
+        for (int i=0; i<8; i++)
+                FTFL.fccob.generic.data_be[i] = 0;
+}
+
 /* This will have to live in SRAM. */
 __attribute__((section(".ramtext.ftfl_submit_cmd"), long_call))
 int
@@ -80,4 +88,29 @@ flash_get_staging_area(uintptr_t addr, size_t len)
             len != FLASH_SECTION_SIZE)
                 return (NULL);
         return (FlexRAM);
+}
+
+int
+flash_set_partitioning(enum FTFL_FLEXNVM_PARTITION flexnvm_partition,
+                       enum FTFL_EEPROM_SIZE eeprom_size)
+{
+        /* first verify that the IFR is clear */
+        flash_prepare_cmd(FTFL_FCMD_READ_RESOURCE);
+        FTFL.fccob.read_resource.resource_select = FTFL_RESOURCE_IFR;
+        FTFL.fccob.read_resource.addr = 0xfc;
+        ftfl_submit_cmd();
+        if (FTFL.fccob.read_resource.data != 0xffffffff)
+                return 1;
+
+        /* setup the PROGRAM_PARTITION command */
+        flash_prepare_cmd(FTFL_FCMD_PROGRAM_PARTITION);
+        FTFL.fccob.program_partition.flexnvm_partition = flexnvm_partition;
+        FTFL.fccob.program_partition.eeprom_size = eeprom_size;
+        ftfl_submit_cmd();
+        if (FTFL.fstat.accerr)
+                return 2;
+        else if (FTFL.fstat.mgstat0)
+                return 3;
+        else
+                return 0;
 }

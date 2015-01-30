@@ -9,3 +9,5 @@ int flash_erase_sector(uintptr_t);
 int flash_program_section(uintptr_t, size_t);
 int flash_program_sector(const char *, uintptr_t, size_t);
 void *flash_get_staging_area(uintptr_t, size_t);
+int flash_set_partitioning(enum FTFL_FLEXNVM_PARTITION flexnvm_partition,
+			   enum FTFL_EEPROM_SIZE eeprom_size);
