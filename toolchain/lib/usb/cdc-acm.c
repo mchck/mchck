@@ -137,8 +137,8 @@ cdc_init(void (*data_ready_cb)(uint8_t *, size_t), void (*data_sent_cb)(size_t),
         ctx->data_sent_cb = data_sent_cb;
         ctx->out_queued = 0;
         ctx->notice_pipe = usb_init_ep(&ctx->header, CDC_NOTICE_EP, USB_EP_TX, CDC_NOTICE_SIZE);
-	ctx->tx_pipe = usb_init_ep(&ctx->header, CDC_TX_EP, USB_EP_TX, CDC_TX_SIZE);
-	ctx->rx_pipe = usb_init_ep(&ctx->header, CDC_RX_EP, USB_EP_RX, CDC_RX_SIZE);
+        ctx->tx_pipe = usb_init_ep(&ctx->header, CDC_TX_EP, USB_EP_TX, CDC_TX_SIZE);
+        ctx->rx_pipe = usb_init_ep(&ctx->header, CDC_RX_EP, USB_EP_RX, CDC_RX_SIZE);
         cdc_read_more(ctx);
         cdc_tx_done(ctx->outbuf, -1, ctx);
 }
