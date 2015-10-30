@@ -1,0 +1,2 @@
+SRCS-host=	system.c
+SRCS.libs+=	host

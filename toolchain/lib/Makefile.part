@@ -1,0 +1,7 @@
+ifeq (${TARGET},host)
+include ${_libdir}/lib/host/Makefile.part
+else
+include ${_libdir}/lib/mchck/Makefile.part
+endif
+include ${_libdir}/lib/usb/Makefile.part
+include ${_libdir}/lib/nrf/Makefile.part

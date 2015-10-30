@@ -1,0 +1,37 @@
+#!/usr/bin/env ruby
+
+$: << File.dirname(__FILE__)
+
+require 'desc'
+require 'cdc'
+require 'dfu'
+require 'hid'
+require 'optparse'
+
+outname = nil
+OptionParser.new do |opts|
+  opts.on("--output FILE") do |fn|
+    outname = fn
+  end
+end.parse!
+
+infile = ARGV[0]
+
+r = DescriptorRoot.load(infile)
+if !(warnings = r.warnings).empty?
+  $stderr.puts warnings.join("\n")
+  exit 1
+end
+
+if !outname
+  outname = infile + ".c"
+end
+
+headername = File.join(File.dirname(outname), File.basename(outname, ".c") + ".h")
+File.open(headername, 'w') do |f|
+  f.puts r.gen_header
+end
+
+File.open(outname, 'w') do |f|
+  f.puts r.gen_src(File.basename(headername))
+end

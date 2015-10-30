@@ -1,0 +1,30 @@
+# -*- makefile-gmake -*-
+
+SRCS-usb=	usb.c dfu.c dfu-app.c cdc-acm.c hid.c
+
+ifeq (${TARGET},host)
+SRCS-usb+=	vusb.c
+CFLAGS+=	-DVUSB
+else
+SRCS-usb+=	kinetis.c
+endif
+
+SRCS.libs+=	usb
+
+_GEN_DESC_SRCS=	$(wildcard ${_libdir}/lib/usb/gen-desc/*.rb)
+
+.SUFFIXES: .desc
+%.desc.h %.desc.c: %.desc ${_GEN_DESC_SRCS}
+	${_libdir}/lib/usb/gen-desc/gen-desc $<
+
+_descsrc+=	$(filter %.desc,${SRCS})
+
+# automatically pick up .desc if no srcs were given
+ifdef _no_src_given
+ifneq ($(wildcard ${PROG}.desc),)
+_descsrc+=	${PROG}.desc
+endif
+endif
+
+_gensrc+=	$(addsuffix .c,${_descsrc})
+CLEANFILES+=	$(addsuffix .c,${_descsrc}) $(addsuffix .h,${_descsrc})

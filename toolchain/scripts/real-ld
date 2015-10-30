@@ -1,0 +1,149 @@
+#!/usr/bin/env ruby
+
+# This script is called by gcc's collect2 during link phase.  We
+# intercept linking to fix section packing.  This is really only
+# necessary for link-time-optimization (-flto) and loaders, because
+# gcc replaces the original object files with an optimized one.
+
+require 'tempfile'
+
+$: << File.dirname(__FILE__)
+require 'pack-sections'
+
+call_args = []
+object_files = []
+output_file = nil
+linker_out = nil
+linker_in = nil
+save_temps = false
+output_linker_script = nil
+ld = ENV["LD"] || "arm-none-eabi-ld"
+
+while arg = ARGV.shift
+  case arg
+  when /^-o$/
+    output_file = ARGV.shift
+  when /^-plugin$/
+    call_args << arg
+    call_args << ARGV.shift
+  when /^-T$/
+    linker_in = ARGV.shift
+    linker_out = Tempfile.new(['mchck-real-ld-', '.ld'])
+  when /^-save-temps$/
+    save_temps = true
+  when /^-output-linker-script=(.*)$/
+    output_linker_script = $1
+  when /^-/
+    call_args << arg
+  else
+    object_files << arg
+  end
+end
+
+if linker_in
+  fixed_sects = []
+
+  # do one plain pass so that --gc-sections do its job
+  tmp_obj = Tempfile.new(['mchck-real-ld-', '.o'])
+  tmp_obj.close
+
+  tmp_map = Tempfile.new(['mchck-real-ld-', '.map'])
+  tmp_map.close
+
+  if save_temps
+    path = linker_out.path
+    linker_out.close(true)
+    linker_out = File.open(path, "w+")
+    $stdout.puts "keeping temporary linker file #{path}"
+
+    path = tmp_obj.path
+    $stdout.puts "keeping intermediary object file #{path}"
+
+    path = tmp_map.path
+    $stdout.puts "keeping intermediary map file #{path}"
+  end
+
+  ln = File.readlines(linker_in)
+  ln.grep(/PACK SECTIONS FIX\s+([^\s]+)\s*=\s*(0x[[:xdigit:]]+|[[:digit:]]+)[^\w]/) do |m|
+    s = Objdump::Section.new
+    s.name = $1
+    s.addr = Integer($2)
+    fixed_sects << s
+  end
+  all_sect = Objdump.new object_files
+  ln.grep(/PACK SECTIONS IGNORE\s+([^\s]+)/) do |m|
+    all_sect.delete_if{|s| File.fnmatch($1, s.name)}
+  end
+
+  args = [ld, "-o", tmp_obj.path, "-T", linker_in, *object_files, *call_args, "-Map=#{tmp_map.path}"]
+  if !system(*args)
+    exit $?.exitstatus
+  end
+
+  # XXX getting ugly, move to separate functions
+  skipping = true
+  carryover = []
+  File.readlines(tmp_map.path).each do |line|
+    line.chomp!
+    case line
+    when /^Discarded input sections/
+      skipping = false
+      next
+    when /^[^ ]/
+      if !skipping
+        break
+      end
+    end
+    next if skipping
+    line = carryover + line.split
+    if line.count < 4
+      carryover = line
+      next
+    end
+    carryover = []
+    sect, _, _, file = line
+    all_sect.delete_if{|s| s.name == sect && s.file == file}
+  end
+
+  fixed_sects.delete_if do |fs|
+    all_sect.select{|s| s.name == fs.name}.empty?
+  end
+
+  l = Linker.new(all_sect, fixed_sects)
+
+  skipping = false
+  ln.each do |line|
+    case line
+    when /PACK SECTIONS START/
+      linker_out.write line
+      linker_out.puts l.pack.join("\n")
+      skipping = true
+    when /PACK SECTIONS END/
+      skipping = false
+    end
+    next if skipping
+    linker_out.write line
+  end
+
+  if output_linker_script
+    File.open(output_linker_script, 'w') do |of|
+      linker_out.seek(0)
+      of.write(linker_out.read)
+    end
+  end
+  linker_out.close
+end
+
+err = 1
+begin
+  args = [ld, "-o", output_file, "-T", linker_out.path, *object_files, *call_args]
+  system(*args)
+  err = $?.exitstatus
+ensure
+  if !save_temps
+    linker_out.unlink if linker_out
+    tmp_obj.unlink if tmp_obj
+    tmp_map.unlink if tmp_map
+  end
+end
+exit(err)

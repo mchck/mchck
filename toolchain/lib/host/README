@@ -1,0 +1,2 @@
+Helper routines for compiling code to run on the host.  Right now only
+used by the virtual USB subsystem.

@@ -1,0 +1,6 @@
+SRCS-nrf=	nrf.c
+
+ifeq (${TARGET},host)
+else
+SRCS.libs+=	nrf
+endif

@@ -1,0 +1,44 @@
+device(:foo) {
+  idVendor 0x2323
+  idProduct 0x1
+  iManufacturer "mchck.org"
+  iProduct "descriptor test"
+  config {
+    initfun :foo_init
+
+    cdc {
+    }
+    dfu {
+    }
+    hid {
+      collection(:generic_desktop, :mouse) {
+        report(:input) {
+          name :mouse_report
+          # report_id 5
+          item(:buttons => 1..3) {
+            usage_page :buttons
+            size 1
+            logical_range 0..1
+            # absolute
+          }
+          #pad(:align => 8) {}
+          pad(5) {}
+          item(:x, :y) {
+            usage_page :generic_desktop
+            size 8
+            logical_range -127..127
+            # relative
+          }
+        }
+        report(:input) {
+          name :other_report
+          item(:custom => 0xff00) {
+            usage_page 0xff00
+            size 8
+            logical_range 0..255
+          }
+        }
+      }
+    }
+  }
+}

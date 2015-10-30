@@ -1,0 +1,12 @@
+device(:dfu_device) {
+  idVendor 0x2323
+  idProduct 0x1
+  iManufacturer "mchck.org"
+  iProduct "DFU bootloader"
+  config {
+    initfun :init_usb_bootloader
+
+    dfu {
+    }
+  }
+}
