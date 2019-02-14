@@ -1,6 +1,6 @@
 #include <mchck.h>
 
-static struct spi_ctx_bare *spi_ctx;
+static struct spi_ctx_bare *volatile spi_ctx;
 
 static void
 spi_start_xfer(void)
@@ -19,7 +19,7 @@ spi_start_xfer(void)
                                 .rfdf_re = spi_ctx->rx != NULL,
                                 .eoqf_re = 1,
                                 }).raw;
-        SPI0.sr.raw |= 0;
+        SPI0.sr.raw |= 0xffffffff;
 }
 
 static void
@@ -35,7 +35,7 @@ spi_stop_xfer(void)
                                 .halt = 1
                                 }).raw;
         SPI0.rser.raw = 0;
-        SPI0.sr.raw |= 0;
+        SPI0.sr.raw |= 0xffffffff;
 }
 
 bool spi_is_idle(void)
@@ -88,7 +88,7 @@ spi_queue_xfer_sg(struct spi_ctx_bare *ctx,
 
         crit_enter();
         /* search for tail and append */
-        for (struct spi_ctx_bare **c = &spi_ctx; ; c = &(*c)->next) {
+        for (struct spi_ctx_bare *volatile *c = &spi_ctx; ; c = &(*c)->next) {
                 if (*c == NULL) {
                         *c = ctx;
                         /* we're at the head, so start xfer */
