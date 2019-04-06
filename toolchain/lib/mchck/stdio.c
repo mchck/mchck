@@ -50,6 +50,29 @@ fputc(int c, FILE *f)
         crit_exit();
 }
 
+int fflush(FILE *f)
+{
+    crit_enter();
+
+    /* number of buffered characters */
+    size_t buffered = f->outbuf_head - f->outbuf_tail;
+    if (buffered < 0)
+            buffered += sizeof(f->outbuf) - 1;
+
+    size_t n;
+    if (f->outbuf_head > f->outbuf_tail) {
+            n = buffered;
+    } else {
+            n = sizeof(f->outbuf) - f->outbuf_tail;
+    }
+    size_t written = f->ops->write(&f->outbuf[f->outbuf_tail],
+                                   n, f->ops_data);
+    f->outbuf_tail = (f->outbuf_tail + written) % sizeof(f->outbuf);
+    crit_exit();
+
+    return 0;
+}
+
 struct buffer_file_ctx {
         char *buf;
         size_t buflen;
