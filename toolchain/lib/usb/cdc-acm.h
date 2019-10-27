@@ -10,6 +10,23 @@
 #define CDC_RX_EP	1
 #define CDC_RX_SIZE 32
 
+enum cdc_ctrl_req_code {
+        USB_CTRL_REQ_CDC_SET_LINE_CODING = 0x20,
+        USB_CTRL_REQ_CDC_GET_LINE_CODING = 0x21,
+        USB_CTRL_REQ_CDC_SET_CTRL_LINE_STATE = 0x22,
+        USB_CTRL_REQ_CDC_SET_OPERATION_PARAMS = 0x32,
+        USB_CTRL_REQ_CDC_GET_OPERATION_PARAMS = 0x33,
+        USB_CTRL_REQ_CDC_SET_LINE_PARAMS = 0x34,
+};
+
+struct cdc_line_coding {
+        uint32_t dte_rate;
+        uint8_t char_format;
+        uint8_t parity_type;
+        uint8_t data_bits;
+} __packed;
+CTASSERT_SIZE_BYTE(struct cdc_line_coding, 7);
+
 struct cdc_ctx {
         struct usbd_function_ctx_header header;
         struct usbd_ep_pipe_state_t *notice_pipe;
@@ -22,6 +39,8 @@ struct cdc_ctx {
         int out_queued;
         uint8_t outbuf[CDC_TX_SIZE];
         uint8_t inbuf[CDC_RX_SIZE];
+        uint8_t control_lines;
+        struct cdc_line_coding line_coding;
 };
 
 enum cdc_dev_class {

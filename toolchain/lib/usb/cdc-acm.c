@@ -83,8 +83,49 @@ cdc_write_string(const char *s, struct cdc_ctx *ctx)
  * 0x21, 0x32
  */
 
+static void
+cdc_handle_control_set_line_coding(void *buf, ssize_t len, void *cbdata)
+{
+        usb_handle_control_status(0);
+}
+
+/* Windows 7 fails to configure device unless this is implemented */
+static int
+cdc_handle_control(struct usb_ctrl_req_t *req, void *data)
+{
+        struct cdc_ctx *ctx = data;
+        switch ((enum cdc_ctrl_req_code)req->bRequest) {
+        case USB_CTRL_REQ_CDC_SET_LINE_CODING: {
+                if (req->wLength != sizeof(struct cdc_line_coding)) {
+                        usb_handle_control_status(1);
+                } else {
+                        usb_ep0_rx(&ctx->line_coding, req->wLength, cdc_handle_control_set_line_coding, ctx);
+                        return 1;
+                }
+                break;
+        }
+        case USB_CTRL_REQ_CDC_GET_LINE_CODING: {
+                usb_ep0_tx_cp(&ctx->line_coding, sizeof(struct cdc_line_coding), req->wLength, NULL, NULL);
+                usb_handle_control_status(0);
+                break;
+        }
+        case USB_CTRL_REQ_CDC_SET_CTRL_LINE_STATE: {
+                /*
+                 * We should remain inactive unless there is a terminal on the other end of the link,
+                 * indicated by the first two bits of wValue
+                 */
+                ctx->control_lines = req->wValue;
+                usb_handle_control_status(0);
+                break;
+        }
+        default:
+                return 0;
+        }
+        return 0;
+}
 
 const struct usbd_function cdc_function = {
+        .control = cdc_handle_control,
         .interface_count = USB_FUNCTION_CDC_IFACE_COUNT,
 };
 
@@ -96,8 +137,8 @@ cdc_init(void (*data_ready_cb)(uint8_t *, size_t), void (*data_sent_cb)(size_t),
         ctx->data_sent_cb = data_sent_cb;
         ctx->out_queued = 0;
         ctx->notice_pipe = usb_init_ep(&ctx->header, CDC_NOTICE_EP, USB_EP_TX, CDC_NOTICE_SIZE);
-	ctx->tx_pipe = usb_init_ep(&ctx->header, CDC_TX_EP, USB_EP_TX, CDC_TX_SIZE);
-	ctx->rx_pipe = usb_init_ep(&ctx->header, CDC_RX_EP, USB_EP_RX, CDC_RX_SIZE);
+        ctx->tx_pipe = usb_init_ep(&ctx->header, CDC_TX_EP, USB_EP_TX, CDC_TX_SIZE);
+        ctx->rx_pipe = usb_init_ep(&ctx->header, CDC_RX_EP, USB_EP_RX, CDC_RX_SIZE);
         cdc_read_more(ctx);
         cdc_tx_done(ctx->outbuf, -1, ctx);
 }
